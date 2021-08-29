@@ -1,46 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Button} from 'antd';
 
+//Redux
+import { getNewToken } from '../../redux/actions/auth';
+import { useDispatch } from 'react-redux';
+
 const LoginForm = () => {
+    const [credentials, setCredentials] = useState({
+        email: '',
+        password: '',
+    });
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
+    //Redux
+    const dispatch = useDispatch();
+    const login = credentials => dispatch( getNewToken(credentials) );
+    
+    const attempLogin = (e) => {
+        e.preventDefault();
+        login(credentials)
     };
 
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
+    const loadCredentials = (e) => {
+        setCredentials({
+            ...credentials,
+            [e.target.name] : e.target.value
+        })
+    }
 
     return (
         <Form
             initialValues={{
                 remember: true,
             }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+            onSubmitCapture={(e) => { attempLogin(e) }}
         >
-            <Form.Item
-                name="username"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Nombre de usuario requerido',
-                    },
-                ]}
-            >
-                <Input placeholder="Usuario"/>
+            <Form.Item>
+                <Input 
+                    type="email"
+                    name="email"
+                    placeholder="Usuario"
+                    onChange={ (e) => {loadCredentials(e)} }
+                    required
+                />
             </Form.Item>
 
-            <Form.Item
-                name="password"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Contraseña requerida',
-                    },
-                ]}
-            >
-                <Input.Password placeholder="Contraseña"/>
+            <Form.Item>
+                <Input.Password 
+                    type="password"
+                    name="password"
+                    placeholder="Contraseña"
+                    onChange={ (e) => {loadCredentials(e)} }
+                    required
+                />
             </Form.Item>
 
             <Form.Item
@@ -49,8 +60,11 @@ const LoginForm = () => {
                 span: 16,
                 }}
             >
-                <Button type="primary" htmlType="submit">
-                Login
+                <Button 
+                    type="primary" 
+                    htmlType="submit"
+                >
+                    Login
                 </Button>
             </Form.Item>
         </Form>
