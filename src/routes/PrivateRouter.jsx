@@ -34,9 +34,9 @@ const PrivateRouter = ({ path, component: Component }) => {
             :
             (authorizedUser)
                 ?
-                <Layout>
+                <Layout style={{height: '100vh'}}>
                     <Sider trigger={null} collapsible collapsed={collapsed}>
-                        <div className="logo" />
+                        <div style={{height:"57px", background: "grey", marginTop: "3px", marginLeft: "3px"}}></div>
                         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
                             <Menu.Item key="1" icon={<FaTag />}>
                                 <Link to="/productos">
@@ -83,21 +83,6 @@ const PrivateRouter = ({ path, component: Component }) => {
                         </Content>
                     </Layout>
                 </Layout>
-                // <div>
-                //     <Row align="center" style={{backgroundColor: 'white'}}>
-                //         <h1>Nav bar</h1>
-                //     </Row>
-                //     <Row>
-                //         <Col span={6} style={{backgroundColor: "white", height: '100vh'}}>
-                //             <h1>asdfasdf</h1>
-                //         </Col>
-                //         <Col span={18}>
-                //             <Route exact path={path}>
-                //                 <Component/>
-                //             </Route>
-                //         </Col>
-                //     </Row>
-                // </div>
                 : <Redirect to='/login' />
     )
 }
