@@ -9,6 +9,7 @@ import ProductosForm from '../views/Productos/ProductsForm';
 import Salidas from '../views/Salidas';
 import Marcas from '../views/Marcas';
 import Rubros from '../views/Rubros';
+import RubrosForm from '../views/Rubros/RubrosForm';
 import Usuarios from '../views/Usuarios';
 import Imagenes from '../views/Imagenes';
 
@@ -18,10 +19,10 @@ const routes = [
     {path: '/productos', private: true, component: Productos},
     {path: '/salidas', private: true, component: Salidas},
     {path: '/marcas', private: true, component: Marcas},
+    {path: '/rubros/:id', private: true, component: RubrosForm},
     {path: '/rubros', private: true, component: Rubros},
     {path: '/usuarios', private: true, component: Usuarios},
     {path: '/uploads/:image', private: true, component: Imagenes},
-
     {path: '/', private: true, component: Home},
 ]
 

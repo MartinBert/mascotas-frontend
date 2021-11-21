@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services';
 import {Row, Col, Table} from 'antd';
+import icons from '../../components/icons';
 import Header from './Header';
+
+const { Edit, Delete } = icons;
 
 const Rubros = () => {
     const [rubros, setRubros] = useState(null);
@@ -25,6 +28,15 @@ const Rubros = () => {
       {
         title: 'Nombre',
         dataIndex: 'nombre',
+      },
+      {
+        title: 'Acciones',
+        render: (data) => (
+          <Row flex>
+            <Edit/>
+            <Delete/>
+          </Row>
+        )
       }
     ]
 
