@@ -26,14 +26,14 @@ const Rubros = () => {
     fetchRubros();
   },[page, limit, filters, loading])
 
-  const handleDelete = async(id) => {
+  const handleDelete = async(id) => { 
     const response = await api.rubros.deleteRubro(id);
     
     if(response !== 'OK') {
       errorAlert('No se pudo eliminar el registro...');
       return;
-    }
-
+    }   
+    
     setLoading(true);
   }
 

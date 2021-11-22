@@ -24,7 +24,7 @@ const Usuarios = () => {
         setLoading(false);
       }
       fetchUsuarios();
-    },[page, limit, filters])
+    },[page, limit, filters, loading])
 
     const handleDelete = async(id) => {
       const response = await api.usuarios.deleteUsuario(id);
