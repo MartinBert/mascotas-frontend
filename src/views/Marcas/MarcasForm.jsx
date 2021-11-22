@@ -9,61 +9,61 @@ import { errorAlert, successAlert } from '../../components/alerts'
 const { Error } = messages;
 const { Spinner } = graphics;
 
-const RubrosForm = () => {
+const MarcasForm = () => {
   const history = useHistory();
   const {id} = useParams(); 
-  const [rubro, setRubro] = useState({
+  const [marca, setMarca] = useState({
     nombre: ''
   });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const loadRubroData = (e) => {
-    setRubro({
-      ...rubro,
+  const loadMarcaData = (e) => {
+    setMarca({
+      ...marca,
       [e.target.name] : e.target.value
     })
   }
 
   useEffect(() => {
-    if(rubro.nombre) return;
+    if(marca.nombre) return;
     if(id === 'nuevo'){
       setLoading(false);
       return;
     }
 
-    const fetchRubro = async() => {
-      const searchedItem = await api.rubros.getById(id);
-      setRubro({
+    const fetchMarca = async() => {
+      const searchedItem = await api.marcas.getById(id);
+      setMarca({
         _id: searchedItem._id,
         nombre: searchedItem.nombre
       })
       setLoading(false);
     }
-    fetchRubro();
+    fetchMarca();
   })
 
   const save = () => {
-    if(!rubro.nombre){
+    if(!marca.nombre){
       setError(true);
       return;
     }
 
     const saveItem = async() => {
-      const response = (rubro._id) ? await api.rubros.edit(rubro) : await api.rubros.save(rubro);
+      const response = (marca._id) ? await api.marcas.edit(marca) : await api.marcas.save(marca);
       if(response === 'OK') return success();
       return fail();
     }
     saveItem();
   };
 
-  const redirectToRubros = () => {
-    history.push("/rubros")
+  const redirectToMarcas = () => {
+    history.push("/marcas")
   }
 
   const success = () => {
     successAlert('El registro se guardo en la base de datos').then(() => {
-      redirectToRubros();
+      redirectToMarcas();
     })
   }
 
@@ -77,7 +77,7 @@ const RubrosForm = () => {
       (loading) ? <Spinner/> 
       :
         <Col>
-          <h1>{(id === "nuevo") ? "Crear nuevo rubro" : "Editar rubro"}</h1>
+          <h1>{(id === "nuevo") ? "Crear nueva marca" : "Editar marca"}</h1>
           {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
           <Form
             name="basic"
@@ -90,16 +90,16 @@ const RubrosForm = () => {
           >
             <Form.Item
               label="Nombre"
-              onChange={(e) => {loadRubroData(e)}}
+              onChange={(e) => {loadMarcaData(e)}}
               required={true}
             >
-              <Input name="nombre" value={rubro.nombre} className="ml-5"/>
+              <Input name="nombre" value={marca.nombre} className="ml-5"/>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">
                 Guardar
               </Button>
-              <Button type="secondary" htmlType="button" onClick={() => {redirectToRubros()}} style={{marginLeft: "10px"}}>
+              <Button type="secondary" htmlType="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
                 Cancelar
               </Button>
             </Form.Item>
@@ -110,4 +110,4 @@ const RubrosForm = () => {
   );
 };
 
-export default RubrosForm;
+export default MarcasForm;

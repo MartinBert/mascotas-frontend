@@ -8,9 +8,11 @@ import Productos from '../views/Productos';
 import ProductosForm from '../views/Productos/ProductsForm';
 import Salidas from '../views/Salidas';
 import Marcas from '../views/Marcas';
+import MarcasForm from '../views/Marcas/MarcasForm';
 import Rubros from '../views/Rubros';
 import RubrosForm from '../views/Rubros/RubrosForm';
 import Usuarios from '../views/Usuarios';
+import UsuariosForm from '../views/Usuarios/UsuariosForm';
 import Imagenes from '../views/Imagenes';
 
 const routes = [
@@ -18,9 +20,11 @@ const routes = [
     {path: '/productos/:id', private: true, component: ProductosForm},
     {path: '/productos', private: true, component: Productos},
     {path: '/salidas', private: true, component: Salidas},
+    {path: '/marcas/:id', private: true, component: MarcasForm},
     {path: '/marcas', private: true, component: Marcas},
     {path: '/rubros/:id', private: true, component: RubrosForm},
     {path: '/rubros', private: true, component: Rubros},
+    {path: '/usuarios/:id', private: true, component: UsuariosForm},
     {path: '/usuarios', private: true, component: Usuarios},
     {path: '/uploads/:image', private: true, component: Imagenes},
     {path: '/', private: true, component: Home},

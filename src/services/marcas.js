@@ -28,10 +28,40 @@ const getByName = async(name) => {
     }
 }
 
+const save = async(marca) => {
+    try{
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/marcas`, marca);
+        return response.data.message;
+    }catch(err){
+        console.error(err);
+    }
+}
+
+const edit = async(marca) => {
+    try{
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/marcas/${marca._id}`, marca);
+        return response.data.message;
+    }catch(err){
+        console.error(err);
+    }
+}
+
+const deleteMarca = async(id) => {
+    try{
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/marcas/${id}`);
+        return response.data.message;
+    }catch(err){
+        console.error(err);
+    }
+}
+
 const marcas = {
     getAll,
     getById,
-    getByName
+    getByName,
+    save,
+    edit,
+    deleteMarca
 }
 
 export default marcas;
