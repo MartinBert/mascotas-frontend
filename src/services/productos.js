@@ -29,10 +29,30 @@ const deleteById = async(id) => {
     }
 }
 
+const save = async(producto) => {
+    try{
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/productos`, producto);
+        return response.data.message;
+    }catch(err){
+        console.error(err);
+    }
+}
+
+const edit = async(producto) => {
+    try{
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos/${producto._id}`, producto);
+        return response.data.message;
+    }catch(err){
+        console.error(err);
+    }
+}
+
 const productos = {
     getAll,
     getById,
-    deleteById
+    deleteById,
+    save,
+    edit
 }
 
 export default productos;

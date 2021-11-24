@@ -4,7 +4,6 @@ const getAll = async(params) => {
     const {page, limit, filters} = params;
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/rubros?page=${page}&limit=${limit}&filters=${filters}`);
-        console.log(response);
         return response.data;
     }catch(err){
         console.error(err);

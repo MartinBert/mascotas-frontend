@@ -25,6 +25,7 @@ const RubrosForm = () => {
     })
   }
 
+  //eslint-disable-next-line
   useEffect(() => {
     if(rubro.nombre) return;
     if(id === 'nuevo'){

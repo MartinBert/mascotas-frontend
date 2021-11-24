@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../../services';
-import { useParams } from 'react-router-dom';
-import { Row, Col, Form, Input, Button, Upload, message } from 'antd';
-import graphics from '../../../components/graphics';
-import { UploadOutlined } from '@ant-design/icons';
+import api from '../../services';
+import { useParams, useHistory } from 'react-router-dom';
+import { Row, Col, Form, Input, Button, AutoComplete } from 'antd';
+import graphics from '../../components/graphics';
+import ImageUploading from 'react-images-uploading';
+import { errorAlert, successAlert } from '../../components/alerts';
 
 const { Spinner } = graphics;
 
-const ProductsForm = () => {
-    const { idParams } = useParams();
+const ProductosForm = () => {
+    const { id } = useParams();
+    const history = useHistory();
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState({
         nombre: '',
@@ -24,6 +26,14 @@ const ProductsForm = () => {
         iva: 0,
         imagenes: null,
     })
+    const [brandSearch, setBrandSearch] = useState(null);
+    const [headingSearch, setHeadingSearch] = useState(null);
+    const [brandOptions, setBrandOptions] = useState(null);
+    const [headingOptions, setHeadingOptions] = useState(null);
+    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [selectedHeading, setSelectedHeading] = useState(null);
+    const [images, setImages] = useState([]);
+    const maxNumber = 69;
 
     //eslint-disable-next-line
     useEffect(() => {
@@ -32,10 +42,66 @@ const ProductsForm = () => {
             setProduct(data);
             setLoading(false);
         }
-        if(idParams !== "nuevo"){
-            fetchProductById(idParams)
+        if(id !== "nuevo"){
+            fetchProductById(id)
+        }else{
+            setLoading(false);
         }
-    }, [loading, idParams])
+    }, [loading, id])
+
+    useEffect(() => {
+        if(brandSearch && brandSearch !== ''){
+            const fetchBrands = async() => {
+                const response = await api.marcas.getByName(brandSearch);
+                const formattedOptions = response.docs.map(el => ({value: el.nombre, key: el._id}));
+                setBrandOptions(formattedOptions);
+            }
+            fetchBrands();
+        }
+
+        if(headingSearch && headingSearch !== ''){
+            const fetchHeadings = async() => {
+                const response = await api.rubros.getByName(headingSearch);
+                const formattedOptions = response.docs.map(el => ({value: el.nombre, key: el._id}));
+                setHeadingOptions(formattedOptions);
+            }
+            fetchHeadings();
+        }
+    }, [brandSearch, headingSearch])
+
+    const handleSearch = (searchType, e) => {
+        if(searchType === 'marcas'){
+            setBrandSearch(e);
+        }else{
+            setHeadingSearch(e);
+        }
+    }
+
+    const handleSelect = (selectedType, e) => {
+        if(selectedType === 'marcas'){
+            const selected = brandOptions.filter(el => el.value === e)[0];
+            setSelectedBrand(selected);
+            const setBrandToProduct = async() => {
+                const response = await api.marcas.getById(selected.key)
+                setProduct({
+                    ...product,
+                    marca: response
+                })
+            }
+            setBrandToProduct()
+        }else{
+            const selected = headingOptions.filter(el => el.value === e)[0];
+            setSelectedHeading(selected);
+            const setHeadingToProduct = async() => {
+                const response = await api.rubros.getById(selected.key)
+                setProduct({
+                    ...product,
+                    rubro: response
+                })
+            }
+            setHeadingToProduct()
+        }
+    }
 
     const setFormDataToProduct = (e, val) =>{
         console.log(e, val)
@@ -46,31 +112,46 @@ const ProductsForm = () => {
     } 
     
     const saveProduct = () => {
+        product.imagenes = images;
         console.log(product);
+        
+        // const saveProduct = async() => {
+        //     const response = await api.productos.save(product);
+        //     if(response === 'OK'){
+        //         successAlert('El registro fue grabado con exito').then(redirectToProducts());
+        //     }else{
+        //         errorAlert('Error al guardar el registro');
+        //     }
+        // }
+
+        // const editProduct = async() => {
+        //     const response = await api.productos.edit(id, product);
+        //     if(response === 'OK'){
+        //         successAlert('El registro fue grabado con exito').then(redirectToProducts());
+        //     }else{
+        //         errorAlert('Error al guardar el registro');
+        //     }
+        // }
+
+        // if(id === 'nuevo'){
+        //     saveProduct();
+        // }else{
+        //     editProduct();
+        // }
     }
 
-    const props = {
-        name: 'file',
-        action: 'http://127.0.0.1:8080',
-        headers: {
-            "Content-Type": "text/html",
-            "charset": "utf-8"
-        },
-        onChange(info) {
-          if (info.file.status !== 'uploading') {
-            console.log(info.file, info.fileList);
-          }
-          if (info.file.status === 'done') {
-            message.success(`${info.file.name} cargado con éxito.`);
-          } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} falló.`);
-          }
-        },
-      };
+    const redirectToProducts = () => {
+        history.push('productos');
+    }
+
+    const onUploadImage = (imageList) => {
+        setImages(imageList);
+    };
 
     return (
         <Row>
             <Col>
+                <h1>{(id === 'nuevo') ? 'Crear nuevo producto' : 'Editar producto'}</h1>
                 {(loading) 
                     ? <Spinner/>
                     :
@@ -114,10 +195,13 @@ const ProductsForm = () => {
                                 <Form.Item 
                                     required
                                 >
-                                    <Input 
-                                        name="marca" 
-                                        placeholder="Marca"
-                                        onChange={e => { setFormDataToProduct(e) }} 
+                                    <AutoComplete
+                                        style={{ width: 200 }}
+                                        options={brandOptions}
+                                        value={(selectedBrand) ? selectedBrand.value : null}
+                                        id="marcas"
+                                        onSearch={(e) => {handleSearch('marcas', e)}}
+                                        onSelect={(e) => {handleSelect('marcas', e)}}
                                     />
                                 </Form.Item>
                             </Col>
@@ -126,10 +210,13 @@ const ProductsForm = () => {
                                         required
                                         style={{marginRight: '10px'}}
                                     >
-                                        <Input 
-                                            name="rubro" 
-                                            placeholder="Rubro"
-                                            onChange={e => { setFormDataToProduct(e) }} 
+                                        <AutoComplete
+                                            style={{ width: 200 }}
+                                            options={headingOptions}
+                                            value={(selectedHeading) ? selectedHeading.value : null}
+                                            id="rubros"
+                                            onSearch={(e) => {handleSearch('rubros', e)}}
+                                            onSelect={(e) => {handleSelect('rubros', e)}}
                                         />
                                     </Form.Item>
                                     <Form.Item 
@@ -202,9 +289,47 @@ const ProductsForm = () => {
                             </Col>
                             <Col span={4}>
                                 <Form.Item>
-                                    <Upload {...props}>
-                                        <Button icon={<UploadOutlined />}>Click para cargar imágenes</Button>
-                                    </Upload>
+                                <a href="" id="imageDownloader" style={{visibility: 'none'}}></a>
+                                <ImageUploading
+                                    multiple
+                                    value={images}
+                                    onChange={onUploadImage}
+                                    maxNumber={maxNumber}
+                                    dataURLKey="data_url"
+                                >
+                                    {({
+                                    imageList,
+                                    onImageUpload,
+                                    onImageRemoveAll,
+                                    onImageUpdate,
+                                    onImageRemove,
+                                    isDragging,
+                                    dragProps,
+                                    }) => (
+                                    // write your building UI
+                                    <div className="upload__image-wrapper">
+                                        <button
+                                        style={isDragging ? { color: 'red' } : undefined}
+                                        onClick={onImageUpload}
+                                        {...dragProps}
+                                        >
+                                        Click or Drop here
+                                        </button>
+                                        &nbsp;
+                                        <button onClick={onImageRemoveAll}>Remove all images</button>
+                                        {imageList.map((image, index) => (
+                                        <div key={index} className="image-item">
+                                            <img src={image['data_url']} alt="Mascota feliz" width="100" />
+                                            <div className="image-item__btn-wrapper">
+                                            <button onClick={() => onImageUpdate(index)}>Update</button>
+                                            <button onClick={() => onImageRemove(index)}>Remove</button>
+                                            </div>
+                                        </div>
+                                        ))}
+                                    </div>
+                                    )}
+                                </ImageUploading>
+
                                 </Form.Item>
                             </Col>
                             <Col span={24} align="start">
@@ -225,4 +350,4 @@ const ProductsForm = () => {
     )
 }
 
-export default ProductsForm;
+export default ProductosForm;

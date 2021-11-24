@@ -28,6 +28,7 @@ const UsuariosForm = () => {
     });
   };
 
+  //eslint-disable-next-line
   useEffect(() => {
     if (usuario.nombre) return;
     if (id === "nuevo") {

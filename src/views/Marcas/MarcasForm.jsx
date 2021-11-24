@@ -25,6 +25,7 @@ const MarcasForm = () => {
     })
   }
 
+  //eslint-disable-next-line
   useEffect(() => {
     if(marca.nombre) return;
     if(id === 'nuevo'){
@@ -40,7 +41,7 @@ const MarcasForm = () => {
       })
       setLoading(false);
     }
-    fetchMarca();
+    fetchMarca()
   })
 
   const save = () => {

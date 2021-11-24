@@ -36,7 +36,9 @@ const Header = ({setFilters}) => {
         const brandKey = (selectedBrand) ? selectedBrand.key : null;
         const headingKey = (selectedHeading) ? selectedHeading.key : null;
         setFilters(JSON.stringify({marca: brandKey, rubro: headingKey}))
-    }, [selectedBrand, selectedHeading])
+    }, 
+    //eslint-disable-next-line
+    [selectedBrand, selectedHeading])
 
     const handleSearch = (searchType, e) => {
         if(searchType === 'marcas'){

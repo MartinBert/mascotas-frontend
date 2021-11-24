@@ -5,7 +5,7 @@ import {BrowserRouter as Router, Switch} from 'react-router-dom';
 import Login from '../views/Login';
 import Home from '../views/Home';
 import Productos from '../views/Productos';
-import ProductosForm from '../views/Productos/ProductsForm';
+import ProductosForm from '../views/Productos/ProductosForm';
 import Salidas from '../views/Salidas';
 import Marcas from '../views/Marcas';
 import MarcasForm from '../views/Marcas/MarcasForm';
