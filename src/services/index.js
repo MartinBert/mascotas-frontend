@@ -4,6 +4,7 @@ import salidas from './salidas';
 import marcas from './marcas';
 import rubros from './rubros';
 import usuarios from './usuarios';
+import uploader from './uploader';
 
 const api = {
     auth,
@@ -12,6 +13,7 @@ const api = {
     marcas,
     rubros,
     usuarios,
+    uploader
 }
 
 export default api;
