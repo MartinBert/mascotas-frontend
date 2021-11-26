@@ -95,9 +95,7 @@ const Productos = () => {
         {
           title: 'Imagen',
           render: (product) => (
-            <Link to={(product.imagenes.length > 0) ? `/uploads/${product.imagenes[0].filename}` : '/productos'}>
-              <OpenImage title='Ver imagen'/>
-            </Link>
+            <OpenImage title='Ver imagen' imageId={product.imagenes[0]}/>
           )
         },
         {
