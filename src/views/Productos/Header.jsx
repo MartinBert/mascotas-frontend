@@ -73,7 +73,7 @@ const Header = ({setFilters}) => {
         <>
         <Row>
             <Col span={24}>
-                <Button type="primary"> 
+                <Button type='primary'> 
                     <Link to="/productos/nuevo">
                         Nuevo    
                     </Link>

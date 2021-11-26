@@ -35,9 +35,9 @@ const PrivateRouter = ({ path, component: Component }) => {
             (authorizedUser)
                 ?
                 <Layout style={{height: '100vh'}}>
-                    <Sider trigger={null} collapsible collapsed={collapsed}>
-                        <div style={{height:"57px", background: "grey", marginTop: "3px", marginLeft: "3px"}}></div>
-                        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+                    <Sider trigger={null} collapsible collapsed={collapsed} style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}>
+                        <div style={{height:"57px", background: "transparent", marginTop: "3px", marginLeft: "3px"}}></div>
+                        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} style={{background: 'transparent'}}>
                             <Menu.Item key="1" icon={<FaTag />}>
                                 <Link to="/productos">
                                     Productos
@@ -66,7 +66,7 @@ const PrivateRouter = ({ path, component: Component }) => {
                         </Menu>
                     </Sider>
                     <Layout className="site-layout">
-                        <Header className="site-layout-background" style={{ padding: 0 }}>
+                        <Header className="site-layout-background" style={{ padding: 0, background:  'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}>
                             <MenuOutlined style={{color: "#fff", marginLeft: '20px'}} onClick={() => { toggle() }}/>
                         </Header>
                         <Content
