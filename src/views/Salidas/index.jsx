@@ -55,7 +55,7 @@ const Salidas = () => {
 
     return (
         <Row>
-            <Header/>
+            <Header setFilters={setFilters}/>
             <Col>
                 <Table 
                     width={"100%"}

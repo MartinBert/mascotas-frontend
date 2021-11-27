@@ -51,7 +51,6 @@ const Header = ({setFilters}) => {
     const handleSelect = (selectedType, e) => {
         if(selectedType === 'marcas'){
             const selected = brandOptions.filter(el => el.value === e)[0];
-            console.log(selected) 
             setSelectedBrand(selected);
         }else{
             const selected = headingOptions.filter(el => el.value === e)[0];

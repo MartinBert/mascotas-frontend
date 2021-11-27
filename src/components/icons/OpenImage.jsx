@@ -10,7 +10,6 @@ const OpenImage = ({title, imageId}) => {
      
     useEffect(() => {
         const fetchImageUrl = async() => {
-            console.log('IMAGE ID: ' + imageId);
             const response = await api.uploader.getImageUrl(imageId)
             setImageUrl(response);
         } 
@@ -19,7 +18,7 @@ const OpenImage = ({title, imageId}) => {
 
     return (
         (imageUrl ? 
-            <a href={imageUrl} target='_blank'>
+            <a href={imageUrl} target='_blank' rel="noreferrer">
                 <FaImage
                     title={title} 
                     style={{cursor: 'pointer'}}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Button, AutoComplete, Checkbox, message, Upload } from 'antd';
+import { Row, Col, Form, Input, Button, AutoComplete, Checkbox, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';
 import helper from '../../helpers'
@@ -35,9 +35,8 @@ const ProductosForm = () => {
     const [headingOptions, setHeadingOptions] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
-    const [images, setImages] = useState([]);
+    const [uploadedImages, setUploadedImages] = useState([]);
     const [applyIVA, setApplyIVA] = useState(false);
-    const maxNumber = 69;
 
     //eslint-disable-next-line
     useEffect(() => {
@@ -83,7 +82,9 @@ const ProductosForm = () => {
             precioVenta:(applyIVA) ? calculeWithIva : calculeWithoutIva,
             gananciaNeta: (applyIVA) ? realProfitWithIva : realProfitWithoutIva
         })
-    }, [product.precioUnitario, product.margenGanancia, product.iva])
+    }, 
+    //eslint-disable-next-line
+    [product.precioUnitario, product.margenGanancia, product.iva])
 
     const handleSearch = (searchType, e) => {
         if(searchType === 'marcas'){
@@ -140,50 +141,72 @@ const ProductosForm = () => {
     }
     
     const saveProduct = () => {
-        product.imagenes = images;
-        // const saveProduct = async() => {
-        //     const response = await api.productos.save(product);
-        //     if(response === 'OK'){
-        //         successAlert('El registro fue grabado con exito').then(redirectToProducts());
-        //     }else{
-        //         errorAlert('Error al guardar el registro');
-        //     }
-        // }
+        product.imagenes = uploadedImages;
+        const saveProduct = async() => {
+            const response = await api.productos.save(product);
+            if(response === 'OK'){
+                successAlert('El registro fue grabado con exito').then(redirectToProducts());
+            }else{
+                errorAlert('Error al guardar el registro');
+            }
+        }
 
-        // const editProduct = async() => {
-        //     const response = await api.productos.edit(id, product);
-        //     if(response === 'OK'){
-        //         successAlert('El registro fue grabado con exito').then(redirectToProducts());
-        //     }else{
-        //         errorAlert('Error al guardar el registro');
-        //     }
-        // }
+        const editProduct = async() => {
+            const response = await api.productos.edit(id, product);
+            if(response === 'OK'){
+                successAlert('El registro fue grabado con exito').then(redirectToProducts());
+            }else{
+                errorAlert('Error al guardar el registro');
+            }
+        }
 
-        // if(id === 'nuevo'){
-        //     saveProduct();
-        // }else{
-        //     editProduct();
-        // }
+        if(id === 'nuevo'){
+            saveProduct();
+        }else{
+            editProduct();
+        }
+    }
+
+    const handleCancel = () => {
+        if(uploadedImages.length > 0){
+            removeImage(uploadedImages[0]._id)
+            .then(() => {
+                redirectToProducts();
+            })
+        }
+        redirectToProducts();
     }
 
     const redirectToProducts = () => {
-        history.push('productos');
+        history.push('/productos');
     }
 
     const uploaderProps = {
         name: 'file',
-        accept: 'jpg/png',
-        multiple: true,
-        action: `${process.env.REACT_APP_API_REST}/uploader`,
+        accept: '.jpg,.png',
+        multiple: false,
+        action: (file) => { uploadImageToServer(file) },
         onChange(info) {
-            console.log(info)
-            if (info.file.status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully`);
-            } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-            }
+            info.file.status = 'done';
         },
+        onRemove() {
+            removeImage(uploadedImages[0]._id)
+        }
     };
+
+    const uploadImageToServer = async(file) => {
+        const response = await api.uploader.uploadImage(file);
+        if(response.file){
+            setUploadedImages(response.file);
+            return response.code;
+        }
+    }
+
+    const removeImage = async(id) => {
+        const response = await api.uploader.deleteImage(id);
+        setUploadedImages([]);
+        return response;
+    }
 
     return (
         <Row>
@@ -364,11 +387,11 @@ const ProductosForm = () => {
                                         />
                                 </Form.Item>
                             </Col>
-                            <Col span={24} style={{marginBottom: '20px'}}>
+                            <Col span={6} style={{marginBottom: '20px'}}>
                             <Upload 
                             {...uploaderProps}
                             >
-                                <Button icon={<UploadOutlined />}>Subir imagen</Button>
+                                <Button icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
                             </Upload>
                             </Col>
                             <Col span={24} align="start">
@@ -377,7 +400,15 @@ const ProductosForm = () => {
                                         type="primary" 
                                         htmlType="submit"
                                     >
-                                        Submit
+                                        Guardar
+                                    </Button>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button 
+                                        type="primary" 
+                                        onClick={() => {handleCancel()}}
+                                    >
+                                        Cancelar
                                     </Button>
                                 </Form.Item>
                             </Col>

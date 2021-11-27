@@ -6,7 +6,7 @@ import DetailsModal from './DetailsModal';
 import DeleteModal from './DeleteModal';
 import graphics from '../../components/graphics';
 import icons from '../../components/icons';
-import {Link, useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 
 const { Details, Edit, Delete, OpenImage } = icons;
 const { Spinner } = graphics;
@@ -27,7 +27,6 @@ const Productos = () => {
     useEffect(() => {
         const fetchProducts = async() => {
             const data = await api.productos.getAll({page, limit, filters});
-            console.log(data);
             setProducts(data.docs);
             setTotalDocs(data.totalDocs);
             setLoading(false);
