@@ -73,7 +73,7 @@ const RubrosForm = () => {
   }
 
   return (
-    <Row flex>
+    <Row>
       {
       (loading) ? <Spinner/> 
       :

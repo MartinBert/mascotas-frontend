@@ -45,7 +45,7 @@ const Rubros = () => {
     {
       title: 'Acciones',
       render: ({_id}) => (
-        <Row flex>
+        <Row>
           <Link to={`/rubros/${_id}`}>
             <Edit />
           </Link>

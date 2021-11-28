@@ -3,7 +3,7 @@ import { Row, Col, Button, Input, AutoComplete } from 'antd';
 import { Link } from 'react-router-dom';
 import api from '../../services';
 
-const Header = ({setFilters}) => {
+const Header = ({setFilters, filters}) => {
     const [brandSearch, setBrandSearch] = useState(null);
     const [headingSearch, setHeadingSearch] = useState(null);
     const [brandOptions, setBrandOptions] = useState(null);
@@ -31,14 +31,6 @@ const Header = ({setFilters}) => {
         }
     }, [brandSearch, headingSearch])
 
-    useEffect(() => {
-        if(selectedBrand === null && selectedHeading === null) return;
-        const brandKey = (selectedBrand) ? selectedBrand.key : null;
-        const headingKey = (selectedHeading) ? selectedHeading.key : null;
-        setFilters(JSON.stringify({marca: brandKey, rubro: headingKey}))
-    }, 
-    //eslint-disable-next-line
-    [selectedBrand, selectedHeading])
 
     const handleSearch = (searchType, e) => {
         if(searchType === 'marcas'){
@@ -51,10 +43,17 @@ const Header = ({setFilters}) => {
     const handleSelect = (selectedType, e) => {
         if(selectedType === 'marcas'){
             const selected = brandOptions.filter(el => el.value === e)[0];
-            setSelectedBrand(selected);
+            setFilters({
+                ...filters,
+                marca: selected.key
+            });
         }else{
             const selected = headingOptions.filter(el => el.value === e)[0];
-            setSelectedHeading(selected);
+            console.log(selected);
+            setFilters({
+                ...filters,
+                rubro: selected.key
+            });
         }
     }
 
@@ -105,14 +104,40 @@ const Header = ({setFilters}) => {
                     <Col>
                         <Input 
                             color="primary" 
-                            placeholder="Buscar producto"
-                            onChange={(e) => { setFilters(JSON.stringify({
-                                marca: (selectedBrand) ? selectedBrand.key : null,
-                                rubro: (selectedHeading) ? selectedHeading.key : null,
-                                nombre: e.target.value,
-                                codigoBarras: e.target.value,
-                                codigoProducto: e.target.value
-                            }))}}
+                            placeholder="Buscar por nombre"
+                            onChange={(e) => { setFilters(
+                                {
+                                    ...filters,
+                                    nombre: e.target.value
+                                }
+                            )}}
+                            value={(filters) ? filters.nombre : null}
+                        /> 
+                    </Col>
+                    <Col>
+                        <Input 
+                            color="primary" 
+                            placeholder="Buscar por codigo de barras"
+                            onChange={(e) => { setFilters(
+                                {
+                                    ...filters,
+                                    codigoBarras: e.target.value
+                                }
+                            )}}
+                            value={(filters) ? filters.codigoBarras : null}
+                        /> 
+                    </Col>
+                    <Col>
+                        <Input 
+                            color="primary" 
+                            placeholder="Buscar por codigo de producto"
+                            onChange={(e) => { setFilters(
+                                {
+                                    ...filters,
+                                    codigoProducto: e.target.value
+                                }
+                            )}}
+                            value={(filters) ? filters.codigoProducto : null}
                         /> 
                     </Col>
                     <Col>

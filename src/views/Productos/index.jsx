@@ -7,8 +7,9 @@ import DeleteModal from './DeleteModal';
 import graphics from '../../components/graphics';
 import icons from '../../components/icons';
 import {useHistory} from 'react-router-dom';
+import OpenImage from './OpenImage';
 
-const { Details, Edit, Delete, OpenImage } = icons;
+const { Details, Edit, Delete } = icons;
 const { Spinner } = graphics;
 const Productos = () => {
     const [products, setProducts] = useState(null);
@@ -26,10 +27,11 @@ const Productos = () => {
 
     useEffect(() => {
         const fetchProducts = async() => {
-            const data = await api.productos.getAll({page, limit, filters});
-            setProducts(data.docs);
-            setTotalDocs(data.totalDocs);
-            setLoading(false);
+          const stringFilters = JSON.stringify(filters)
+          const data = await api.productos.getAll({page, limit, filters: stringFilters});
+          setProducts(data.docs);
+          setTotalDocs(data.totalDocs);
+          setLoading(false);
         }
         fetchProducts();
     },[page, limit, filters, loading])
@@ -122,7 +124,7 @@ const Productos = () => {
           :
           <Row>
             <Col span={24} style={{marginBottom: '10px'}}>
-              <Header setFilters={setFilters}/>
+              <Header setFilters={setFilters} filters={filters}/>
             </Col>
             <Col span={24}>
               <Table 

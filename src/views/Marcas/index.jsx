@@ -45,7 +45,7 @@ const Marcas = () => {
     {
       title: 'Acciones',
       render: ({_id}) => (
-        <Row flex>
+        <Row>
           <Link to={`/marcas/${_id}`}>
             <Edit />
           </Link>

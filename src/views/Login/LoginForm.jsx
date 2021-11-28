@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import { Form, Input, Button} from 'antd';
+import api from '../../services';
+import { useHistory } from 'react-router-dom';
+import messages from '../../components/messages';
 
-//Redux
-import { getNewToken } from '../../redux/actions/auth';
-import { useDispatch } from 'react-redux';
+const { Error } = messages;
 
 const LoginForm = () => {
     const [credentials, setCredentials] = useState({
         email: '',
         password: '',
     });
-
-    //Redux
-    const dispatch = useDispatch();
-    const login = credentials => dispatch( getNewToken(credentials) );
-    
-    const attempLogin = (e) => {
-        e.preventDefault();
-        login(credentials)
-    };
+    const [error, setError] = useState(false);
+    const history = useHistory();
 
     const loadCredentials = (e) => {
         setCredentials({
@@ -27,13 +21,28 @@ const LoginForm = () => {
         })
     }
 
+    const login = async() => {
+        const token = await api.auth.login(credentials);
+        if(!token){
+            setError(true);
+            return;
+        }
+        localStorage.setItem('token', token);
+        return redirectToHome();
+    }
+
+    const redirectToHome = () => {
+        history.push('/');
+    }
+
     return (
         <Form
             initialValues={{
                 remember: true,
             }}
-            onSubmitCapture={(e) => { attempLogin(e) }}
+            onSubmitCapture={(e) => { login(e) }}
         >
+            {(error) ? <Error message="Credenciales invalidas"/> : null}
             <Form.Item>
                 <Input 
                     type="email"
@@ -41,6 +50,7 @@ const LoginForm = () => {
                     placeholder="Usuario"
                     onChange={ (e) => {loadCredentials(e)} }
                     required
+                    style={{marginTop: '25px'}}
                 />
             </Form.Item>
 

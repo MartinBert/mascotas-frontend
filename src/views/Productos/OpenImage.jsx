@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaImage } from 'react-icons/fa';
 import api from '../../services';
-import graphics from '../graphics';
+import graphics from '../../components/graphics';
 
 const { Spinner } = graphics;
 

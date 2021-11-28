@@ -391,21 +391,22 @@ const ProductosForm = () => {
                             <Upload 
                             {...uploaderProps}
                             >
-                                <Button icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
+                                <Button type='primary' icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
                             </Upload>
                             </Col>
-                            <Col span={24} align="start">
+                            <Col span={24} align="start" style={{display: 'flex'}}>
                                 <Form.Item>
                                     <Button 
                                         type="primary" 
                                         htmlType="submit"
+                                        style={{marginRight: '15px'}}
                                     >
                                         Guardar
                                     </Button>
                                 </Form.Item>
                                 <Form.Item>
                                     <Button 
-                                        type="primary" 
+                                        type="secondary" 
                                         onClick={() => {handleCancel()}}
                                     >
                                         Cancelar

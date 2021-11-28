@@ -73,7 +73,7 @@ const MarcasForm = () => {
   }
 
   return (
-    <Row flex>
+    <Row>
       {
       (loading) ? <Spinner/> 
       :
