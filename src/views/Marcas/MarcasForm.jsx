@@ -73,45 +73,45 @@ const MarcasForm = () => {
   }
 
   return (
+    (loading) ? <Spinner/> 
+    :
+    <Form
+      name="basic"
+      labelCol={{ span: 8 }}
+      wrapperCol={{ span: 16 }}
+      initialValues={{ remember: true }}
+      onFinish={() => { save() }}
+      autoComplete="off"
+      style={{marginTop: '10px'}}
+    >
     <Row>
-      {
-      (loading) ? <Spinner/> 
-      :
-        <Col>
-          <h1>{(id === "nuevo") ? "Crear nueva marca" : "Editar marca"}</h1>
-          {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
-          <Form
-            name="basic"
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
-            initialValues={{ remember: true }}
-            onFinish={() => { save() }}
-            autoComplete="off"
-            style={{marginTop: '10px'}}
+      <Col span={24}>
+        <h1>{(id === "nuevo") ? "Crear nueva marca" : "Editar marca"}</h1>
+      </Col>
+      <Col span={12} >
+        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
+          <Form.Item
+            onChange={(e) => {loadMarcaData(e)}}
+            required={true}
           >
-            <Form.Item
-              label="Nombre"
-              onChange={(e) => {loadMarcaData(e)}}
-              required={true}
-            >
-              <Input name="nombre" value={marca.nombre} className="ml-5"/>
-            </Form.Item>
-            <Col span={24} align="start" style={{display: 'flex', flexDirection: 'column'}}>
-              <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Button type="primary" htmlType="submit"
-                  style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-                  color: '#fff'}}>
-                  Guardar
-                </Button>
-                <Button type="secondary" htmlType="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
-                  Cancelar
-                </Button>
-              </Form.Item>
-            </Col>
-          </Form>
+            <div style={{display: 'flex'}}>
+              <div style={{marginRight: '15px'}}><p>*Nombre:</p></div>
+              <Input name="nombre" value={marca.nombre}/>
+            </div>
+          </Form.Item>
         </Col>
-      }
-    </Row>
+        <Col span={24}>
+          <Button type="primary" htmlType="submit"
+            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+            color: '#fff'}}>
+            Guardar
+          </Button>
+          <Button type="secondary" htmlType="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
+            Cancelar
+          </Button>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 
