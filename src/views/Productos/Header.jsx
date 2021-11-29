@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { Row, Col, Button, Input, AutoComplete } from 'antd';
 import { Link } from 'react-router-dom';
 import api from '../../services';
+import PriceModificatorModal from './PriceModificatorModal';
 
 const Header = ({setFilters, filters}) => {
     const [brandSearch, setBrandSearch] = useState(null);
@@ -10,6 +11,7 @@ const Header = ({setFilters, filters}) => {
     const [headingOptions, setHeadingOptions] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
+    const [priceModalVisible, setPriceModalVisible] = useState(false);
 
     useEffect(() => {
         if(brandSearch && brandSearch !== ''){
@@ -71,7 +73,7 @@ const Header = ({setFilters, filters}) => {
         <>
         <Row>            
             <Col span={24}>
-                <Row justify="space between" gutter={16} >
+                <Row>
                     <Col span={2} style={{marginRight: '15px'}}>
                         <Button
                             style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
@@ -81,6 +83,17 @@ const Header = ({setFilters, filters}) => {
                             </Link>
                         </Button>
                     </Col>
+                    <Col span={2}>
+                        <Button
+                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+                            color: '#fff', marginBottom: '20px'}} 
+                            onClick={() => {setPriceModalVisible(true)}}
+                        >
+                                Modificar precios    
+                        </Button>
+                    </Col>
+                </Row>
+                <Row justify="space between" gutter={16} >
                     <Col>
                         <label htmlFor="marcas">Filtrar por marcas  </label>
                         <AutoComplete
@@ -156,6 +169,10 @@ const Header = ({setFilters, filters}) => {
                 </Row>
             </Col>
         </Row>
+        <PriceModificatorModal 
+            priceModalVisible={priceModalVisible} 
+            setPriceModalVisible={setPriceModalVisible}
+        />
         </>
     ) 
 }
