@@ -134,7 +134,9 @@ const UsuariosForm = () => {
               />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit"
+                style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+                color: '#fff'}}>
                 Guardar
               </Button>
               <Button
@@ -143,7 +145,7 @@ const UsuariosForm = () => {
                 onClick={() => {
                   redirectToUsuarios();
                 }}
-                style={{ marginLeft: "10px" }}
+                style={{ marginLeft: "10px"}}
               >
                 Cancelar
               </Button>

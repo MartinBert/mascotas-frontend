@@ -391,15 +391,16 @@ const ProductosForm = () => {
                             <Upload 
                             {...uploaderProps}
                             >
-                                <Button type='primary' icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
+                                <Button style={{background:'#f081d2'}} icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
                             </Upload>
                             </Col>
                             <Col span={24} align="start" style={{display: 'flex'}}>
                                 <Form.Item>
-                                    <Button 
-                                        type="primary" 
+                                    <Button                                         
                                         htmlType="submit"
-                                        style={{marginRight: '15px'}}
+                                        style={{marginRight: '15px',
+                                                background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+                                                color: '#fff'}}                                        
                                     >
                                         Guardar
                                     </Button>

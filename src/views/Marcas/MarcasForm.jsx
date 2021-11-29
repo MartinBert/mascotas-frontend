@@ -96,14 +96,18 @@ const MarcasForm = () => {
             >
               <Input name="nombre" value={marca.nombre} className="ml-5"/>
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                Guardar
-              </Button>
-              <Button type="secondary" htmlType="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
-                Cancelar
-              </Button>
-            </Form.Item>
+            <Col span={24} align="start" style={{display: 'flex', flexDirection: 'column'}}>
+              <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                <Button type="primary" htmlType="submit"
+                  style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+                  color: '#fff'}}>
+                  Guardar
+                </Button>
+                <Button type="secondary" htmlType="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
+                  Cancelar
+                </Button>
+              </Form.Item>
+            </Col>
           </Form>
         </Col>
       }

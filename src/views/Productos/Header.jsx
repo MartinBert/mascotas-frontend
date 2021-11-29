@@ -69,20 +69,22 @@ const Header = ({setFilters, filters}) => {
 
     return(
         <>
-        <Row>
+        <Row>            
             <Col span={24}>
-                <Button type='primary'> 
-                    <Link to="/productos/nuevo">
-                        Nuevo    
-                    </Link>
-                </Button>
-            </Col>
-            <Col span={24}>
-                <Row align="end" gutter={8}>
+                <Row justify="pace-between" gutter={32} >
+                    <Col span={2}>
+                        <Button
+                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+                            color: '#fff', marginBottom: '20px'}}> 
+                            <Link to="/productos/nuevo">
+                                Nuevo    
+                            </Link>
+                        </Button>
+                    </Col>
                     <Col>
                         <label htmlFor="marcas">Filtrar por marcas  </label>
                         <AutoComplete
-                            style={{ width: 200 }}
+                            style={{ width: 200, marginBottom: '10px' }}
                             options={brandOptions}
                             value={(selectedBrand) ? selectedBrand.value : null}
                             id="marcas"
@@ -93,7 +95,7 @@ const Header = ({setFilters, filters}) => {
                     <Col>
                         <label htmlFor="marcas">Filtrar por rubros  </label>
                         <AutoComplete
-                            style={{ width: 200 }}
+                            style={{ width: 200, marginBottom: '10px' }}
                             options={headingOptions}
                             value={(selectedHeading) ? selectedHeading.value : null}
                             id="rubros"
@@ -104,6 +106,7 @@ const Header = ({setFilters, filters}) => {
                     <Col>
                         <Input 
                             color="primary" 
+                            style={{ width: 200, marginBottom: '10px' }}
                             placeholder="Buscar por nombre"
                             onChange={(e) => { setFilters(
                                 {
@@ -117,6 +120,7 @@ const Header = ({setFilters, filters}) => {
                     <Col>
                         <Input 
                             color="primary" 
+                            style={{ width: 200, marginBottom: '10px' }}
                             placeholder="Buscar por codigo de barras"
                             onChange={(e) => { setFilters(
                                 {
@@ -130,6 +134,7 @@ const Header = ({setFilters, filters}) => {
                     <Col>
                         <Input 
                             color="primary" 
+                            style={{ width: 200, marginBottom: '10px' }}
                             placeholder="Buscar por codigo de producto"
                             onChange={(e) => { setFilters(
                                 {
