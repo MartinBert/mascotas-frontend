@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Row, Col, Select, Spin, Input, Table, Button, Checkbox } from 'antd';
+import { errorAlert, successAlert } from '../../components/alerts';
+import helper from '../../helpers';
 import api from '../../services';
 import icons from '../../components/icons';
 
 const { Option } = Select;
 const { Delete } = icons;
-const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible}) => {
+const { decimalPercent, roundTwoDecimals } = helper.mathHelper;
+
+const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoading}) => {
     const [brands, setBrands] = useState(null);
     const [headings, setHeadings] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -74,11 +78,40 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible}) => {
     [selectedBrand, selectedHeading, productNameSearch, currentPage, limitPerPage]);
 
     const handleOk = () => {
+        setLoading(true)
+        if(!selectedModificationType) return errorAlert('Debe seleccionar el tipo de modificación a aplicar en el precio de los productos...');
+        if(modificationValue === 0) return errorAlert('El valor de la modificación no puede ser 0...');
+        if(addedProducts.length < 1) return errorAlert('Debe seleccionar al menos 1 producto para modificar su precio...')
+        console.log('pasa')
+        for(let product of addedProducts){
+            product.precioUnitario = (selectedModificationType === 1) ? product.precioUnitario * (1 + decimalPercent(modificationValue)) : product.precioUnitario + modificationValue;
+            const calculeWithoutIva = roundTwoDecimals(product.precioUnitario * (1 + decimalPercent(product.margenGanancia)));
+            const calculeWithIva = roundTwoDecimals((product.precioUnitario * (1 + decimalPercent(product.margenGanancia))) * (1 + decimalPercent(product.iva)));
+            const realProfitWithoutIva = roundTwoDecimals(calculeWithoutIva - product.precioUnitario);
+            const realProfitWithIva = roundTwoDecimals((calculeWithIva / (1 + decimalPercent(product.iva))) - product.precioUnitario);
+            console.log(calculeWithoutIva, realProfitWithoutIva, calculeWithIva, realProfitWithIva)
+            if(product.iva > 0){
+                product.precioVenta = calculeWithoutIva;
+                product.gananciaNeta = realProfitWithoutIva;
+            }else{
+                product.precioVenta = calculeWithIva;
+                product.gananciaNeta = realProfitWithIva;
+            }
+            const saveModification = async(prod) => {
+                const response = await api.productos.edit(prod);
+                if(response) return;
+            }
+            saveModification(product);
+        }
         setPriceModalVisible(false);
+        cleanModificator();
+        successAlert('Los precios fueron modificados!')
+        setLoading(false)
     }
 
+    
+
     const addProductToModification = (product) => {
-        console.log(product);
         const duplicated = addedProducts.find(item => item._id === product._id);
         if(duplicated){
             const stateWithoutThisElement = addedProducts.filter(item => item._id !== product._id);
@@ -88,7 +121,6 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible}) => {
                 ...addedProducts,
                 product
             ])
-            console.log(addedProducts);
         }
     }
 
@@ -96,6 +128,15 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible}) => {
         setSelectedBrand(null);
         setSelectedHeading(null);
         setProductNameSearch('');
+    }
+
+    const cleanModificator = () => {
+        setSelectedBrand(null);
+        setSelectedHeading(null);
+        setProductNameSearch('');
+        setAddedProducts([]);
+        setModificationValue(0);
+        setSelectedModificationType(null);
     }
 
     const checkPage = () => {
@@ -220,7 +261,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible}) => {
                     </Button>
                 </Col>
             </Row>
-            <Row style={{marginTop: '15px'}} align="end">
+            <Row style={{marginTop: '15px'}} align="start">
                 <Col style={{marginRight: '15px'}}>
                     <Select 
                         placeholder="Tipo de modificación" 

@@ -41,11 +41,12 @@ const ProductosForm = () => {
     //eslint-disable-next-line
     useEffect(() => {
         const fetchProductById = async(id) => {
-            const data = api.productos.getById(id);
-            setProduct(data);
+            const response = await api.productos.getById(id);
+            setProduct(response.data);
             setLoading(false);
         }
         if(id !== "nuevo"){
+            console.log('pasa')
             fetchProductById(id)
         }else{
             setLoading(false);
@@ -152,7 +153,7 @@ const ProductosForm = () => {
         }
 
         const editProduct = async() => {
-            const response = await api.productos.edit(id, product);
+            const response = await api.productos.edit(product);
             if(response === 'OK'){
                 successAlert('El registro fue grabado con exito').then(redirectToProducts());
             }else{

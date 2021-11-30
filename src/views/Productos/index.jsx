@@ -96,7 +96,7 @@ const Productos = () => {
         {
           title: 'Imagen',
           render: (product) => (
-            <OpenImage title='Ver imagen' imageId={product.imagenes[0]}/>
+            <OpenImage title='Ver imagen' imageUrl={(product.imagenes[0]) ? product.imagenes[0].url : ''}/>
           )
         },
         {
@@ -124,7 +124,7 @@ const Productos = () => {
           :
           <Row>
             <Col span={24} style={{marginBottom: '10px'}}>
-              <Header setFilters={setFilters} filters={filters}/>
+              <Header setFilters={setFilters} filters={filters} setLoading={setLoading}/>
             </Col>
             <Col span={24}>
               <Table 

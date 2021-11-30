@@ -13,7 +13,6 @@ const getAll = async(params) => {
 const getById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/${id}`);
-        console.log(response.data)
         return response.data;
     }catch(err){
         console.error(err);
@@ -40,7 +39,7 @@ const save = async(producto) => {
 
 const edit = async(producto) => {
     try{
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos/${producto._id}`, producto);
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos`, producto);
         return response.data.message;
     }catch(err){
         console.error(err);

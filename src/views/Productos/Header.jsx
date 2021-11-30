@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services';
 import PriceModificatorModal from './PriceModificatorModal';
 
-const Header = ({setFilters, filters}) => {
+const Header = ({setFilters, filters, setLoading}) => {
     const [brandSearch, setBrandSearch] = useState(null);
     const [headingSearch, setHeadingSearch] = useState(null);
     const [brandOptions, setBrandOptions] = useState(null);
@@ -51,7 +51,6 @@ const Header = ({setFilters, filters}) => {
             });
         }else{
             const selected = headingOptions.filter(el => el.value === e)[0];
-            console.log(selected);
             setFilters({
                 ...filters,
                 rubro: selected.key
@@ -172,6 +171,7 @@ const Header = ({setFilters, filters}) => {
         <PriceModificatorModal 
             priceModalVisible={priceModalVisible} 
             setPriceModalVisible={setPriceModalVisible}
+            setLoading={setLoading}
         />
         </>
     ) 
