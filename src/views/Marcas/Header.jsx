@@ -2,6 +2,7 @@
 import React from 'react';
 import { Row, Col, Button, Input} from 'antd';
 import { Link } from 'react-router-dom';
+import '../../index.css';
 
 const Header = ({setFilters}) => {
     return(
@@ -11,8 +12,7 @@ const Header = ({setFilters}) => {
                 <Row align="end">
                     <Col span={20}>
                         <Button 
-                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-                            marginBottom: '20px', color: '#fff'}}> 
+                            className="btn-primary-bg"> 
                             <Link to="/marcas/nuevo">
                                 Nuevo    
                             </Link>

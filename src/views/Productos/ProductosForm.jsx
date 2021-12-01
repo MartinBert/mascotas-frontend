@@ -6,6 +6,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';
 import helper from '../../helpers'
 import { errorAlert, successAlert } from '../../components/alerts';
+import '../../index.css';
 
 const { Spinner } = graphics;
 const roundTwoDecimals = helper.mathHelper.roundTwoDecimals;
@@ -399,9 +400,8 @@ const ProductosForm = () => {
                                 <Form.Item>
                                     <Button                                         
                                         htmlType="submit"
-                                        style={{marginRight: '15px',
-                                                background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-                                                color: '#fff'}}                                        
+                                        className="btn-primary-bg"
+                                        style={{marginRight: '15px'}}                                        
                                     >
                                         Guardar
                                     </Button>

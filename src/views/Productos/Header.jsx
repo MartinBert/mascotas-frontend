@@ -3,6 +3,7 @@ import { Row, Col, Button, Input, AutoComplete } from 'antd';
 import { Link } from 'react-router-dom';
 import api from '../../services';
 import PriceModificatorModal from './PriceModificatorModal';
+import '../../index.css';
 
 const Header = ({setFilters, filters, setLoading}) => {
     const [brandSearch, setBrandSearch] = useState(null);
@@ -75,8 +76,8 @@ const Header = ({setFilters, filters, setLoading}) => {
                 <Row>
                     <Col span={2} style={{marginRight: '15px'}}>
                         <Button
-                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-                            color: '#fff', marginBottom: '20px'}}> 
+                            className="btn-primary-bg"
+                            style={{ marginBottom: '20px'}}> 
                             <Link to="/productos/nuevo">
                                 Nuevo    
                             </Link>
