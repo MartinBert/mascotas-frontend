@@ -89,6 +89,13 @@ const Header = ({setFilters, filters, setLoading}) => {
                             color: '#fff', marginBottom: '20px'}} 
                             onClick={() => {setPriceModalVisible(true)}}
                         >
+                                Cargar desde Archivo    
+                        </Button>
+                        <Button
+                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
+                            color: '#fff', marginBottom: '20px'}} 
+                            onClick={() => {setPriceModalVisible(true)}}
+                        >
                                 Modificar precios    
                         </Button>
                     </Col>
