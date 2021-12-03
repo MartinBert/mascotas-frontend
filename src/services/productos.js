@@ -19,6 +19,15 @@ const getById = async(id) => {
     }
 }
 
+const getByBarcode = async(barcode) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/barcode/${barcode}`);
+        return response.data;
+    }catch(err){
+        console.error(err);
+    }
+}
+
 const deleteById = async(id) => {
     try{
         const response = await axios.delete(`${process.env.REACT_APP_API_REST}/productos/${id}`);
@@ -40,7 +49,7 @@ const save = async(producto) => {
 const edit = async(producto) => {
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos`, producto);
-        return response.data.message;
+        return response.data;
     }catch(err){
         console.error(err);
     }
@@ -49,6 +58,7 @@ const edit = async(producto) => {
 const productos = {
     getAll,
     getById,
+    getByBarcode,
     deleteById,
     save,
     edit

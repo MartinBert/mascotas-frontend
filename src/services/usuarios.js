@@ -13,7 +13,6 @@ const getAll = async(params) => {
 const getById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/usuarios/${id}`);
-        console.log(response.data)
         return response.data;
     }catch(err){
         console.error(err);

@@ -1,9 +1,9 @@
 import React from 'react';
-import { FaPlus } from 'react-icons/fa';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
-const Add = () => {
+const Add = ({customStyle}) => {
     return (
-        <FaPlus/>
+        <AddBoxOutlinedIcon style={customStyle}/>
     )
 }
 

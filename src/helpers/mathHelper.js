@@ -6,9 +6,14 @@ const decimalPercent = (value) => {
     return Number(value) / 100;
 }
 
+const randomFiveDecimals = () => {
+    return Math.floor(Math.random()*90000) + 10000;
+}
+
 const mathHelper = {
     roundTwoDecimals,
-    decimalPercent
+    decimalPercent,
+    randomFiveDecimals
 }
 
 export default mathHelper;

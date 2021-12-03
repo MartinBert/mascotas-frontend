@@ -7,6 +7,7 @@ import Home from '../views/Home';
 import Productos from '../views/Productos';
 import ProductosForm from '../views/Productos/ProductosForm';
 import Salidas from '../views/Salidas';
+import SalidasForm from '../views/Salidas/SalidasForm';
 import Marcas from '../views/Marcas';
 import MarcasForm from '../views/Marcas/MarcasForm';
 import Rubros from '../views/Rubros';
@@ -19,6 +20,7 @@ const routes = [
     {path: '/login', private: false, component: Login},
     {path: '/productos/:id', private: true, component: ProductosForm},
     {path: '/productos', private: true, component: Productos},
+    {path: '/salidas/:id', private: true, component: SalidasForm},
     {path: '/salidas', private: true, component: Salidas},
     {path: '/marcas/:id', private: true, component: MarcasForm},
     {path: '/marcas', private: true, component: Marcas},

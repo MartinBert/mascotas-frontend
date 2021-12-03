@@ -40,7 +40,7 @@ const Productos = () => {
       if(deleteEntityId === null) return;
       const deleteProduct = async() => {
         setLoading(true);
-        await api.productos.deleteById(deleteEntityId)
+        api.productos.deleteById(deleteEntityId)
         .then(() => {
           setDeleteEntityId(null)
           setLoading(false);
