@@ -83,7 +83,7 @@ const Header = ({setFilters, filters, setLoading}) => {
                             </Link>
                         </Button>
                     </Col>
-                    <Col span={2}>
+                    <Col span={2}>                       
                         <Button
                             style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
                             color: '#fff', marginBottom: '20px'}} 
