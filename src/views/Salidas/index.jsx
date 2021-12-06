@@ -31,7 +31,7 @@ const Salidas = () => {
         setLoading(false);
       }
       fetchSalidas();
-    },[page, limit, filters])
+    },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
     useEffect(() => {
       if(deleteEntityId === null) return;

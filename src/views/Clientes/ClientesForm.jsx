@@ -48,13 +48,6 @@ const ClientesForm = () => {
   //eslint-disable-next-line
   [selectedCondition])
 
-  useEffect(() => {
-    if(selectedCondition) return;
-    setSelectedCondition(cliente.condicionFiscal);
-  }, 
-  //eslint-disable-next-line
-  [cliente])
-
   //eslint-disable-next-line
   useEffect(() => {
     if(cliente.razonSocial) return;

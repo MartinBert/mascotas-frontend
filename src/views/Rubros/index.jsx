@@ -3,8 +3,8 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import { Link } from 'react-router-dom';
-import { errorAlert } from '../../components/alerts';
+import { useHistory } from 'react-router-dom';
+import DeleteModal from './DeleteModal';
 
 const { Edit, Delete } = icons;
 
@@ -15,6 +15,10 @@ const Rubros = () => {
   const [totalDocs, setTotalDocs] = useState(null);
   const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState(null);
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [deleteEntityId, setDeleteEntityId] = useState(null);
+  const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     const fetchRubros = async() => {
@@ -24,17 +28,23 @@ const Rubros = () => {
       setLoading(false);
     }
     fetchRubros();
-  },[page, limit, filters, loading])
+  },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
-  const handleDelete = async(id) => { 
-    const response = await api.rubros.deleteRubro(id);
-    
-    if(response !== 'OK') {
-      errorAlert('No se pudo eliminar el registro...');
-      return;
-    }   
-    
-    setLoading(true);
+  useEffect(() => {
+    if(deleteEntityId === null) return;
+    const deleteHeading = async() => {
+      setLoading(true);
+      api.rubros.deleteRubro(deleteEntityId)
+      .then(() => {
+        setDeleteEntityId(null)
+        setLoading(false);
+      })
+    }
+    deleteHeading();
+  }, [deleteEntityId])
+
+  const editHeading = (id) => {
+    history.push(`/rubros/${id}`);
   }
 
   const columnsForTable = [
@@ -44,13 +54,16 @@ const Rubros = () => {
     },
     {
       title: 'Acciones',
-      render: ({_id}) => (
+      render: (heading) => (
         <Row>
-          <Link to={`/rubros/${_id}`}>
-            <Edit />
-          </Link>
-          <div onClick={() => { handleDelete(_id) }}>
-            <Delete />
+          <div onClick={() => {editHeading(heading._id)}}>
+            <Edit/>
+          </div>
+          <div onClick={() => {
+            setDeleteEntityIdConfirmation(heading._id);
+            setDeleteVisible(true);
+          }}>
+            <Delete/>
           </div>
         </Row>
       )
@@ -79,6 +92,13 @@ const Rubros = () => {
               tableLayout='fixed'
               size="small"
               loading={loading}
+          />
+          <DeleteModal 
+            deleteVisible={deleteVisible}
+            setLoading={setLoading}
+            setDeleteVisible={setDeleteVisible}
+            setDeleteEntityId={setDeleteEntityId}
+            deleteEntityIdConfirmation={deleteEntityIdConfirmation}
           />
         </Col>
     </Row>

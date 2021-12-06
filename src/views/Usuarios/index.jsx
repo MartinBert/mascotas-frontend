@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import Header from './Header';
-import { Link } from 'react-router-dom';
-import { errorAlert } from '../../components/alerts';
+import {useHistory} from 'react-router-dom';
+import DeleteModal from './DeleteModal';
 import icons from '../../components/icons';
 
 const { Edit, Delete } = icons;
@@ -15,6 +15,10 @@ const Usuarios = () => {
     const [totalDocs, setTotalDocs] = useState(null);
     const [limit, setLimit] = useState(10);
     const [filters, setFilters] = useState(null);
+    const [deleteVisible, setDeleteVisible] = useState(false);
+    const [deleteEntityId, setDeleteEntityId] = useState(null);
+    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
+    const history = useHistory();
 
     useEffect(() => {
       const fetchUsuarios = async() => {
@@ -24,16 +28,23 @@ const Usuarios = () => {
         setLoading(false);
       }
       fetchUsuarios();
-    },[page, limit, filters, loading])
+    },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
-    const handleDelete = async(id) => {
-      const response = await api.usuarios.deleteUsuario(id);
-      
-      if(response !== 'OK') {
-        errorAlert('No se pudo eliminar el registro...');
-        return;
+    useEffect(() => {
+      if(deleteEntityId === null) return;
+      const deleteUser = async() => {
+        setLoading(true);
+        api.usuarios.deleteUsuario(deleteEntityId)
+        .then(() => {
+          setDeleteEntityId(null)
+          setLoading(false);
+        })
       }
-      setLoading(true);
+      deleteUser();
+    }, [deleteEntityId])
+
+    const editUser = (id) => {
+      history.push(`/usuarios/${id}`);
     }
 
     const columnsForTable = [
@@ -53,11 +64,14 @@ const Usuarios = () => {
         title: 'Acciones',
         render: ({_id}) => (
           <Row>
-            <Link to={`/usuarios/${_id}`}>
-              <Edit />
-            </Link>
-            <div onClick={() => { handleDelete(_id) }}>
-              <Delete />
+            <div onClick={() => {editUser(_id)}}>
+              <Edit/>
+            </div>
+            <div onClick={() => {
+              setDeleteEntityIdConfirmation(_id);
+              setDeleteVisible(true);
+            }}>
+              <Delete/>
             </div>
           </Row>
         )
@@ -86,6 +100,13 @@ const Usuarios = () => {
               rowKey='_id'
               tableLayout='fixed'
               size="small"
+          />
+          <DeleteModal 
+            deleteVisible={deleteVisible}
+            setLoading={setLoading}
+            setDeleteVisible={setDeleteVisible}
+            setDeleteEntityId={setDeleteEntityId}
+            deleteEntityIdConfirmation={deleteEntityIdConfirmation}
           />
         </Col>
       </Row>

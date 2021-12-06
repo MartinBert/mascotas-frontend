@@ -82,7 +82,7 @@ const UsuariosForm = () => {
   };
 
   return (
-    <Row flex>
+    <Row>
       {loading ? (
         <Spinner />
       ) : (
@@ -130,7 +130,7 @@ const UsuariosForm = () => {
               <Input
                 name="password"
                 value={usuario.password}
-                htmlType="password"
+                type="password"
                 className="ml-5"
               />
             </Form.Item>

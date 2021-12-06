@@ -3,11 +3,11 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import Header from './Header';
 import DetailsModal from './DetailsModal';
-import DeleteModal from './DeleteModal';
 import graphics from '../../components/graphics';
 import icons from '../../components/icons';
-import {useHistory} from 'react-router-dom';
 import OpenImage from './OpenImage';
+import {useHistory} from 'react-router-dom';
+import DeleteModal from './DeleteModal';
 
 const { Details, Edit, Delete } = icons;
 const { Spinner } = graphics;
@@ -19,8 +19,8 @@ const Productos = () => {
     const [limit, setLimit] = useState(10);
     const [filters, setFilters] = useState(null);
     const [detailsVisible, setDetailsVisible] = useState(false);
-    const [deleteVisible, setDeleteVisible] = useState(false);
     const [detailsData, setDetailsData] = useState(null);
+    const [deleteVisible, setDeleteVisible] = useState(false);
     const [deleteEntityId, setDeleteEntityId] = useState(null);
     const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
     const history = useHistory();
@@ -75,12 +75,12 @@ const Productos = () => {
         {
           title: 'Marca',
           dataIndex: 'marca',
-          render: marca => marca.nombre
+          render: marca => (marca) ? marca.nombre : null
         },
         {
           title: 'Rubro',
           dataIndex: 'rubro',
-          render: rubro => rubro.nombre
+          render: rubro => (rubro) ? rubro.nombre : null
         },
         {
           title: 'Stock',

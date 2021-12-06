@@ -3,8 +3,8 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import { Link } from 'react-router-dom';
-import { errorAlert } from '../../components/alerts';
+import DeleteModal from './DeleteModal';
+import {useHistory} from 'react-router-dom';
 
 const { Edit, Delete } = icons;
 
@@ -15,6 +15,10 @@ const Marcas = () => {
   const [totalDocs, setTotalDocs] = useState(null);
   const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState(null);
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [deleteEntityId, setDeleteEntityId] = useState(null);
+  const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     const fetchMarcas = async() => {
@@ -24,17 +28,23 @@ const Marcas = () => {
       setLoading(false);
     }
     fetchMarcas();
-  },[page, limit, filters, loading])
+  },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
-  const handleDelete = async(id) => {
-    const response = await api.marcas.deleteMarca(id);
-    
-    if(response !== 'OK') {
-      errorAlert('No se pudo eliminar el registro...');
-      return;
+  useEffect(() => {
+    if(deleteEntityId === null) return;
+    const deleteBrand = async() => {
+      setLoading(true);
+      api.marcas.deleteMarca(deleteEntityId)
+      .then(() => {
+        setDeleteEntityId(null)
+        setLoading(false);
+      })
     }
+    deleteBrand();
+  }, [deleteEntityId])
 
-    setLoading(true);
+  const editBrand = (id) => {
+    history.push(`/marcas/${id}`);
   }
 
   const columnsForTable = [
@@ -46,11 +56,14 @@ const Marcas = () => {
       title: 'Acciones',
       render: ({_id}) => (
         <Row>
-          <Link to={`/marcas/${_id}`}>
-            <Edit />
-          </Link>
-          <div onClick={() => { handleDelete(_id) }}>
-            <Delete />
+          <div onClick={() => {editBrand(_id)}}>
+            <Edit/>
+          </div>
+          <div onClick={() => {
+            setDeleteEntityIdConfirmation(_id);
+            setDeleteVisible(true);
+          }}>
+            <Delete/>
           </div>
         </Row>
       )
@@ -79,6 +92,13 @@ const Marcas = () => {
               tableLayout='fixed'
               size="small"
               loading={loading}
+          />
+          <DeleteModal 
+            deleteVisible={deleteVisible}
+            setLoading={setLoading}
+            setDeleteVisible={setDeleteVisible}
+            setDeleteEntityId={setDeleteEntityId}
+            deleteEntityIdConfirmation={deleteEntityIdConfirmation}
           />
         </Col>
     </Row>

@@ -3,8 +3,8 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import { Link } from 'react-router-dom';
-import { errorAlert } from '../../components/alerts';
+import { useHistory } from 'react-router-dom';
+import DeleteModal from './DeleteModal';
 
 const { Edit, Delete } = icons;
 
@@ -15,6 +15,10 @@ const Clientes = () => {
   const [totalDocs, setTotalDocs] = useState(null);
   const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState(null);
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [deleteEntityId, setDeleteEntityId] = useState(null);
+  const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     const fetchClientes = async() => {
@@ -24,17 +28,23 @@ const Clientes = () => {
       setLoading(false);
     }
     fetchClientes();
-  },[page, limit, filters, loading])
+  },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
-  const handleDelete = async(id) => {
-    const response = await api.clientes.deleteCliente(id);
-    
-    if(response !== 'OK') {
-      errorAlert('No se pudo eliminar el registro...');
-      return;
+  useEffect(() => {
+    if(deleteEntityId === null) return;
+    const deleteClient = async() => {
+      setLoading(true);
+      api.clientes.deleteCliente(deleteEntityId)
+      .then(() => {
+        setDeleteEntityId(null)
+        setLoading(false);
+      })
     }
+    deleteClient();
+  }, [deleteEntityId])
 
-    setLoading(true);
+  const editClient = (id) => {
+    history.push(`/clientes/${id}`);
   }
 
   const columnsForTable = [
@@ -72,13 +82,16 @@ const Clientes = () => {
     },
     {
       title: 'Acciones',
-      render: ({_id}) => (
+      render: (client) => (
         <Row>
-          <Link to={`/clientes/${_id}`}>
-            <Edit />
-          </Link>
-          <div onClick={() => { handleDelete(_id) }}>
-            <Delete />
+          <div onClick={() => {editClient(client._id)}}>
+            <Edit/>
+          </div>
+          <div onClick={() => {
+            setDeleteEntityIdConfirmation(client._id);
+            setDeleteVisible(true);
+          }}>
+            <Delete/>
           </div>
         </Row>
       )
@@ -107,6 +120,13 @@ const Clientes = () => {
               tableLayout='fixed'
               size="small"
               loading={loading}
+          />
+          <DeleteModal 
+            deleteVisible={deleteVisible}
+            setLoading={setLoading}
+            setDeleteVisible={setDeleteVisible}
+            setDeleteEntityId={setDeleteEntityId}
+            deleteEntityIdConfirmation={deleteEntityIdConfirmation}
           />
         </Col>
     </Row>
