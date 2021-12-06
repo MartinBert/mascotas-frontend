@@ -4,6 +4,7 @@ import salidas from './salidas';
 import marcas from './marcas';
 import rubros from './rubros';
 import usuarios from './usuarios';
+import clientes from './clientes';
 import uploader from './uploader';
 
 const api = {
@@ -13,6 +14,7 @@ const api = {
     marcas,
     rubros,
     usuarios,
+    clientes,
     uploader
 }
 

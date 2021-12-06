@@ -19,31 +19,31 @@ import UsuariosForm from '../views/Usuarios/UsuariosForm';
 import Imagenes from '../views/Imagenes';
 
 const routes = [
-    {path: '/login', private: false, component: Login},
-    {path: '/productos/:id', private: true, component: ProductosForm},
-    {path: '/productos', private: true, component: Productos},
-    {path: '/salidas/:id', private: true, component: SalidasForm},
-    {path: '/salidas', private: true, component: Salidas},
-    {path: '/marcas/:id', private: true, component: MarcasForm},
-    {path: '/marcas', private: true, component: Marcas},
-    {path: '/clientes/:id', private: true, component: ClientesForm},
-    {path: '/clientes', private: true, component: Clientes},
-    {path: '/rubros/:id', private: true, component: RubrosForm},
-    {path: '/rubros', private: true, component: Rubros},
-    {path: '/usuarios/:id', private: true, component: UsuariosForm},
-    {path: '/usuarios', private: true, component: Usuarios},
-    {path: '/uploads/:image', private: true, component: Imagenes},
-    {path: '/', private: true, component: Home},
+    {id: 1, path: '/login', private: false, component: Login},
+    {id: 2, path: '/productos/:id', private: true, component: ProductosForm},
+    {id: 3, path: '/productos', private: true, component: Productos},
+    {id: 4, path: '/salidas/:id', private: true, component: SalidasForm},
+    {id: 5, path: '/salidas', private: true, component: Salidas},
+    {id: 6, path: '/marcas/:id', private: true, component: MarcasForm},
+    {id: 7, path: '/marcas', private: true, component: Marcas},
+    {id: 8, path: '/clientes/:id', private: true, component: ClientesForm},
+    {id: 9, path: '/clientes', private: true, component: Clientes},
+    {id: 10, path: '/rubros/:id', private: true, component: RubrosForm},
+    {id: 11, path: '/rubros', private: true, component: Rubros},
+    {id: 12, path: '/usuarios/:id', private: true, component: UsuariosForm},
+    {id: 13, path: '/usuarios', private: true, component: Usuarios},
+    {id: 14, path: '/uploads/:image', private: true, component: Imagenes},
+    {id: 15, path: '/', private: true, component: Home},
 ]
 
 const AppRouter  = () => {
     return (
         <Router>
             <Switch>
-                {routes.map((route, index) => (
+                {routes.map(route => (
                     (route.private)
-                    ? <PrivateRouter path={route.path} component={route.component} key={index} />
-                    : <PublicRouter path={route.path} component={route.component} key={index} />
+                    ? <PrivateRouter path={route.path} component={route.component} key={route.id} />
+                    : <PublicRouter path={route.path} component={route.component} key={route.id} />
                 ))}
             </Switch>
         </Router>

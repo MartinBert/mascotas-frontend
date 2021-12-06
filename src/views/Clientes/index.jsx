@@ -39,8 +39,36 @@ const Clientes = () => {
 
   const columnsForTable = [
     {
-      title: 'Nombre',
-      dataIndex: 'nombre',
+      title: 'Razón social',
+      dataIndex: 'razonSocial',
+    },
+    {
+      title: 'CUIT',
+      dataIndex: 'cuit',
+    },
+    {
+      title: 'Cond. Fiscal',
+      dataIndex: 'condicionFiscal',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+    },
+    {
+      title: 'Teléfono',
+      dataIndex: 'telefono',
+    },
+    {
+      title: 'Dirección',
+      dataIndex: 'direccion',
+    },
+    {
+      title: 'Ciudad',
+      dataIndex: 'ciudad',
+    },
+    {
+      title: 'Provincia',
+      dataIndex: 'provincia',
     },
     {
       title: 'Acciones',

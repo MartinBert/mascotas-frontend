@@ -63,12 +63,12 @@ const PrivateRouter = ({ path, component: Component }) => {
                             Rubros
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<UploadOutlined />}>
+                    <Menu.Item key="5" icon={<UploadOutlined />}>
                         <Link to="/clientes">
                             Clientes
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="5" icon={<UserOutlined />}>
+                    <Menu.Item key="6" icon={<UserOutlined />}>
                         <Link to="/usuarios">
                             Usuarios
                         </Link>
