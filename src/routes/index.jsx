@@ -12,6 +12,8 @@ import Marcas from '../views/Marcas';
 import MarcasForm from '../views/Marcas/MarcasForm';
 import Clientes from '../views/Clientes';
 import ClientesForm from '../views/Clientes/ClientesForm';
+import MediosPago from '../views/MediosPago';
+import MediosPagoForm from '../views/MediosPago/MediosPagoForm';
 import Rubros from '../views/Rubros';
 import RubrosForm from '../views/Rubros/RubrosForm';
 import Usuarios from '../views/Usuarios';
@@ -26,14 +28,16 @@ const routes = [
     {id: 5, activeKey: '2', path: '/salidas', private: true, component: Salidas},
     {id: 6, activeKey: null, path: '/marcas/:id', private: true, component: MarcasForm},
     {id: 7, activeKey: '3', path: '/marcas', private: true, component: Marcas},
-    {id: 10, activeKey: null, path: '/rubros/:id', private: true, component: RubrosForm},
-    {id: 11, activeKey: '4', path: '/rubros', private: true, component: Rubros},
-    {id: 8, activeKey: null, path: '/clientes/:id', private: true, component: ClientesForm},
-    {id: 9, activeKey: '5', path: '/clientes', private: true, component: Clientes},
-    {id: 12, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
-    {id: 13, activeKey: '6', path: '/usuarios', private: true, component: Usuarios},
-    {id: 14, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
-    {id: 15, activeKey: null, path: '/', private: true, component: Home},
+    {id: 8, activeKey: null, path: '/rubros/:id', private: true, component: RubrosForm},
+    {id: 9, activeKey: '4', path: '/rubros', private: true, component: Rubros},
+    {id: 10, activeKey: null, path: '/clientes/:id', private: true, component: ClientesForm},
+    {id: 11, activeKey: '5', path: '/clientes', private: true, component: Clientes},
+    {id: 12, activeKey: null, path: '/mediospago/:id', private: true, component: MediosPagoForm},
+    {id: 13, activeKey: '6', path: '/mediospago', private: true, component: MediosPago},
+    {id: 14, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
+    {id: 15, activeKey: '7', path: '/usuarios', private: true, component: Usuarios},
+    {id: 16, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
+    {id: 17, activeKey: null, path: '/', private: true, component: Home},
 ]
 
 const AppRouter  = () => {

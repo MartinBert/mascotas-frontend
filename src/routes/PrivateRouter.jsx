@@ -3,13 +3,14 @@ import { Route } from 'react-router-dom';
 import { Link, useHistory } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import {
-    MenuOutlined,
-    UserOutlined,
-    UploadOutlined,
-} from '@ant-design/icons';
-import {
     FaDollarSign,
-    FaTag
+    FaTag,
+    FaTags,
+    FaBookmark,
+    FaUsers,
+    FaMoneyBillWave,
+    FaUser,
+    FaBars
 } from 'react-icons/fa'
 
 const { Header, Sider, Content } = Layout;
@@ -53,7 +54,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                     style={{background: 'transparent'}}
                     defaultSelectedKeys={[activeKey]}
                 >
-                    <Menu.Item key="1" icon={<FaTag />}>
+                    <Menu.Item key="1" icon={<FaBookmark />}>
                         <Link to="/productos">
                             Productos
                         </Link>
@@ -63,22 +64,27 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                             Salidas
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="3" icon={<UploadOutlined />}>
+                    <Menu.Item key="3" icon={<FaTag />}>
                         <Link to="/marcas">
                             Marcas
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<UploadOutlined />}>
+                    <Menu.Item key="4" icon={<FaTags />}>
                         <Link to="/rubros">
                             Rubros
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="5" icon={<UploadOutlined />}>
+                    <Menu.Item key="5" icon={<FaUsers />}>
                         <Link to="/clientes">
                             Clientes
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="6" icon={<UserOutlined />}>
+                    <Menu.Item key="6" icon={<FaMoneyBillWave />}>
+                        <Link to="/mediospago">
+                            Medios de pago
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key="7" icon={<FaUser />}>
                         <Link to="/usuarios">
                             Usuarios
                         </Link>
@@ -87,7 +93,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
             </Sider>
             <Layout className="site-layout">
                 <Header className="site-layout-background" style={{ padding: 0, background:  'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}>
-                    <MenuOutlined style={{color: "#fff", marginLeft: '20px'}} onClick={() => { toggle() }}/>
+                    <FaBars style={{color: "#fff", marginLeft: '20px', cursor: 'pointer'}} onClick={() => { toggle() }}/>
                 </Header>
                 <Content
                     className="site-layout-background"
