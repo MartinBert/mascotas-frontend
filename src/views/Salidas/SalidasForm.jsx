@@ -26,6 +26,7 @@ const SalidasForm = () => {
     })
     const [productLines, setProductLines] = useState([]);
 
+    //eslint-disable-next-line
     useEffect(() => {
         if(id === 'nuevo'){
             setLoading(false);
@@ -66,7 +67,9 @@ const SalidasForm = () => {
             }
             saveSalida();
         }
-    }, [salida])
+    }, 
+    //eslint-disable-next-line
+    [salida])
 
     const handleSubmit = () => {
         const fetchProducts = async() => {
