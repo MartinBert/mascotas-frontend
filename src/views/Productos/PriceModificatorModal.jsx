@@ -9,7 +9,7 @@ const { Option } = Select;
 const { Delete } = icons;
 const { decimalPercent, roundTwoDecimals } = helper.mathHelper;
 
-const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoading}) => {
+const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoading, setReRendering}) => {
     const [brands, setBrands] = useState(null);
     const [headings, setHeadings] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -82,14 +82,14 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
         if(!selectedModificationType) return errorAlert('Debe seleccionar el tipo de modificación a aplicar en el precio de los productos...');
         if(modificationValue === 0) return errorAlert('El valor de la modificación no puede ser 0...');
         if(addedProducts.length < 1) return errorAlert('Debe seleccionar al menos 1 producto para modificar su precio...')
-        console.log('pasa')
         for(let product of addedProducts){
-            product.precioUnitario = (selectedModificationType === 1) ? product.precioUnitario * (1 + decimalPercent(modificationValue)) : product.precioUnitario + modificationValue;
-            const calculeWithoutIva = roundTwoDecimals(product.precioUnitario * (1 + decimalPercent(product.margenGanancia)));
-            const calculeWithIva = roundTwoDecimals((product.precioUnitario * (1 + decimalPercent(product.margenGanancia))) * (1 + decimalPercent(product.iva)));
-            const realProfitWithoutIva = roundTwoDecimals(calculeWithoutIva - product.precioUnitario);
-            const realProfitWithIva = roundTwoDecimals((calculeWithIva / (1 + decimalPercent(product.iva))) - product.precioUnitario);
-            console.log(calculeWithoutIva, realProfitWithoutIva, calculeWithIva, realProfitWithIva)
+            product.precioUnitario = (selectedModificationType === '1') 
+            ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue))) 
+            : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue));
+            const calculeWithoutIva = roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(product.margenGanancia)));
+            const calculeWithIva = roundTwoDecimals((Number(product.precioUnitario) * (1 + decimalPercent(product.margenGanancia))) * (1 + decimalPercent(product.iva)));
+            const realProfitWithoutIva = roundTwoDecimals(calculeWithoutIva - Number(product.precioUnitario));
+            const realProfitWithIva = roundTwoDecimals((calculeWithIva / (1 + decimalPercent(product.iva))) - Number(product.precioUnitario));
             if(product.iva > 0){
                 product.precioVenta = calculeWithoutIva;
                 product.gananciaNeta = realProfitWithoutIva;
@@ -97,16 +97,12 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                 product.precioVenta = calculeWithIva;
                 product.gananciaNeta = realProfitWithIva;
             }
-            const saveModification = async(prod) => {
-                const response = await api.productos.edit(prod);
-                if(response) return;
-            }
-            saveModification(product);
+            api.productos.edit(product);
         }
         setPriceModalVisible(false);
         cleanModificator();
-        successAlert('Los precios fueron modificados!')
-        setLoading(false)
+        successAlert('Los precios fueron modificados!');
+        setLoading(false);
     }
 
     
@@ -140,7 +136,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
     }
 
     const checkPage = () => {
-        setAddedProducts([products]);
+        setAddedProducts(products);
     } 
 
     const uncheckPage = () => {
@@ -201,7 +197,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
             setPriceModalVisible(false);
         }}
         onOk={() => {handleOk()}}
-        width={1000}
+        width={1200}
     >
      <Row>
         <Col span={24}>

@@ -26,15 +26,16 @@ const Productos = () => {
     const history = useHistory();
 
     useEffect(() => {
-        const fetchProducts = async() => {
-          const stringFilters = JSON.stringify(filters)
-          const data = await api.productos.getAll({page, limit, filters: stringFilters});
-          setProducts(data.docs);
-          setTotalDocs(data.totalDocs);
-          setLoading(false);
-        }
-        fetchProducts();
-    },[page, limit, filters, loading])
+      console.log('rendering')
+      const fetchProducts = async() => {
+        const stringFilters = JSON.stringify(filters)
+        const data = await api.productos.getAll({page, limit, filters: stringFilters});
+        setProducts(data.docs);
+        setTotalDocs(data.totalDocs);
+        setLoading(false);
+      }
+      fetchProducts();
+    },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
     useEffect(() => {
       if(deleteEntityId === null) return;

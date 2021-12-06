@@ -43,11 +43,13 @@ const ProductosForm = () => {
     useEffect(() => {
         const fetchProductById = async(id) => {
             const response = await api.productos.getById(id);
-            setProduct(response.data);
+            const product = response.data;
+            setSelectedBrand({value: product.marca.nombre, key: product.marca._id});
+            setSelectedHeading({value: product.rubro.nombre, key: product.rubro._id});
+            setProduct(product);
             setLoading(false);
         }
         if(id !== "nuevo"){
-            console.log('pasa')
             fetchProductById(id)
         }else{
             setLoading(false);
@@ -143,25 +145,25 @@ const ProductosForm = () => {
     }
     
     const saveProduct = () => {
-        product.imagenes = uploadedImages;
+        if(!product.imagenes || product.imagenes.length === 0){
+            product.imagenes = uploadedImages;
+        }
         const saveProduct = async() => {
             const response = await api.productos.save(product);
-            if(response === 'OK'){
+            if(response.code === 200){
                 successAlert('El registro fue grabado con exito').then(redirectToProducts());
             }else{
                 errorAlert('Error al guardar el registro');
             }
         }
-
         const editProduct = async() => {
             const response = await api.productos.edit(product);
-            if(response === 'OK'){
+            if(response.code === 200){
                 successAlert('El registro fue grabado con exito').then(redirectToProducts());
             }else{
                 errorAlert('Error al guardar el registro');
             }
         }
-
         if(id === 'nuevo'){
             saveProduct();
         }else{
