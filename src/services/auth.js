@@ -9,19 +9,8 @@ const login = async(userCredentials) => {
     }
 }
 
-const validateToken = async(token) => {
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/checkToken/${token}`); 
-        return response.data.authorized;
-    }catch(err){
-        console.error(err);
-        return false;
-    }
-}
-
 const auth = {
-    login,
-    validateToken
+    login
 }
 
 export default auth;

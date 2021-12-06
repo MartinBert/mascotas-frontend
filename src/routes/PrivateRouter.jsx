@@ -11,27 +11,20 @@ import {
     FaDollarSign,
     FaTag
 } from 'react-icons/fa'
-import api from '../services';
-import graphics from '../components/graphics';
 
-const { Spinner } = graphics;
 const { Header, Sider, Content } = Layout;
 
 const PrivateRouter = ({ path, component: Component }) => {
     const history = useHistory();
     const [collapsed, setCollapsed] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [userStatus, setUserStatus] = useState(false);
 
     useEffect(() => {
         if(userStatus) return;
-        const verifyUser = async() => {
+        const verifyUser = () => {
             const token = localStorage.getItem('token');
-            const response = await api.auth.validateToken(token);
-            console.log(response);
-            if(!response) return redirectToLogin();
+            if(!token) return redirectToLogin();
             setUserStatus(true);
-            setLoading(false);
         } 
         verifyUser()
     })
@@ -46,8 +39,6 @@ const PrivateRouter = ({ path, component: Component }) => {
     };
 
     return (
-        (loading) ? <Spinner/>
-        :
         <Layout style={{height: '100vh'}}>
             <Sider trigger={null} collapsible collapsed={collapsed} style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}>
                 <div style={{height:"57px", background: "transparent", marginTop: "3px", marginLeft: "3px"}}></div>
