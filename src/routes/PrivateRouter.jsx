@@ -14,7 +14,7 @@ import {
 
 const { Header, Sider, Content } = Layout;
 
-const PrivateRouter = ({ path, component: Component }) => {
+const PrivateRouter = ({ path, component: Component, activeKey }) => {
     const history = useHistory();
     const [collapsed, setCollapsed] = useState(false);
     const [userStatus, setUserStatus] = useState(false);
@@ -40,9 +40,19 @@ const PrivateRouter = ({ path, component: Component }) => {
 
     return (
         <Layout style={{height: '100vh'}}>
-            <Sider trigger={null} collapsible collapsed={collapsed} style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}>
+            <Sider 
+                trigger={null} 
+                collapsible 
+                collapsed={collapsed} 
+                style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}
+            >
                 <div style={{height:"57px", background: "transparent", marginTop: "3px", marginLeft: "3px"}}></div>
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} style={{background: 'transparent'}}>
+                <Menu 
+                    theme="dark" 
+                    mode="inline" 
+                    style={{background: 'transparent'}}
+                    defaultSelectedKeys={[activeKey]}
+                >
                     <Menu.Item key="1" icon={<FaTag />}>
                         <Link to="/productos">
                             Productos

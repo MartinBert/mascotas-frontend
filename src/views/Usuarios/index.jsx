@@ -33,7 +33,6 @@ const Usuarios = () => {
         errorAlert('No se pudo eliminar el registro...');
         return;
       }
-  
       setLoading(true);
     }
 
@@ -53,7 +52,7 @@ const Usuarios = () => {
       {
         title: 'Acciones',
         render: ({_id}) => (
-          <Row flex>
+          <Row>
             <Link to={`/usuarios/${_id}`}>
               <Edit />
             </Link>
