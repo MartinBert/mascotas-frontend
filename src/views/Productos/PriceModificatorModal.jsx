@@ -9,7 +9,7 @@ const { Option } = Select;
 const { Delete } = icons;
 const { decimalPercent, roundTwoDecimals } = helper.mathHelper;
 
-const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoading, setReRendering}) => {
+const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoading}) => {
     const [brands, setBrands] = useState(null);
     const [headings, setHeadings] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -193,7 +193,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
 
     return (
     <Modal 
-        title="Editar precio de productos" 
+        header={false}
         visible={priceModalVisible}
         onCancel={() => {
             setPriceModalVisible(false);
@@ -304,7 +304,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
      <Row gutter={8}>
         <Col span={12}>
             <div align="center">
-                <h2>Tabla de selección de artículos</h2>
+                <h3>Tabla de selección de artículos</h3>
             </div>
             <Table 
                 width={"100%"}
@@ -326,7 +326,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
         </Col>
         <Col span={12}>
             <div align="center">
-                <h2>Artículos seleccionados</h2>
+                <h3>Artículos seleccionados</h3>
             </div>
             <Table 
                 width={"100%"}
