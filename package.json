@@ -24,6 +24,7 @@
     "react-scripts": "4.0.3",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
+    "sass": "^1.44.0",
     "shortid": "^2.2.16",
     "sweetalert2": "^11.1.2",
     "web-vitals": "^1.1.2"
