@@ -6,6 +6,7 @@ import rubros from './rubros';
 import usuarios from './usuarios';
 import clientes from './clientes';
 import mediospago from './mediospago';
+import documentos from './documentos';
 import uploader from './uploader';
 
 const api = {
@@ -17,6 +18,7 @@ const api = {
     usuarios,
     clientes,
     mediospago,
+    documentos,
     uploader
 }
 

@@ -101,7 +101,7 @@ const Salidas = () => {
     return (
         <Row>
             <Header setFilters={setFilters}/>
-            <Col>
+            <Col span={24}>
                 <Table 
                     width={"100%"}
                     dataSource={salidas}
@@ -116,7 +116,7 @@ const Salidas = () => {
                     }}
                     loading={loading}
                     rowKey='_id'
-                    tableLayout='fixed'
+                    tableLayout='auto'
                     size="small"
                 />
             </Col>

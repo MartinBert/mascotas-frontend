@@ -101,8 +101,10 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
         }
         setPriceModalVisible(false);
         cleanModificator();
-        successAlert('Los precios fueron modificados!');
-        setLoading(false);
+        successAlert('Los precios fueron modificados!')
+        .then(() => {
+            window.location.reload();
+        })
     }
 
     
@@ -318,7 +320,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                 }}
                 loading={productsLoading}
                 rowKey='_id'
-                tableLayout='fixed'
+                tableLayout='auto'
                 size="small"
             />
         </Col>
@@ -332,7 +334,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                 columns={columnsInAddedProductsTable}
                 pagination={false}
                 rowKey='_id'
-                tableLayout='fixed'
+                tableLayout='auto'
                 size="small"
             />
         </Col>

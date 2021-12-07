@@ -12,6 +12,8 @@ import Marcas from '../views/Marcas';
 import MarcasForm from '../views/Marcas/MarcasForm';
 import Clientes from '../views/Clientes';
 import ClientesForm from '../views/Clientes/ClientesForm';
+import Documentos from '../views/Documentos';
+import DocumentosForm from '../views/Documentos/DocumentosForm';
 import MediosPago from '../views/MediosPago';
 import MediosPagoForm from '../views/MediosPago/MediosPagoForm';
 import Rubros from '../views/Rubros';
@@ -34,10 +36,12 @@ const routes = [
     {id: 11, activeKey: '5', path: '/clientes', private: true, component: Clientes},
     {id: 12, activeKey: null, path: '/mediospago/:id', private: true, component: MediosPagoForm},
     {id: 13, activeKey: '6', path: '/mediospago', private: true, component: MediosPago},
-    {id: 14, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
-    {id: 15, activeKey: '7', path: '/usuarios', private: true, component: Usuarios},
-    {id: 16, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
-    {id: 17, activeKey: null, path: '/', private: true, component: Home},
+    {id: 14, activeKey: null, path: '/documentos/:id', private: true, component: DocumentosForm},
+    {id: 15, activeKey: '7', path: '/documentos', private: true, component: Documentos},
+    {id: 16, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
+    {id: 17, activeKey: '8', path: '/usuarios', private: true, component: Usuarios},
+    {id: 18, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
+    {id: 19, activeKey: null, path: '/', private: true, component: Home},
 ]
 
 const AppRouter  = () => {

@@ -8,8 +8,8 @@ import DeleteModal from './DeleteModal';
 
 const { Edit, Delete } = icons;
 
-const Rubros = () => {
-  const [rubros, setRubros] = useState(null);
+const Documentos = () => {
+  const [documentos, setDocumentos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalDocs, setTotalDocs] = useState(null);
@@ -21,30 +21,30 @@ const Rubros = () => {
   const history = useHistory();
 
   useEffect(() => {
-    const fetchRubros = async() => {
-      const data = await api.rubros.getAll({page, limit, filters});
-      setRubros(data.docs);
+    const fetchDocumentos = async() => {
+      const data = await api.documentos.getAll({page, limit, filters});
+      setDocumentos(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);
     }
-    fetchRubros();
+    fetchDocumentos();
   },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
   useEffect(() => {
     if(deleteEntityId === null) return;
-    const deleteHeading = async() => {
+    const deleteDocument = async() => {
       setLoading(true);
-      api.rubros.deleteRubro(deleteEntityId)
+      api.documentos.deleteDocumento(deleteEntityId)
       .then(() => {
         setDeleteEntityId(null)
         setLoading(false);
       })
     }
-    deleteHeading();
+    deleteDocument();
   }, [deleteEntityId])
 
-  const editHeading = (id) => {
-    history.push(`/rubros/${id}`);
+  const editDocument = (id) => {
+    history.push(`/documentos/${id}`);
   }
 
   const columnsForTable = [
@@ -53,14 +53,46 @@ const Rubros = () => {
       dataIndex: 'nombre',
     },
     {
+      title: 'Fiscal',
+      render: ({fiscal}) => (
+        (fiscal) ? 'Si' : 'No'
+      )
+    },
+    {
+      title: 'Ticket',
+      render: ({ticket}) => (
+        (ticket) ? 'Si' : 'No'
+      )
+    },
+    {
+      title: 'Presupuesto',
+      render: ({presupuesto}) => (
+        (presupuesto) ? 'Si' : 'No'
+      )
+    },
+    {
+      title: 'Remito',
+      render: ({remito}) => (
+        (remito) ? 'Si' : 'No'
+      )
+    },
+    {
+      title: 'Letra',
+      dataIndex: 'letra',
+    },
+    {
+      title: 'Código único',
+      dataIndex: 'codigoUnico',
+    },
+    {
       title: 'Acciones',
-      render: (heading) => (
+      render: ({_id}) => (
         <Row>
-          <div onClick={() => {editHeading(heading._id)}}>
+          <div onClick={() => {editDocument(_id)}}>
             <Edit/>
           </div>
           <div onClick={() => {
-            setDeleteEntityIdConfirmation(heading._id);
+            setDeleteEntityIdConfirmation(_id);
             setDeleteVisible(true);
           }}>
             <Delete/>
@@ -78,7 +110,7 @@ const Rubros = () => {
         <Col span={24}>
           <Table 
               width={"100%"}
-              dataSource={rubros}
+              dataSource={documentos}
               columns={columnsForTable}
               pagination={{
                   defaultCurrent: page,
@@ -105,4 +137,4 @@ const Rubros = () => {
   )
 }
 
-export default Rubros;
+export default Documentos;

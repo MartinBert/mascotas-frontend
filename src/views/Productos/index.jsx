@@ -142,7 +142,7 @@ const Productos = () => {
                   }}
                   loading={loading}
                   rowKey='_id'
-                  tableLayout='fixed'
+                  tableLayout='auto'
                   size="small"
               />
             </Col>

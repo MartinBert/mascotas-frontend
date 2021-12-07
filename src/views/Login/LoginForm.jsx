@@ -23,14 +23,19 @@ const LoginForm = () => {
 
     const login = async() => {
         const response = await api.auth.login(credentials);
-        const {token, data} = response;
-        if(!token){
+        if(response){
+            const {token, data} = response;
+            if(!token){
+                setError(true);
+                return;
+            }
+            localStorage.setItem('token', token);
+            localStorage.setItem('userId', data);
+            return redirectToHome();
+        }else{
             setError(true);
             return;
         }
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', data);
-        return redirectToHome();
     }
 
     const redirectToHome = () => {

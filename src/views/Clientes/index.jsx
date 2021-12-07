@@ -103,7 +103,7 @@ const Clientes = () => {
         <Col span={24} style={{marginBottom: '10px'}}>
           <Header setFilters={setFilters}/>
         </Col>
-        <Col>
+        <Col span={24}> 
           <Table 
               width={"100%"}
               dataSource={clientes}
@@ -117,7 +117,7 @@ const Clientes = () => {
                   onShowSizeChange: (e, val) => { setLimit(val) }
               }}
               rowKey='_id'
-              tableLayout='fixed'
+              tableLayout='auto'
               size="small"
               loading={loading}
           />
