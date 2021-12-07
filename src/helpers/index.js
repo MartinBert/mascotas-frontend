@@ -1,7 +1,9 @@
 import mathHelper from './mathHelper';
+import dateHelper from './dateHelper';
 
-const helper = {
-    mathHelper
+const helpers = {
+    mathHelper,
+    dateHelper
 }
 
-export default helper;
+export default helpers;
