@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Table } from 'antd';
+import { Modal, Table, Row, Col } from 'antd';
 
 const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
     const columns = [
@@ -32,11 +32,23 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
         footer={false}
         width={800}
     >
-        <Table 
-            dataSource={[detailsData]} 
-            columns={columns}
-            pagination={false}
-        />
+        <Row>
+            <Col span={24}>
+                <h2>
+                    Marca: {(detailsData) ? detailsData.marca.nombre : null}
+                </h2>
+                <h2>
+                    Rubro: {(detailsData) ? detailsData.rubro.nombre : null}
+                </h2>
+            </Col>
+            <Col span={24}>
+                <Table 
+                    dataSource={[detailsData]} 
+                    columns={columns}
+                    pagination={false}
+                />
+            </Col>
+        </Row>
     </Modal>
   )
 }

@@ -20,7 +20,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
     const [products, setProducts] = useState(null);
     const [productsLoading, setProductsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const [limitPerPage, setLimitPerPage] = useState(10);
+    const [limitPerPage, setLimitPerPage] = useState(5);
     const [totalDocsInPage, setTotalDocsInPage] = useState(0);
     const [addedProducts, setAddedProducts] = useState([]);
     const [modificationValue, setModificationValue] = useState(0);
@@ -314,7 +314,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                     defaultCurrent: currentPage,
                     limit: limitPerPage,
                     total: totalDocsInPage,
-                    showSizeChanger: true,
+                    showSizeChanger: false,
                     onChange: (e) => { setCurrentPage(e) },
                     onShowSizeChange: (e, val) => { setLimitPerPage(val) }
                 }}

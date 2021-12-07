@@ -73,16 +73,6 @@ const Productos = () => {
           dataIndex: 'codigoBarras',
         },
         {
-          title: 'Marca',
-          dataIndex: 'marca',
-          render: marca => (marca) ? marca.nombre : null
-        },
-        {
-          title: 'Rubro',
-          dataIndex: 'rubro',
-          render: rubro => (rubro) ? rubro.nombre : null
-        },
-        {
           title: 'Stock',
           dataIndex: 'cantidadStock',
         },
