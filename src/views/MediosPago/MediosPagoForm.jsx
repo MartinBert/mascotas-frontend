@@ -1,118 +1,280 @@
-import React, {useState, useEffect} from "react";
+import React, { useEffect, useState } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
+import { Row, Col, Form, Input, Button, Checkbox} from 'antd';
 import api from '../../services';
-import { Row, Col, Form, Input, Button } from "antd";
-import { useHistory, useParams } from "react-router-dom";
-import messages from '../../components/messages';
 import graphics from '../../components/graphics';
-import { errorAlert, successAlert } from '../../components/alerts'
+import icons from '../../components/icons';
+import helpers from '../../helpers';
+import {questionAlert, errorAlert, successAlert} from '../../components/alerts';
+import '../../index.css';
 
-const { Error } = messages;
 const { Spinner } = graphics;
+const { Add, Delete } = icons;
+const { mathHelper } = helpers;
 
 const MediosPagoForm = () => {
-  const history = useHistory();
-  const {id} = useParams(); 
-  const [mediopago, setMedioPago] = useState({
-    nombre: ''
-  });
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const loadMedioPagoData = (e) => {
-    setMedioPago({
-      ...mediopago,
-      [e.target.name] : e.target.value
+    const { id } = useParams();
+    const history = useHistory();
+    const [loading, setLoading] = useState(true);
+    const [mediopago, setMedioPago] = useState({
+        nombre: '',
+        arqueoCaja: false,
+        cierrez: false,
+        planes: [],
     })
-  }
+    const [planLines, setPlanLines] = useState([]);
 
-  //eslint-disable-next-line
-  useEffect(() => {
-    if(mediopago.nombre) return;
-    if(id === 'nuevo'){
-      setLoading(false);
-      return;
-    }
-
-    const fetchMedioPago = async() => {
-      const searchedItem = await api.mediospago.getById(id);
-      setMedioPago({
-        _id: searchedItem._id,
-        nombre: searchedItem.nombre
-      })
-      setLoading(false);
-    }
-    fetchMedioPago()
-  })
-
-  const save = () => {
-    if(!mediopago.nombre){
-      setError(true);
-      return;
-    }
-
-    const saveItem = async() => {
-      const response = (mediopago._id) ? await api.mediospago.edit(mediopago) : await api.mediospago.save(mediopago);
-      if(response === 'OK') return success();
-      return fail();
-    }
-    saveItem();
-  };
-
-  const redirectToMediosPago = () => {
-    history.push("/mediospago")
-  }
-
-  const success = () => {
-    successAlert('El registro se guardo en la base de datos').then(() => {
-      redirectToMediosPago();
+    //eslint-disable-next-line
+    useEffect(() => {
+        if(id === 'nuevo'){
+            setLoading(false);
+        }else{
+            if(mediopago.nombre) return;
+            const fetchPaymentMethod = async() => {
+                const response =  await api.mediospago.getById(id);
+                setMedioPago(response.data);
+                setPlanLines(response.data.planes);
+                setLoading(false);
+            }
+            fetchPaymentMethod();
+        }
     })
-  }
 
-  const fail = () => {
-    errorAlert('Error al guardar el registro')
-  }
+    const handleSubmit = () => {
+        if(planLines.length === 0 && mediopago.planes.length === 0){
+            questionAlert('Si no carga ningún plan el porcentaje de variación del medio de pago será nulo, ¿Desea continuar?')
+            .then(result => {
+                if(result.isConfirmed){
+                    console.log(mediopago);
+                }
+            })
+        }else{
+            planLines.forEach(el => {
+                if(!el.nombre || !el.cuotas || !el.porcentaje) return errorAlert('Campos incompletos en planes de pago');
+            })
+            mediopago.planes = planLines;
+            if(id === 'nuevo'){
+                api.mediospago.save(mediopago)
+                .then(response => {
+                    if(response.code === 200){
+                        success();
+                    }else{
+                        errorAlert('No se ha podido guardar el registro');
+                    }
+                })
+            }else{
+                api.mediospago.edit(mediopago)
+                .then(response => {
+                    if(response.code === 200){
+                        success();
+                    }else{
+                        errorAlert('No se ha podido guardar el registro');
+                    }
+                })
+            }
+        }
+    }
 
-  return (
-    (loading) ? <Spinner/> 
-    :
-    <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      initialValues={{ remember: true }}
-      onFinish={() => { save() }}
-      autoComplete="off"
-      style={{marginTop: '10px'}}
-    >
-    <Row>
-      <Col span={24}>
-        <h1>{(id === "nuevo") ? "Crear nuevo medio de pago" : "Editar medio de pago"}</h1>
-      </Col>
-      <Col span={12} >
-        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
-          <Form.Item
-            onChange={(e) => {loadMedioPagoData(e)}}
-            required={true}
-          >
-            <div style={{display: 'flex'}}>
-              <div style={{marginRight: '15px'}}><p>*Nombre:</p></div>
-              <Input name="nombre" value={mediopago.nombre}/>
-            </div>
-          </Form.Item>
-        </Col>
-        <Col span={24}>
-          <Button type="primary" htmlType="submit"
-            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-            color: '#fff'}}>
-            Guardar
-          </Button>
-          <Button type="secondary" htmlType="button" onClick={() => {redirectToMediosPago()}} style={{marginLeft: "10px"}}>
-            Cancelar
-          </Button>
-        </Col>
-      </Row>
-    </Form>
-  );
-};
+    const success = () => {
+        successAlert('Se ha guardado el registro')
+        .then(() => {
+            redirectToMediosPago();
+        })
+    }
+
+    const redirectToMediosPago = () => {
+        history.push('/mediospago');
+    }
+
+    return (
+        <Row>
+            <Col span={24}>
+                <h1>{(id === 'nuevo') ? 'Nueva medio de pago' : 'Editar medio de pago'}</h1>
+                {(loading) 
+                    ? <Spinner/>
+                    :
+                    <Form 
+                        autoComplete="off"
+                        onFinish={() => {handleSubmit()}}
+                    >
+                        <Row gutter={8}>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                    required
+                                    label="Nombre"
+                                >
+                                    <Input 
+                                        name="nombre"
+                                        placeholder="Nombre"
+                                        value={mediopago.nombre}
+                                        onChange={(e) => {
+                                            setMedioPago({
+                                                ...mediopago,
+                                                nombre: e.target.value
+                                            })
+                                        }}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={18} lg={16} md={12} sm={24} xs={24} style={{display: 'flex'}}>
+                                <Form.Item 
+                                    required
+                                    label="Suma en arqueo: "
+                                >
+                                    <Checkbox 
+                                        onChange={(e) => {setMedioPago({
+                                            ...mediopago,
+                                            arqueoCaja: e.target.checked
+                                        })}} 
+                                        checked={mediopago.arqueoCaja}
+                                    />
+                                </Form.Item>
+                                <Form.Item 
+                                    style={{marginLeft: '15px'}}
+                                    required
+                                    label="Suma en cierre z: "
+                                >
+                                    <Checkbox 
+                                        onChange={(e) => {setMedioPago({
+                                            ...mediopago,
+                                            cierrez: e.target.checked
+                                        })}} 
+                                        checked={mediopago.cierrez}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={24}>
+                                <div><h3>Agregar planes de pago</h3></div>
+                                <div 
+                                    onClick={() => {
+                                        setPlanLines([
+                                            ...planLines,
+                                            {
+                                                _id: mathHelper.randomFiveDecimals(),
+                                                nombre: '',
+                                                cuotas: 0,
+                                                porcentaje: 0
+                                            }
+                                        ])
+                                    }}
+                                >
+                                    <Add customStyle={{width: '70px', height: '70px'}}/>
+                                </div>
+                            </Col>
+                            <Col span={24}>
+                                {(planLines.length > 0) ?
+                                    <Row flex='true' gutter={8}>
+                                        <Col><div><h3>Nombre / </h3></div></Col>
+                                        <Col><div><h3>Cant. de cuotas / </h3></div></Col>
+                                        <Col><div><h3>Porcentaje</h3></div></Col>
+                                    </Row>
+                                    : null                               
+                                }
+                                {(planLines.length > 0) ?
+                                    planLines.map((item, key) => (
+                                        <Row key={key} gutter={8}>
+                                            <Col>
+                                                <Form.Item 
+                                                    required
+                                                >
+                                                    <Input 
+                                                        name="nombre"
+                                                        value={item.nombre}
+                                                        onChange={(e) => {
+                                                            setPlanLines(
+                                                                planLines.map(el => {
+                                                                    if(el.id === planLines[key].id){
+                                                                        el.nombre = e.target.value
+                                                                    }
+                                                                    return el;
+                                                                })
+                                                            )
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <Form.Item 
+                                                    required
+                                                >
+                                                    <Input 
+                                                        name="cuotas"
+                                                        type="number"
+                                                        value={item.cuotas}
+                                                        onChange={(e) => {
+                                                            setPlanLines(
+                                                                planLines.map(el => {
+                                                                    if(el.id === planLines[key].id){
+                                                                        el.cuotas = e.target.value
+                                                                    }
+                                                                    return el;
+                                                                })
+                                                            )
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <Form.Item 
+                                                    required
+                                                >
+                                                    <Input 
+                                                        name="porcentaje"
+                                                        placeholder="Cant. de cuotas"
+                                                        type="number"
+                                                        value={item.porcentaje}
+                                                        onChange={(e) => {
+                                                            setPlanLines(
+                                                                planLines.map(el => {
+                                                                    if(el.id === planLines[key].id){
+                                                                        el.porcentaje = e.target.value
+                                                                    }
+                                                                    return el;
+                                                                })
+                                                            )
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <div onClick={() => {
+                                                    setPlanLines(
+                                                        planLines.filter(el => el.id !== item.id)
+                                                    )
+                                                }}>
+                                                    <Delete/>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    ))
+                                : null
+                            }
+                            </Col>
+                            <Col span={24} align="start" style={{display: 'flex'}}>
+                                <Form.Item>
+                                    <Button                                         
+                                        htmlType="submit"
+                                        className="btn-primary-bg"
+                                        style={{marginRight: '15px'}}                                 
+                                    >
+                                        Guardar
+                                    </Button>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button 
+                                        type="secondary"
+                                        onClick={() => {redirectToMediosPago()}}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Form>
+                }
+            </Col>
+        </Row>
+    )
+}
 
 export default MediosPagoForm;

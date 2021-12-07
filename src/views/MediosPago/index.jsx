@@ -5,8 +5,9 @@ import icons from '../../components/icons';
 import Header from './Header';
 import DeleteModal from './DeleteModal';
 import {useHistory} from 'react-router-dom';
+import DetailsModal from './DetailsModal';
 
-const { Edit, Delete } = icons;
+const { Edit, Delete, Details } = icons;
 
 const MediosPago = () => {
   const [mediospago, setMediosPago] = useState(null);
@@ -15,6 +16,8 @@ const MediosPago = () => {
   const [totalDocs, setTotalDocs] = useState(null);
   const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState(null);
+  const [detailsVisible, setDetailsVisible] = useState(false);
+  const [detailsData, setDetailsData] = useState(null);
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteEntityId, setDeleteEntityId] = useState(null);
   const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
@@ -47,10 +50,35 @@ const MediosPago = () => {
     history.push(`/mediospago/${id}`);
   }
 
+  const seeDetails = (data) => {
+    setDetailsData(data);
+    setDetailsVisible(true);
+  }
+
   const columnsForTable = [
     {
       title: 'Nombre',
       dataIndex: 'nombre',
+    },
+    {
+      title: 'Suma en cierre z',
+      render: (data) => (
+        (data.cierrez) ? 'Si' : 'No' 
+      )
+    },
+    {
+      title: 'Suma en arqueo',
+      render: (data) => (
+        (data.arqueoCaja) ? 'Si' : 'No' 
+      )
+    },
+    {
+      title: 'Detalles',
+      render: (data) => (
+        <div onClick={() => {seeDetails(data.planes)}}>
+          <Details title='Ver detalle'/>
+        </div>
+      )
     },
     {
       title: 'Acciones',
@@ -99,6 +127,11 @@ const MediosPago = () => {
             setDeleteVisible={setDeleteVisible}
             setDeleteEntityId={setDeleteEntityId}
             deleteEntityIdConfirmation={deleteEntityIdConfirmation}
+          />
+          <DetailsModal 
+            detailsVisible={detailsVisible}
+            setDetailsVisible={setDetailsVisible}
+            detailsData={detailsData}
           />
         </Col>
     </Row>

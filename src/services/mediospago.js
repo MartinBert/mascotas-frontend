@@ -21,7 +21,7 @@ const getAll = async(params) => {
 const getById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers);
-        return response.data;
+        return response;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);
@@ -41,7 +41,7 @@ const getByName = async(name) => {
 const save = async(mediopago) => {
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/mediospago`, mediopago, headers);
-        return response.data.message;
+        return response.data;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);
@@ -51,7 +51,7 @@ const save = async(mediopago) => {
 const edit = async(mediopago) => {
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_REST}/mediospago/${mediopago._id}`, mediopago, headers);
-        return response.data.message;
+        return response.data;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);
@@ -61,7 +61,7 @@ const edit = async(mediopago) => {
 const deleteMedioPago = async(id) => {
     try{
         const response = await axios.delete(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers);
-        return response.data.message;
+        return response.data;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);

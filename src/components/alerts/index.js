@@ -11,7 +11,19 @@ export const errorAlert = async(message) => {
 export const successAlert = async(message) => {
     return Swal.fire({
         icon: 'success',
-        title: 'Exito!',
+        title: 'Éxito!',
         text: message
+    })
+}
+
+export const questionAlert = async(message) => {
+    return Swal.fire({
+        icon: 'info',
+        title: 'Atención!',
+        text: message,
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
     })
 }

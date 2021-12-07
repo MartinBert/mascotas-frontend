@@ -23,7 +23,7 @@ const Header = ({setFilters}) => {
                             type="primary" 
                             placeholder="Buscar cliente"
                             onChange={(e) => { setFilters(JSON.stringify({
-                                nombre: e.target.value,
+                                razonSocial: e.target.value,
                             }))}}
                         /> 
                     </Col>
