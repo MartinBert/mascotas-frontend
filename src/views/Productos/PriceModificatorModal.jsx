@@ -203,7 +203,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
     >
      <Row>
         <Col span={24}>
-            <h2>Filtrar artículos</h2>
+            <h3>Filtrar artículos</h3>
         </Col>
         <Col span={24} style={{marginBottom: '15px'}}>
             <Row gutter={8}>
