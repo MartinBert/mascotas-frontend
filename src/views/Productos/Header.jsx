@@ -1,9 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import { Row, Col, Button, Input, AutoComplete } from 'antd';
+import { Row, Col, Button, Input, AutoComplete, Space } from 'antd';
 import { Link } from 'react-router-dom';
 import api from '../../services';
 import PriceModificatorModal from './PriceModificatorModal';
+import {
+    FaDollarSign, 
+    FaFile,    
+    FaPlus
+} from 'react-icons/fa'
 import '../../index.css';
+import { sizeHeight } from '@mui/system';
 
 const Header = ({setFilters, filters, setLoading}) => {
     const [brandSearch, setBrandSearch] = useState(null);
@@ -72,28 +78,38 @@ const Header = ({setFilters, filters, setLoading}) => {
     return(
         <>
         <Row>            
-            <Col span={24}>
-                <Row>
-                    <Col span={2} style={{marginRight: '15px'}}>
+            <Col span={24}>            
+                <Row gutter={10}>
+                    <Col>                     
                         <Button
-                            className="btn-primary-bg"
-                            style={{ marginBottom: '20px'}}> 
+                            type="primary"
+                            
+                            style={{ marginBottom: '20px'}}
+                            icon={<FaPlus style={{marginRight:'10px'}}/>}> 
                             <Link to="/productos/nuevo">
                                 Nuevo    
                             </Link>
                         </Button>
                     </Col>
-                    <Col span={2}>                       
+                    <Col>                       
                         <Button
-                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-                            color: '#fff', marginBottom: '20px'}} 
+                            type="primary"
+                            icon={<FaFile style={{marginRight:'10px'}}/>}                            
+                        >
+                                Cargar desde archivo    
+                        </Button>
+                    </Col>
+                    <Col>                       
+                        <Button
+                            type="primary" 
                             onClick={() => {setPriceModalVisible(true)}}
+                            icon={<FaDollarSign style={{marginRight:'10px'}}/>}
                         >
                                 Modificar precios    
                         </Button>
                     </Col>
                 </Row>
-                <Row justify="space between" gutter={16} >
+                <Row style={{display:'flex', justifyContent:'space-around'}}>
                     <Col>
                         <label htmlFor="marcas">Filtrar por marcas  </label>
                         <AutoComplete
@@ -106,7 +122,7 @@ const Header = ({setFilters, filters, setLoading}) => {
                         />
                     </Col>
                     <Col>
-                        <label htmlFor="marcas">Filtrar por rubros  </label>
+                        <label htmlFor="marcas">Filtrar por rubros </label>
                         <AutoComplete
                             style={{ width: 200, marginBottom: '10px' }}
                             options={headingOptions}
@@ -115,7 +131,7 @@ const Header = ({setFilters, filters, setLoading}) => {
                             onSearch={(e) => {handleSearch('rubros', e)}}
                             onSelect={(e) => {handleSelect('rubros', e)}}
                         />
-                    </Col>
+                    </Col>                    
                     <Col>
                         <Input 
                             color="primary" 
@@ -158,9 +174,9 @@ const Header = ({setFilters, filters, setLoading}) => {
                             value={(filters) ? filters.codigoProducto : null}
                         /> 
                     </Col>
-                    <Col>
+                    <Col style={{display:'flex', justifyContent:'flex-end'}}>
                         <Button 
-                            type="danger" 
+                            type='danger'                                                       
                             onClick={() => {cleanFilters()}}
                         > 
                             Limpiar filtros

@@ -48,7 +48,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                     trigger={null} 
                     collapsible 
                     collapsed={collapsed} 
-                    style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)'}}
+                    style={{background: '#2F415F'}}
                 >
                     <div style={{height:"57px", background: "transparent", marginTop: "3px", marginLeft: "3px"}}></div>
                     <Menu 
@@ -100,7 +100,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                     </Menu>
                 </Sider>
                 <Layout className="site-layout">
-                    <Header className="site-layout-background" style={{ padding: 0, background:  'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)', display: 'flex', justifyContent: 'space-between'}}>
+                    <Header className="site-layout-background" style={{ padding: 0, background:  '#2F415F', display: 'flex', justifyContent: 'space-between'}}>
                         <div>
                             <FaBars style={{color: "#fff", marginLeft: '20px', cursor: 'pointer'}} onClick={() => { toggle() }}/>
                         </div>

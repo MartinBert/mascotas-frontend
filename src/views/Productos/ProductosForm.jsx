@@ -395,14 +395,14 @@ const ProductosForm = () => {
                             <Upload 
                             {...uploaderProps}
                             >
-                                <Button style={{background:'#f081d2'}} icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
+                                <Button style={{background:'#bae7ff'}} icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
                             </Upload>
                             </Col>
                             <Col span={24} align="start" style={{display: 'flex'}}>
                                 <Form.Item>
                                     <Button                                         
                                         htmlType="submit"
-                                        className="btn-primary-bg"
+                                        type="primary"
                                         style={{marginRight: '15px'}}                                        
                                     >
                                         Guardar
@@ -410,7 +410,7 @@ const ProductosForm = () => {
                                 </Form.Item>
                                 <Form.Item>
                                     <Button 
-                                        type="secondary" 
+                                        type="danger"                                        
                                         onClick={() => {handleCancel()}}
                                     >
                                         Cancelar

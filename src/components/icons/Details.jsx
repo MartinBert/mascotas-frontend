@@ -4,9 +4,10 @@ import { FaEye } from 'react-icons/fa';
 const Details = ({title}) => {
     return (
         <FaEye 
+            size={22}
             title={title} 
             style={{cursor: 'pointer'}}
-            color="#1890ff"
+            color="#1890ff"            
         />
     )
 }

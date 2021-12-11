@@ -79,7 +79,8 @@ const Productos = () => {
         {
           title: 'Detalles',
           render: (product) => (
-            <div onClick={() => {seeDetails(product)}}>
+            <div onClick={() => {seeDetails(product)}}
+              style={{display:'flex', justifyContent:'center'}}>
               <Details title='Ver detalle'/>
             </div>
           )
@@ -93,8 +94,9 @@ const Productos = () => {
         {
           title: 'Acciones',
           render: (product) => (
-            <Row style={{display: 'inline-flex'}}>
-              <div onClick={() => {editProduct(product._id)}}>
+            <Row style={{display: 'flex', justifyContent:'center'}}>
+              <div onClick={() => {editProduct(product._id)}}
+              style={{marginRight:'20px'}}>
                 <Edit/>
               </div>
               <div onClick={() => {
