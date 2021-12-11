@@ -43,7 +43,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
 
     return (
         (userStatus) ? 
-            <Layout style={{height: '100vh'}}>
+            <Layout style={{height: '100%'}}>
                 <Sider 
                     trigger={null} 
                     collapsible 
@@ -99,7 +99,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                         </Menu.Item>
                     </Menu>
                 </Sider>
-                <Layout className="site-layout">
+                <Layout className="site-layout" style={{height: '100%'}}>
                     <Header className="site-layout-background" style={{ padding: 0, background:  'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)', display: 'flex', justifyContent: 'space-between'}}>
                         <div>
                             <FaBars style={{color: "#fff", marginLeft: '20px', cursor: 'pointer'}} onClick={() => { toggle() }}/>
