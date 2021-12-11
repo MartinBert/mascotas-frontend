@@ -3,6 +3,7 @@ import React from 'react';
 import { Row, Col, Button, Input} from 'antd';
 import { Link } from 'react-router-dom';
 import '../../index.css';
+import { FaPlus } from 'react-icons/fa';
 
 const Header = ({setFilters}) => {
     return(
@@ -11,7 +12,8 @@ const Header = ({setFilters}) => {
                 <Row align="end">
                     <Col span={20}>
                         <Button 
-                            className="btn-primary-bg"> 
+                            type="primary"
+                            icon={<FaPlus style={{marginRight:'10px'}}/>}> 
                             <Link to="/rubros/nuevo">
                                 Nuevo    
                             </Link>
