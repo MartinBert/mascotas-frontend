@@ -112,16 +112,16 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                                     history.push('/login');  
                                 }} 
                                 style={{background: 'transparent'}}
-                                selectable={false}
+                                selectable={'false'}
                             >
                                 <SubMenu 
                                     key="SubMenu" 
                                     icon={<FaUser style={{color: "#fff", cursor: 'pointer', width: '25px', height: '25px'}}/>}
-                                    selectable={false}
+                                    selectable={'false'}
                                     style={{background: 'transparent'}}
                                 >
                                     <Menu.ItemGroup>
-                                        <Menu.Item>Cerrar sesión</Menu.Item>
+                                        <Menu.Item key="1">Cerrar sesión</Menu.Item>
                                     </Menu.ItemGroup>
                                 </SubMenu>
                             </Menu>
