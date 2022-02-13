@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Row, Col, Select, Spin, Input, Table, Button, Checkbox } from 'antd';
+import { GenericAutocomplete } from '../../components/generics';
+import { Modal, Row, Col, Select, Input, Table, Button, Checkbox } from 'antd';
 import { errorAlert, successAlert } from '../../components/alerts';
 import helper from '../../helpers';
 import api from '../../services';
@@ -14,8 +15,6 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
     const [headings, setHeadings] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
-    const [brandsLoading, setBrandsLoading] = useState(true);
-    const [headingsLoading, setHeadingsLoading] = useState(true);
     const [productNameSearch, setProductNameSearch] = useState('');
     const [products, setProducts] = useState(null);
     const [productsLoading, setProductsLoading] = useState(true);
@@ -35,7 +34,6 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
         const fetchBrands = async() => {
             const response = await api.marcas.getAll({page: 0, limit: 100000, filters: null});
             setBrands(response.docs);
-            setBrandsLoading(false);
         }
         fetchBrands();
     })
@@ -45,7 +43,6 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
         const fetchHeadings = async() => {
             const response = await api.rubros.getAll({page: 0, limit: 100000, filters: null});
             setHeadings(response.docs);
-            setHeadingsLoading(false);
         }
         fetchHeadings();
     })
@@ -207,42 +204,27 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
         </Col>
         <Col span={24} style={{marginBottom: '15px'}}>
             <Row gutter={8}>
-                <Col>
-                {
-                    (brandsLoading) ? <Spin/>
-                    :
-                    <Select 
-                        placeholder="Marcas" 
-                        onChange={(e) => { 
-                            setSelectedBrand(e)    
-                        }}
-                        value={selectedBrand}
-                    >
-                        {brands.map(brand => (
-                            <Option key={brand._id}>{brand.nombre}</Option>
-                        ))}
-                    </Select>
-                }
+                <Col span={6}>
+                    <GenericAutocomplete
+                        label="Filtrar por marcas"
+                        modelToFind="marca"
+                        keyToCompare="nombre"
+                        setResultSearch={setSelectedBrand}
+                        selectedSearch={selectedBrand}
+                        styles={{backgroundColor: '#fff'}}
+                    />
                 </Col>
-                <Col>
-                {
-                    (headingsLoading) ? <Spin/> 
-                    :
-                    <Select 
-                        placeholder="Rubros" 
-                        onChange={(e) => { 
-                            setSelectedHeading(e)
-                        }}
-                        
-                        value={selectedHeading}
-                    >
-                        {headings.map(heading => (
-                            <Option key={heading._id}>{heading.nombre}</Option>
-                        ))}
-                    </Select>
-                }
+                <Col span={6}>
+                    <GenericAutocomplete
+                        label="Filtrar por rubros"
+                        modelToFind="rubro"
+                        keyToCompare="nombre"
+                        setResultSearch={setSelectedHeading}
+                        selectedSearch={selectedHeading}
+                        styles={{backgroundColor: '#fff'}}
+                    />
                 </Col>
-                <Col>
+                <Col span={6}>
                     <Input 
                         color="primary" 
                         placeholder="Nombre"
@@ -250,7 +232,7 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                         value={productNameSearch}
                     /> 
                 </Col>
-                <Col>
+                <Col span={6}>
                     <Button 
                         type="danger" 
                         onClick={() => {cleanFilters()}}

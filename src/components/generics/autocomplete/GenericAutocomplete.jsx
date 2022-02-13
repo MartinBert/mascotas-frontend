@@ -17,7 +17,9 @@ const GenericAutocomplete = ({modelToFind, keyToCompare, label, styles, setResul
             setLoading(false)
         }
         fetchOptions();
-    }, [search])
+    }, 
+    //eslint-disable-next-line
+    [search])
 
     return (
         <>

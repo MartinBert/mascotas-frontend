@@ -17,7 +17,9 @@ const Header = ({setFilters, filters, setLoading}) => {
                 marca: selectedBrand
             })
         }
-    }, [selectedBrand])
+    }, 
+    //eslint-disable-next-line
+    [selectedBrand])
 
     useEffect(() => {
         if(selectedHeading){
@@ -26,7 +28,9 @@ const Header = ({setFilters, filters, setLoading}) => {
                 rubro: selectedHeading
             })
         }
-    }, [selectedHeading]);
+    }, 
+    //eslint-disable-next-line
+    [selectedHeading]);
 
     const cleanFilters = () => {
         setSelectedBrand(null);
