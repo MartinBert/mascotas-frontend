@@ -8,6 +8,7 @@ import clientes from './clientes';
 import mediospago from './mediospago';
 import documentos from './documentos';
 import uploader from './uploader';
+import genericos from './genericos';
 
 const api = {
     auth,
@@ -19,7 +20,8 @@ const api = {
     clientes,
     mediospago,
     documentos,
-    uploader
+    uploader,
+    genericos
 }
 
 export default api;

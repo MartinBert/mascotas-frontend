@@ -26,7 +26,6 @@ const Productos = () => {
     const history = useHistory();
 
     useEffect(() => {
-      console.log('rendering')
       const fetchProducts = async() => {
         const stringFilters = JSON.stringify(filters)
         const data = await api.productos.getAll({page, limit, filters: stringFilters});

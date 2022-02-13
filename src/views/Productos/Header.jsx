@@ -1,69 +1,34 @@
 import React, {useEffect, useState} from 'react';
-import { Row, Col, Button, Input, AutoComplete } from 'antd';
+import { GenericAutocomplete } from '../../components/generics';
+import { Row, Col, Button, Input } from 'antd';
 import { Link } from 'react-router-dom';
-import api from '../../services';
 import PriceModificatorModal from './PriceModificatorModal';
 import '../../index.css';
 
 const Header = ({setFilters, filters, setLoading}) => {
-    const [brandSearch, setBrandSearch] = useState(null);
-    const [headingSearch, setHeadingSearch] = useState(null);
-    const [brandOptions, setBrandOptions] = useState(null);
-    const [headingOptions, setHeadingOptions] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
     const [priceModalVisible, setPriceModalVisible] = useState(false);
 
     useEffect(() => {
-        if(brandSearch && brandSearch !== ''){
-            const fetchBrands = async() => {
-                const response = await api.marcas.getByName(brandSearch);
-                const formattedOptions = response.docs.map(el => ({value: el.nombre, key: el._id}));
-                setBrandOptions(formattedOptions);
-            }
-            fetchBrands();
-        }
-
-        if(headingSearch && headingSearch !== ''){
-            const fetchHeadings = async() => {
-                const response = await api.rubros.getByName(headingSearch);
-                const formattedOptions = response.docs.map(el => ({value: el.nombre, key: el._id}));
-                setHeadingOptions(formattedOptions);
-            }
-            fetchHeadings();
-        }
-    }, [brandSearch, headingSearch])
-
-
-    const handleSearch = (searchType, e) => {
-        if(searchType === 'marcas'){
-            setBrandSearch(e);
-        }else{
-            setHeadingSearch(e);
-        }
-    }
-
-    const handleSelect = (selectedType, e) => {
-        if(selectedType === 'marcas'){
-            const selected = brandOptions.filter(el => el.value === e)[0];
+        if(selectedBrand){
             setFilters({
                 ...filters,
-                marca: selected.key
-            });
-        }else{
-            const selected = headingOptions.filter(el => el.value === e)[0];
+                marca: selectedBrand
+            })
+        }
+    }, [selectedBrand])
+
+    useEffect(() => {
+        if(selectedHeading){
             setFilters({
                 ...filters,
-                rubro: selected.key
-            });
+                rubro: selectedHeading
+            })
         }
-    }
+    }, [selectedHeading]);
 
     const cleanFilters = () => {
-        setBrandSearch(null);
-        setHeadingSearch(null);
-        setBrandOptions(null);
-        setHeadingOptions(null);
         setSelectedBrand(null);
         setSelectedHeading(null);
         setFilters(null);
@@ -93,30 +58,8 @@ const Header = ({setFilters, filters, setLoading}) => {
                         </Button>
                     </Col>
                 </Row>
-                <Row justify="space between" gutter={16} >
-                    <Col>
-                        <label htmlFor="marcas">Filtrar por marcas  </label>
-                        <AutoComplete
-                            style={{ width: 200, marginBottom: '10px' }}
-                            options={brandOptions}
-                            value={(selectedBrand) ? selectedBrand.value : null}
-                            id="marcas"
-                            onSearch={(e) => {handleSearch('marcas', e)}}
-                            onSelect={(e) => {handleSelect('marcas', e)}}
-                        />
-                    </Col>
-                    <Col>
-                        <label htmlFor="marcas">Filtrar por rubros  </label>
-                        <AutoComplete
-                            style={{ width: 200, marginBottom: '10px' }}
-                            options={headingOptions}
-                            value={(selectedHeading) ? selectedHeading.value : null}
-                            id="rubros"
-                            onSearch={(e) => {handleSearch('rubros', e)}}
-                            onSelect={(e) => {handleSelect('rubros', e)}}
-                        />
-                    </Col>
-                    <Col>
+                <Row justify="space between" gutter={16}>
+                <Col span={6}>
                         <Input 
                             color="primary" 
                             style={{ width: 200, marginBottom: '10px' }}
@@ -130,7 +73,7 @@ const Header = ({setFilters, filters, setLoading}) => {
                             value={(filters) ? filters.nombre : null}
                         /> 
                     </Col>
-                    <Col>
+                    <Col span={6}>
                         <Input 
                             color="primary" 
                             style={{ width: 200, marginBottom: '10px' }}
@@ -144,7 +87,7 @@ const Header = ({setFilters, filters, setLoading}) => {
                             value={(filters) ? filters.codigoBarras : null}
                         /> 
                     </Col>
-                    <Col>
+                    <Col span={6}>
                         <Input 
                             color="primary" 
                             style={{ width: 200, marginBottom: '10px' }}
@@ -158,13 +101,33 @@ const Header = ({setFilters, filters, setLoading}) => {
                             value={(filters) ? filters.codigoProducto : null}
                         /> 
                     </Col>
-                    <Col>
+                    <Col span={6}>
                         <Button 
                             type="danger" 
                             onClick={() => {cleanFilters()}}
                         > 
                             Limpiar filtros
                         </Button>
+                    </Col>
+                    <Col span={8}>
+                        <GenericAutocomplete
+                            label="Filtrar por marcas"
+                            modelToFind="marca"
+                            keyToCompare="nombre"
+                            setResultSearch={setSelectedBrand}
+                            selectedSearch={selectedBrand}
+                            styles={{backgroundColor: '#fff'}}
+                        />
+                    </Col>
+                    <Col span={8}>
+                        <GenericAutocomplete
+                            label="Filtrar por rubros"
+                            modelToFind="rubro"
+                            keyToCompare="nombre"
+                            setResultSearch={setSelectedHeading}
+                            selectedSearch={selectedHeading}
+                            styles={{backgroundColor: '#fff'}}
+                        />
                     </Col>
                 </Row>
             </Col>
