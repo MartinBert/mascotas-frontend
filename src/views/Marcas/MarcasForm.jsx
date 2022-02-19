@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import api from '../../services';
-import { Row, Col, Form, Input, Button } from "antd";
+import { Row, Col, Form, Input } from "antd";
 import { useHistory, useParams } from "react-router-dom";
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
@@ -100,15 +100,14 @@ const MarcasForm = () => {
             </div>
           </Form.Item>
         </Col>
-        <Col span={24}>
-          <Button type="primary" htmlType="submit"
-            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-            color: '#fff'}}>
+        <Col span={12}></Col>
+        <Col span={8} style={{display: 'flex'}}>
+          <button className="btn-primary" type="submit">
             Guardar
-          </Button>
-          <Button type="secondary" htmlType="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
+          </button>
+          <button className="btn-secondary" type="button" onClick={() => {redirectToMarcas()}} style={{marginLeft: "10px"}}>
             Cancelar
-          </Button>
+          </button>
         </Col>
       </Row>
     </Form>

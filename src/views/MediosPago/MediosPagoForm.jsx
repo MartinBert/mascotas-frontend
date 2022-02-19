@@ -250,22 +250,21 @@ const MediosPagoForm = () => {
                             }
                             </Col>
                             <Col span={24} align="start" style={{display: 'flex'}}>
-                                <Form.Item>
-                                    <Button                                         
-                                        htmlType="submit"
-                                        className="btn-primary-bg"
-                                        style={{marginRight: '15px'}}                                 
+                                <Form.Item style={{marginRight: '15px'}}>
+                                    <button                                         
+                                        type="submit"
+                                        className="btn-primary"      
                                     >
                                         Guardar
-                                    </Button>
+                                    </button>
                                 </Form.Item>
                                 <Form.Item>
-                                    <Button 
-                                        type="secondary"
+                                    <button
+                                        className="btn-secondary"
                                         onClick={() => {redirectToMediosPago()}}
                                     >
                                         Cancelar
-                                    </Button>
+                                    </button>
                                 </Form.Item>
                             </Col>
                         </Row>

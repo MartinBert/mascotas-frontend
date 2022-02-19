@@ -9,14 +9,14 @@ const Header = ({setFilters}) => {
             
             <Col span={24}>
                 <Row align="end">
-                    <Col span={20}>
-                        <Button 
-                            className="btn-primary-bg"> 
-                            <Link to="/mediospago/nuevo">
+                    <Col span={4}>
+                        <Link to="/mediospago/nuevo">
+                            <button className="btn-primary"> 
                                 Nuevo    
-                            </Link>
-                        </Button>
+                            </button>
+                        </Link>
                     </Col>
+                    <Col span={16}></Col>
                     <Col span={4}>
                         <Input 
                             type="primary" 

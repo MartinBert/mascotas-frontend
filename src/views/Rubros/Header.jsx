@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Row, Col, Button, Input} from 'antd';
+import { Row, Col, Input} from 'antd';
 import { Link } from 'react-router-dom';
 
 const Header = ({setFilters}) => {
@@ -8,14 +8,14 @@ const Header = ({setFilters}) => {
         <Row>            
             <Col span={24}>
                 <Row align="end">
-                    <Col span={20}>
-                        <Button 
-                            className="btn-primary-bg"> 
-                            <Link to="/rubros/nuevo">
+                    <Col span={4}>
+                        <Link to="/rubros/nuevo">
+                            <button className="btn-primary"> 
                                 Nuevo    
-                            </Link>
-                        </Button>
+                            </button>
+                        </Link>
                     </Col>
+                    <Col span={16}></Col>
                     <Col span={4}>
                         <Input 
                             type="primary" 
