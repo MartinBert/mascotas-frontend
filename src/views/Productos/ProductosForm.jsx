@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Button, Checkbox, Upload } from 'antd';
+import { Row, Col, Form, Input, Checkbox, Upload } from 'antd';
 import { GenericAutocomplete } from '../../components/generics';
 import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';

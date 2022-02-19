@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Button, Checkbox} from 'antd';
+import { Row, Col, Form, Input, Checkbox} from 'antd';
 import api from '../../services';
 import graphics from '../../components/graphics';
 import icons from '../../components/icons';

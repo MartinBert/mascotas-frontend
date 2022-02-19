@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services";
-import { Row, Col, Form, Input, Button } from "antd";
+import { Row, Col, Form, Input } from "antd";
 import { useHistory, useParams } from "react-router-dom";
 import messages from "../../components/messages";
 import graphics from "../../components/graphics";
@@ -133,22 +133,22 @@ const UsuariosForm = () => {
                 className="ml-5"
               />
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit"
-                className="btn-primary-bg">
-                Guardar
-              </Button>
-              <Button
-                type="secondary"
-                htmlType="button"
-                onClick={() => {
-                  redirectToUsuarios();
-                }}
-                style={{ marginLeft: "10px"}}
-              >
-                Cancelar
-              </Button>
-            </Form.Item>
+              <Row>
+                <Col span={8} style={{display: 'flex'}}>
+                  <button type="submit" className="btn-primary">
+                    Guardar
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => {
+                      redirectToUsuarios();
+                    }}
+                    style={{ marginLeft: "10px"}}
+                  >
+                    Cancelar
+                  </button>
+                </Col>
+              </Row>
           </Form>
         </Col>
       )}

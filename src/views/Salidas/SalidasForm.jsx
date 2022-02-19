@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Button} from 'antd';
+import { Row, Col, Form, Input } from 'antd';
 import api from '../../services';
 import graphics from '../../components/graphics';
 import icons from '../../components/icons';
@@ -213,23 +213,23 @@ const SalidasForm = () => {
                             }
                             </Col>
                             <Col span={24} align="start" style={{display: 'flex'}}>
-                                <Form.Item>
-                                    <Button                                         
-                                        htmlType="submit"
-                                        className="btn-primary-bg"
-                                        style={{marginRight: '15px'}}                                 
-                                    >
-                                        Guardar
-                                    </Button>
-                                </Form.Item>
-                                <Form.Item>
-                                    <Button 
-                                        type="secondary"
-                                        onClick={() => {redirectToSalidas()}}
-                                    >
-                                        Cancelar
-                                    </Button>
-                                </Form.Item>
+                                <Row>
+                                    <Col span={12} style={{display: 'flex'}}>
+                                        <button                                         
+                                            type="submit"
+                                            className="btn-primary"
+                                            style={{marginRight: '15px'}}                                 
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            className="btn-secondary"
+                                            onClick={() => {redirectToSalidas()}}
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
                     </Form>

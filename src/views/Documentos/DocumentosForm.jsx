@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import api from '../../services';
-import { Row, Col, Form, Input, Button, Checkbox } from "antd";
+import { Row, Col, Form, Input, Checkbox } from "antd";
 import { useHistory, useParams } from "react-router-dom";
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
@@ -184,14 +184,16 @@ const DocumentosForm = () => {
         </Form.Item>
       </Col>
       <Col span={24}>
-        <Button type="primary" htmlType="submit"
-          style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-          color: '#fff'}}>
-          Guardar
-        </Button>
-        <Button type="secondary" htmlType="button" onClick={() => {redirectToDocumentos()}} style={{marginLeft: "10px"}}>
-          Cancelar
-        </Button>
+        <Row>
+          <Col span={6} style={{display: 'flex'}}>
+            <button className="btn-primary" type="submit">
+              Guardar
+            </button>
+            <button className="btn-secondary" onClick={() => {redirectToDocumentos()}} style={{marginLeft: "10px"}}>
+              Cancelar
+            </button>
+          </Col>
+        </Row>
       </Col>
     </Row>
   </Form>
