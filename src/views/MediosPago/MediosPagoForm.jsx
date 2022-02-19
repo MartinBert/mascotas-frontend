@@ -6,7 +6,6 @@ import graphics from '../../components/graphics';
 import icons from '../../components/icons';
 import helpers from '../../helpers';
 import {questionAlert, errorAlert, successAlert} from '../../components/alerts';
-import '../../index.css';
 
 const { Spinner } = graphics;
 const { Add, Delete } = icons;

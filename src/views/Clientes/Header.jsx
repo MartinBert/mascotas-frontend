@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Row, Col, Button, Input} from 'antd';
+import { Row, Col, Input} from 'antd';
 import { Link } from 'react-router-dom';
-import '../../index.css';
 
 const Header = ({setFilters}) => {
     return(
@@ -10,14 +9,15 @@ const Header = ({setFilters}) => {
             
             <Col span={24}>
                 <Row align="end">
-                    <Col span={20}>
-                        <Button 
-                            className="btn-primary-bg"> 
+                    <Col span={4}>
+                        <button 
+                            className="btn-primary"> 
                             <Link to="/clientes/nuevo">
                                 Nuevo    
                             </Link>
-                        </Button>
+                        </button>
                     </Col>
+                    <Col span={16}></Col>
                     <Col span={4}>
                         <Input 
                             type="primary" 

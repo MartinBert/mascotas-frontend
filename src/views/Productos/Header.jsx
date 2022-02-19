@@ -3,7 +3,8 @@ import { GenericAutocomplete } from '../../components/generics';
 import { Row, Col, Button, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import PriceModificatorModal from './PriceModificatorModal';
-import '../../index.css';
+import api from '../../services'
+import { exportSimpleExcel } from '../../helpers/excel';
 
 const Header = ({setFilters, filters, setLoading}) => {
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -34,28 +35,72 @@ const Header = ({setFilters, filters, setLoading}) => {
         setFilters(null);
     }
 
+    const exportExcel = async() => {
+        const response = await api.productos.getAll({page: 0, limit: 1000000, filters: null});
+        const nameOfSheet = "Hoja de productos";
+        const nameOfDocument = "Lista de productos";
+        const columnHeaders = [
+            'Producto' , 
+            'Marca', 
+            'Rubro', 
+            'Precio unitario', 
+            'IVA', 
+            'Precio de venta', 
+            'Margen de ganancia', 
+            'Ganancia por venta', 
+            'Stock'
+        ];
+        const lines = await processExcelLines(response.docs);
+        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument);
+    }
+
+    const processExcelLines = async(products) => {
+        const processedLines = [];
+        for await (let product of products){
+            processedLines.push([
+                product.nombre,
+                product.marca.nombre,
+                product.rubro.nombre,
+                '$'+product.precioUnitario,
+                '$'+product.iva,
+                '$'+product.precioVenta,
+                '%'+product.margenGanancia,
+                '$'+product.gananciaNeta,
+                product.cantidadStock
+            ])
+        }
+        return processedLines;
+    }
+
     return(
         <>
         <Row>            
             <Col span={24}>
-                <Row>
-                    <Col span={2} style={{marginRight: '15px'}}>
-                        <Button
-                            className="btn-primary-bg"
-                            style={{ marginBottom: '20px'}}> 
+                <Row gutter={8}>
+                    <Col>
+                        <button
+                            className="btn-primary"
+                        > 
                             <Link to="/productos/nuevo">
                                 Nuevo    
                             </Link>
-                        </Button>
+                        </button>
                     </Col>
-                    <Col span={2}>                       
-                        <Button
-                            style={{background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
-                            color: '#fff', marginBottom: '20px'}} 
+                    <Col>                       
+                        <button
+                            className="btn-primary"
                             onClick={() => {setPriceModalVisible(true)}}
                         >
                                 Modificar precios    
-                        </Button>
+                        </button>
+                    </Col>
+                    <Col>                       
+                        <button
+                            className="btn-primary"
+                            onClick={() => {exportExcel()}}
+                        >
+                            Exportar Excel
+                        </button>
                     </Col>
                 </Row>
                 <Row justify="space between" gutter={16}>

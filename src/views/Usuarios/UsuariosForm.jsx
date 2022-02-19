@@ -5,7 +5,6 @@ import { useHistory, useParams } from "react-router-dom";
 import messages from "../../components/messages";
 import graphics from "../../components/graphics";
 import { errorAlert, successAlert } from "../../components/alerts";
-import '../../index.css'
 
 const { Error } = messages;
 const { Spinner } = graphics;

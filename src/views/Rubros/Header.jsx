@@ -2,7 +2,6 @@
 import React from 'react';
 import { Row, Col, Button, Input} from 'antd';
 import { Link } from 'react-router-dom';
-import '../../index.css';
 
 const Header = ({setFilters}) => {
     return(

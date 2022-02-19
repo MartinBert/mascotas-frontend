@@ -6,7 +6,6 @@ import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';
 import helper from '../../helpers'
 import { errorAlert, successAlert } from '../../components/alerts';
-import '../../index.css';
 
 const { Spinner } = graphics;
 const roundTwoDecimals = helper.mathHelper.roundTwoDecimals;
@@ -395,26 +394,25 @@ const ProductosForm = () => {
                             <Upload 
                             {...uploaderProps}
                             >
-                                <Button style={{background:'#f081d2'}} icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</Button>
+                                <button className="btn-primary" icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</button>
                             </Upload>
                             </Col>
                             <Col span={24} align="start" style={{display: 'flex'}}>
-                                <Form.Item>
-                                    <Button                                         
+                                <Form.Item style={{marginRight: '15px'}}>
+                                    <button                                         
                                         htmlType="submit"
-                                        className="btn-primary-bg"
-                                        style={{marginRight: '15px'}}                                        
+                                        className="btn-primary"                                     
                                     >
                                         Guardar
-                                    </Button>
+                                    </button>
                                 </Form.Item>
                                 <Form.Item>
-                                    <Button 
-                                        type="secondary" 
+                                    <button 
+                                        className="btn-secondary" 
                                         onClick={() => {handleCancel()}}
                                     >
                                         Cancelar
-                                    </Button>
+                                    </button>
                                 </Form.Item>
                             </Col>
                         </Row>
