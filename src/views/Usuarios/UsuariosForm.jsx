@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services";
-import { Row, Col, Form, Input } from "antd";
+import { Row, Col, Form, Input, Checkbox } from "antd";
 import { useHistory, useParams } from "react-router-dom";
 import messages from "../../components/messages";
 import graphics from "../../components/graphics";
@@ -16,7 +16,7 @@ const UsuariosForm = () => {
     nombre: '',
     email: '',
     password: '',
-    perfil: true
+    perfil: false
   });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ const UsuariosForm = () => {
   const loadUsuarioData = (e) => {
     setUsuario({
       ...usuario,
-      [e.target.name]: e.target.value,
+      [e.target.name]: (e.target.name === 'perfil') ? e.target.checked : e.target.value,
     });
   };
 
@@ -85,7 +85,7 @@ const UsuariosForm = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <Col>
+        <Col span={12}>
           <h1>{id === "nuevo" ? "Crear nuevo usuario" : "Editar usuario"}</h1>
           {error ? (
             <Error message="Debe completar todos los campos obligatorios *" />
@@ -133,22 +133,34 @@ const UsuariosForm = () => {
                 className="ml-5"
               />
             </Form.Item>
-              <Row>
-                <Col span={8} style={{display: 'flex'}}>
-                  <button type="submit" className="btn-primary">
-                    Guardar
-                  </button>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => {
-                      redirectToUsuarios();
-                    }}
-                    style={{ marginLeft: "10px"}}
-                  >
-                    Cancelar
-                  </button>
-                </Col>
-              </Row>
+            <Form.Item
+              label="Perfil administrador"
+              required={true}
+            >
+              <Checkbox 
+                name="perfil"
+                checked={usuario.perfil}
+                onChange={(e, val) => {
+                  loadUsuarioData(e, val);
+                }}
+              ></Checkbox>
+            </Form.Item>
+            <Row>
+              <Col span={8} style={{display: 'flex'}}>
+                <button type="submit" className="btn-primary">
+                  Guardar
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={() => {
+                    redirectToUsuarios();
+                  }}
+                  style={{ marginLeft: "10px"}}
+                >
+                  Cancelar
+                </button>
+              </Col>
+            </Row>
           </Form>
         </Col>
       )}

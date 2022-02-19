@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GenericAutocomplete } from '../../components/generics';
-import { Modal, Row, Col, Select, Input, Table, Button, Checkbox } from 'antd';
+import { Modal, Row, Col, Select, Input, Table, Checkbox } from 'antd';
 import { errorAlert, successAlert } from '../../components/alerts';
 import helper from '../../helpers';
 import api from '../../services';
@@ -233,12 +233,12 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                     /> 
                 </Col>
                 <Col span={6}>
-                    <Button 
-                        type="danger" 
+                    <button 
+                        className="btn-secondary" 
                         onClick={() => {cleanFilters()}}
                     > 
                         Limpiar filtros
-                    </Button>
+                    </button>
                 </Col>
             </Row>
             <Row style={{marginTop: '15px'}} align="start">
@@ -265,20 +265,20 @@ const PriceModificatorModal = ({priceModalVisible, setPriceModalVisible, setLoad
                     />
                 </Col>
                 <Col style={{marginRight: '15px'}}>
-                    <Button 
-                        type="primary" 
+                    <button 
+                        className="btn-primary" 
                         onClick={() => {checkPage()}}
                     > 
                         Marcar página
-                    </Button>
+                    </button>
                 </Col>
                 <Col>
-                    <Button 
-                        type="secondary" 
+                    <button 
+                        className="btn-secondary" 
                         onClick={() => {uncheckPage()}}
                     > 
                         Desmarcar todo
-                    </Button>
+                    </button>
                 </Col>
             </Row>
         </Col>
