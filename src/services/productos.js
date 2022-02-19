@@ -51,7 +51,7 @@ const deleteById = async(id) => {
 const save = async(producto) => {
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/productos`, producto, headers);
-        return response.data.message;
+        return response.data;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);

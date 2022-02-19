@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Button, AutoComplete, Checkbox, Upload } from 'antd';
+import { Row, Col, Form, Input, Button, Checkbox, Upload } from 'antd';
+import { GenericAutocomplete } from '../../components/generics';
 import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';
 import helper from '../../helpers'
@@ -29,10 +30,6 @@ const ProductosForm = () => {
         iva: 0,
         imagenes: null,
     })
-    const [brandSearch, setBrandSearch] = useState(null);
-    const [headingSearch, setHeadingSearch] = useState(null);
-    const [brandOptions, setBrandOptions] = useState(null);
-    const [headingOptions, setHeadingOptions] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
     const [uploadedImages, setUploadedImages] = useState([]);
@@ -43,8 +40,8 @@ const ProductosForm = () => {
         const fetchProductById = async(id) => {
             const response = await api.productos.getById(id);
             const product = response.data;
-            setSelectedBrand({value: product.marca.nombre, key: product.marca._id});
-            setSelectedHeading({value: product.rubro.nombre, key: product.rubro._id});
+            setSelectedBrand({_id: product.marca._id, nombre: product.marca.nombre});
+            setSelectedHeading({_id: product.rubro._id, nombre: product.rubro.nombre});
             setProduct(product);
             setLoading(false);
         }
@@ -54,26 +51,6 @@ const ProductosForm = () => {
             setLoading(false);
         }
     }, [loading, id])
-
-    useEffect(() => {
-        if(brandSearch && brandSearch !== ''){
-            const fetchBrands = async() => {
-                const response = await api.marcas.getByName(brandSearch);
-                const formattedOptions = response.docs.map(el => ({value: el.nombre, key: el._id}));
-                setBrandOptions(formattedOptions);
-            }
-            fetchBrands();
-        }
-
-        if(headingSearch && headingSearch !== ''){
-            const fetchHeadings = async() => {
-                const response = await api.rubros.getByName(headingSearch);
-                const formattedOptions = response.docs.map(el => ({value: el.nombre, key: el._id}));
-                setHeadingOptions(formattedOptions);
-            }
-            fetchHeadings();
-        }
-    }, [brandSearch, headingSearch])
 
     useEffect(() => {
         const calculeWithoutIva = roundTwoDecimals(product.precioUnitario * (1 + decimalPercent(product.margenGanancia)));
@@ -88,40 +65,6 @@ const ProductosForm = () => {
     }, 
     //eslint-disable-next-line
     [product.precioUnitario, product.margenGanancia, product.iva])
-
-    const handleSearch = (searchType, e) => {
-        if(searchType === 'marcas'){
-            setBrandSearch(e);
-        }else{
-            setHeadingSearch(e);
-        }
-    }
-
-    const handleSelect = (selectedType, e) => {
-        if(selectedType === 'marcas'){
-            const selected = brandOptions.filter(el => el.value === e)[0];
-            setSelectedBrand(selected);
-            const setBrandToProduct = async() => {
-                const response = await api.marcas.getById(selected.key)
-                setProduct({
-                    ...product,
-                    marca: response
-                })
-            }
-            setBrandToProduct()
-        }else{
-            const selected = headingOptions.filter(el => el.value === e)[0];
-            setSelectedHeading(selected);
-            const setHeadingToProduct = async() => {
-                const response = await api.rubros.getById(selected.key)
-                setProduct({
-                    ...product,
-                    rubro: response
-                })
-            }
-            setHeadingToProduct()
-        }
-    }
 
     const checkApplyIva = (e) => {
         const checked = e.target.checked;
@@ -142,11 +85,30 @@ const ProductosForm = () => {
             [e.target.name] : e.target.value
         })
     }
+
+    const setSelectedBrandToProduct = async(brand) => {
+        setSelectedBrand(brand);
+        const response = await api.marcas.getById(brand._id);
+        setProduct({
+            ...product,
+            marca: response
+        })
+    }
+
+    const setSelectedHeadingToProduct = async(heading) => {
+        setSelectedHeading(heading);
+        const response = await api.rubros.getById(heading._id);
+        setProduct({
+            ...product,
+            rubro: response
+        })
+    }
     
     const saveProduct = () => {
         if(!product.imagenes || product.imagenes.length === 0){
             product.imagenes = uploadedImages;
         }
+
         const saveProduct = async() => {
             const response = await api.productos.save(product);
             if(response.code === 200){
@@ -155,6 +117,7 @@ const ProductosForm = () => {
                 errorAlert('Error al guardar el registro');
             }
         }
+
         const editProduct = async() => {
             const response = await api.productos.edit(product);
             if(response.code === 200){
@@ -163,6 +126,7 @@ const ProductosForm = () => {
                 errorAlert('Error al guardar el registro');
             }
         }
+
         if(id === 'nuevo'){
             saveProduct();
         }else{
@@ -267,13 +231,13 @@ const ProductosForm = () => {
                                     required
                                     label="Marca"
                                 >
-                                    <AutoComplete
-                                        style={{ width: '100%' }}
-                                        options={brandOptions}
-                                        value={(selectedBrand) ? selectedBrand.value : null}
-                                        id="marcas"
-                                        onSearch={(e) => {handleSearch('marcas', e)}}
-                                        onSelect={(e) => {handleSelect('marcas', e)}}
+                                    <GenericAutocomplete
+                                        label="Marca"
+                                        modelToFind="marca"
+                                        keyToCompare="nombre"
+                                        setResultSearch={setSelectedBrandToProduct}
+                                        selectedSearch={selectedBrand}
+                                        styles={{backgroundColor: '#fff'}}
                                     />
                                 </Form.Item>
                             </Col>
@@ -282,13 +246,13 @@ const ProductosForm = () => {
                                     required
                                     label="Rubro"
                                 >
-                                    <AutoComplete
-                                        style={{ width: '100%' }}
-                                        options={headingOptions}
-                                        value={(selectedHeading) ? selectedHeading.value : null}
-                                        id="rubros"
-                                        onSearch={(e) => {handleSearch('rubros', e)}}
-                                        onSelect={(e) => {handleSelect('rubros', e)}}
+                                    <GenericAutocomplete
+                                        label="Rubro"
+                                        modelToFind="rubro"
+                                        keyToCompare="nombre"
+                                        setResultSearch={setSelectedHeadingToProduct}
+                                        selectedSearch={selectedHeading}
+                                        styles={{backgroundColor: '#fff'}}
                                     />
                                 </Form.Item>
                             </Col>
@@ -352,12 +316,12 @@ const ProductosForm = () => {
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
-                                        name="applyIva" 
-                                        onChange={e => {
-                                            checkApplyIva(e)
-                                        }} 
-                                    >
-                                        <Checkbox>Aplica IVA?</Checkbox>
+                                    name="applyIva" 
+                                    onChange={e => {
+                                        checkApplyIva(e)
+                                    }} 
+                                >
+                                    <Checkbox>Aplica IVA?</Checkbox>
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>

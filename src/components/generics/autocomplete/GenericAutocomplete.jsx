@@ -17,7 +17,9 @@ const GenericAutocomplete = ({modelToFind, keyToCompare, label, styles, setResul
             setLoading(false)
         }
         fetchOptions();
-    }, [search])
+    }, 
+    //eslint-disable-next-line
+    [search])
 
     return (
         <>
@@ -33,7 +35,6 @@ const GenericAutocomplete = ({modelToFind, keyToCompare, label, styles, setResul
                 onInputChange={(e, val) => setSearch(val)}
                 getOptionLabel={(options) => options[keyToCompare]}
                 onChange={(e, val) => {
-                    console.log(val);
                     setResultSearch(val)
                 }}
                 isOptionEqualToValue={(options) => options['_id']}
