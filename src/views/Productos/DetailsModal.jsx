@@ -39,12 +39,12 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             <Col span={24}>
                 <div>
                     <h3>
-                        Marca: {(detailsData) ? detailsData.marca.nombre : null}
+                        Marca: {(detailsData && detailsData.marca) ? detailsData.marca.nombre : "Sin Marca"}
                     </h3>
                 </div>
                 <div>
                     <h3>
-                        Rubro: {(detailsData) ? detailsData.rubro.nombre : null}
+                        Rubro: {(detailsData && detailsData.rubro) ? detailsData.rubro.nombre : "Sin Rubro"}
                     </h3>
                 </div>
                 <div>
