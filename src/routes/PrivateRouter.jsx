@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 import { Link, useHistory } from 'react-router-dom';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Spin } from 'antd';
 import {
     FaDollarSign,
     FaTag,
@@ -42,7 +42,7 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
     };
 
     return (
-        (userStatus) ? 
+        
             <Layout style={{height: '100%'}}>
                 <Sider 
                     trigger={null} 
@@ -127,21 +127,23 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                             </Menu>
                         </div>
                     </Header>
-                    <Content
-                        className="site-layout-background"
-                        style={{
-                            margin: '24px 16px',
-                            padding: 24,
-                            minHeight: 280,
-                        }}
-                    >
-                        <Route exact path={path}>
-                            <Component />
-                        </Route>
-                    </Content>
+                    {(userStatus) ? 
+                        <Content
+                            className="site-layout-background"
+                            style={{
+                                margin: '24px 16px',
+                                padding: 24,
+                                minHeight: 280,
+                            }}
+                        >
+                            <Route exact path={path}>
+                                <Component />
+                            </Route>
+                        </Content>
+                    : <Spin/>}
                 </Layout>
             </Layout>
-        : null
+        
     )
 }
 

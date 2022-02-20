@@ -3,14 +3,12 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import Header from './Header';
 import DetailsModal from './DetailsModal';
-import graphics from '../../components/graphics';
 import icons from '../../components/icons';
 import OpenImage from './OpenImage';
 import {useHistory} from 'react-router-dom';
 import DeleteModal from './DeleteModal';
 
 const { Details, Edit, Delete } = icons;
-const { Spinner } = graphics;
 const Productos = () => {
     const [products, setProducts] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -109,47 +107,43 @@ const Productos = () => {
 
     return (
       <>
-        {(loading) 
-          ? <Spinner/>
-          :
-          <Row>
-            <Col span={24} style={{marginBottom: '10px'}}>
-              <Header setFilters={setFilters} filters={filters} setLoading={setLoading}/>
-            </Col>
-            <Col span={24}>
-              <Table 
-                  width={"100%"}
-                  dataSource={products}
-                  columns={columnsForTable}
-                  pagination={{
-                      defaultCurrent: page,
-                      limit: limit,
-                      total: totalDocs,
-                      showSizeChanger: true,
-                      onChange: (e) => { setPage(e) },
-                      onShowSizeChange: (e, val) => { setLimit(val) }
-                  }}
-                  loading={loading}
-                  rowKey='_id'
-                  tableLayout='auto'
-                  size="small"
-              />
-            </Col>
-            <DetailsModal 
-              detailsVisible={detailsVisible}
-              setDetailsVisible={setDetailsVisible}
-              detailsData={detailsData}
+        <Row>
+          <Col span={24} style={{marginBottom: '10px'}}>
+            <Header setFilters={setFilters} filters={filters} setLoading={setLoading}/>
+          </Col>
+          <Col span={24}>
+            <Table 
+                width={"100%"}
+                dataSource={products}
+                columns={columnsForTable}
+                pagination={{
+                    defaultCurrent: page,
+                    limit: limit,
+                    total: totalDocs,
+                    showSizeChanger: true,
+                    onChange: (e) => { setPage(e) },
+                    onShowSizeChange: (e, val) => { setLimit(val) }
+                }}
+                loading={loading}
+                rowKey='_id'
+                tableLayout='auto'
+                size="small"
             />
-         </Row>
-        }
-          <DeleteModal 
-            deleteVisible={deleteVisible}
-            setLoading={setLoading}
-            setDeleteVisible={setDeleteVisible}
-            setDeleteEntityId={setDeleteEntityId}
-            deleteEntityIdConfirmation={deleteEntityIdConfirmation}
+          </Col>
+          <DetailsModal 
+            detailsVisible={detailsVisible}
+            setDetailsVisible={setDetailsVisible}
+            detailsData={detailsData}
           />
-        </>
+        </Row>
+        <DeleteModal 
+          deleteVisible={deleteVisible}
+          setLoading={setLoading}
+          setDeleteVisible={setDeleteVisible}
+          setDeleteEntityId={setDeleteEntityId}
+          deleteEntityIdConfirmation={deleteEntityIdConfirmation}
+        />
+      </>
     )
 }
 
