@@ -63,8 +63,8 @@ const Header = ({setFilters, filters, setLoading}) => {
         for await (let product of products){
             processedLines.push([
                 product.nombre,
-                product.marca.nombre,
-                product.rubro.nombre,
+                (product.marca) ? product.marca.nombre : "Sin Marca",
+                (product.rubro) ? product.rubro.nombre : "Sin Rubro",
                 '$'+product.precioUnitario,
                 '$'+product.iva,
                 '$'+product.precioVenta,
