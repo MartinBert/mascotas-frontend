@@ -11,11 +11,11 @@ const { Spinner } = graphics;
 const { Add, Delete } = icons;
 const { mathHelper, dateHelper } = helpers;
 
-const SalidasForm = () => {
+const EntradasForm = () => {
     const { id } = useParams();
     const history = useHistory();
     const [loading, setLoading] = useState(true);
-    const [salida, setSalida] = useState({
+    const [entrada, setEntrada] = useState({
         descripcion: '',
         fecha: new Date(),
         cantidad: 0,
@@ -30,21 +30,21 @@ const SalidasForm = () => {
         if(id === 'nuevo'){
             setLoading(false);
         }else{
-            const fetchSalida = async() => {
-                const response =  await api.salidas.getById(id);
-                setSalida(response.data);
+            const fetchEntrada = async() => {
+                const response =  await api.entradas.getById(id);
+                setEntrada(response.data);
                 setLoading(false);
             }
-            fetchSalida();
+            fetchEntrada();
         }
     })
 
     useEffect(() => {
-        if(salida.usuario) return;
+        if(entrada.usuario) return;
         const fetchLoggedUser = async() => {
             const response = await api.usuarios.getById(localStorage.getItem('userId'));
-            setSalida({
-                ...salida,
+            setEntrada({
+                ...entrada,
                 usuario: response
             })
         }
@@ -53,47 +53,47 @@ const SalidasForm = () => {
 
     useEffect(() => {
         if(id !== 'nuevo') return;
-        if(salida.cantidad !== 0 && salida.gananciaNeta !== 0){
-            if(salida.descripcion === undefined || salida.descripcion === ''){
-                salida.descripcion = `Salida del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+        if(entrada.cantidad !== 0 && entrada.gananciaNeta !== 0){
+            if(entrada.descripcion === undefined || entrada.descripcion === ''){
+                entrada.descripcion = `Entrada del ${dateHelper.simpleDateWithHours(new Date())} hs`;
             }
-            const saveSalida = async() => {
-                const response = await api.salidas.save(salida);
-                console.log(response);
+            const saveEntrada = async() => {
+                const response = await api.entradas.save(entrada);
                 if(response.code === 200){
                     successAlert('Registro guardado con éxito')
                     .then(() => {
-                        redirectToSalidas();
+                        redirectToEntradas();
                     })
                 }
             }
-            saveSalida();
+            saveEntrada();
         }
     }, 
     //eslint-disable-next-line
-    [salida])
+    [entrada])
 
     const handleSubmit = () => {
         const fetchProducts = async() => {
             try{
 
-                let productsToSalida = [];
+                let productsToEntrada = [];
                 for(const item of productLines){
                     const response = await api.productos.getByBarcode(item.barcode);
                     let product = response.data;
-                    product.cantidadStock -= item.quantity;
+                    let itemQuantity = parseFloat(item.quantity);
+                    product.cantidadStock += itemQuantity;
                     const productEditionResponse = await api.productos.edit(product);
                     if(productEditionResponse.code === 200){
-                        product.cantidadesSalientes = Number(item.quantity);
-                        product.gananciaNetaTotal = mathHelper.roundTwoDecimals(product.gananciaNeta * product.cantidadesSalientes);
-                        productsToSalida.push(product)
+                        product.cantidadesEntrantes = Number(item.quantity);
+                        product.gananciaNetaTotal = mathHelper.roundTwoDecimals(product.gananciaNeta * product.cantidadesEntrantes);
+                        productsToEntrada.push(product)
                     }
                 }
-                const gananciaNeta = productsToSalida.reduce((acc, el) => acc + el.gananciaNetaTotal, 0);
-                const cantidad = productsToSalida.reduce((acc, el) => acc + el.cantidadesSalientes, 0);
-                setSalida({
-                    ...salida,
-                    productos: productsToSalida,
+                const gananciaNeta = productsToEntrada.reduce((acc, el) => acc + el.gananciaNetaTotal, 0);
+                const cantidad = productsToEntrada.reduce((acc, el) => acc + el.cantidadesEntrantes, 0);
+                setEntrada({
+                    ...entrada,
+                    productos: productsToEntrada,
                     gananciaNeta,
                     cantidad
                 })
@@ -105,14 +105,14 @@ const SalidasForm = () => {
         fetchProducts()
     }
 
-    const redirectToSalidas = () => {
-        history.push('/salidas');
+    const redirectToEntradas = () => {
+        history.push('/entradas');
     }
 
     return (
         <Row>
             <Col span={24}>
-                <h1>{(id === 'nuevo') ? 'Nueva salida' : 'Editar salida'}</h1>
+                <h1>{(id === 'nuevo') ? 'Nueva entrada' : 'Editar entrada'}</h1>
                 {(loading) 
                     ? <Spinner/>
                     :
@@ -128,10 +128,10 @@ const SalidasForm = () => {
                                     <Input 
                                         name="descripcion"
                                         placeholder="Descripción"
-                                        value={salida.descripcion}
+                                        value={entrada.descripcion}
                                         onChange={(e) => {
-                                            setSalida({
-                                                ...salida,
+                                            setEntrada({
+                                                ...entrada,
                                                 descripcion: e.target.value
                                             })
                                         }}
@@ -226,7 +226,7 @@ const SalidasForm = () => {
                                         </button>
                                         <button 
                                             className="btn-secondary"
-                                            onClick={() => {redirectToSalidas()}}
+                                            onClick={() => {redirectToEntradas()}}
                                         >
                                             Cancelar
                                         </button>
@@ -241,4 +241,4 @@ const SalidasForm = () => {
     )
 }
 
-export default SalidasForm;
+export default EntradasForm;

@@ -40,8 +40,19 @@ const ProductosForm = () => {
         const fetchProductById = async(id) => {
             const response = await api.productos.getById(id);
             const product = response.data;
-            setSelectedBrand({_id: product.marca._id, nombre: product.marca.nombre});
-            setSelectedHeading({_id: product.rubro._id, nombre: product.rubro.nombre});
+
+            if(product.marca === null){
+                product.marca = {
+                    _id : 'no especificado',
+                    nombre : 'no especificado'};
+            } else {setSelectedBrand({_id: product.marca._id, nombre: product.marca.nombre});}
+
+            if(product.rubro === null){
+                product.rubro = {
+                    _id : 'no especificado',
+                    nombre : 'no especificado'};
+            } else {setSelectedHeading({_id: product.rubro._id, nombre: product.rubro.nombre});}
+
             setProduct(product);
             setLoading(false);
         }

@@ -67,32 +67,37 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                                 Salidas
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="3" icon={<FaTag />}>
+                        <Menu.Item key="3" icon={<FaDollarSign />}>
+                            <Link to="/entradas">
+                                Entradas
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="4" icon={<FaTag />}>
                             <Link to="/marcas">
                                 Marcas
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="4" icon={<FaTags />}>
+                        <Menu.Item key="5" icon={<FaTags />}>
                             <Link to="/rubros">
                                 Rubros
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="5" icon={<FaUsers />}>
+                        <Menu.Item key="6" icon={<FaUsers />}>
                             <Link to="/clientes">
                                 Clientes
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="6" icon={<FaMoneyBillWave />}>
+                        <Menu.Item key="7" icon={<FaMoneyBillWave />}>
                             <Link to="/mediospago">
                                 Medios de pago
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="7" icon={<FaFile />}>
+                        <Menu.Item key="8" icon={<FaFile />}>
                             <Link to="/documentos">
                                 Documentos
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="8" icon={<FaUser />}>
+                        <Menu.Item key="9" icon={<FaUser />}>
                             <Link to="/usuarios">
                                 Usuarios
                             </Link>

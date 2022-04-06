@@ -8,6 +8,8 @@ import Productos from '../views/Productos';
 import ProductosForm from '../views/Productos/ProductosForm';
 import Salidas from '../views/Salidas';
 import SalidasForm from '../views/Salidas/SalidasForm';
+import Entradas from '../views/Entradas';
+import EntradasForm from '../views/Entradas/EntradasForm';
 import Marcas from '../views/Marcas';
 import MarcasForm from '../views/Marcas/MarcasForm';
 import Clientes from '../views/Clientes';
@@ -28,20 +30,22 @@ const routes = [
     {id: 3, activeKey: '1', path: '/productos', private: true, component: Productos},
     {id: 4, activeKey: null, path: '/salidas/:id', private: true, component: SalidasForm},
     {id: 5, activeKey: '2', path: '/salidas', private: true, component: Salidas},
-    {id: 6, activeKey: null, path: '/marcas/:id', private: true, component: MarcasForm},
-    {id: 7, activeKey: '3', path: '/marcas', private: true, component: Marcas},
-    {id: 8, activeKey: null, path: '/rubros/:id', private: true, component: RubrosForm},
-    {id: 9, activeKey: '4', path: '/rubros', private: true, component: Rubros},
-    {id: 10, activeKey: null, path: '/clientes/:id', private: true, component: ClientesForm},
-    {id: 11, activeKey: '5', path: '/clientes', private: true, component: Clientes},
-    {id: 12, activeKey: null, path: '/mediospago/:id', private: true, component: MediosPagoForm},
-    {id: 13, activeKey: '6', path: '/mediospago', private: true, component: MediosPago},
-    {id: 14, activeKey: null, path: '/documentos/:id', private: true, component: DocumentosForm},
-    {id: 15, activeKey: '7', path: '/documentos', private: true, component: Documentos},
-    {id: 16, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
-    {id: 17, activeKey: '8', path: '/usuarios', private: true, component: Usuarios},
-    {id: 18, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
-    {id: 19, activeKey: null, path: '/', private: true, component: Home},
+    {id: 6, activeKey: null, path: '/entradas/:id', private: true, component: EntradasForm},
+    {id: 7, activeKey: '3', path: '/entradas', private: true, component: Entradas},
+    {id: 8, activeKey: null, path: '/marcas/:id', private: true, component: MarcasForm},
+    {id: 9, activeKey: '4', path: '/marcas', private: true, component: Marcas},
+    {id: 10, activeKey: null, path: '/rubros/:id', private: true, component: RubrosForm},
+    {id: 11, activeKey: '5', path: '/rubros', private: true, component: Rubros},
+    {id: 12, activeKey: null, path: '/clientes/:id', private: true, component: ClientesForm},
+    {id: 13, activeKey: '6', path: '/clientes', private: true, component: Clientes},
+    {id: 14, activeKey: null, path: '/mediospago/:id', private: true, component: MediosPagoForm},
+    {id: 15, activeKey: '7', path: '/mediospago', private: true, component: MediosPago},
+    {id: 16, activeKey: null, path: '/documentos/:id', private: true, component: DocumentosForm},
+    {id: 17, activeKey: '8', path: '/documentos', private: true, component: Documentos},
+    {id: 18, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
+    {id: 19, activeKey: '9', path: '/usuarios', private: true, component: Usuarios},
+    {id: 20, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
+    {id: 21, activeKey: null, path: '/', private: true, component: Home},
 ]
 
 const AppRouter  = () => {

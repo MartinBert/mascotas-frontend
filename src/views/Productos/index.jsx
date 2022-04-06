@@ -112,7 +112,7 @@ const Productos = () => {
             <Header setFilters={setFilters} filters={filters} setLoading={setLoading}/>
           </Col>
           <Col span={24}>
-            <Table 
+            <Table
                 width={"100%"}
                 dataSource={products}
                 columns={columnsForTable}

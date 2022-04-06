@@ -6,9 +6,9 @@ const Header = () => {
     return (
         <Row>
             <Col>
-                <Link to="/salidas/nuevo">
+                <Link to="/entradas/nuevo">
                     <button className="btn-primary">
-                        Nueva salida
+                        Nueva entrada
                     </button>
                 </Link>
             </Col>
