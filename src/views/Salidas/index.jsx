@@ -25,7 +25,7 @@ const Salidas = () => {
 
     useEffect(() => {
       const fetchSalidas = async() => {
-        const response = await api.salidas.getAll({page, limit, filters});
+        const response = await api.salidas.getAll({page, limit, filters: JSON.stringify(filters)});
         setSalidas(response.data.docs);
         setTotalDocs(response.data.totalDocs);
         setLoading(false);
@@ -100,7 +100,9 @@ const Salidas = () => {
 
     return (
         <Row>
-            <Header setFilters={setFilters}/>
+            <Col span={24}>
+              <Header setFilters={setFilters} filters={filters}/>
+            </Col>
             <Col span={24}>
                 <Table 
                     width={"100%"}
