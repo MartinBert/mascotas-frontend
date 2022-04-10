@@ -182,12 +182,14 @@ const MediosPagoForm = () => {
                                                         onChange={(e) => {
                                                             setPlanLines(
                                                                 planLines.map(el => {
-                                                                    if(el.id === planLines[key].id){
+                                                                    if(el._id === item._id){
                                                                         el.nombre = e.target.value
                                                                     }
                                                                     return el;
                                                                 })
                                                             )
+
+                                                            console.log(planLines);
                                                         }}
                                                     />
                                                 </Form.Item>
@@ -203,7 +205,7 @@ const MediosPagoForm = () => {
                                                         onChange={(e) => {
                                                             setPlanLines(
                                                                 planLines.map(el => {
-                                                                    if(el.id === planLines[key].id){
+                                                                    if(el._id === item._id){
                                                                         el.cuotas = e.target.value
                                                                     }
                                                                     return el;
@@ -225,7 +227,7 @@ const MediosPagoForm = () => {
                                                         onChange={(e) => {
                                                             setPlanLines(
                                                                 planLines.map(el => {
-                                                                    if(el.id === planLines[key].id){
+                                                                    if(el._id === item._id){
                                                                         el.porcentaje = e.target.value
                                                                     }
                                                                     return el;
@@ -238,7 +240,7 @@ const MediosPagoForm = () => {
                                             <Col>
                                                 <div onClick={() => {
                                                     setPlanLines(
-                                                        planLines.filter(el => el.id !== item.id)
+                                                        planLines.filter(el => el._id !== item._id)
                                                     )
                                                 }}>
                                                     <Delete/>

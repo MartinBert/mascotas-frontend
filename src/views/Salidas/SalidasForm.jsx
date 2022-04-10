@@ -89,7 +89,7 @@ const SalidasForm = () => {
                         productsToSalida.push(product)
                     }
                 }
-                const gananciaNeta = productsToSalida.reduce((acc, el) => acc + el.gananciaNetaTotal, 0);
+                const gananciaNeta = mathHelper.roundTwoDecimals(productsToSalida.reduce((acc, el) => acc + el.gananciaNetaTotal, 0));
                 const cantidad = productsToSalida.reduce((acc, el) => acc + el.cantidadesSalientes, 0);
                 setSalida({
                     ...salida,
