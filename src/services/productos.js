@@ -68,13 +68,24 @@ const edit = async(producto) => {
     }
 }
 
+const modifyStock = async(body) => {
+    try{
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos/modifyStock`, body, headers);
+        return response.data;
+    }catch(err){
+        checkStorageStatus(err);
+        console.error(err);
+    }
+} 
+
 const productos = {
     getAll,
     getById,
     getByBarcode,
     deleteById,
     save,
-    edit
+    edit,
+    modifyStock
 }
 
 export default productos;

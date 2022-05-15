@@ -140,8 +140,8 @@ const UsuariosForm = () => {
               <Checkbox 
                 name="perfil"
                 checked={usuario.perfil}
-                onChange={(e, val) => {
-                  loadUsuarioData(e, val);
+                onChange={(e) => {
+                  loadUsuarioData(e);
                 }}
               ></Checkbox>
             </Form.Item>

@@ -27,10 +27,6 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             title: 'Cantidad entrante',
             dataIndex: 'cantidadesEntrantes',
         },
-        {
-            title: 'Ganancia neta total',
-            dataIndex: 'gananciaNetaTotal',
-        },
     ]
     return (
     <Modal 

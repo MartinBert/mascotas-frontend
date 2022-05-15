@@ -5,11 +5,14 @@ import api from '../../services';
 import icons from '../../components/icons';
 import helpers from '../../helpers';
 import { errorAlert, successAlert } from '../../components/alerts';
+import { ProductSelectionModal } from '../../components/generics';
 
 const { Add, Delete } = icons;
-const { mathHelper, dateHelper } = helpers;
+const {dateHelper} = helpers;
 
 const EntradasForm = () => {
+
+    //------------------------------------------------------ State declarations ------------------------------------------------------/
     const { id } = useParams();
     const history = useHistory();
     const [loading, setLoading] = useState(true);
@@ -22,12 +25,17 @@ const EntradasForm = () => {
         usuario: null,
     });
     const [entradaIsReady, setEntradaIsReady] = useState(false);
+    const [productSelectionVisible, setProductSelectionVisible] = useState(false);
+    const [selectedProductsInModal, setSelectedProductsInModal] = useState([]);
+    //------------------------------------------------------------------------------------------------------------------------------/
 
+
+    //--------------------------------------------------------- First load ---------------------------------------------------------/
     //eslint-disable-next-line
     useEffect(() => {
         if(!loading) return;
         if(id === 'nuevo'){
-            setLoading(false);
+            setEntradaIsReady(true);
         }else{
             fetchEntrada(); 
         }
@@ -35,55 +43,117 @@ const EntradasForm = () => {
 
     useEffect(() => {
         if(!entradaIsReady) return;
+        if(!entrada.usuario){
+            const fetchLoggedUser = async() => {
+                const loggedUser = await api.usuarios.getById(localStorage.getItem('userId'));
+                setEntrada({
+                    ...entrada,
+                    usuario: loggedUser
+                })
+            }
+            fetchLoggedUser();      
+        }
         setLoading(false);
-    }, [entradaIsReady])
-
-    useEffect(() => {
-        if(entrada.usuario) return;
-        const fetchLoggedUser = async() => {
-            const response = await api.usuarios.getById(localStorage.getItem('userId'));
-            setEntrada({
-                ...entrada,
-                usuario: response
-            })
-        }
-        fetchLoggedUser();
-    })
-
-    useEffect(() => {
-        if(id !== 'nuevo') return;
-        if(entrada.cantidad !== 0 && entrada.gananciaNeta !== 0){
-            if(entrada.descripcion === undefined || entrada.descripcion === ''){
-                entrada.descripcion = `Entrada del ${dateHelper.simpleDateWithHours(new Date())} hs`;
-            }
-            const saveEntrada = async() => {
-                const response = await api.entradas.save(entrada);
-                if(response.code === 200){
-                    successAlert('Registro guardado con éxito')
-                    .then(() => {
-                        redirectToEntradas();
-                    })
-                }
-            }
-            saveEntrada();
-        }
     }, 
     //eslint-disable-next-line
-    [entrada]);
+    [entradaIsReady])
 
     const fetchEntrada = async() => {
+        console.log('Ejecucion de fetch de entrada')
         const response =  await api.entradas.getById(id);
         setEntrada(response.data);
         setEntradaIsReady(true);
     }
+    //------------------------------------------------------------------------------------------------------------------------------/
 
-    const handleSubmit = () => {
-        console.log('submit');
+
+    //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
+    useEffect(() => {
+        if(selectedProductsInModal && selectedProductsInModal.length !== 0){
+            selectedProductsInModal.forEach(item => {
+                delete(item.selected);
+                if(!entrada.productos.find(el => el._id === item._id)){
+                    setEntrada({
+                        ...entrada,
+                        productos: [
+                            ...entrada.productos,
+                            item
+                        ]
+                    })
+                }
+            })
+        }
+    }, 
+    //eslint-disable-next-line
+    [selectedProductsInModal])
+    //------------------------------------------------------------------------------------------------------------------------------/
+
+
+    //----------------------------------------------- Submit form action -----------------------------------------------------------/
+    const handleSubmit = async() => {
+        try{
+            if(id !== "nuevo"){
+                for(let product of entrada.productos){
+                    const firstEntradaRequest = await api.entradas.getById(id);
+                    const firstEntradaInstance = firstEntradaRequest.data;
+                    const originalProductInstance = firstEntradaInstance.productos.find(el => el._id === product._id);
+                    if(originalProductInstance && originalProductInstance.cantidadesEntrantes !== product.cantidadesEntrantes){
+                        const productToModifyRequest = await api.productos.getById(product._id);
+                        const productToModify = productToModifyRequest.data;
+                        productToModify.cantidadStock -= originalProductInstance.cantidadesEntrantes;
+                        productToModify.cantidadStock += parseFloat(product.cantidadesEntrantes);
+                        await api.productos.edit(productToModify);
+                    }else{
+                        await api.productos.modifyStock({
+                            product,
+                            action: 'increase',
+                            quantity: product.cantidadesEntrantes
+                        })
+                    }
+                }
+                entrada.fecha = new Date();
+                entrada.cantidad = entrada.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0);
+                await api.entradas.edit(entrada)
+                .then((response) => {
+                    if(response.code === 200){
+                        successAlert('El registro se editó correctamente');
+                        redirectToEntradas();
+                    }else{
+                        errorAlert('Fallo al editar el registro');
+                    }
+                })
+            }else{
+                if(!entrada.descripcion){
+                    entrada.descripcion = `Entrada del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+                }
+                entrada.fecha = new Date();
+                entrada.cantidad = entrada.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0);
+                for(const product of entrada.productos){
+                    await api.productos.modifyStock({
+                        product,
+                        action: 'increase',
+                        quantity: product.cantidadesEntrantes
+                    })
+                }
+                await api.entradas.save(entrada)
+                .then((response) => {
+                    if(response.code === 200){
+                        successAlert('El registro se guardó correctamente');
+                        redirectToEntradas();
+                    }else{
+                        errorAlert('Fallo al guardar el registro');
+                    }
+                })
+            }
+        }catch(err){
+            console.error(err);
+        }
     }
-
     const redirectToEntradas = () => {
         history.push('/entradas');
     }
+    //------------------------------------------------------------------------------------------------------------------------------/
+
 
     return (
         <Row>
@@ -116,28 +186,38 @@ const EntradasForm = () => {
                             </Col>
                             <Col span={24}>
                                 <div 
-                                    onClick={() => {
-                                        setEntrada({
-                                            ...entrada,
-                                            productos: [
-                                                ...entrada.productos,
-                                                {
-                                                    _id: null,
-                                                    codigoBarras: null,
-                                                    cantidad: 0
-                                                }
-                                            ]
-                                        })
-                                    }}
+                                    onClick={() => {setProductSelectionVisible(true)}}
                                 >
                                     <Add customStyle={{width: '70px', height: '70px'}}/>
                                 </div>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 {(entrada.productos.length > 0) ?
                                     entrada.productos.map((item, key) => (
                                         <Row key={key} gutter={8}>
-                                            <Col>
+                                            <Col span={8}>
+                                                <Form.Item 
+                                                    required
+                                                >
+                                                    <Input 
+                                                        name="nombre"
+                                                        placeholder="Nombre del producto"
+                                                        value={item.nombre}
+                                                        onChange={(e) => {
+                                                            setEntrada({
+                                                                ...entrada,
+                                                                productos: entrada.productos.map(el => {
+                                                                    if(el._id === item._id){
+                                                                        el.nombre = e.target.value
+                                                                    }
+                                                                    return el;
+                                                                })
+                                                            })
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
                                                 <Form.Item 
                                                     required
                                                 >
@@ -159,7 +239,7 @@ const EntradasForm = () => {
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col>
+                                            <Col span={6}>
                                                 <Form.Item 
                                                     required
                                                 >
@@ -173,7 +253,8 @@ const EntradasForm = () => {
                                                                 ...entrada,
                                                                 productos: entrada.productos.map(el => {
                                                                     if(el._id === item._id){
-                                                                        el.cantidadesEntrantes = parseFloat(e.target.value)
+                                                                        console.log(e.target.value)
+                                                                        el.cantidadesEntrantes = (!e.target.value) ? 0 : parseFloat(e.target.value);
                                                                     }
                                                                     return el;
                                                                 })
@@ -182,7 +263,7 @@ const EntradasForm = () => {
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col>
+                                            <Col span={4}>
                                                 <div onClick={
                                                     () => {
                                                         setEntrada({
@@ -221,6 +302,12 @@ const EntradasForm = () => {
                     </Form>
                 }
             </Col>
+            <ProductSelectionModal
+                productSelectionVisible={productSelectionVisible}
+                setProductSelectionVisible={setProductSelectionVisible}
+                selectionLimit={1}
+                setSelectedProductsInModal={setSelectedProductsInModal}
+            />
         </Row>
     )
 }
