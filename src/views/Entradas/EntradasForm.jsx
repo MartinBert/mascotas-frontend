@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input } from 'antd';
+import { Row, Col, Form, Input, Spin } from 'antd';
 import api from '../../services';
-import graphics from '../../components/graphics';
 import icons from '../../components/icons';
 import helpers from '../../helpers';
 import { errorAlert, successAlert } from '../../components/alerts';
 
-const { Spinner } = graphics;
 const { Add, Delete } = icons;
 const { mathHelper, dateHelper } = helpers;
 
@@ -22,22 +20,23 @@ const EntradasForm = () => {
         gananciaNeta: 0,
         productos: [],
         usuario: null,
-    })
-    const [productLines, setProductLines] = useState([]);
+    });
+    const [entradaIsReady, setEntradaIsReady] = useState(false);
 
     //eslint-disable-next-line
     useEffect(() => {
+        if(!loading) return;
         if(id === 'nuevo'){
             setLoading(false);
         }else{
-            const fetchEntrada = async() => {
-                const response =  await api.entradas.getById(id);
-                setEntrada(response.data);
-                setLoading(false);
-            }
-            fetchEntrada();
+            fetchEntrada(); 
         }
     })
+
+    useEffect(() => {
+        if(!entradaIsReady) return;
+        setLoading(false);
+    }, [entradaIsReady])
 
     useEffect(() => {
         if(entrada.usuario) return;
@@ -70,39 +69,16 @@ const EntradasForm = () => {
         }
     }, 
     //eslint-disable-next-line
-    [entrada])
+    [entrada]);
+
+    const fetchEntrada = async() => {
+        const response =  await api.entradas.getById(id);
+        setEntrada(response.data);
+        setEntradaIsReady(true);
+    }
 
     const handleSubmit = () => {
-        const fetchProducts = async() => {
-            try{
-
-                let productsToEntrada = [];
-                for(const item of productLines){
-                    const response = await api.productos.getByBarcode(item.barcode);
-                    let product = response.data;
-                    let itemQuantity = parseFloat(item.quantity);
-                    product.cantidadStock += itemQuantity;
-                    const productEditionResponse = await api.productos.edit(product);
-                    if(productEditionResponse.code === 200){
-                        product.cantidadesEntrantes = Number(item.quantity);
-                        product.gananciaNetaTotal = mathHelper.roundTwoDecimals(product.gananciaNeta * product.cantidadesEntrantes);
-                        productsToEntrada.push(product)
-                    }
-                }
-                const gananciaNeta = productsToEntrada.reduce((acc, el) => acc + el.gananciaNetaTotal, 0);
-                const cantidad = productsToEntrada.reduce((acc, el) => acc + el.cantidadesEntrantes, 0);
-                setEntrada({
-                    ...entrada,
-                    productos: productsToEntrada,
-                    gananciaNeta,
-                    cantidad
-                })
-            }catch(err){
-                console.error(err);
-                errorAlert('Error al guardar el registro...');
-            }
-        }
-        fetchProducts()
+        console.log('submit');
     }
 
     const redirectToEntradas = () => {
@@ -114,7 +90,7 @@ const EntradasForm = () => {
             <Col span={24}>
                 <h1>{(id === 'nuevo') ? 'Nueva entrada' : 'Editar entrada'}</h1>
                 {(loading) 
-                    ? <Spinner/>
+                    ? <Spin/>
                     :
                     <Form 
                         autoComplete="off"
@@ -141,22 +117,25 @@ const EntradasForm = () => {
                             <Col span={24}>
                                 <div 
                                     onClick={() => {
-                                        setProductLines([
-                                            ...productLines,
-                                            {
-                                                id: mathHelper.randomFiveDecimals(),
-                                                barcode: '',
-                                                quantity: 0
-                                            }
-                                        ])
+                                        setEntrada({
+                                            ...entrada,
+                                            productos: [
+                                                ...entrada.productos,
+                                                {
+                                                    _id: null,
+                                                    codigoBarras: null,
+                                                    cantidad: 0
+                                                }
+                                            ]
+                                        })
                                     }}
                                 >
                                     <Add customStyle={{width: '70px', height: '70px'}}/>
                                 </div>
                             </Col>
                             <Col span={12}>
-                                {(productLines.length > 0) ?
-                                    productLines.map((item, key) => (
+                                {(entrada.productos.length > 0) ?
+                                    entrada.productos.map((item, key) => (
                                         <Row key={key} gutter={8}>
                                             <Col>
                                                 <Form.Item 
@@ -165,16 +144,17 @@ const EntradasForm = () => {
                                                     <Input 
                                                         name="barcode"
                                                         placeholder="Codigo de barras de producto"
-                                                        value={item.barcode}
+                                                        value={item.codigoBarras}
                                                         onChange={(e) => {
-                                                            setProductLines(
-                                                                productLines.map(el => {
-                                                                    if(el.id === productLines[key].id){
-                                                                        el.barcode = e.target.value
+                                                            setEntrada({
+                                                                ...entrada,
+                                                                productos: entrada.productos.map(el => {
+                                                                    if(el._id === item._id){
+                                                                        el.codigoBarras = e.target.value
                                                                     }
                                                                     return el;
                                                                 })
-                                                            )
+                                                            })
                                                         }}
                                                     />
                                                 </Form.Item>
@@ -186,26 +166,30 @@ const EntradasForm = () => {
                                                     <Input 
                                                         name="quantity"
                                                         placeholder="Cantidad"
-                                                        value={item.quantity}
+                                                        type="number"
+                                                        value={item.cantidadesEntrantes}
                                                         onChange={(e) => {
-                                                            setProductLines(
-                                                                productLines.map(el => {
-                                                                    if(el.id === productLines[key].id){
-                                                                        el.quantity = e.target.value
+                                                            setEntrada({
+                                                                ...entrada,
+                                                                productos: entrada.productos.map(el => {
+                                                                    if(el._id === item._id){
+                                                                        el.cantidadesEntrantes = parseFloat(e.target.value)
                                                                     }
                                                                     return el;
                                                                 })
-                                                            )
+                                                            })
                                                         }}
                                                     />
                                                 </Form.Item>
                                             </Col>
                                             <Col>
-                                                <div onClick={() => {
-                                                    setProductLines(
-                                                        productLines.filter(el => el.id !== item.id)
-                                                    )
-                                                }}>
+                                                <div onClick={
+                                                    () => {
+                                                        setEntrada({
+                                                        ...entrada,
+                                                        productos: entrada.productos.filter(el => el._id !== item._id)
+                                                    })}
+                                                }>
                                                     <Delete/>
                                                 </div>
                                             </Col>
