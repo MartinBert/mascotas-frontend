@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input } from 'antd';
+import { Row, Col, Form, Input, Spin } from 'antd';
 import api from '../../services';
-import graphics from '../../components/graphics';
 import icons from '../../components/icons';
 import helpers from '../../helpers';
 import { errorAlert, successAlert } from '../../components/alerts';
+import { ProductSelectionModal } from '../../components/generics';
 
-const { Spinner } = graphics;
 const { Add, Delete } = icons;
-const { mathHelper, dateHelper } = helpers;
+const {dateHelper, mathHelper} = helpers;
 
 const SalidasForm = () => {
+
+    //------------------------------------------------------ State declarations ------------------------------------------------------/
     const { id } = useParams();
     const history = useHistory();
     const [loading, setLoading] = useState(true);
@@ -22,99 +23,146 @@ const SalidasForm = () => {
         gananciaNeta: 0,
         productos: [],
         usuario: null,
-    })
-    const [productLines, setProductLines] = useState([]);
+    });
+    const [salidaIsReady, setSalidaIsReady] = useState(false);
+    const [productSelectionVisible, setProductSelectionVisible] = useState(false);
+    const [selectedProductsInModal, setSelectedProductsInModal] = useState([]);
+    //------------------------------------------------------------------------------------------------------------------------------/
 
+
+    //--------------------------------------------------------- First load ---------------------------------------------------------/
     //eslint-disable-next-line
     useEffect(() => {
+        if(!loading) return;
         if(id === 'nuevo'){
-            setLoading(false);
+            setSalidaIsReady(true);
         }else{
-            const fetchSalida = async() => {
-                const response =  await api.salidas.getById(id);
-                setSalida(response.data);
-                setLoading(false);
-            }
-            fetchSalida();
+            fetchSalida(); 
         }
     })
 
     useEffect(() => {
-        if(salida.usuario) return;
-        const fetchLoggedUser = async() => {
-            const response = await api.usuarios.getById(localStorage.getItem('userId'));
-            setSalida({
-                ...salida,
-                usuario: response
-            })
-        }
-        fetchLoggedUser();
-    })
-
-    useEffect(() => {
-        if(id !== 'nuevo') return;
-        if(salida.cantidad !== 0 && salida.gananciaNeta !== 0){
-            if(salida.descripcion === undefined || salida.descripcion === ''){
-                salida.descripcion = `Salida del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+        if(!salidaIsReady) return;
+        if(!salida.usuario){
+            const fetchLoggedUser = async() => {
+                const loggedUser = await api.usuarios.getById(localStorage.getItem('userId'));
+                setSalida({
+                    ...salida,
+                    usuario: loggedUser
+                })
             }
-            const saveSalida = async() => {
-                const response = await api.salidas.save(salida);
-                console.log(response);
-                if(response.code === 200){
-                    successAlert('Registro guardado con éxito')
-                    .then(() => {
-                        redirectToSalidas();
+            fetchLoggedUser();      
+        }
+        setLoading(false);
+    }, ''
+    //eslint-disable-next-line
+    [salidaIsReady])
+
+    const fetchSalida = async() => {
+        console.log('Ejecucion de fetch de salida')
+        const response =  await api.salidas.getById(id);
+        setSalida(response.data);
+        setSalidaIsReady(true);
+    }
+    //------------------------------------------------------------------------------------------------------------------------------/
+
+
+    //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
+    useEffect(() => {
+        if(selectedProductsInModal && selectedProductsInModal.length !== 0){
+            selectedProductsInModal.forEach(item => {
+                delete(item.selected);
+                if(!salida.productos.find(el => el._id === item._id)){
+                    setSalida({
+                        ...salida,
+                        productos: [
+                            ...salida.productos,
+                            item
+                        ]
                     })
                 }
-            }
-            saveSalida();
+            })
         }
     }, 
     //eslint-disable-next-line
-    [salida])
+    [selectedProductsInModal])
+    //------------------------------------------------------------------------------------------------------------------------------/
 
-    const handleSubmit = () => {
-        const fetchProducts = async() => {
-            try{
 
-                let productsToSalida = [];
-                for(const item of productLines){
-                    const response = await api.productos.getByBarcode(item.barcode);
-                    let product = response.data;
-                    product.cantidadStock -= item.quantity;
-                    const productEditionResponse = await api.productos.edit(product);
-                    if(productEditionResponse.code === 200){
-                        product.cantidadesSalientes = Number(item.quantity);
-                        product.gananciaNetaTotal = mathHelper.roundTwoDecimals(product.gananciaNeta * product.cantidadesSalientes);
-                        productsToSalida.push(product)
+    //----------------------------------------------- Submit form action -----------------------------------------------------------/
+    const handleSubmit = async() => {
+        try{
+            if(id !== "nuevo"){
+                for(let product of salida.productos){
+                    const productToModifyRequest = await api.productos.getById(product._id);
+                    const productToModify = productToModifyRequest.data;
+                    const firstSalidaRequest = await api.salidas.getById(id);
+                    const firstSalidaInstance = firstSalidaRequest.data;
+                    const originalProductInstance = firstSalidaInstance.productos.find(el => el._id === product._id);
+                    if(originalProductInstance && originalProductInstance.cantidadesSalientes !== product.cantidadesSalientes){
+                        productToModify.cantidadStock += originalProductInstance.cantidadesSalientes;
+                        productToModify.cantidadStock -= parseFloat(product.cantidadesSalientes);
+                        await api.productos.edit(productToModify);
+                    }else{
+                        await api.productos.modifyStock({
+                            product,
+                            isIncrement: false,
+                            quantity: product.cantidadesSalientes
+                        })
                     }
+                    product.gananciaNetaTotal = mathHelper.roundTwoDecimals(productToModify.gananciaNeta * product.cantidadesSalientes);
                 }
-                const gananciaNeta = mathHelper.roundTwoDecimals(productsToSalida.reduce((acc, el) => acc + el.gananciaNetaTotal, 0));
-                const cantidad = productsToSalida.reduce((acc, el) => acc + el.cantidadesSalientes, 0);
-                setSalida({
-                    ...salida,
-                    productos: productsToSalida,
-                    gananciaNeta,
-                    cantidad
+                salida.fecha = new Date();
+                salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0);
+                salida.gananciaNeta = salida.productos.reduce((acc, item) => acc + item.gananciaNetaTotal, 0);
+                await api.salidas.edit(salida)
+                .then((response) => {
+                    if(response.code === 200){
+                        successAlert('El registro se editó correctamente');
+                        redirectToSalidas();
+                    }else{
+                        errorAlert('Fallo al editar el registro');
+                    }
                 })
-            }catch(err){
-                console.error(err);
-                errorAlert('Error al guardar el registro...');
+            }else{
+                if(!salida.descripcion){
+                    salida.descripcion = `Salida del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+                }
+                salida.fecha = new Date();
+                salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0);
+                for(const product of salida.productos){
+                    await api.productos.modifyStock({
+                        product,
+                        isIncrement: false,
+                        quantity: product.cantidadesSalientes
+                    })
+                }
+                await api.salidas.save(salida)
+                .then((response) => {
+                    if(response.code === 200){
+                        successAlert('El registro se guardó correctamente');
+                        redirectToSalidas();
+                    }else{
+                        errorAlert('Fallo al guardar el registro');
+                    }
+                })
             }
+        }catch(err){
+            console.error(err);
         }
-        fetchProducts()
     }
-
     const redirectToSalidas = () => {
         history.push('/salidas');
     }
+    //------------------------------------------------------------------------------------------------------------------------------/
+
 
     return (
         <Row>
             <Col span={24}>
                 <h1>{(id === 'nuevo') ? 'Nueva salida' : 'Editar salida'}</h1>
                 {(loading) 
-                    ? <Spinner/>
+                    ? <Spin/>
                     :
                     <Form 
                         autoComplete="off"
@@ -139,73 +187,92 @@ const SalidasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div 
-                                    onClick={() => {
-                                        setProductLines([
-                                            ...productLines,
-                                            {
-                                                id: mathHelper.randomFiveDecimals(),
-                                                barcode: '',
-                                                quantity: 0
-                                            }
-                                        ])
-                                    }}
-                                >
+                                <div onClick={() => {setProductSelectionVisible(true)}}>
                                     <Add customStyle={{width: '70px', height: '70px'}}/>
                                 </div>
                             </Col>
-                            <Col span={12}>
-                                {(productLines.length > 0) ?
-                                    productLines.map((item, key) => (
+                            <Col span={24}>
+                                {(salida.productos.length > 0) ?
+                                    salida.productos.map((item, key) => (
                                         <Row key={key} gutter={8}>
-                                            <Col>
+                                            <Col span={8}>
                                                 <Form.Item 
                                                     required
                                                 >
-                                                    <Input 
-                                                        name="barcode"
-                                                        placeholder="Codigo de barras de producto"
-                                                        value={item.barcode}
+                                                    <Input
+                                                        disabled
+                                                        name="nombre"
+                                                        placeholder="Nombre del producto"
+                                                        value={item.nombre}
                                                         onChange={(e) => {
-                                                            setProductLines(
-                                                                productLines.map(el => {
-                                                                    if(el.id === productLines[key].id){
-                                                                        el.barcode = e.target.value
+                                                            setSalida({
+                                                                ...salida,
+                                                                productos: salida.productos.map(el => {
+                                                                    if(el._id === item._id){
+                                                                        el.nombre = e.target.value
                                                                     }
                                                                     return el;
                                                                 })
-                                                            )
+                                                            })
                                                         }}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col>
+                                            <Col span={6}>
+                                                <Form.Item 
+                                                    required
+                                                >
+                                                    <Input
+                                                        disabled
+                                                        name="barcode"
+                                                        placeholder="Codigo de barras de producto"
+                                                        value={item.codigoBarras}
+                                                        onChange={(e) => {
+                                                            setSalida({
+                                                                ...salida,
+                                                                productos: salida.productos.map(el => {
+                                                                    if(el._id === item._id){
+                                                                        el.codigoBarras = e.target.value
+                                                                    }
+                                                                    return el;
+                                                                })
+                                                            })
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
                                                 <Form.Item 
                                                     required
                                                 >
                                                     <Input 
                                                         name="quantity"
                                                         placeholder="Cantidad"
-                                                        value={item.quantity}
+                                                        type="number"
+                                                        value={item.cantidadesSalientes}
                                                         onChange={(e) => {
-                                                            setProductLines(
-                                                                productLines.map(el => {
-                                                                    if(el.id === productLines[key].id){
-                                                                        el.quantity = e.target.value
+                                                            setSalida({
+                                                                ...salida,
+                                                                productos: salida.productos.map(el => {
+                                                                    if(el._id === item._id){
+                                                                        console.log(e.target.value)
+                                                                        el.cantidadesSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
                                                                     }
                                                                     return el;
                                                                 })
-                                                            )
+                                                            })
                                                         }}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col>
-                                                <div onClick={() => {
-                                                    setProductLines(
-                                                        productLines.filter(el => el.id !== item.id)
-                                                    )
-                                                }}>
+                                            <Col span={4}>
+                                                <div onClick={
+                                                    () => {
+                                                        setSalida({
+                                                        ...salida,
+                                                        productos: salida.productos.filter(el => el._id !== item._id)
+                                                    })}
+                                                }>
                                                     <Delete/>
                                                 </div>
                                             </Col>
@@ -237,6 +304,12 @@ const SalidasForm = () => {
                     </Form>
                 }
             </Col>
+            <ProductSelectionModal
+                productSelectionVisible={productSelectionVisible}
+                setProductSelectionVisible={setProductSelectionVisible}
+                selectionLimit={1}
+                setSelectedProductsInModal={setSelectedProductsInModal}
+            />
         </Row>
     )
 }

@@ -54,7 +54,7 @@ const EntradasForm = () => {
             fetchLoggedUser();      
         }
         setLoading(false);
-    }, 
+    }, ''
     //eslint-disable-next-line
     [entradaIsReady])
 
@@ -106,7 +106,7 @@ const EntradasForm = () => {
                     }else{
                         await api.productos.modifyStock({
                             product,
-                            action: 'increase',
+                            isIncrement: true,
                             quantity: product.cantidadesEntrantes
                         })
                     }
@@ -131,7 +131,7 @@ const EntradasForm = () => {
                 for(const product of entrada.productos){
                     await api.productos.modifyStock({
                         product,
-                        action: 'increase',
+                        isIncrement: true,
                         quantity: product.cantidadesEntrantes
                     })
                 }
@@ -185,9 +185,7 @@ const EntradasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div 
-                                    onClick={() => {setProductSelectionVisible(true)}}
-                                >
+                                <div onClick={() => {setProductSelectionVisible(true)}}>
                                     <Add customStyle={{width: '70px', height: '70px'}}/>
                                 </div>
                             </Col>
@@ -199,7 +197,8 @@ const EntradasForm = () => {
                                                 <Form.Item 
                                                     required
                                                 >
-                                                    <Input 
+                                                    <Input
+                                                        disabled
                                                         name="nombre"
                                                         placeholder="Nombre del producto"
                                                         value={item.nombre}
@@ -221,7 +220,8 @@ const EntradasForm = () => {
                                                 <Form.Item 
                                                     required
                                                 >
-                                                    <Input 
+                                                    <Input
+                                                        disabled
                                                         name="barcode"
                                                         placeholder="Codigo de barras de producto"
                                                         value={item.codigoBarras}
