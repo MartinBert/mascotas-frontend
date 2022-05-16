@@ -54,12 +54,11 @@ const SalidasForm = () => {
             fetchLoggedUser();      
         }
         setLoading(false);
-    }, ''
+    },
     //eslint-disable-next-line
     [salidaIsReady])
 
     const fetchSalida = async() => {
-        console.log('Ejecucion de fetch de salida')
         const response =  await api.salidas.getById(id);
         setSalida(response.data);
         setSalidaIsReady(true);
@@ -255,7 +254,6 @@ const SalidasForm = () => {
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
                                                                     if(el._id === item._id){
-                                                                        console.log(e.target.value)
                                                                         el.cantidadesSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
                                                                     }
                                                                     return el;

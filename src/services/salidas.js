@@ -21,7 +21,6 @@ const getAll = async(params) => {
 const getById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/${id}`, headers);
-        console.log(response.data)
         return response.data;
     }catch(err){
         checkStorageStatus(err);

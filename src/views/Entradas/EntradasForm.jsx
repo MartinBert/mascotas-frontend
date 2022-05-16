@@ -54,12 +54,11 @@ const EntradasForm = () => {
             fetchLoggedUser();      
         }
         setLoading(false);
-    }, ''
+    },
     //eslint-disable-next-line
     [entradaIsReady])
 
     const fetchEntrada = async() => {
-        console.log('Ejecucion de fetch de entrada')
         const response =  await api.entradas.getById(id);
         setEntrada(response.data);
         setEntradaIsReady(true);
@@ -253,7 +252,6 @@ const EntradasForm = () => {
                                                                 ...entrada,
                                                                 productos: entrada.productos.map(el => {
                                                                     if(el._id === item._id){
-                                                                        console.log(e.target.value)
                                                                         el.cantidadesEntrantes = (!e.target.value) ? 0 : parseFloat(e.target.value);
                                                                     }
                                                                     return el;
