@@ -6,8 +6,10 @@ import Header from './Header';
 import icons from '../../components/icons';
 import DetailsModal from './DetailsModal';
 import DeleteModal from './DeleteModal';
+import helpers from '../../helpers';
 
 const { Details, Edit, Delete } = icons;
+const { dateHelper } = helpers;
 
 const Entradas = () => {
     const history = useHistory();
@@ -56,10 +58,15 @@ const Entradas = () => {
         dataIndex: 'descripcion',
       },
       {
+        title: 'Fecha',
+        render: (data) => (
+          <p>{dateHelper.simpleDateWithHours(data.fecha)}</p>
+        ),
+      },
+      {
         title: 'Productos que entraron',
         render: data => (
           <div onClick={() => {
-            console.log(data.productos)
             setDetailsData(data.productos);
             setDetailsVisible(true)
           }}>
@@ -70,6 +77,10 @@ const Entradas = () => {
       {
         title: 'Cantidad total de unidades',
         dataIndex: 'cantidad',
+      },
+      {
+        title: 'Costo total',
+        dataIndex: 'costoTotal',
       },
       {
         title: 'Usuario',

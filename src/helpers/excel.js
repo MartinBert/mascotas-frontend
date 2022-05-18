@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import {saveAs} from 'file-saver';
 
-export const exportSimpleExcel = (columnHeaders, lines, nameSheet, nameDocument) => {
+const exportSimpleExcel = (columnHeaders, lines, nameSheet, nameDocument) => {
     let wb = XLSX.utils.book_new();
     wb.Props = {
     Title: nameSheet,
@@ -27,3 +27,9 @@ export const exportSimpleExcel = (columnHeaders, lines, nameSheet, nameDocument)
     
     saveAs(new Blob([s2ab(wbout)],{type:'application/octet-stream'}), nameDocument + '.xlsx');
 }
+
+const excel = {
+    exportSimpleExcel
+}
+
+export default excel;
