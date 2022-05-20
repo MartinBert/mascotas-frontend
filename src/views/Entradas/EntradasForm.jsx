@@ -3,12 +3,10 @@ import { useParams, useHistory } from 'react-router-dom';
 import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
 import api from '../../services';
 import icons from '../../components/icons';
-import helpers from '../../helpers';
 import { errorAlert, successAlert } from '../../components/alerts';
 import { ProductSelectionModal } from '../../components/generics';
 
 const { Add, Delete } = icons;
-const {dateHelper} = helpers;
 
 const EntradasForm = () => {
 

@@ -30,7 +30,7 @@ const Header = ({ filters, setFilters }) => {
                 simpleDateWithHours(entrada.fecha),
                 entrada.descripcion,
                 entrada.productos.reduce((acc, item) => { 
-                    acc = acc + item.nombre + '(' + item.cantidadesEntrantes + '),'
+                    acc = acc + item.nombre + ' (' + item.cantidadesEntrantes + '),'
                     return acc;
                 }, ''),
                 entrada.cantidad,

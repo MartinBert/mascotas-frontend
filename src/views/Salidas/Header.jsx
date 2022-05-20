@@ -30,10 +30,9 @@ const Header = ({ filters, setFilters }) => {
                 simpleDateWithHours(salida.fecha),
                 salida.descripcion,
                 salida.productos.reduce((acc, item) => { 
-                    acc = acc + item.nombre + '(' + item.cantidadesSalientes + '),'
+                    acc = acc + item.nombre + ' (' + item.cantidadesSalientes + '),'
                     return acc;
                 }, ''),
-                salida.cantidad,
                 salida.gananciaNetaTotal,
                 salida.usuario.nombre
             ])
