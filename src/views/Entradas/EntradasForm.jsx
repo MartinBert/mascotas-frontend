@@ -131,7 +131,7 @@ const EntradasForm = () => {
                 })
             }else{
                 if(!entrada.descripcion){
-                    entrada.descripcion = `Entrada del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+                    entrada.descripcion = '-- Sin descripción --';
                 }
                 if(!entrada.fecha){
                     entrada.fecha = new Date()

@@ -27,7 +27,7 @@ const Entradas = () => {
 
     useEffect(() => {
       const fetchEntradas = async() => {
-        const response = await api.entradas.getAll({page, limit, filters});
+        const response = await api.entradas.getAll({page, limit, filters: JSON.stringify(filters)});
         setEntradas(response.data.docs);
         setTotalDocs(response.data.totalDocs);
         setLoading(false);
@@ -60,7 +60,7 @@ const Entradas = () => {
       {
         title: 'Fecha',
         render: (data) => (
-          <p>{dateHelper.simpleDateWithHours(data.fecha)}</p>
+          <p>{dateHelper.simpleDateWithHours(data.fecha)+' hs'}</p>
         ),
       },
       {
@@ -75,11 +75,7 @@ const Entradas = () => {
         )
       },
       {
-        title: 'Cantidad total de unidades',
-        dataIndex: 'cantidad',
-      },
-      {
-        title: 'Costo total',
+        title: 'Costo',
         dataIndex: 'costoTotal',
       },
       {
@@ -107,7 +103,9 @@ const Entradas = () => {
 
     return (
         <Row>
-            <Header setFilters={setFilters}/>
+            <Col span={24}>
+              <Header setFilters={setFilters} filters={filters}/>
+            </Col>
             <Col span={24}>
                 <Table 
                     width={"100%"}
