@@ -33,7 +33,6 @@ const Header = ({ filters, setFilters }) => {
                     acc = acc + item.nombre + ' (' + item.cantidadesEntrantes + '),'
                     return acc;
                 }, ''),
-                entrada.cantidad,
                 entrada.costoTotal,
                 entrada.usuario.nombre
             ])
