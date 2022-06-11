@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Spin } from 'antd';
+import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
 import api from '../../services';
 import icons from '../../components/icons';
-import helpers from '../../helpers';
 import { errorAlert, successAlert } from '../../components/alerts';
 import { ProductSelectionModal } from '../../components/generics';
 
 const { Add, Delete } = icons;
-const {dateHelper} = helpers;
 
 const EntradasForm = () => {
 
@@ -27,6 +25,7 @@ const EntradasForm = () => {
     const [entradaIsReady, setEntradaIsReady] = useState(false);
     const [productSelectionVisible, setProductSelectionVisible] = useState(false);
     const [selectedProductsInModal, setSelectedProductsInModal] = useState([]);
+    const [total, setTotal] = useState(0);
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
@@ -85,6 +84,13 @@ const EntradasForm = () => {
     }, 
     //eslint-disable-next-line
     [selectedProductsInModal])
+
+    useEffect(() => {
+        setTotal(
+            entrada.productos.reduce(
+                (acc, item) => acc + ((item.cantidadesEntrantes) ? (item.precioUnitario * item.cantidadesEntrantes) : 0), 0
+            ))
+    }, [entrada.productos])
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
@@ -123,10 +129,13 @@ const EntradasForm = () => {
                 })
             }else{
                 if(!entrada.descripcion){
-                    entrada.descripcion = `Entrada del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+                    entrada.descripcion = '-- Sin descripción --';
                 }
-                entrada.fecha = new Date();
+                if(!entrada.fecha){
+                    entrada.fecha = new Date()
+                };
                 entrada.cantidad = entrada.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0);
+                entrada.costoTotal = total;
                 for(const product of entrada.productos){
                     await api.productos.modifyStock({
                         product,
@@ -180,6 +189,34 @@ const EntradasForm = () => {
                                                 descripcion: e.target.value
                                             })
                                         }}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item
+                                    label="Fecha"
+                                >
+                                    <DatePicker 
+                                        name="fecha"
+                                        locale='es-es'
+                                        onChange={(e) => {
+                                            setEntrada({
+                                                ...entrada,
+                                                fecha: new Date(e._d)
+                                            })
+                                        }}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item
+                                    label="Costo total"
+                                >
+                                    <Input 
+                                        name="costoTotal"
+                                        placeholder="Costo total"
+                                        value={total}
+                                        disabled={true}
                                     />
                                 </Form.Item>
                             </Col>

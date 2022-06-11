@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Spin } from 'antd';
+import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
 import api from '../../services';
 import icons from '../../components/icons';
-import helpers from '../../helpers';
 import { errorAlert, successAlert } from '../../components/alerts';
 import { ProductSelectionModal } from '../../components/generics';
 
 const { Add, Delete } = icons;
-const {dateHelper, mathHelper} = helpers;
 
 const SalidasForm = () => {
 
@@ -27,39 +25,40 @@ const SalidasForm = () => {
     const [salidaIsReady, setSalidaIsReady] = useState(false);
     const [productSelectionVisible, setProductSelectionVisible] = useState(false);
     const [selectedProductsInModal, setSelectedProductsInModal] = useState([]);
+    const [total, setTotal] = useState(0);
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
     //--------------------------------------------------------- First load ---------------------------------------------------------/
     //eslint-disable-next-line
     useEffect(() => {
-        if(!loading) return;
-        if(id === 'nuevo'){
+        if (!loading) return;
+        if (id === 'nuevo') {
             setSalidaIsReady(true);
-        }else{
-            fetchSalida(); 
+        } else {
+            fetchSalida();
         }
     })
 
     useEffect(() => {
-        if(!salidaIsReady) return;
-        if(!salida.usuario){
-            const fetchLoggedUser = async() => {
+        if (!salidaIsReady) return;
+        if (!salida.usuario) {
+            const fetchLoggedUser = async () => {
                 const loggedUser = await api.usuarios.getById(localStorage.getItem('userId'));
                 setSalida({
                     ...salida,
                     usuario: loggedUser
                 })
             }
-            fetchLoggedUser();      
+            fetchLoggedUser();
         }
         setLoading(false);
     },
-    //eslint-disable-next-line
-    [salidaIsReady])
+        //eslint-disable-next-line
+        [salidaIsReady])
 
-    const fetchSalida = async() => {
-        const response =  await api.salidas.getById(id);
+    const fetchSalida = async () => {
+        const response = await api.salidas.getById(id);
         setSalida(response.data);
         setSalidaIsReady(true);
     }
@@ -68,10 +67,10 @@ const SalidasForm = () => {
 
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
-        if(selectedProductsInModal && selectedProductsInModal.length !== 0){
+        if (selectedProductsInModal && selectedProductsInModal.length !== 0) {
             selectedProductsInModal.forEach(item => {
-                delete(item.selected);
-                if(!salida.productos.find(el => el._id === item._id)){
+                delete (item.selected);
+                if (!salida.productos.find(el => el._id === item._id)) {
                     setSalida({
                         ...salida,
                         productos: [
@@ -82,9 +81,16 @@ const SalidasForm = () => {
                 }
             })
         }
-    }, 
-    //eslint-disable-next-line
-    [selectedProductsInModal])
+    },
+        //eslint-disable-next-line
+        [selectedProductsInModal])
+
+    useEffect(() => {
+        setTotal(
+            salida.productos.reduce(
+                (acc, item) => acc + ((item.cantidadesSalientes) ? (item.gananciaNeta * item.cantidadesSalientes) : 0), 0
+            ))
+    }, [salida.productos])
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
@@ -93,12 +99,12 @@ const SalidasForm = () => {
         try{
             if(id !== "nuevo"){
                 for(let product of salida.productos){
-                    const productToModifyRequest = await api.productos.getById(product._id);
-                    const productToModify = productToModifyRequest.data;
                     const firstSalidaRequest = await api.salidas.getById(id);
                     const firstSalidaInstance = firstSalidaRequest.data;
                     const originalProductInstance = firstSalidaInstance.productos.find(el => el._id === product._id);
                     if(originalProductInstance && originalProductInstance.cantidadesSalientes !== product.cantidadesSalientes){
+                        const productToModifyRequest = await api.productos.getById(product._id);
+                        const productToModify = productToModifyRequest.data;
                         productToModify.cantidadStock += originalProductInstance.cantidadesSalientes;
                         productToModify.cantidadStock -= parseFloat(product.cantidadesSalientes);
                         await api.productos.edit(productToModify);
@@ -109,11 +115,9 @@ const SalidasForm = () => {
                             quantity: product.cantidadesSalientes
                         })
                     }
-                    product.gananciaNetaTotal = mathHelper.roundTwoDecimals(productToModify.gananciaNeta * product.cantidadesSalientes);
                 }
                 salida.fecha = new Date();
                 salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0);
-                salida.gananciaNeta = salida.productos.reduce((acc, item) => acc + item.gananciaNetaTotal, 0);
                 await api.salidas.edit(salida)
                 .then((response) => {
                     if(response.code === 200){
@@ -125,10 +129,13 @@ const SalidasForm = () => {
                 })
             }else{
                 if(!salida.descripcion){
-                    salida.descripcion = `Salida del ${dateHelper.simpleDateWithHours(new Date())} hs`;
+                    salida.descripcion = '-- Sin descripción --';
                 }
-                salida.fecha = new Date();
+                if(!salida.fecha){
+                    salida.fecha = new Date()
+                };
                 salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0);
+                salida.gananciaNeta = total;
                 for(const product of salida.productos){
                     await api.productos.modifyStock({
                         product,
@@ -150,6 +157,7 @@ const SalidasForm = () => {
             console.error(err);
         }
     }
+    
     const redirectToSalidas = () => {
         history.push('/salidas');
     }
@@ -160,19 +168,19 @@ const SalidasForm = () => {
         <Row>
             <Col span={24}>
                 <h1>{(id === 'nuevo') ? 'Nueva salida' : 'Editar salida'}</h1>
-                {(loading) 
-                    ? <Spin/>
+                {(loading)
+                    ? <Spin />
                     :
-                    <Form 
+                    <Form
                         autoComplete="off"
-                        onFinish={() => {handleSubmit()}}
+                        onFinish={() => { handleSubmit() }}
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item
                                     label="Descripción"
                                 >
-                                    <Input 
+                                    <Input
                                         name="descripcion"
                                         placeholder="Descripción"
                                         value={salida.descripcion}
@@ -185,9 +193,37 @@ const SalidasForm = () => {
                                     />
                                 </Form.Item>
                             </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item
+                                    label="Fecha"
+                                >
+                                    <DatePicker
+                                        name="fecha"
+                                        locale='es-es'
+                                        onChange={(e) => {
+                                            setSalida({
+                                                ...salida,
+                                                fecha: new Date(e._d)
+                                            })
+                                        }}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item
+                                    label="Ganancia neta total"
+                                >
+                                    <Input
+                                        name="gananciaNetaTotal"
+                                        placeholder="Ganancia neta total"
+                                        value={total}
+                                        disabled={true}
+                                    />
+                                </Form.Item>
+                            </Col>
                             <Col span={24}>
-                                <div onClick={() => {setProductSelectionVisible(true)}}>
-                                    <Add customStyle={{width: '70px', height: '70px'}}/>
+                                <div onClick={() => { setProductSelectionVisible(true) }}>
+                                    <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>
                             <Col span={24}>
@@ -195,7 +231,7 @@ const SalidasForm = () => {
                                     salida.productos.map((item, key) => (
                                         <Row key={key} gutter={8}>
                                             <Col span={8}>
-                                                <Form.Item 
+                                                <Form.Item
                                                     required
                                                 >
                                                     <Input
@@ -207,7 +243,7 @@ const SalidasForm = () => {
                                                             setSalida({
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
-                                                                    if(el._id === item._id){
+                                                                    if (el._id === item._id) {
                                                                         el.nombre = e.target.value
                                                                     }
                                                                     return el;
@@ -218,7 +254,7 @@ const SalidasForm = () => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item 
+                                                <Form.Item
                                                     required
                                                 >
                                                     <Input
@@ -230,7 +266,7 @@ const SalidasForm = () => {
                                                             setSalida({
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
-                                                                    if(el._id === item._id){
+                                                                    if (el._id === item._id) {
                                                                         el.codigoBarras = e.target.value
                                                                     }
                                                                     return el;
@@ -241,10 +277,10 @@ const SalidasForm = () => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item 
+                                                <Form.Item
                                                     required
                                                 >
-                                                    <Input 
+                                                    <Input
                                                         name="quantity"
                                                         placeholder="Cantidad"
                                                         type="number"
@@ -253,7 +289,7 @@ const SalidasForm = () => {
                                                             setSalida({
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
-                                                                    if(el._id === item._id){
+                                                                    if (el._id === item._id) {
                                                                         el.cantidadesSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
                                                                     }
                                                                     return el;
@@ -267,31 +303,32 @@ const SalidasForm = () => {
                                                 <div onClick={
                                                     () => {
                                                         setSalida({
-                                                        ...salida,
-                                                        productos: salida.productos.filter(el => el._id !== item._id)
-                                                    })}
+                                                            ...salida,
+                                                            productos: salida.productos.filter(el => el._id !== item._id)
+                                                        })
+                                                    }
                                                 }>
-                                                    <Delete/>
+                                                    <Delete />
                                                 </div>
                                             </Col>
                                         </Row>
                                     ))
-                                : null
-                            }
+                                    : null
+                                }
                             </Col>
-                            <Col span={24} align="start" style={{display: 'flex'}}>
+                            <Col span={24} align="start" style={{ display: 'flex' }}>
                                 <Row>
-                                    <Col span={12} style={{display: 'flex'}}>
-                                        <button                                         
+                                    <Col span={12} style={{ display: 'flex' }}>
+                                        <button
                                             type="submit"
                                             className="btn-primary"
-                                            style={{marginRight: '15px'}}                                 
+                                            style={{ marginRight: '15px' }}
                                         >
                                             Guardar
                                         </button>
-                                        <button 
+                                        <button
                                             className="btn-secondary"
-                                            onClick={() => {redirectToSalidas()}}
+                                            onClick={() => { redirectToSalidas() }}
                                         >
                                             Cancelar
                                         </button>

@@ -6,8 +6,10 @@ import Header from './Header';
 import icons from '../../components/icons';
 import DetailsModal from './DetailsModal';
 import DeleteModal from './DeleteModal';
+import helpers from '../../helpers';
 
 const { Details, Edit, Delete } = icons;
+const { dateHelper } = helpers;
 
 const Entradas = () => {
     const history = useHistory();
@@ -25,7 +27,7 @@ const Entradas = () => {
 
     useEffect(() => {
       const fetchEntradas = async() => {
-        const response = await api.entradas.getAll({page, limit, filters});
+        const response = await api.entradas.getAll({page, limit, filters: JSON.stringify(filters)});
         setEntradas(response.data.docs);
         setTotalDocs(response.data.totalDocs);
         setLoading(false);
@@ -56,10 +58,15 @@ const Entradas = () => {
         dataIndex: 'descripcion',
       },
       {
+        title: 'Fecha',
+        render: (data) => (
+          <p>{dateHelper.simpleDateWithHours(data.fecha)+' hs'}</p>
+        ),
+      },
+      {
         title: 'Productos que entraron',
         render: data => (
           <div onClick={() => {
-            console.log(data.productos)
             setDetailsData(data.productos);
             setDetailsVisible(true)
           }}>
@@ -68,8 +75,8 @@ const Entradas = () => {
         )
       },
       {
-        title: 'Cantidad total de unidades',
-        dataIndex: 'cantidad',
+        title: 'Costo',
+        dataIndex: 'costoTotal',
       },
       {
         title: 'Usuario',
@@ -96,7 +103,9 @@ const Entradas = () => {
 
     return (
         <Row>
-            <Header setFilters={setFilters}/>
+            <Col span={24}>
+              <Header setFilters={setFilters} filters={filters}/>
+            </Col>
             <Col span={24}>
                 <Table 
                     width={"100%"}

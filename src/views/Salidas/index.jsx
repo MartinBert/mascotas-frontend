@@ -6,8 +6,10 @@ import Header from './Header';
 import icons from '../../components/icons';
 import DetailsModal from './DetailsModal';
 import DeleteModal from './DeleteModal';
+import helpers from '../../helpers';
 
 const { Details, Edit, Delete } = icons;
+const { dateHelper } = helpers;
 
 const Salidas = () => {
     const history = useHistory();
@@ -56,8 +58,10 @@ const Salidas = () => {
         dataIndex: 'descripcion',
       },
       {
-        title: 'Ganancia neta',
-        dataIndex: 'gananciaNeta',
+        title: 'Fecha',
+        render: (data) => (
+          <p>{dateHelper.simpleDateWithHours(data.fecha)+' hs'}</p>
+        ),
       },
       {
         title: 'Productos que salieron',
@@ -72,8 +76,8 @@ const Salidas = () => {
         )
       },
       {
-        title: 'Cantidad total de unidades',
-        dataIndex: 'cantidad',
+        title: 'Ganancia neta',
+        dataIndex: 'gananciaNeta',
       },
       {
         title: 'Usuario',

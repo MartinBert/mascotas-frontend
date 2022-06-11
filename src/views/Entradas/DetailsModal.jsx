@@ -1,14 +1,22 @@
 import React from 'react';
 import { Modal, Table } from 'antd';
 
-const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
+const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
     const columns = [
+        {
+            title: 'Producto',
+            render: (product) => (
+                <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+                    <p>{product.nombre}</p>
+                </div>
+            ),
+        },
         {
             title: 'Precio Unitario',
             dataIndex: 'precioUnitario',
         },
         {
-            title: 'Margen de Ganancia',
+            title: 'Porcentaje de Ganancia',
             dataIndex: 'margenGanancia',
         },
         {
@@ -27,23 +35,29 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             title: 'Cantidad entrante',
             dataIndex: 'cantidadesEntrantes',
         },
+        {
+            title: 'Costo total',
+            render: (product) => (
+                <p>{product.cantidadesEntrantes * product.precioUnitario}</p>
+            ),
+        },
     ]
     return (
-    <Modal 
-        title="Detalle de producto" 
-        visible={detailsVisible}
-        onCancel={() => {setDetailsVisible(false)}}
-        footer={false}
-        width={800}
-    >
-        <Table 
-            dataSource={detailsData} 
-            columns={columns}
-            pagination={false}
-            rowKey='_id'
-        />
-    </Modal>
-  )
+        <Modal
+            title="Detalle de producto"
+            visible={detailsVisible}
+            onCancel={() => { setDetailsVisible(false) }}
+            footer={false}
+            width={800}
+        >
+            <Table
+                dataSource={detailsData}
+                columns={columns}
+                pagination={false}
+                rowKey='_id'
+            />
+        </Modal>
+    )
 }
 
 export default DetailsModal;

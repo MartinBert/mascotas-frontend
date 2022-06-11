@@ -4,7 +4,9 @@ import { Row, Col, Button, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import PriceModificatorModal from './PriceModificatorModal';
 import api from '../../services'
-import { exportSimpleExcel } from '../../helpers/excel';
+import helpers from '../../helpers';
+
+const {exportSimpleExcel} = helpers.excel;
 
 const Header = ({setFilters, filters, setLoading}) => {
     const [selectedBrand, setSelectedBrand] = useState(null);

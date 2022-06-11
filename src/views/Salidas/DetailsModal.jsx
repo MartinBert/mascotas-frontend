@@ -4,11 +4,19 @@ import { Modal, Table } from 'antd';
 const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
     const columns = [
         {
+            title: 'Producto',
+            render: (product) => (
+                <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+                    <p>{product.nombre}</p>
+                </div>
+            ),
+        },
+        {
             title: 'Precio Unitario',
             dataIndex: 'precioUnitario',
         },
         {
-            title: 'Margen de Ganancia',
+            title: 'Porcentaje de Ganancia',
             dataIndex: 'margenGanancia',
         },
         {
@@ -29,7 +37,9 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
         },
         {
             title: 'Ganancia neta total',
-            dataIndex: 'gananciaNetaTotal',
+            render: (product) => (
+                <p>{product.cantidadesSalientes * product.gananciaNeta}</p>
+            ),
         },
     ]
     return (
