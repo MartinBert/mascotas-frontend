@@ -1,13 +1,9 @@
 import React from 'react';
-import { FaImage } from 'react-icons/fa';
 
-const OpenImage = ({title, imageUrl}) => {
+const OpenImage = ({alt, imageUrl}) => {
     return (
         <a href={imageUrl} target='_blank' rel="noreferrer">
-            <FaImage
-                title={title} 
-                style={{cursor: 'pointer'}}
-            />
+            <img style={{cursor: 'pointer'}} width="70" height="70" src={imageUrl} alt={alt}/>
         </a>
     )
 }

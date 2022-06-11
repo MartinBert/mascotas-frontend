@@ -84,7 +84,7 @@ const Productos = () => {
         {
           title: 'Imagen',
           render: (product) => (
-            <OpenImage title='Ver imagen' imageUrl={(product.imagenes[0]) ? product.imagenes[0].url : ''}/>
+            <OpenImage alt='Ver imagen' imageUrl={(product.imagenes[0]) ? product.imagenes[0].url : '/no-image.png'}/>
           )
         },
         {
