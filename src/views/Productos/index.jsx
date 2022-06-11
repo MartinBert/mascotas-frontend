@@ -14,7 +14,7 @@ const Productos = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalDocs, setTotalDocs] = useState(null);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(6);
     const [filters, setFilters] = useState(null);
     const [detailsVisible, setDetailsVisible] = useState(false);
     const [detailsData, setDetailsData] = useState(null);
