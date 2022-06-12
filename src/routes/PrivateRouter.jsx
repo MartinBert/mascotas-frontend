@@ -11,7 +11,11 @@ import {
     FaMoneyBillWave,
     FaUser,
     FaBars,
-    FaFile
+    FaFile,
+    FaShoppingCart,
+    FaBusinessTime,
+    FaCodeBranch,
+    FaAddressBook
 } from 'react-icons/fa'
 
 const { Header, Sider, Content } = Layout;
@@ -57,49 +61,69 @@ const PrivateRouter = ({ path, component: Component, activeKey }) => {
                         style={{background: 'transparent'}}
                         defaultSelectedKeys={[activeKey]}
                     >
-                        <Menu.Item key="1" icon={<FaBookmark />}>
+                        <Menu.Item key="1" icon={<FaShoppingCart />}>
+                            <Link to="/ventas">
+                                Ventas
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="2" icon={<FaBookmark />}>
                             <Link to="/productos">
                                 Productos
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="2" icon={<FaDollarSign />}>
+                        <Menu.Item key="3" icon={<FaDollarSign />}>
                             <Link to="/salidas">
                                 Salidas
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="3" icon={<FaDollarSign />}>
+                        <Menu.Item key="4" icon={<FaDollarSign />}>
                             <Link to="/entradas">
                                 Entradas
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="4" icon={<FaTag />}>
+                        <Menu.Item key="5" icon={<FaTag />}>
                             <Link to="/marcas">
                                 Marcas
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="5" icon={<FaTags />}>
+                        <Menu.Item key="6" icon={<FaTags />}>
                             <Link to="/rubros">
                                 Rubros
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="6" icon={<FaUsers />}>
+                        <Menu.Item key="7" icon={<FaUsers />}>
                             <Link to="/clientes">
                                 Clientes
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="7" icon={<FaMoneyBillWave />}>
+                        <Menu.Item key="8" icon={<FaMoneyBillWave />}>
                             <Link to="/mediospago">
                                 Medios de pago
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="8" icon={<FaFile />}>
+                        <Menu.Item key="9" icon={<FaFile />}>
                             <Link to="/documentos">
                                 Documentos
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="9" icon={<FaUser />}>
+                        <Menu.Item key="10" icon={<FaUser />}>
                             <Link to="/usuarios">
                                 Usuarios
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="11" icon={<FaBusinessTime />}>
+                            <Link to="/empresas">
+                                Empresa
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="12" icon={<FaCodeBranch />}>
+                            <Link to="/puntosventa">
+                                Puntos de venta
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="13" icon={<FaAddressBook />}>
+                            <Link to="/condicionesfiscales">
+                                Condiciones fiscales
                             </Link>
                         </Menu.Item>
                     </Menu>

@@ -4,7 +4,7 @@ import {Row, Col, Table} from 'antd';
 import Header from './Header';
 import DetailsModal from './DetailsModal';
 import icons from '../../components/icons';
-import OpenImage from './OpenImage';
+import {OpenImage} from '../../components/generics';
 import {useHistory} from 'react-router-dom';
 import DeleteModal from './DeleteModal';
 
@@ -121,6 +121,8 @@ const Productos = () => {
                     limit: limit,
                     total: totalDocs,
                     showSizeChanger: true,
+                    defaultPageSize: 7,
+                    pageSizeOptions: [7, 14, 28, 56],
                     onChange: (e) => { setPage(e) },
                     onShowSizeChange: (e, val) => { setLimit(val) }
                 }}

@@ -163,13 +163,13 @@ const ProductosForm = () => {
         name: 'file',
         accept: '.jpg,.png',
         multiple: false,
-        action: (file) => { uploadImageToServer(file) },
-        onChange(info) {
-            info.file.status = 'done';
+        onChange: (info) => {
+            uploadImageToServer(info.file)
         },
-        onRemove() {
+        onRemove: () => {
             removeImage(uploadedImages[0]._id)
-        }
+        },
+        beforeUpload: () => false
     };
 
     const uploadImageToServer = async(file) => {

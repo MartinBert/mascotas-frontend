@@ -10,6 +10,10 @@ import mediospago from './mediospago';
 import documentos from './documentos';
 import uploader from './uploader';
 import genericos from './genericos';
+import empresas from './empresas';
+import ventas from './ventas';
+import puntosventa from './puntosventa';
+import condicionesfiscales from './condicionesfiscales';
 
 const api = {
     auth,
@@ -23,7 +27,11 @@ const api = {
     mediospago,
     documentos,
     uploader,
-    genericos
+    genericos,
+    empresas,
+    ventas,
+    puntosventa,
+    condicionesfiscales
 }
 
 export default api;
