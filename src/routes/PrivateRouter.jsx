@@ -21,19 +21,19 @@ import {
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 
-const PrivateRouter = ({ path, component: Component, activeKey, submenu }) => {
+const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}) => {
     const history = useHistory();
     const [collapsed, setCollapsed] = useState(false);
-    const [openKeys, setOpenKeys] = useState([]);
     const [userStatus, setUserStatus] = useState(false);
-
     useEffect(() => {
         if (userStatus) return;
         const verifyUser = () => {
             const token = localStorage.getItem('token');
             if (!token) return redirectToLogin();
             setUserStatus(true);
-            setOpenKeys(openKeys[openKeys.length-1])
+            if(state.openKeys.length === 0){
+                dispatch({type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1']});
+            }
         }
         verifyUser()
     })
@@ -47,10 +47,8 @@ const PrivateRouter = ({ path, component: Component, activeKey, submenu }) => {
         setCollapsed(!collapsed);
     };
 
-    const rootSubmenuKeys = ['sub1', 'sub2', 'sub3'];
     const onOpenChange = (keys) => {
-        console.log(keys)
-        setOpenKeys(keys);
+        dispatch({type: 'SET_OPEN_SUBMENU_KEY', payload: [keys[keys.length - 1]]});
     };
 
     return (
@@ -68,7 +66,7 @@ const PrivateRouter = ({ path, component: Component, activeKey, submenu }) => {
                     style={{ background: 'transparent' }}
                     defaultSelectedKeys={[activeKey]}
                     selectedKeys={[activeKey]}
-                    openKeys={openKeys}
+                    openKeys={state.openKeys}
                     onOpenChange={onOpenChange}
                 >
                     <Menu.SubMenu key='sub1' title='Ventas'>
