@@ -33,33 +33,34 @@ import Ventas from '../views/Ventas';
 
 const routes = [
     {id: 1, activeKey: null, path: '/login', private: false, component: Login},
-    {id: 2, activeKey: null, path: '/productos/:id', private: true, component: ProductosForm},
-    {id: 3, activeKey: '2', path: '/productos', private: true, component: Productos},
-    {id: 4, activeKey: null, path: '/salidas/:id', private: true, component: SalidasForm},
-    {id: 5, activeKey: '3', path: '/salidas', private: true, component: Salidas},
-    {id: 6, activeKey: null, path: '/entradas/:id', private: true, component: EntradasForm},
-    {id: 7, activeKey: '4', path: '/entradas', private: true, component: Entradas},
-    {id: 8, activeKey: null, path: '/marcas/:id', private: true, component: MarcasForm},
-    {id: 9, activeKey: '5', path: '/marcas', private: true, component: Marcas},
-    {id: 10, activeKey: null, path: '/rubros/:id', private: true, component: RubrosForm},
-    {id: 11, activeKey: '6', path: '/rubros', private: true, component: Rubros},
-    {id: 12, activeKey: null, path: '/clientes/:id', private: true, component: ClientesForm},
-    {id: 13, activeKey: '7', path: '/clientes', private: true, component: Clientes},
-    {id: 14, activeKey: null, path: '/mediospago/:id', private: true, component: MediosPagoForm},
-    {id: 15, activeKey: '8', path: '/mediospago', private: true, component: MediosPago},
-    {id: 16, activeKey: null, path: '/documentos/:id', private: true, component: DocumentosForm},
-    {id: 17, activeKey: '9', path: '/documentos', private: true, component: Documentos},
-    {id: 18, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
-    {id: 19, activeKey: '10', path: '/usuarios', private: true, component: Usuarios},
-    {id: 20, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
-    {id: 21, activeKey: '1', path: '/ventas', private: true, component: Ventas},
+    {id: 2, activeKey: null, path: '/uploads/:image', private: true, component: Imagenes},
+    {id: 3, activeKey: '1', submenu:'sub1', path: '/ventas', private: true, component: Ventas},
+    {id: 4, activeKey: null, path: '/documentos/:id', private: true, component: DocumentosForm},
+    {id: 5, activeKey: '2', submenu:'sub1', path: '/documentos', private: true, component: Documentos},
+    {id: 6, activeKey: null, path: '/clientes/:id', private: true, component: ClientesForm},
+    {id: 7, activeKey: '3', submenu:'sub1', path: '/clientes', private: true, component: Clientes},
+    {id: 8, activeKey: null, path: '/mediospago/:id', private: true, component: MediosPagoForm},
+    {id: 9, activeKey: '4', submenu:'sub1', path: '/mediospago', private: true, component: MediosPago},
+    {id: 10, activeKey: null, path: '/productos/:id', private: true, component: ProductosForm},
+    {id: 11, activeKey: '5', submenu:'sub2', path: '/productos', private: true, component: Productos},
+    {id: 12, activeKey: null, path: '/salidas/:id', private: true, component: SalidasForm},
+    {id: 13, activeKey: '6', submenu:'sub2', path: '/salidas', private: true, component: Salidas},
+    {id: 14, activeKey: null, path: '/entradas/:id', private: true, component: EntradasForm},
+    {id: 15, activeKey: '7', submenu:'sub2', path: '/entradas', private: true, component: Entradas},
+    {id: 16, activeKey: null, path: '/marcas/:id', private: true, component: MarcasForm},
+    {id: 17, activeKey: '8', submenu:'sub2', path: '/marcas', private: true, component: Marcas},
+    {id: 18, activeKey: null, path: '/rubros/:id', private: true, component: RubrosForm},
+    {id: 19, activeKey: '9', submenu:'sub2', path: '/rubros', private: true, component: Rubros},
+    {id: 20, activeKey: null, path: '/usuarios/:id', private: true, component: UsuariosForm},
+    {id: 21, activeKey: '10', submenu:'sub3', path: '/usuarios', private: true, component: Usuarios},
     {id: 22, activeKey: null, path: '/empresas/:id', private: true, component: EmpresasForm},
-    {id: 23, activeKey: '11', path: '/empresas', private: true, component: Empresas},
-    {id: 24, activeKey: null, path: '/puntosventa/:id', private: true, component: PuntosVentaForm},
-    {id: 25, activeKey: '12', path: '/puntosventa', private: true, component: PuntosVenta},
-    {id: 26, activeKey: null, path: '/condicionesfiscales/:id', private: true, component: CondicionesFiscalesForm},
-    {id: 27, activeKey: '13', path: '/condicionesfiscales', private: true, component: CondicionesFiscales},
+    {id: 23, activeKey: '11', submenu:'sub3', path: '/empresas', private: true, component: Empresas},
+    {id: 24, activeKey: null, path: '/condicionesfiscales/:id', private: true, component: CondicionesFiscalesForm},
+    {id: 25, activeKey: '12', submenu:'sub3', path: '/condicionesfiscales', private: true, component: CondicionesFiscales},
+    {id: 26, activeKey: null, path: '/puntosventa/:id', private: true, component: PuntosVentaForm},
+    {id: 27, activeKey: '13', submenu:'sub3', path: '/puntosventa', private: true, component: PuntosVenta},
     {id: 28, activeKey: null, path: '/', private: true, component: Home},
+
 ]
 
 const AppRouter  = () => {
@@ -68,7 +69,7 @@ const AppRouter  = () => {
             <Switch>
                 {routes.map(route => (
                     (route.private)
-                    ? <PrivateRouter path={route.path} component={route.component} key={route.id} activeKey={route.activeKey}/>
+                    ? <PrivateRouter path={route.path} component={route.component} key={route.id} activeKey={route.activeKey} submenu={route.submenu}/>
                     : <PublicRouter path={route.path} component={route.component} key={route.id} />
                 ))}
             </Switch>
