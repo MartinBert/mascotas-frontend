@@ -121,7 +121,8 @@ const CuentasCorrientes = () => {
               size="small"
               loading={loading}
           />
-          <DeleteModal 
+          <DeleteModal
+            title="Eliminar cuenta corriente"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

@@ -3,7 +3,7 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 import {useHistory} from 'react-router-dom';
 
 const { Edit, Delete } = icons;
@@ -104,6 +104,7 @@ const CondicionesFiscales = () => {
               loading={loading}
           />
           <DeleteModal 
+            title="Eliminar condición fiscal"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

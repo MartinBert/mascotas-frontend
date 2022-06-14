@@ -5,7 +5,7 @@ import {Row, Col, Table} from 'antd';
 import Header from './Header';
 import icons from '../../components/icons';
 import DetailsModal from './DetailsModal';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 import helpers from '../../helpers';
 
 const { Details, Edit, Delete } = icons;
@@ -131,7 +131,8 @@ const Salidas = () => {
               setDetailsVisible={setDetailsVisible}
               detailsData={detailsData}
             />
-            <DeleteModal 
+            <DeleteModal
+              title="Eliminar salida"
               deleteVisible={deleteVisible}
               setLoading={setLoading}
               setDeleteVisible={setDeleteVisible}

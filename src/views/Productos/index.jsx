@@ -6,7 +6,7 @@ import DetailsModal from './DetailsModal';
 import icons from '../../components/icons';
 import {OpenImage} from '../../components/generics';
 import {useHistory} from 'react-router-dom';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 
 const { Details, Edit, Delete } = icons;
 const Productos = () => {
@@ -138,7 +138,8 @@ const Productos = () => {
             detailsData={detailsData}
           />
         </Row>
-        <DeleteModal 
+        <DeleteModal
+          title="Eliminar producto"
           deleteVisible={deleteVisible}
           setLoading={setLoading}
           setDeleteVisible={setDeleteVisible}

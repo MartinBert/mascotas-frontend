@@ -4,7 +4,7 @@ import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
 import { useHistory } from 'react-router-dom';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 
 const { Edit, Delete } = icons;
 
@@ -125,7 +125,8 @@ const Documentos = () => {
               size="small"
               loading={loading}
           />
-          <DeleteModal 
+          <DeleteModal
+            title="Eliminar documento"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

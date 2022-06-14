@@ -3,13 +3,13 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import { useHistory } from 'react-router-dom';
-import {DeleteModal} from '../../components/generics';
+import {DeleteModal} from '../../../components/generics';
+import {useHistory} from 'react-router-dom';
 
 const { Edit, Delete } = icons;
 
-const Clientes = () => {
-  const [clientes, setClientes] = useState(null);
+const Marcas = () => {
+  const [marcas, setMarcas] = useState(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalDocs, setTotalDocs] = useState(null);
@@ -21,74 +21,46 @@ const Clientes = () => {
   const history = useHistory();
 
   useEffect(() => {
-    const fetchClientes = async() => {
-      const data = await api.clientes.getAll({page, limit, filters});
-      setClientes(data.docs);
+    const fetchMarcas = async() => {
+      const data = await api.marcas.getAll({page, limit, filters});
+      setMarcas(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);
     }
-    fetchClientes();
+    fetchMarcas();
   },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
   useEffect(() => {
     if(deleteEntityId === null) return;
-    const deleteClient = async() => {
+    const deleteBrand = async() => {
       setLoading(true);
-      api.clientes.deleteCliente(deleteEntityId)
+      api.marcas.deleteMarca(deleteEntityId)
       .then(() => {
         setDeleteEntityId(null)
         setLoading(false);
       })
     }
-    deleteClient();
+    deleteBrand();
   }, [deleteEntityId])
 
-  const editClient = (id) => {
-    history.push(`/clientes/${id}`);
+  const editBrand = (id) => {
+    history.push(`/marcas/${id}`);
   }
 
   const columnsForTable = [
     {
-      title: 'Razón social',
-      dataIndex: 'razonSocial',
-    },
-    {
-      title: 'CUIT',
-      dataIndex: 'cuit',
-    },
-    {
-      title: 'Cond. Fiscal',
-      dataIndex: 'condicionFiscal',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-    },
-    {
-      title: 'Teléfono',
-      dataIndex: 'telefono',
-    },
-    {
-      title: 'Dirección',
-      dataIndex: 'direccion',
-    },
-    {
-      title: 'Ciudad',
-      dataIndex: 'ciudad',
-    },
-    {
-      title: 'Provincia',
-      dataIndex: 'provincia',
+      title: 'Nombre',
+      dataIndex: 'nombre',
     },
     {
       title: 'Acciones',
-      render: (client) => (
+      render: ({_id}) => (
         <Row>
-          <div onClick={() => {editClient(client._id)}}>
+          <div onClick={() => {editBrand(_id)}}>
             <Edit/>
           </div>
           <div onClick={() => {
-            setDeleteEntityIdConfirmation(client._id);
+            setDeleteEntityIdConfirmation(_id);
             setDeleteVisible(true);
           }}>
             <Delete/>
@@ -103,10 +75,10 @@ const Clientes = () => {
         <Col span={24} style={{marginBottom: '10px'}}>
           <Header setFilters={setFilters}/>
         </Col>
-        <Col span={24}> 
+        <Col span={24}>
           <Table 
               width={"100%"}
-              dataSource={clientes}
+              dataSource={marcas}
               columns={columnsForTable}
               pagination={{
                   defaultCurrent: page,
@@ -122,7 +94,7 @@ const Clientes = () => {
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar cliente" 
+            title="Eliminar venta"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}
@@ -134,4 +106,4 @@ const Clientes = () => {
   )
 }
 
-export default Clientes;
+export default Marcas;

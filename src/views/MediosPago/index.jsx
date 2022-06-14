@@ -3,7 +3,7 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 import {useHistory} from 'react-router-dom';
 import DetailsModal from './DetailsModal';
 
@@ -121,7 +121,8 @@ const MediosPago = () => {
               size="small"
               loading={loading}
           />
-          <DeleteModal 
+          <DeleteModal
+            title="Eliminar medio de pago"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

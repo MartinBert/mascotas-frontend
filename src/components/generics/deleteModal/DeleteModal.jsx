@@ -1,14 +1,14 @@
 import React from 'react';
 import { Modal} from 'antd';
 
-const DeleteModal = ({deleteVisible, setDeleteVisible, deleteEntityIdConfirmation, setDeleteEntityId, setLoading}) => {
+const DeleteModal = ({deleteVisible, setDeleteVisible, deleteEntityIdConfirmation, setDeleteEntityId, setLoading, title}) => {
     const handleOk = () => {
         setDeleteEntityId(deleteEntityIdConfirmation);
         setDeleteVisible(false);
     }
     return (
     <Modal 
-        title="Eliminar medio de pago" 
+        title={title} 
         visible={deleteVisible}
         onCancel={() => {
             setDeleteVisible(false);
@@ -17,7 +17,7 @@ const DeleteModal = ({deleteVisible, setDeleteVisible, deleteEntityIdConfirmatio
         onOk={() => {handleOk()}}
         width={800}
     >
-     <h3>Esta acción eliminará el medio de pago, ¿desea continuar?</h3>
+     <h3>Esta acción eliminará el registro, ¿desea continuar?</h3>
     </Modal>
   )
 }

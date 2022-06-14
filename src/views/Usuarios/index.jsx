@@ -3,7 +3,7 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import Header from './Header';
 import {useHistory} from 'react-router-dom';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 import icons from '../../components/icons';
 
 const { Edit, Delete } = icons;
@@ -101,7 +101,8 @@ const Usuarios = () => {
               tableLayout='auto'
               size="small"
           />
-          <DeleteModal 
+          <DeleteModal
+            title="Eliminar usuario"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

@@ -3,7 +3,7 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import DeleteModal from './DeleteModal';
+import {DeleteModal} from '../../components/generics';
 import {useHistory} from 'react-router-dom';
 
 const { Edit, Delete } = icons;
@@ -98,6 +98,7 @@ const PuntosVenta = () => {
               loading={loading}
           />
           <DeleteModal 
+            title="Eliminar punto de venta"
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}
