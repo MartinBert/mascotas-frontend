@@ -12,7 +12,7 @@ const Header = ({setFilters}) => {
                     <Col span={4}>
                         <Link to="/marcas/nuevo">
                             <button className="btn-primary"> 
-                                    Nuevo    
+                                    Reporte de ventas    
                             </button>
                         </Link>
                     </Col>

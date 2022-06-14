@@ -30,6 +30,7 @@ import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm';
 import CondicionesFiscales from '../views/CondicionesFiscales';
 import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm';
 import Ventas from '../views/Ventas';
+import VentasList from '../views/Ventas/VentasList';
 
 const routes = [
     {id: 1, activeKey: null, path: '/login', private: false, component: Login},
@@ -58,7 +59,9 @@ const routes = [
     {id: 24, activeKey: '12', path: '/condicionesfiscales', private: true, component: CondicionesFiscales},
     {id: 25, activeKey: null, path: '/puntosventa/:id', private: true, component: PuntosVentaForm},
     {id: 26, activeKey: '13', path: '/puntosventa', private: true, component: PuntosVenta},
-    {id: 27, activeKey: null, path: '/', private: true, component: Home},
+    {id: 27, activeKey: '14', path: '/generarventa', private: true, component: Ventas},
+    {id: 28, activeKey: '15', path: '/ventas', private: true, component: VentasList},
+    {id: 29, activeKey: null, path: '/', private: true, component: Home},
 ]
 
 const {reducer, initialState} = reducers.privateRouteReducer;

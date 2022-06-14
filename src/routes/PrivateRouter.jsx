@@ -51,6 +51,57 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
         dispatch({type: 'SET_OPEN_SUBMENU_KEY', payload: [keys[keys.length - 1]]});
     };
 
+    const generateSubMenus = () => {
+        const subMenus = [
+            { 
+                title: 'Ventas',
+                key: 'sub1',
+                items: [
+                    createSubMenuItem('1', <FaShoppingCart/>, '/ventas', 'Ventas'),
+                    createSubMenuItem('2', <FaFile/>, '/documentos', 'Documentos'),
+                    createSubMenuItem('3', <FaUsers/>, '/clientes', 'Clientes'),
+                    createSubMenuItem('4', <FaMoneyBillWave/>, '/mediospago', 'Medios de pago')
+                ]
+            },
+            {
+                title: 'Productos y stock',
+                key: 'sub2',
+                items: [
+                    createSubMenuItem('5', <FaBookmark/>, '/productos', 'Productos'),
+                    createSubMenuItem('6', <FaDollarSign/>, '/salidas', 'Salidas'),
+                    createSubMenuItem('7', <FaDollarSign/>, '/entradas', 'Entradas'),
+                    createSubMenuItem('8', <FaTag/>, '/marcas', 'Marcas'),
+                    createSubMenuItem('9', <FaTags/>, '/rubros', 'Rubros'),
+                ]
+            },
+            {
+                title: 'Configuraciones',
+                key: 'sub3',
+                items: [
+                    createSubMenuItem('10', <FaUser/>, '/usuarios', 'Usuarios'),
+                    createSubMenuItem('11', <FaBusinessTime/>, '/empresas', 'Empresas'),
+                    createSubMenuItem('12', <FaCodeBranch/>, '/puntosventa', 'Puntos de venta'),
+                    createSubMenuItem('13', <FaAddressBook/>, '/condicionesfiscales', 'Condiciones fiscales'),
+                ]
+            },
+        ]
+
+        return subMenus.map(sub => {
+            const subMenu = <Menu.SubMenu key={sub.key} title={sub.title}>
+                {sub.items.map(item => item)}
+            </Menu.SubMenu>
+            return subMenu;
+        })
+    }
+
+    const createSubMenuItem = (key, icon, path, title) => (
+        <Menu.Item key={key} icon={icon} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
+            <Link to={path}>
+                {title}
+            </Link>
+        </Menu.Item>
+    ) 
+
     return (
         <Layout style={{ height: '100%' }}>
             <Sider
@@ -69,77 +120,7 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
                     openKeys={state.openKeys}
                     onOpenChange={onOpenChange}
                 >
-                    <Menu.SubMenu key='sub1' title='Ventas'>
-                        <Menu.Item key="1" icon={<FaShoppingCart />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/ventas">
-                                Ventas
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="2" icon={<FaFile />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/documentos">
-                                Documentos
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="3" icon={<FaUsers />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/clientes">
-                                Clientes
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="4" icon={<FaMoneyBillWave />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/mediospago">
-                                Medios de pago
-                            </Link>
-                        </Menu.Item>
-                    </Menu.SubMenu>
-                    <Menu.SubMenu key='sub2' title='Productos y stock'>
-                        <Menu.Item key="5" icon={<FaBookmark />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/productos">
-                                Productos
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="6" icon={<FaDollarSign />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/salidas">
-                                Salidas
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="7" icon={<FaDollarSign />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/entradas">
-                                Entradas
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="8" icon={<FaTag />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/marcas">
-                                Marcas
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="9" icon={<FaTags />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/rubros">
-                                Rubros
-                            </Link>
-                        </Menu.Item>
-                    </Menu.SubMenu>
-                    <Menu.SubMenu key='sub3' title='Configuraciones'>
-                        <Menu.Item key="10" icon={<FaUser />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/usuarios">
-                                Usuarios
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="11" icon={<FaBusinessTime />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/empresas">
-                                Empresa
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="12" icon={<FaAddressBook />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/condicionesfiscales">
-                                Condiciones fiscales
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="13" icon={<FaCodeBranch />} style={{background: 'rgb(117, 0, 146)', margin: '0px'}}>
-                            <Link to="/puntosventa">
-                                Puntos de venta
-                            </Link>
-                        </Menu.Item>
-                    </Menu.SubMenu>
+                    {generateSubMenus()}
                 </Menu>
             </Sider>
             <Layout className="site-layout" style={{ height: '100%' }}>
