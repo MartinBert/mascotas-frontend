@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
+import reducers from '../../reducers';
 import { useParams, useHistory } from 'react-router-dom';
 import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
 import api from '../../services';
@@ -7,6 +8,8 @@ import { errorAlert, successAlert } from '../../components/alerts';
 import { ProductSelectionModal } from '../../components/generics';
 
 const { Add, Delete } = icons;
+const {reducer, initialState, actions} = reducers.productSelectionModalReducer;
+const {DELETE_PRODUCT} = actions;
 
 const EntradasForm = () => {
 
@@ -23,9 +26,8 @@ const EntradasForm = () => {
         usuario: null,
     });
     const [entradaIsReady, setEntradaIsReady] = useState(false);
-    const [productSelectionVisible, setProductSelectionVisible] = useState(false);
-    const [selectedProductsInModal, setSelectedProductsInModal] = useState([]);
     const [total, setTotal] = useState(0);
+    const [state, dispatch] = useReducer(reducer, initialState);
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
@@ -67,23 +69,13 @@ const EntradasForm = () => {
 
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
-        if(selectedProductsInModal && selectedProductsInModal.length !== 0){
-            selectedProductsInModal.forEach(item => {
-                delete(item.selected);
-                if(!entrada.productos.find(el => el._id === item._id)){
-                    setEntrada({
-                        ...entrada,
-                        productos: [
-                            ...entrada.productos,
-                            item
-                        ]
-                    })
-                }
-            })
-        }
-    }, 
+        setEntrada({
+            ...entrada,
+            productos: state.selectedProducts
+        })
+    },
     //eslint-disable-next-line
-    [selectedProductsInModal])
+    [state.selectedProducts])
 
     useEffect(() => {
         setTotal(
@@ -221,7 +213,7 @@ const EntradasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => {setProductSelectionVisible(true)}}>
+                                <div onClick={() => {dispatch({type: 'SHOW_MODAL'})}}>
                                     <Add customStyle={{width: '70px', height: '70px'}}/>
                                 </div>
                             </Col>
@@ -301,10 +293,8 @@ const EntradasForm = () => {
                                             <Col span={4}>
                                                 <div onClick={
                                                     () => {
-                                                        setEntrada({
-                                                        ...entrada,
-                                                        productos: entrada.productos.filter(el => el._id !== item._id)
-                                                    })}
+                                                        dispatch({type: DELETE_PRODUCT, payload: state.selectedProducts.find(product => product._id === item._id)})
+                                                    }
                                                 }>
                                                     <Delete/>
                                                 </div>
@@ -338,10 +328,9 @@ const EntradasForm = () => {
                 }
             </Col>
             <ProductSelectionModal
-                productSelectionVisible={productSelectionVisible}
-                setProductSelectionVisible={setProductSelectionVisible}
-                selectionLimit={1}
-                setSelectedProductsInModal={setSelectedProductsInModal}
+                state={state}
+                actions={actions}
+                dispatch={dispatch}
             />
         </Row>
     )

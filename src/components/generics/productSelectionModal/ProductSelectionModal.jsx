@@ -3,7 +3,8 @@ import { Modal, Row, Col, Input, Button, Table, Checkbox } from 'antd';
 import { GenericAutocomplete } from '../';
 import api from '../../../services';
 
-const ProductSelectionModal = ({productSelectionVisible, setProductSelectionVisible, selectionLimit, setSelectedProductsInModal}) => {
+const ProductSelectionModal = ({state, dispatch, actions}) => {
+    const {SET_PRODUCT, DELETE_PRODUCT, HIDE_MODAL, CLEAN_PRODUCT_LIST} = actions;
 
     //--------------------------- State declarations ---------------------------//
     const [products, setProducts] = useState(null);
@@ -14,7 +15,6 @@ const ProductSelectionModal = ({productSelectionVisible, setProductSelectionVisi
     const [selectedHeading, setSelectedHeading] = useState(null);
     const [filters, setFilters] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [selectedProducts, setSelectedProducts] = useState([]);
 
     const columnsForTable = [
         {
@@ -35,41 +35,9 @@ const ProductSelectionModal = ({productSelectionVisible, setProductSelectionVisi
                 <Checkbox 
                     checked={product.selected}
                     onChange={(e) => {
-                        if(selectionLimit <= 1) {
-                            setProducts(
-                                products.map(el => {
-                                    el.selected = false;
-                                    return el;
-                                })
-                            )
-                            setSelectedProducts([])
-                        }
-
-                        setProducts(
-                            products.map(el => {
-                                if(el._id === product._id){
-                                    el.selected = e.target.checked;
-                                }
-                                return el;
-                            })
-                        )
-
-                        if(e.target.checked === false){
-                            if(selectionLimit <= 1) {
-                                setSelectedProducts(selectedProducts.filter(el => el._id !== product._id));
-                            }else{
-                                setSelectedProducts([]);
-                            }
-                        }else{
-                            if(selectionLimit <= 1) {
-                                setSelectedProducts([
-                                    ...selectedProducts,
-                                    product
-                                ])
-                            }else{
-                                setSelectedProducts([product])
-                            }
-                        }
+                        if(state.selectionLimit <= 1) dispatch({type: CLEAN_PRODUCT_LIST});
+                        product.selected = e.target.checked;
+                        dispatch({type: (e.target.checked) ? SET_PRODUCT : DELETE_PRODUCT, payload: product});
                     }}
                 />
             )
@@ -79,18 +47,24 @@ const ProductSelectionModal = ({productSelectionVisible, setProductSelectionVisi
     //--------------------------------------------------------------------------//
 
 
-
     //---------------------------- Products load --------------------------------//
     useEffect(() => {
         const fetchProducts = async() => {
           const stringFilters = JSON.stringify(filters)
           const data = await api.productos.getAll({page, limit, filters: stringFilters});
+          data.docs.forEach(product => {
+              state.selectedProducts.forEach(selectedProduct => {
+                if(product._id === selectedProduct._id){
+                    product.selected = true;
+                }
+              })
+          })
           setProducts(data.docs);
           setTotalDocs(data.totalDocs);
           setLoading(false);
         }
         fetchProducts();
-    },[page, limit, filters])
+    },[page, limit, filters, state.selectedProducts])
     //
 
     //------------------------- State changes detection -------------------------//
@@ -123,19 +97,13 @@ const ProductSelectionModal = ({productSelectionVisible, setProductSelectionVisi
     [selectedHeading]);
     //--------------------------------------------------------------------------//
 
-    const handleOk = () => {
-        setSelectedProductsInModal(selectedProducts)
-        setProductSelectionVisible(false);
-    }
-
     return (
     <Modal 
-        title={'Seleccionar producto' + ((selectionLimit > 1) ? 's' : '')}
-        visible={productSelectionVisible}
-        onCancel={() => {
-            setProductSelectionVisible(false);
-        }}
-        onOk={() => {handleOk()}}
+        title={'Seleccionar producto' + ((state.selectionLimit > 1) ? 's' : '')}
+        visible={state.visible}
+        cancelButtonProps={{ style: { display: 'none' } }}
+        closable={false}
+        onOk={() => {dispatch({type: HIDE_MODAL})}}
         width={1200}
     >
         <Row>

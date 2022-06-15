@@ -1,8 +1,12 @@
 import React from 'react'
+import Header from './Header'
 
 const Ventas = () => {
   return (
-    <div>Ventas</div>
+    <>
+      <Header/>
+      <div>Ventas</div>
+    </>
   )
 }
 

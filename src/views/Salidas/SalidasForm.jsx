@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
+import reducers from '../../reducers';
 import { useParams, useHistory } from 'react-router-dom';
 import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
 import api from '../../services';
@@ -7,6 +8,8 @@ import { errorAlert, successAlert } from '../../components/alerts';
 import { ProductSelectionModal } from '../../components/generics';
 
 const { Add, Delete } = icons;
+const {reducer, initialState, actions} = reducers.productSelectionModalReducer;
+const {DELETE_PRODUCT} = actions;
 
 const SalidasForm = () => {
 
@@ -23,8 +26,7 @@ const SalidasForm = () => {
         usuario: null,
     });
     const [salidaIsReady, setSalidaIsReady] = useState(false);
-    const [productSelectionVisible, setProductSelectionVisible] = useState(false);
-    const [selectedProductsInModal, setSelectedProductsInModal] = useState([]);
+    const [state, dispatch] = useReducer(reducer, initialState);
     const [total, setTotal] = useState(0);
     //------------------------------------------------------------------------------------------------------------------------------/
 
@@ -54,8 +56,8 @@ const SalidasForm = () => {
         }
         setLoading(false);
     },
-        //eslint-disable-next-line
-        [salidaIsReady])
+    //eslint-disable-next-line
+    [salidaIsReady])
 
     const fetchSalida = async () => {
         const response = await api.salidas.getById(id);
@@ -67,23 +69,13 @@ const SalidasForm = () => {
 
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
-        if (selectedProductsInModal && selectedProductsInModal.length !== 0) {
-            selectedProductsInModal.forEach(item => {
-                delete (item.selected);
-                if (!salida.productos.find(el => el._id === item._id)) {
-                    setSalida({
-                        ...salida,
-                        productos: [
-                            ...salida.productos,
-                            item
-                        ]
-                    })
-                }
-            })
-        }
+        setSalida({
+            ...salida,
+            productos: state.selectedProducts
+        })
     },
-        //eslint-disable-next-line
-        [selectedProductsInModal])
+    //eslint-disable-next-line
+    [state.selectedProducts])
 
     useEffect(() => {
         setTotal(
@@ -222,7 +214,7 @@ const SalidasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => { setProductSelectionVisible(true) }}>
+                                <div onClick={() => { dispatch({type: 'SHOW_MODAL'}) }}>
                                     <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>
@@ -302,10 +294,7 @@ const SalidasForm = () => {
                                             <Col span={4}>
                                                 <div onClick={
                                                     () => {
-                                                        setSalida({
-                                                            ...salida,
-                                                            productos: salida.productos.filter(el => el._id !== item._id)
-                                                        })
+                                                        dispatch({type: DELETE_PRODUCT, payload: state.selectedProducts.find(product => product._id === item._id)})
                                                     }
                                                 }>
                                                     <Delete />
@@ -339,11 +328,10 @@ const SalidasForm = () => {
                     </Form>
                 }
             </Col>
-            <ProductSelectionModal
-                productSelectionVisible={productSelectionVisible}
-                setProductSelectionVisible={setProductSelectionVisible}
-                selectionLimit={1}
-                setSelectedProductsInModal={setSelectedProductsInModal}
+            <ProductSelectionModal 
+                state={state}
+                actions={actions}
+                dispatch={dispatch}
             />
         </Row>
     )

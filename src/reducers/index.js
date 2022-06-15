@@ -1,7 +1,9 @@
 import privateRouteReducer from './privateRouteReducer';
+import productSelectionModalReducer from './productSelectionModalReducer';
 
 const reducers = {
-    privateRouteReducer
+    privateRouteReducer,
+    productSelectionModalReducer
 }
 
 export default reducers;
