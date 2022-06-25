@@ -38,7 +38,7 @@ const EmpresasForm = () => {
 
   //eslint-disable-next-line
   useEffect(() => {
-    if (empresa.nombre) return;
+    if (empresa.razonSocial) return;
     if (id === "nuevo") {
       setLoading(false);
       return;

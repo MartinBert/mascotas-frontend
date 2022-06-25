@@ -14,6 +14,7 @@ import empresas from './empresas';
 import ventas from './ventas';
 import puntosventa from './puntosventa';
 import condicionesfiscales from './condicionesfiscales';
+import afip from './afip';
 
 const api = {
     auth,
@@ -31,7 +32,8 @@ const api = {
     empresas,
     ventas,
     puntosventa,
-    condicionesfiscales
+    condicionesfiscales,
+    afip
 }
 
 export default api;

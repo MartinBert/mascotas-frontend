@@ -61,10 +61,19 @@ const reducer = (state = initialState, action) => {
     }
 }
 
+const getNamedStates = () => {
+    return {
+        productInitialState: initialState,
+        productReducer: reducer,
+        productActions: actions
+    }
+}
+
 const productSelectionModalReducer = {
     initialState,
     actions,
-    reducer
+    reducer,
+    getNamedStates
 }
 
 export default productSelectionModalReducer;

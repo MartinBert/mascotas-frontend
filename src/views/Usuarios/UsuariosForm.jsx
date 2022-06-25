@@ -4,6 +4,7 @@ import { Row, Col, Form, Input, Checkbox } from "antd";
 import { useHistory, useParams } from "react-router-dom";
 import messages from "../../components/messages";
 import graphics from "../../components/graphics";
+import { GenericAutocomplete } from "../../components/generics";
 import { errorAlert, successAlert } from "../../components/alerts";
 
 const { Error } = messages;
@@ -20,6 +21,8 @@ const UsuariosForm = () => {
   });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedSalePoint, setSelectedSalePoint] = useState(null);
 
   const loadUsuarioData = (e) => {
     setUsuario({
@@ -38,17 +41,31 @@ const UsuariosForm = () => {
 
     const fetchUsuario = async () => {
       const searchedItem = await api.usuarios.getById(id);
-      setUsuario({
-        _id: searchedItem._id,
-        nombre: searchedItem.nombre,
-        email: searchedItem.email,
-        password: searchedItem.password,
-        perfil: searchedItem.perfil
-      });
+      setUsuario(searchedItem);
+      setSelectedCompany({_id: searchedItem.company._id, razonSocial: searchedItem.company.razonSocial});
+      setSelectedSalePoint(searchedItem.puntoVenta);
       setLoading(false);
     };
     fetchUsuario();
   });
+
+  const setSelectedCompanyToUser = async(company) => {
+    setSelectedCompany(company);
+    const response = await api.empresas.getById(company._id);
+    setUsuario({
+        ...usuario,
+        empresa: response
+    })
+  }
+
+  const setSelectedSalePointToUser = async(salePoint) => {
+    setSelectedSalePoint(salePoint);
+    const response = await api.puntosventa.getById(salePoint._id);
+    setUsuario({
+        ...usuario,
+        puntoVenta: response
+    })
+  }
 
   const save = () => {
     if (!usuario.nombre || !usuario.email || !usuario.password) {
@@ -144,6 +161,32 @@ const UsuariosForm = () => {
                   loadUsuarioData(e);
                 }}
               ></Checkbox>
+            </Form.Item>
+            <Form.Item
+              label="Empresa"
+              required={true}
+            >
+              <GenericAutocomplete
+                label="Empresa"
+                modelToFind="empresa"
+                keyToCompare="razonSocial"
+                setResultSearch={setSelectedCompanyToUser}
+                selectedSearch={selectedCompany}
+                styles={{backgroundColor: '#fff'}}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Punto de venta"
+              required={true}
+            >
+              <GenericAutocomplete
+                label="Punto de venta"
+                modelToFind="puntoventa"
+                keyToCompare="nombre"
+                setResultSearch={setSelectedSalePointToUser}
+                selectedSearch={selectedSalePoint}
+                styles={{backgroundColor: '#fff'}}
+              />
             </Form.Item>
             <Row>
               <Col span={8} style={{display: 'flex'}}>

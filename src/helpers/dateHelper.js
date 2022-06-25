@@ -8,7 +8,7 @@ const simpleDateWithHours = (unformattedDate) => {
     const hour = unformattedDate.getHours();
     const minutes = unformattedDate.getMinutes();
     const seconds = unformattedDate.getSeconds();
-    return day + '/' + month.toString() + '/' + year + ' ' + hour + ':' + minutes + ':' + seconds;
+    return day + '/' + ((month.toString().length === 1) ? '0' + month.toString() : month.toString()) + '/' + year + ' ' + hour + ':' + minutes + ':' + seconds;
 }
 
 const dateHelper = {

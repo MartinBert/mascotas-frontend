@@ -3,7 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import api from '../../../services';
 
-const GenericAutocomplete = ({modelToFind, keyToCompare, label, styles, setResultSearch, selectedSearch}) => {
+const GenericAutocomplete = ({modelToFind, keyToCompare, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
     const [loading, setLoading] = useState(true);
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState(null);
@@ -21,22 +21,30 @@ const GenericAutocomplete = ({modelToFind, keyToCompare, label, styles, setResul
     //eslint-disable-next-line
     [search])
 
+    const returnResults = async(val) => {
+        if(setResultSearch) return setResultSearch(val);
+        if(returnCompleteModel){
+            const controllerToUse = modelToFind + 's'
+            const result = await api[controllerToUse].getById(val._id)
+            return dispatch({type: action, payload: result})
+        }else{
+            return dispatch({type: action, payload: val})
+        }
+    }
     return (
         <>
             <Autocomplete
                 disablePortal
                 id="generic_autocomplete"
                 options={options}
-                sx={styles}
-                fullWidth={(styles['width']) ? false : true}
+                sx={{backgroundColor: "#fff"}}
+                fullWidth={true}
                 renderInput={(params) => <TextField {...params} label={label} />}
                 loading={loading}
                 filterOptions={(options) => options}
                 onInputChange={(e, val) => setSearch(val)}
                 getOptionLabel={(options) => options[keyToCompare]}
-                onChange={(e, val) => {
-                    setResultSearch(val)
-                }}
+                onChange={(e, val) => {returnResults(val)}}
                 isOptionEqualToValue={(options) => options['_id']}
                 noOptionsText="Sin resultados..."
                 multiple={false}

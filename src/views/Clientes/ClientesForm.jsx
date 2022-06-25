@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services";
-import { Row, Col, Form, Input, Select } from "antd";
+import { Row, Col, Form, Input } from "antd";
 import { useHistory, useParams } from "react-router-dom";
 import messages from "../../components/messages";
 import graphics from "../../components/graphics";
+import { GenericAutocomplete } from "../../components/generics";
 import { errorAlert, successAlert } from "../../components/alerts";
 
 const { Error } = messages;
 const { Spinner } = graphics;
-const { Option } = Select;
 
 const ClientesForm = () => {
   const history = useHistory();
@@ -26,11 +26,6 @@ const ClientesForm = () => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedCondition, setSelectedCondition] = useState(null);
-  const conditions = [
-    { value: "Consumidor Final", key: 1 },
-    { value: "Monotributista", key: 2 },
-    { value: "Responsable Ins.", key: 3 },
-  ];
 
   const loadClienteData = (e) => {
     setCliente({
@@ -38,17 +33,6 @@ const ClientesForm = () => {
       [e.target.name]: e.target.value,
     });
   };
-
-  useEffect(
-    () => {
-      setCliente({
-        ...cliente,
-        condicionFiscal: selectedCondition,
-      });
-    },
-    //eslint-disable-next-line
-    [selectedCondition]
-  );
 
   //eslint-disable-next-line
   useEffect(() => {
@@ -94,6 +78,15 @@ const ClientesForm = () => {
 
   const fail = () => {
     errorAlert("Error al guardar el registro");
+  };
+
+  const setSelectedConditionToBusiness = async (condition) => {
+    setSelectedCondition(condition);
+    const response = await api.condicionesfiscales.getById(condition._id);
+    setCliente({
+      ...cliente,
+      condicionFiscal: response,
+    });
   };
 
   return loading ? (
@@ -155,18 +148,13 @@ const ClientesForm = () => {
               <p>*Cond. fiscal:</p>
             </div>
             <div>
-              <Select
-                onChange={(e) => {
-                  setSelectedCondition(e);
-                }}
-                defaultValue={selectedCondition}
-              >
-                {conditions.map((condition) => (
-                  <Option key={condition.key} value={condition.value}>
-                    {condition.value}
-                  </Option>
-                ))}
-              </Select>
+              <GenericAutocomplete
+                label="Condición Fiscal"
+                modelToFind="condicionfiscal"
+                keyToCompare="nombre"
+                setResultSearch={setSelectedConditionToBusiness}
+                selectedSearch={selectedCondition}
+              />
             </div>
           </Form.Item>
         </Col>
