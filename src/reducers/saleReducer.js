@@ -36,7 +36,7 @@ const initialState = {
     porcentajeDescuentoGlobal: 0,
     porcentajeRecargoGlobal: 0,
     totalDescuento: 0,
-    totalRecargo: 0,a
+    totalRecargo: 0,
     totalDescuentoLineas: 0,
     totalRecargoLineas: 0,
     porcentajeIva: 0,
