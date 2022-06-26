@@ -36,9 +36,7 @@ const initialState = {
     porcentajeDescuentoGlobal: 0,
     porcentajeRecargoGlobal: 0,
     totalDescuento: 0,
-    totalRecargo: 0,
-    descuentosLinea: 0,
-    recargosLinea: 0,
+    totalRecargo: 0,a
     totalDescuentoLineas: 0,
     totalRecargoLineas: 0,
     porcentajeIva: 0,
@@ -78,6 +76,10 @@ const calculateLineTotal = (line) => {
     const discount = totalWithoutModifications - totalWithDiscount;
     const total = totalWithoutModifications + surcharge - discount;
     return roundTwoDecimals(total);
+}
+
+const basePrice = (line) => {
+    return line.productoPrecioUnitario * line.cantidadUnidades
 }
 
 const reducer = (state, action) => {
@@ -136,6 +138,7 @@ const reducer = (state, action) => {
                     if(line._id === action.payload._id){
                         line.porcentajeDescuentoRenglon = action.payload.porcentajeDescuentoRenglon
                         line.totalRenglon = calculateLineTotal(line)
+                        line.importeDescuentoRenglon = basePrice(line) - line.totalRenglon
                     }
                     return line
                 })  
@@ -147,6 +150,7 @@ const reducer = (state, action) => {
                     if(line._id === action.payload._id){
                         line.porcentajeRecargoRenglon = action.payload.porcentajeRecargoRenglon
                         line.totalRenglon = calculateLineTotal(line)
+                        line.importeRecargoRenglon = line.totalRenglon - basePrice(line)
                     }
                     return line
                 }) 
@@ -245,7 +249,6 @@ const reducer = (state, action) => {
             let total = 0;
             if(state.renglones.length > 0){
                 const totalLinesSum = state.renglones.reduce((acc, el) => acc + el.totalRenglon, 0);
-                console.log(totalLinesSum)
                 const totalSurcharge = totalLinesSum * decimalPercent(state.porcentajeRecargoGlobal);
                 const totalDiscount = totalLinesSum * decimalPercent(state.porcentajeDescuentoGlobal);
                 total = roundTwoDecimals(totalLinesSum + totalSurcharge - totalDiscount);

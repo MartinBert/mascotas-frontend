@@ -68,7 +68,6 @@ const Header = ({productState, productDispatch, productActions, actions, dispatc
                             dispatch={dispatch}
                             action={SET_CLIENT}
                             returnCompleteModel={true}
-                            styles={{backgroundColor: '#fff'}}
                         />
                     </Col>
                     <Col xl={6} lg={8} md={8}>
@@ -80,7 +79,6 @@ const Header = ({productState, productDispatch, productActions, actions, dispatc
                             dispatch={dispatch}
                             action={SET_DOCUMENT}
                             returnCompleteModel={true}
-                            styles={{backgroundColor: '#fff'}}
                         />
                     </Col>
                     <Col xl={12} lg={8} md={8}>

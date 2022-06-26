@@ -13,7 +13,14 @@ const Lines = ({
     actions,
 }) => {
     const {DELETE_PRODUCT} = productActions;
-    const {SET_LINES, SET_LINE_DISCOUNT_PERCENT, SET_LINE_SURCHARGE_PERCENT, SET_LINE_QUANTITY, SET_PRODUCTS, SET_TOTAL} = actions;
+    const {
+      SET_LINES, 
+      SET_LINE_DISCOUNT_PERCENT, 
+      SET_LINE_SURCHARGE_PERCENT, 
+      SET_LINE_QUANTITY, 
+      SET_PRODUCTS, 
+      SET_TOTAL
+    } = actions;
 
     const columnsForTable = [
         {
@@ -53,6 +60,7 @@ const Lines = ({
                 type="number"
                 placeholder="Porc. descuento"
                 value={product.porcentajeDescuentoRenglon}
+                disabled={(product.porcentajeRecargoRenglon > 0)}
                 onChange={(e) => {
                     dispatch({
                         type: SET_LINE_DISCOUNT_PERCENT, 
@@ -74,6 +82,7 @@ const Lines = ({
                 type="number"
                 placeholder="Porc. recargo"
                 value={product.porcentajeRecargoRenglon}
+                disabled={(product.porcentajeDescuentoRenglon > 0)}
                 onChange={(e) => {
                     dispatch({
                         type: SET_LINE_SURCHARGE_PERCENT, 
