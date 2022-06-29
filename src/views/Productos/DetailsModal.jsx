@@ -15,16 +15,16 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             dataIndex: 'margenGanancia',
         },
         {
+            title: 'Iva venta',
+            dataIndex: 'ivaVenta',
+        },
+        {
             title: 'Precio de Venta',
             dataIndex: 'precioVenta',
         },
         {
             title: 'Ganancia Neta',
             dataIndex: 'gananciaNeta',
-        },
-        {
-            title: 'Iva',
-            dataIndex: 'iva',
         },
     ]
     return (

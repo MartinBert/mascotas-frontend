@@ -172,9 +172,11 @@ const reducer = (state, action) => {
             if (line._id === product._id) {
               linePresent.push({
                 _id: product._id,
-                productoNombre: product.nombre,
-                productoCodigoBarras: product.codigoBarras,
-                productoPrecioUnitario: product.precioUnitario,
+                productoNombre: line.nombre,
+                productoCodigoBarras: line.codigoBarras,
+                productoPrecioUnitario: line.precioUnitario,
+                productoPorcentajeIva: line.productoPorcentajeIva,
+                productoImporteIva: line.productoImporteIva,
                 cantidadUnidades: line.cantidadUnidades,
                 porcentajeDescuentoRenglon: line.porcentajeDescuentoRenglon,
                 importeDescuentoRenglon: line.importeDescuentoRenglon,
@@ -193,6 +195,8 @@ const reducer = (state, action) => {
               productoNombre: product.nombre,
               productoCodigoBarras: product.codigoBarras,
               productoPrecioUnitario: product.precioUnitario,
+              productoPorcentajeIva: product.porcentajeIvaVenta,
+              productoImporteIva: product.ivaVenta,
               cantidadUnidades: 1,
               porcentajeDescuentoRenglon: 0,
               importeDescuentoRenglon: 0,

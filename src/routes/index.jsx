@@ -27,6 +27,8 @@ import Empresas from '../views/Empresas';
 import EmpresasForm from '../views/Empresas/EmpresasForm';
 import PuntosVenta from '../views/PuntosVenta';
 import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm';
+import UnidadesMedida from '../views/UnidadesMedida';
+import UnidadesMedidaForm from '../views/UnidadesMedida/UnidadesMedidaForm';
 import CondicionesFiscales from '../views/CondicionesFiscales';
 import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm';
 import Ventas from '../views/Ventas';
@@ -61,7 +63,9 @@ const routes = [
     {id: 26, activeKey: '13', path: '/puntosventa', private: true, component: PuntosVenta},
     {id: 27, activeKey: '14', path: '/generarventa', private: true, component: Ventas},
     {id: 28, activeKey: '15', path: '/ventas', private: true, component: VentasList},
-    {id: 29, activeKey: null, path: '/', private: true, component: Home},
+    {id: 30, activeKey: null, path: '/unidadesmedida/:id', private: true, component: UnidadesMedidaForm},
+    {id: 29, activeKey: '16', path: '/unidadesmedida', private: true, component: UnidadesMedida},
+    {id: 31, activeKey: null, path: '/', private: true, component: Home},
 ]
 
 const {reducer, initialState} = reducers.privateRouteReducer;

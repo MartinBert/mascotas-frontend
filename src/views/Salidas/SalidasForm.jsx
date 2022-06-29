@@ -222,7 +222,7 @@ const SalidasForm = () => {
                                 {(salida.productos.length > 0) ?
                                     salida.productos.map((item, key) => (
                                         <Row key={key} gutter={8}>
-                                            <Col span={8}>
+                                            <Col span={6}>
                                                 <Form.Item
                                                     required
                                                 >
@@ -268,7 +268,7 @@ const SalidasForm = () => {
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
+                                            <Col span={4}>
                                                 <Form.Item
                                                     required
                                                 >
@@ -277,12 +277,37 @@ const SalidasForm = () => {
                                                         placeholder="Cantidad"
                                                         type="number"
                                                         value={item.cantidadesSalientes}
+                                                        disabled={(item.cantidadesFraccionadasSalientes) ? true : false}
                                                         onChange={(e) => {
                                                             setSalida({
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
                                                                     if (el._id === item._id) {
                                                                         el.cantidadesSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
+                                                                    }
+                                                                    return el;
+                                                                })
+                                                            })
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={4}>
+                                                <Form.Item
+                                                    required
+                                                >
+                                                    <Input
+                                                        name="fractionedQuantity"
+                                                        placeholder="Cantidad fraccionada"
+                                                        type="number"
+                                                        value={item.cantidadesFraccionadasSalientes}
+                                                        disabled={(item.cantidadesSalientes) ? true : false}
+                                                        onChange={(e) => {
+                                                            setSalida({
+                                                                ...salida,
+                                                                productos: salida.productos.map(el => {
+                                                                    if (el._id === item._id) {
+                                                                        el.cantidadesFraccionadasSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
                                                                     }
                                                                     return el;
                                                                 })

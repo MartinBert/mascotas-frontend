@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services';
 import { useParams, useHistory } from 'react-router-dom';
-import { Row, Col, Form, Input, Checkbox, Upload } from 'antd';
+import { Row, Col, Form, Input, Upload } from 'antd';
 import { GenericAutocomplete } from '../../components/generics';
 import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';
@@ -22,18 +22,23 @@ const ProductosForm = () => {
         codigoBarras: '',   
         marca: null,   
         rubro: null,   
+        unidadMedida: null,
         cantidadStock: 0,
+        cantidadFraccionadaStock: 1,
         precioUnitario: 0,
         margenGanancia: 0,
         precioVenta: 0,
         gananciaNeta: 0,
-        iva: 0,
+        porcentajeIvaCompra: 0,
+        porcentajeIvaVenta: 0,
+        ivaCompra: 0,
+        ivaVenta: 0,
         imagenes: null,
     })
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
+    const [selectedMeasure, setSelectedMeasure] = useState(null);
     const [uploadedImages, setUploadedImages] = useState([]);
-    const [applyIVA, setApplyIVA] = useState(false);
 
     //eslint-disable-next-line
     useEffect(() => {
@@ -64,31 +69,20 @@ const ProductosForm = () => {
     }, [loading, id])
 
     useEffect(() => {
-        const calculeWithoutIva = roundTwoDecimals(product.precioUnitario * (1 + decimalPercent(product.margenGanancia)));
-        const calculeWithIva = roundTwoDecimals((product.precioUnitario * (1 + decimalPercent(product.margenGanancia))) * (1 + decimalPercent(product.iva)));
-        const realProfitWithoutIva = roundTwoDecimals(calculeWithoutIva - product.precioUnitario);
-        const realProfitWithIva = roundTwoDecimals((calculeWithIva / (1 + decimalPercent(product.iva))) - product.precioUnitario);
+        const ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))));
+        const ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta));
+        const gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia));
+        const precioVenta = parseFloat(product.precioUnitario) + ivaVenta + gananciaNeta;
         setProduct({
             ...product,
-            precioVenta:(applyIVA) ? calculeWithIva : calculeWithoutIva,
-            gananciaNeta: (applyIVA) ? realProfitWithIva : realProfitWithoutIva
+            ivaCompra,
+            ivaVenta,
+            gananciaNeta,
+            precioVenta
         })
     }, 
     //eslint-disable-next-line
-    [product.precioUnitario, product.margenGanancia, product.iva])
-
-    const checkApplyIva = (e) => {
-        const checked = e.target.checked;
-        if(checked){
-            setApplyIVA(true);
-        }else{
-            setProduct({
-                ...product,
-                iva: 0
-            })
-            setApplyIVA(false);
-        }
-    }
+    [product.precioUnitario, product.margenGanancia, product.porcentajeIvaCompra, product.porcentajeIvaVenta])
 
     const setFormDataToProduct = async(e) =>{
         setProduct({
@@ -112,6 +106,16 @@ const ProductosForm = () => {
         setProduct({
             ...product,
             rubro: response
+        })
+    }
+
+    const setSelectedMeasureToProduct = async(measure) => {
+        setSelectedMeasure(measure);
+        const response = await api.unidadesmedida.getById(measure._id);
+        setProduct({
+            ...product,
+            unidadMedida: response,
+            cantidadFraccionadaStock: response.fraccionamiento
         })
     }
     
@@ -248,7 +252,6 @@ const ProductosForm = () => {
                                         keyToCompare="nombre"
                                         setResultSearch={setSelectedBrandToProduct}
                                         selectedSearch={selectedBrand}
-                                        styles={{backgroundColor: '#fff'}}
                                     />
                                 </Form.Item>
                             </Col>
@@ -263,7 +266,48 @@ const ProductosForm = () => {
                                         keyToCompare="nombre"
                                         setResultSearch={setSelectedHeadingToProduct}
                                         selectedSearch={selectedHeading}
-                                        styles={{backgroundColor: '#fff'}}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                    required
+                                    label="U. Medida"
+                                >
+                                    <GenericAutocomplete
+                                        label="U. Medida"
+                                        modelToFind="unidadmedida"
+                                        keyToCompare="nombre"
+                                        setResultSearch={setSelectedMeasureToProduct}
+                                        selectedSearch={selectedMeasure}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                    required
+                                    label="Fraccionamiento"
+                                >
+                                    <Input 
+                                        name="cantidadFraccionadaStock"
+                                        placeholder="Fraccionamiento"
+                                        type="number"
+                                        value={(product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1}
+                                        disabled={true}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                    required
+                                    label="Cant. stock"
+                                >
+                                    <Input 
+                                        name="cantidadStock"
+                                        placeholder="Cantidad de stock"
+                                        type="number"
+                                        value={product.cantidadStock}
+                                        onChange={e => { setFormDataToProduct(e) }} 
                                     />
                                 </Form.Item>
                             </Col>
@@ -286,20 +330,6 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Cant. stock"
-                                >
-                                    <Input 
-                                        name="cantidadStock"
-                                        placeholder="Cantidad de stock"
-                                        type="number"
-                                        value={product.cantidadStock}
-                                        onChange={e => { setFormDataToProduct(e) }} 
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                <Form.Item 
-                                    required
                                     label="% Ganancia"
                                 >
                                     <Input 
@@ -314,25 +344,55 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="IVA"
+                                        label="Porc. Iva Compra"
                                     >
                                         <Input
-                                            name="iva"
+                                            name="porcentajeIvaCompra"
                                             type="number"
-                                            value={product.iva}
-                                            disabled={!applyIVA}
+                                            value={product.porcentajeIvaCompra}
                                             onChange={e => { setFormDataToProduct(e) }} 
                                         />
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
-                                    name="applyIva" 
-                                    onChange={e => {
-                                        checkApplyIva(e)
-                                    }} 
-                                >
-                                    <Checkbox>Aplica IVA?</Checkbox>
+                                        required
+                                        label="Porc. Iva Venta"
+                                    >
+                                        <Input
+                                            name="porcentajeIvaVenta"
+                                            type="number"
+                                            value={product.porcentajeIvaVenta}
+                                            onChange={e => { setFormDataToProduct(e) }} 
+                                        />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                        required
+                                        label="Iva Compra"
+                                    >
+                                        <Input
+                                            name="ivaCompra"
+                                            type="number"
+                                            value={product.ivaCompra}
+                                            disabled={true}
+                                            onChange={e => { setFormDataToProduct(e) }} 
+                                        />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                        required
+                                        label="Iva Venta"
+                                    >
+                                        <Input
+                                            name="ivaVenta"
+                                            type="number"
+                                            value={product.ivaVenta}
+                                            disabled={true}
+                                            onChange={e => { setFormDataToProduct(e) }} 
+                                        />
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
@@ -394,6 +454,41 @@ const ProductosForm = () => {
                         </Row>
                     </Form>
                 }
+            </Col>
+            <Col span={24} align="justify">
+                <h1>
+                    Para realizar ventas AFIP exige que se declare el IVA de la operación, 
+                    el porcentaje del mismo puede variar dependiendo del producto, pero generalmente es del 21%.
+                    El procedimiento estandar es considerar dicho porcentaje al momento de aplicar un margen de ganancia
+                    al producto, puesto que un 21% de la ganancia es absorbida por el IVA de las operaciones cuando el
+                    contribuyente realiza el devengamiento fiscal del impuesto.
+                </h1><br/>
+                <h1>
+                    Ejemplo: si se desea obtener un 15% de ganancia sobre una operación, 
+                    el porcentaje de recargo total del producto será de 36% (21% de IVA, 15% de ganancia).
+                </h1><br/>
+                <h1>
+                    En el sistema hemos tenido en cuenta esta regulación, por lo que ahora se muestran campos nuevos en el producto para 
+                    mayor comodidad del usuario al momento de calcular el iva y la ganancia de sus productos:
+                    <ul>
+                        <li>
+                            Porcentaje de iva compra: corresponde al porcentaje de IVA del costo del producto al momento en el que fue comprado
+                            a un proveedor. Es un campo informativo, para control del usuario del sistema.
+                        </li>
+                        <li>
+                            Iva compra: corresponde al importe de IVA que conforma al precio de costo del producto.  
+                            Es un campo informativo, para control del usuario del sistema.
+                        </li>
+                        <li>
+                            Porcentaje de iva venta: 
+                            Es el porcentaje de IVA que se aplicará al precio del producto en la venta (21% predeterminadamente).
+                        </li>
+                        <li>
+                            Iva venta: Es el importe de IVA del precio del producto que se esté vendiendo.
+                        </li>
+                    </ul>
+                </h1>
+                
             </Col>
         </Row>
     )

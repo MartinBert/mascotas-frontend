@@ -31,6 +31,11 @@ const Header = ({
           state.puntoVentaNumero,
           state.documentoCodigo
         );
+        if(!lastVoucherNumber) {
+          setTimeout(() => {
+            return fetchLastVoucherNumber();
+          }, 100)
+        }
         const nextVoucher = lastVoucherNumber + 1;
         dispatch({ type: SET_VOUCHER_NUMBERS, payload: nextVoucher });
       };

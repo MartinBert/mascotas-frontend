@@ -28,6 +28,7 @@ const Salidas = () => {
     useEffect(() => {
       const fetchSalidas = async() => {
         const response = await api.salidas.getAll({page, limit, filters: JSON.stringify(filters)});
+        console.log(response.data.docs);
         setSalidas(response.data.docs);
         setTotalDocs(response.data.totalDocs);
         setLoading(false);

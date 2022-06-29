@@ -72,16 +72,17 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
                     createSubMenuItem('7', <FaDollarSign/>, '/entradas', 'Entradas'),
                     createSubMenuItem('8', <FaTag/>, '/marcas', 'Marcas'),
                     createSubMenuItem('9', <FaTags/>, '/rubros', 'Rubros'),
+                    createSubMenuItem('10', <FaTags/>, '/unidadesmedida', 'Unid. medida'),
                 ]
             },
             {
                 title: 'Configuraciones',
                 key: 'sub3',
                 items: [
-                    createSubMenuItem('10', <FaUser/>, '/usuarios', 'Usuarios'),
-                    createSubMenuItem('11', <FaBusinessTime/>, '/empresas', 'Empresas'),
-                    createSubMenuItem('12', <FaCodeBranch/>, '/puntosventa', 'Puntos de venta'),
-                    createSubMenuItem('13', <FaAddressBook/>, '/condicionesfiscales', 'Condiciones fiscales'),
+                    createSubMenuItem('11', <FaUser/>, '/usuarios', 'Usuarios'),
+                    createSubMenuItem('12', <FaBusinessTime/>, '/empresas', 'Empresas'),
+                    createSubMenuItem('13', <FaCodeBranch/>, '/puntosventa', 'Puntos de venta'),
+                    createSubMenuItem('14', <FaAddressBook/>, '/condicionesfiscales', 'Condiciones fiscales'),
                 ]
             },
         ]

@@ -14,6 +14,7 @@ import empresas from './empresas';
 import ventas from './ventas';
 import puntosventa from './puntosventa';
 import condicionesfiscales from './condicionesfiscales';
+import unidadesmedida from './unidadesmedida';
 import afip from './afip';
 
 const api = {
@@ -33,6 +34,7 @@ const api = {
     ventas,
     puntosventa,
     condicionesfiscales,
+    unidadesmedida,
     afip
 }
 
