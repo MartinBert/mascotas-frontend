@@ -31,6 +31,10 @@ const initialState = {
   cliente: null,
   clienteRazonSocial: null,
   clienteDireccion: null,
+  mediosPago: [],
+  mediosPagoNombres: [],
+  planesPago: [],
+  planesPagoNombres: [],
   fechaEmision: null,
   fechaEmisionString: null,
   porcentajeDescuentoGlobal: 0,
@@ -62,6 +66,7 @@ const actions = {
   SET_LINE_SURCHARGE_PERCENT: "SET_LINE_SURCHARGE_PERCENT",
   SET_CLIENT: "SET_CLIENT",
   SET_DOCUMENT: "SET_DOCUMENT",
+  SET_PAYMENT_METHODS: "SET_PAYMENT_METHODS",
   SET_COMPANY: "SET_COMPANY",
   SET_SALE_POINT: "SET_SALE_POINT",
   SET_DATES: "SET_DATES",
@@ -260,6 +265,12 @@ const reducer = (state, action) => {
           "-" +
           completeLengthWithZero(action.payload, 8),
       };
+    case actions.SET_PAYMENT_METHODS:
+      return {
+        ...state,
+        mediosPago: action.payload,
+        mediosPagoNombres: action.payload.map(item => item.nombre)
+      }
     case actions.SET_TOTAL:
       let total = 0;
       let totalDescuentoLineas = 0;

@@ -20,6 +20,7 @@ const Header = ({
     SET_CLIENT,
     SET_DOCUMENT,
     SET_VOUCHER_NUMBERS,
+    SET_PAYMENT_METHODS
   } = actions;
 
   useEffect(
@@ -104,6 +105,18 @@ const Header = ({
               selectedSearch={state.documento}
               dispatch={dispatch}
               action={SET_DOCUMENT}
+              returnCompleteModel={true}
+            />
+          </Col>
+          <Col xl={6} lg={8} md={8}>
+            <GenericAutocomplete
+              label="Medio de pago"
+              modelToFind="mediopago"
+              keyToCompare="nombre"
+              selectedSearch={state.mediosPago}
+              dispatch={dispatch}
+              action={SET_PAYMENT_METHODS}
+              multiple={true}
               returnCompleteModel={true}
             />
           </Col>

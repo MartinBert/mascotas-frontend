@@ -3,7 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import api from '../../../services';
 
-const GenericAutocomplete = ({modelToFind, keyToCompare, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
+const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
     const [loading, setLoading] = useState(true);
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState(null);
@@ -47,7 +47,7 @@ const GenericAutocomplete = ({modelToFind, keyToCompare, label, setResultSearch,
                 onChange={(e, val) => {returnResults(val)}}
                 isOptionEqualToValue={(options) => options['_id']}
                 noOptionsText="Sin resultados..."
-                multiple={false}
+                multiple={multiple}
                 size="small"
                 disableClearable
                 value={(selectedSearch) ? selectedSearch : null}
