@@ -42,7 +42,7 @@ const UsuariosForm = () => {
     const fetchUsuario = async () => {
       const searchedItem = await api.usuarios.getById(id);
       setUsuario(searchedItem);
-      setSelectedCompany({_id: searchedItem.company._id, razonSocial: searchedItem.company.razonSocial});
+      if(searchedItem.empresa) setSelectedCompany({_id: searchedItem.empresa._id, razonSocial: searchedItem.empresa.razonSocial});
       setSelectedSalePoint(searchedItem.puntoVenta);
       setLoading(false);
     };
@@ -172,7 +172,6 @@ const UsuariosForm = () => {
                 keyToCompare="razonSocial"
                 setResultSearch={setSelectedCompanyToUser}
                 selectedSearch={selectedCompany}
-                styles={{backgroundColor: '#fff'}}
               />
             </Form.Item>
             <Form.Item
@@ -185,7 +184,6 @@ const UsuariosForm = () => {
                 keyToCompare="nombre"
                 setResultSearch={setSelectedSalePointToUser}
                 selectedSearch={selectedSalePoint}
-                styles={{backgroundColor: '#fff'}}
               />
             </Form.Item>
             <Row>
