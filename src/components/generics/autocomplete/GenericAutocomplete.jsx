@@ -32,27 +32,26 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, label, setRes
         }
     }
     return (
-        <>
-            <Autocomplete
-                disablePortal
-                id="generic_autocomplete"
-                options={options}
-                sx={{backgroundColor: "#fff"}}
-                fullWidth={true}
-                renderInput={(params) => <TextField {...params} label={label} />}
-                loading={loading}
-                filterOptions={(options) => options}
-                onInputChange={(e, val) => setSearch(val)}
-                getOptionLabel={(options) => options[keyToCompare]}
-                onChange={(e, val) => {returnResults(val)}}
-                isOptionEqualToValue={(options) => options['_id']}
-                noOptionsText="Sin resultados..."
-                multiple={multiple}
-                size="small"
-                disableClearable
-                value={(selectedSearch) ? selectedSearch : null}
-            />
-        </>
+        <Autocomplete
+            disablePortal
+            id="generic_autocomplete"
+            options={options}
+            sx={{backgroundColor: "#fff"}}
+            fullWidth={true}
+            height={20}
+            renderInput={(params) => <TextField {...params} label={label}/>}
+            loading={loading}
+            filterOptions={(options) => options}
+            onInputChange={(e, val) => setSearch(val)}
+            getOptionLabel={(options) => options[keyToCompare]}
+            onChange={(e, val) => {returnResults(val)}}
+            isOptionEqualToValue={(options) => options['_id']}
+            noOptionsText="Sin resultados..."
+            multiple={multiple}
+            size="small"
+            disableClearable
+            value={(selectedSearch) ? selectedSearch : null}
+        />
     )
 }
 

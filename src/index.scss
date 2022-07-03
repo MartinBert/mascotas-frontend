@@ -17,6 +17,24 @@ body {
     --secondary-darkness-color: rgb(61, 61, 61);
 }   
 
+.MuiAutocomplete-root > * {
+    height: 32px !important;
+    line-height: 1 !important;
+    font-size: 14px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 2px !important;
+}
+
+.MuiFormControl-root > * {
+    height: 32px !important;
+    line-height: 1 !important;
+    font-size: 14px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 2px !important;
+}
+
 .btn-primary{
     width: 100%;
     height: 32px;

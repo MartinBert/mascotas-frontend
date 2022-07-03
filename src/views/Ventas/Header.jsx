@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { Row, Col } from "antd";
+import { Row, Col, Select } from "antd";
 import {
   ProductSelectionModal,
   GenericAutocomplete,
 } from "../../components/generics";
 import api from "../../services";
+
+const {Option} = Select;
 
 const Header = ({
   productState,
@@ -20,7 +22,8 @@ const Header = ({
     SET_CLIENT,
     SET_DOCUMENT,
     SET_VOUCHER_NUMBERS,
-    SET_PAYMENT_METHODS
+    SET_PAYMENT_METHODS,
+    SET_PAYMENT_PLANS
   } = actions;
 
   useEffect(
@@ -108,6 +111,11 @@ const Header = ({
               returnCompleteModel={true}
             />
           </Col>
+          <Col xl={12} lg={8} md={8}>
+            <span style={{ textAlign: "right" }}>
+              <h1>Total: {state.total}</h1>
+            </span>
+          </Col>
           <Col xl={6} lg={8} md={8}>
             <GenericAutocomplete
               label="Medio de pago"
@@ -120,10 +128,12 @@ const Header = ({
               returnCompleteModel={true}
             />
           </Col>
-          <Col xl={12} lg={8} md={8}>
-            <span style={{ textAlign: "right" }}>
-              <h1>Total: {state.total}</h1>
-            </span>
+          <Col xl={6} lg={8} md={8}>
+            <Select
+              defaultValue={"1"}
+            >
+              <Option value="1">Seleccione un plan de pago</Option>
+            </Select>
           </Col>
         </Row>
       </Col>
