@@ -3,7 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import api from '../../../services';
 
-const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
+const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToUse, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
     const [loading, setLoading] = useState(true);
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState(null);
@@ -24,7 +24,6 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, label, setRes
     const returnResults = async(val) => {
         if(setResultSearch) return setResultSearch(val);
         if(returnCompleteModel){
-            const controllerToUse = modelToFind + 's'
             const result = await api[controllerToUse].getById(val._id)
             return dispatch({type: action, payload: result})
         }else{

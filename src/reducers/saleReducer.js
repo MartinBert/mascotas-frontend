@@ -268,8 +268,14 @@ const reducer = (state, action) => {
     case actions.SET_PAYMENT_METHODS:
       return {
         ...state,
-        mediosPago: action.payload,
-        mediosPagoNombres: action.payload.map(item => item.nombre)
+        mediosPago: [
+          ...state.mediosPago,
+          action.payload[0]
+        ],
+        mediosPagoNombres: [
+          ...state.mediosPagoNombres,
+          action.payload[0].nombre
+        ]
       }
     case actions.SET_TOTAL:
       let total = 0;
