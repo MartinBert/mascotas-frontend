@@ -40,7 +40,7 @@ const UsuariosForm = () => {
     }
 
     const fetchUsuario = async () => {
-      const searchedItem = await api.usuarios.getById(id);
+      const searchedItem = await api.usuarios.findById(id);
       setUsuario(searchedItem);
       if(searchedItem.empresa) setSelectedCompany({_id: searchedItem.empresa._id, razonSocial: searchedItem.empresa.razonSocial});
       setSelectedSalePoint(searchedItem.puntoVenta);
@@ -51,7 +51,7 @@ const UsuariosForm = () => {
 
   const setSelectedCompanyToUser = async(company) => {
     setSelectedCompany(company);
-    const response = await api.empresas.getById(company._id);
+    const response = await api.empresas.findById(company._id);
     setUsuario({
         ...usuario,
         empresa: response
@@ -60,7 +60,7 @@ const UsuariosForm = () => {
 
   const setSelectedSalePointToUser = async(salePoint) => {
     setSelectedSalePoint(salePoint);
-    const response = await api.puntosventa.getById(salePoint._id);
+    const response = await api.puntosventa.findById(salePoint._id);
     setUsuario({
         ...usuario,
         puntoVenta: response

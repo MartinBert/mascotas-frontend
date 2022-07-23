@@ -35,7 +35,7 @@ const PuntosVentaForm = () => {
     }
 
     const fetchPuntoVenta = async() => {
-      const searchedItem = await api.puntosventa.getById(id);
+      const searchedItem = await api.puntosventa.findById(id);
       setPuntoVenta({
         _id: searchedItem._id,
         nombre: searchedItem.nombre

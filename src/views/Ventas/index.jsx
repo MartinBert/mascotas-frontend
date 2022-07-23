@@ -19,7 +19,7 @@ const Ventas = () => {
   useEffect(() => {
     if (state.empresa) return;
     const fetchLoggedUserData = async () => {
-      const loggedUser = await api.usuarios.getById(
+      const loggedUser = await api.usuarios.findById(
         localStorage.getItem("userId")
       );
       dispatch({ type: SET_COMPANY, payload: loggedUser.empresa });

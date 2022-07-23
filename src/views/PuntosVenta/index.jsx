@@ -22,7 +22,7 @@ const PuntosVenta = () => {
 
   useEffect(() => {
     const fetchPuntosVenta = async() => {
-      const data = await api.puntosventa.getAll({page, limit, filters});
+      const data = await api.puntosventa.findAll({page, limit, filters});
       setPuntosVenta(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

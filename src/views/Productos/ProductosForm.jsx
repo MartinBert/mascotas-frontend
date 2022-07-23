@@ -43,7 +43,7 @@ const ProductosForm = () => {
     //eslint-disable-next-line
     useEffect(() => {
         const fetchProductById = async(id) => {
-            const response = await api.productos.getById(id);
+            const response = await api.productos.findById(id);
             const product = response.data;
 
             if(product.marca === null){
@@ -93,7 +93,7 @@ const ProductosForm = () => {
 
     const setSelectedBrandToProduct = async(brand) => {
         setSelectedBrand(brand);
-        const response = await api.marcas.getById(brand._id);
+        const response = await api.marcas.findById(brand._id);
         setProduct({
             ...product,
             marca: response
@@ -102,7 +102,7 @@ const ProductosForm = () => {
 
     const setSelectedHeadingToProduct = async(heading) => {
         setSelectedHeading(heading);
-        const response = await api.rubros.getById(heading._id);
+        const response = await api.rubros.findById(heading._id);
         setProduct({
             ...product,
             rubro: response
@@ -111,7 +111,7 @@ const ProductosForm = () => {
 
     const setSelectedMeasureToProduct = async(measure) => {
         setSelectedMeasure(measure);
-        const response = await api.unidadesmedida.getById(measure._id);
+        const response = await api.unidadesmedida.findById(measure._id);
         setProduct({
             ...product,
             unidadMedida: response,

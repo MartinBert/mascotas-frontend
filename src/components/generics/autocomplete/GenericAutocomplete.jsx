@@ -1,56 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
+import React, {useState} from 'react';
+import {Select} from 'antd';
 import api from '../../../services';
 
-const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToUse, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
-    const [loading, setLoading] = useState(true);
-    const [options, setOptions] = useState([]);
-    const [search, setSearch] = useState(null);
+const {Option} = Select;
 
-    useEffect(() => {
-        setLoading(true);
-        if(!search || search.length < 3) return;
+const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToUse, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
+    const [loading, setLoading] = useState(false);
+    const [options, setOptions] = useState([]);
+
+    const handleSearch = (searchText) => {
+        if(!searchText || searchText.length < 3) return;
         const fetchOptions = async() => {
-            const response = await api.genericos.filterAutocompleteOptions(modelToFind, search, keyToCompare);
+            setLoading(true);
+            const response = await api.genericos.filterAutocompleteOptions(modelToFind, searchText, keyToCompare);
             setOptions(response.data.docs);
             setLoading(false)
         }
         fetchOptions();
-    }, 
-    //eslint-disable-next-line
-    [search])
+    } 
 
-    const returnResults = async(val) => {
-        if(setResultSearch) return setResultSearch(val);
+    const returnResults = async(items) => {
+        if(items.length === 0) return;
+        if(setResultSearch) return setResultSearch(items[0]);
         if(returnCompleteModel){
-            const result = await api[controllerToUse].getById(val._id)
+            const result = await api[controllerToUse].findMultipleIds(items.map(item => item.value));
+            console.log(result)
             return dispatch({type: action, payload: result})
         }else{
-            return dispatch({type: action, payload: val})
+            return dispatch({type: action, payload: items})
         }
     }
     return (
-        <Autocomplete
-            disablePortal
+        <Select
             id="generic_autocomplete"
-            options={options}
-            sx={{backgroundColor: "#fff"}}
-            fullWidth={true}
-            height={20}
-            renderInput={(params) => <TextField {...params} label={label}/>}
+            mode={(multiple) ? "tags" : null}
+            showSearch={true}
+            filterOption={(input) => options.map(option => option.nombre.includes(input)[0])}
+            labelInValue
+            placeholder={label}
             loading={loading}
-            filterOptions={(options) => options}
-            onInputChange={(e, val) => setSearch(val)}
-            getOptionLabel={(options) => options[keyToCompare]}
-            onChange={(e, val) => {returnResults(val)}}
-            isOptionEqualToValue={(options) => options['_id']}
-            noOptionsText="Sin resultados..."
-            multiple={multiple}
-            size="small"
-            disableClearable
-            value={(selectedSearch) ? selectedSearch : null}
-        />
+            onSearch={(e) => {handleSearch(e)}}
+            onChange={(e) => {returnResults(e)}}
+            style={{ width: '100%' }}
+        >
+            {options.map(d => (<Option key={d._id}>{d[keyToCompare]}</Option>))}
+        </Select>
     )
 }
 

@@ -42,7 +42,7 @@ const Header = ({setFilters, filters, setLoading}) => {
     }
 
     const exportExcel = async() => {
-        const response = await api.productos.getAll({page: 0, limit: 1000000, filters: null});
+        const response = await api.productos.findAll({page: 0, limit: 1000000, filters: null});
         const nameOfSheet = "Hoja de productos";
         const nameOfDocument = "Lista de productos";
         const columnHeaders = [

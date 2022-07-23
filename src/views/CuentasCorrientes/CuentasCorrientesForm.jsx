@@ -41,7 +41,7 @@ const CuentasCorrientesForm = () => {
     }
 
     const fetchCuentaCorriente = async() => {
-      const searchedItem = await api.cuentasCorrientes.getById(id);
+      const searchedItem = await api.cuentasCorrientes.findById(id);
       setCuentaCorriente(searchedItem);
       setLoading(false);
     }

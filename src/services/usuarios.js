@@ -7,7 +7,7 @@ const checkStorageStatus = (err) => {
     }
 }
 
-const getAll = async(params) => {
+const findAll = async(params) => {
     const {page, limit, filters} = params
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/usuarios?page=${page}&limit=${limit}&filters=${filters}`, headers);
@@ -18,7 +18,7 @@ const getAll = async(params) => {
     }
 }
 
-const getById = async(id) => {
+const findById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/usuarios/${id}`, headers);
         return response.data;
@@ -59,8 +59,8 @@ const deleteUsuario = async(id) => {
 }
 
 const usuarios = {
-    getAll,
-    getById,
+    findAll,
+    findById,
     save,
     edit,
     deleteUsuario

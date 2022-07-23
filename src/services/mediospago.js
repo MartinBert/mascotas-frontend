@@ -7,7 +7,7 @@ const checkStorageStatus = (err) => {
     }
 }
 
-const getAll = async(params) => {
+const findAll = async(params) => {
     const {page, limit, filters} = params;
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago?page=${page}&limit=${limit}&filters=${filters}`, headers);
@@ -18,7 +18,7 @@ const getAll = async(params) => {
     }
 }
 
-const getById = async(id) => {
+const findById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers);
         return response;
@@ -28,7 +28,17 @@ const getById = async(id) => {
     }
 }
 
-const getByName = async(name) => {
+const findMultipleIds = async(ids) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers);
+        return response.data;
+    }catch(err){
+        checkStorageStatus(err);
+        console.error(err);
+    }
+}
+
+const findByName = async(name) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/name/${name}`, headers);
         return response.data;
@@ -69,9 +79,10 @@ const deleteMedioPago = async(id) => {
 }
 
 const mediospago = {
-    getAll,
-    getById,
-    getByName,
+    findAll,
+    findById,
+    findMultipleIds,
+    findByName,
     save,
     edit,
     deleteMedioPago

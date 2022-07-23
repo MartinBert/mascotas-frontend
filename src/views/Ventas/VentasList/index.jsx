@@ -22,7 +22,7 @@ const VentasList = () => {
 
   useEffect(() => {
     const fetchVentasList = async() => {
-      const data = await api.ventas.getAll({page, limit, filters});
+      const data = await api.ventas.findAll({page, limit, filters});
       setVentas(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

@@ -22,7 +22,7 @@ const Marcas = () => {
 
   useEffect(() => {
     const fetchMarcas = async() => {
-      const data = await api.marcas.getAll({page, limit, filters});
+      const data = await api.marcas.findAll({page, limit, filters});
       setMarcas(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

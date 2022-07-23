@@ -22,7 +22,7 @@ const Clientes = () => {
 
   useEffect(() => {
     const fetchClientes = async() => {
-      const data = await api.clientes.getAll({page, limit, filters});
+      const data = await api.clientes.findAll({page, limit, filters});
       setClientes(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

@@ -37,7 +37,7 @@ const PriceModificatorModal = ({
   useEffect(() => {
     if (brands) return;
     const fetchBrands = async () => {
-      const response = await api.marcas.getAll({
+      const response = await api.marcas.findAll({
         page: 0,
         limit: 100000,
         filters: null,
@@ -50,7 +50,7 @@ const PriceModificatorModal = ({
   useEffect(() => {
     if (headings) return;
     const fetchHeadings = async () => {
-      const response = await api.rubros.getAll({
+      const response = await api.rubros.findAll({
         page: 0,
         limit: 100000,
         filters: null,
@@ -78,7 +78,7 @@ const PriceModificatorModal = ({
           limit: limitPerPage,
           filters: JSON.stringify(filtersToParams),
         };
-        const response = await api.productos.getAll(params);
+        const response = await api.productos.findAll(params);
         setProducts(response.docs);
         setTotalDocsInPage(response.totalDocs);
         setProductsLoading(false);

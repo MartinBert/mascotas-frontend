@@ -22,7 +22,7 @@ const Usuarios = () => {
 
     useEffect(() => {
       const fetchUsuarios = async() => {
-        const data = await api.usuarios.getAll({page, limit, filters});
+        const data = await api.usuarios.findAll({page, limit, filters});
         setUsuarios(data.docs);
         setTotalDocs(data.totalDocs);
         setLoading(false);

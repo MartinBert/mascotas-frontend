@@ -30,7 +30,7 @@ const MediosPagoForm = () => {
         }else{
             if(mediopago.nombre) return;
             const fetchPaymentMethod = async() => {
-                const response =  await api.mediospago.getById(id);
+                const response =  await api.mediospago.findById(id);
                 setMedioPago(response.data);
                 setPlanLines(response.data.planes);
                 setLoading(false);

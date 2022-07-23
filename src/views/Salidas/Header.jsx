@@ -9,7 +9,7 @@ const {simpleDateWithHours} = helpers.dateHelper;
 
 const Header = ({ filters, setFilters }) => {
     const exportExcel = async() => {
-        const response = await api.salidas.getAll({page: 0, limit: 1000000, filters: null});
+        const response = await api.salidas.findAll({page: 0, limit: 1000000, filters: null});
         const nameOfSheet = "Hoja de salidas";
         const nameOfDocument = "Lista de salidas";
         const columnHeaders = [

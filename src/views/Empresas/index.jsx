@@ -23,7 +23,7 @@ const Empresas = () => {
 
   useEffect(() => {
     const fetchEmpresas = async() => {
-      const data = await api.empresas.getAll({page, limit, filters});
+      const data = await api.empresas.findAll({page, limit, filters});
       setEmpresas(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

@@ -7,7 +7,7 @@ const checkStorageStatus = (err) => {
     }
 }
 
-const getAll = async(params) => {
+const findAll = async(params) => {
     const {page, limit, filters} = params;
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos?page=${page}&limit=${limit}&filters=${filters}`, headers);
@@ -18,7 +18,7 @@ const getAll = async(params) => {
     }
 }
 
-const getById = async(id) => {
+const findById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/${id}`, headers);
         return response.data;
@@ -28,7 +28,7 @@ const getById = async(id) => {
     }
 }
 
-const getByName = async(name) => {
+const findByName = async(name) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/name/${name}`, headers);
         return response.data;
@@ -69,9 +69,9 @@ const deleteDocumento = async(id) => {
 }
 
 const documentos = {
-    getAll,
-    getById,
-    getByName,
+    findAll,
+    findById,
+    findByName,
     save,
     edit,
     deleteDocumento

@@ -45,7 +45,7 @@ const EmpresasForm = () => {
     }
 
     const fetchEmpresa = async () => {
-      const searchedItem = await api.empresas.getById(id);
+      const searchedItem = await api.empresas.findById(id);
       const {
         _id,
         razonSocial,
@@ -129,7 +129,7 @@ const EmpresasForm = () => {
 
   const setSelectedConditionToBusiness = async (condition) => {
     setSelectedCondition(condition);
-    const response = await api.condicionesfiscales.getById(condition._id);
+    const response = await api.condicionesfiscales.findById(condition._id);
     setEmpresa({
       ...empresa,
       condicionFiscal: response,
@@ -138,7 +138,7 @@ const EmpresasForm = () => {
 
   const setSelectedSalePointToBusiness = async (salePoint) => {
     setSelectedSalePoint(salePoint);
-    const response = await api.puntosventa.getById(salePoint._id);
+    const response = await api.puntosventa.findById(salePoint._id);
     setEmpresa({
       ...empresa,
       puntosVenta: [response],

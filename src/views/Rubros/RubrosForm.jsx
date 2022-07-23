@@ -34,7 +34,7 @@ const RubrosForm = () => {
     }
 
     const fetchRubro = async () => {
-      const searchedItem = await api.rubros.getById(id);
+      const searchedItem = await api.rubros.findById(id);
       setRubro({
         _id: searchedItem._id,
         nombre: searchedItem.nombre,

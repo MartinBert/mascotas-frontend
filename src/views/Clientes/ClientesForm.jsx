@@ -43,7 +43,7 @@ const ClientesForm = () => {
     }
 
     const fetchCliente = async () => {
-      const searchedItem = await api.clientes.getById(id);
+      const searchedItem = await api.clientes.findById(id);
       setCliente(searchedItem);
       setLoading(false);
     };
@@ -82,7 +82,7 @@ const ClientesForm = () => {
 
   const setSelectedConditionToBusiness = async (condition) => {
     setSelectedCondition(condition);
-    const response = await api.condicionesfiscales.getById(condition._id);
+    const response = await api.condicionesfiscales.findById(condition._id);
     setCliente({
       ...cliente,
       condicionFiscal: response,

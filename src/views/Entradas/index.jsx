@@ -27,7 +27,7 @@ const Entradas = () => {
 
     useEffect(() => {
       const fetchEntradas = async() => {
-        const response = await api.entradas.getAll({page, limit, filters: JSON.stringify(filters)});
+        const response = await api.entradas.findAll({page, limit, filters: JSON.stringify(filters)});
         setEntradas(response.data.docs);
         setTotalDocs(response.data.totalDocs);
         setLoading(false);

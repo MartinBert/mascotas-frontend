@@ -51,7 +51,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
     useEffect(() => {
         const fetchProducts = async() => {
           const stringFilters = JSON.stringify(filters)
-          const data = await api.productos.getAll({page, limit, filters: stringFilters});
+          const data = await api.productos.findAll({page, limit, filters: stringFilters});
           data.docs.forEach(product => {
               state.selectedProducts.forEach(selectedProduct => {
                 if(product._id === selectedProduct._id){

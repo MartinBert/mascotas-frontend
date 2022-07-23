@@ -46,7 +46,7 @@ const SalidasForm = () => {
         if (!salidaIsReady) return;
         if (!salida.usuario) {
             const fetchLoggedUser = async () => {
-                const loggedUser = await api.usuarios.getById(localStorage.getItem('userId'));
+                const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
                 setSalida({
                     ...salida,
                     usuario: loggedUser
@@ -60,7 +60,7 @@ const SalidasForm = () => {
     [salidaIsReady])
 
     const fetchSalida = async () => {
-        const response = await api.salidas.getById(id);
+        const response = await api.salidas.findById(id);
         setSalida(response.data);
         setSalidaIsReady(true);
     }
@@ -91,11 +91,11 @@ const SalidasForm = () => {
         try{
             if(id !== "nuevo"){
                 for(let product of salida.productos){
-                    const firstSalidaRequest = await api.salidas.getById(id);
+                    const firstSalidaRequest = await api.salidas.findById(id);
                     const firstSalidaInstance = firstSalidaRequest.data;
                     const originalProductInstance = firstSalidaInstance.productos.find(el => el._id === product._id);
                     if(originalProductInstance && originalProductInstance.cantidadesSalientes !== product.cantidadesSalientes){
-                        const productToModifyRequest = await api.productos.getById(product._id);
+                        const productToModifyRequest = await api.productos.findById(product._id);
                         const productToModify = productToModifyRequest.data;
                         productToModify.cantidadStock += originalProductInstance.cantidadesSalientes;
                         productToModify.cantidadStock -= parseFloat(product.cantidadesSalientes);

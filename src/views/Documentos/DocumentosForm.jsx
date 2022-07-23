@@ -40,7 +40,7 @@ const DocumentosForm = () => {
     }
 
     const fetchDocumento = async() => {
-      const searchedItem = await api.documentos.getById(id);
+      const searchedItem = await api.documentos.findById(id);
       setDocumento(searchedItem);
       setLoading(false);
     }

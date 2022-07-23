@@ -22,7 +22,7 @@ const Documentos = () => {
 
   useEffect(() => {
     const fetchDocumentos = async() => {
-      const data = await api.documentos.getAll({page, limit, filters});
+      const data = await api.documentos.findAll({page, limit, filters});
       setDocumentos(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

@@ -34,7 +34,7 @@ const MarcasForm = () => {
     }
 
     const fetchMarca = async() => {
-      const searchedItem = await api.marcas.getById(id);
+      const searchedItem = await api.marcas.findById(id);
       setMarca({
         _id: searchedItem._id,
         nombre: searchedItem.nombre

@@ -36,7 +36,7 @@ const CondicionesFiscalesForm = () => {
     }
 
     const fetchCondicionFiscal = async() => {
-      const searchedItem = await api.condicionesfiscales.getById(id);
+      const searchedItem = await api.condicionesfiscales.findById(id);
       setCondicionFiscal({
         _id: searchedItem._id,
         nombre: searchedItem.nombre

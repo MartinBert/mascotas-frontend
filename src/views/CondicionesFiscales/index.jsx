@@ -22,7 +22,7 @@ const CondicionesFiscales = () => {
 
   useEffect(() => {
     const fetchCondicionesFiscales = async() => {
-      const data = await api.condicionesfiscales.getAll({page, limit, filters});
+      const data = await api.condicionesfiscales.findAll({page, limit, filters});
       setCondicionesFiscales(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

@@ -22,7 +22,7 @@ const UnidadesMedida = () => {
 
   useEffect(() => {
     const fetchUnidadesMedida = async() => {
-      const data = await api.unidadesmedida.getAll({page, limit, filters});
+      const data = await api.unidadesmedida.findAll({page, limit, filters});
       setUnidadesMedida(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

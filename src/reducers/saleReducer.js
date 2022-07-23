@@ -270,11 +270,19 @@ const reducer = (state, action) => {
         ...state,
         mediosPago: [
           ...state.mediosPago,
-          action.payload[0]
+          action.payload
         ],
         mediosPagoNombres: [
           ...state.mediosPagoNombres,
-          action.payload[0].nombre
+          action.payload.nombre
+        ],
+        planesPago: [
+          ...state.planesPago,
+          ...action.payload.planes
+        ],
+        planesPagoNombres: [
+          ...state.planesPagoNombres,
+          ...action.payload.planes.map(item => item.nombre)
         ]
       }
     case actions.SET_TOTAL:

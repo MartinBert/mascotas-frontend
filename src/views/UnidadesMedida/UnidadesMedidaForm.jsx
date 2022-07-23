@@ -35,7 +35,7 @@ const UnidadesMedidaForm = () => {
     }
 
     const fetchUnidadMedida = async() => {
-      const searchedItem = await api.unidadesmedida.getById(id);
+      const searchedItem = await api.unidadesmedida.findById(id);
       setUnidadMedida({
         _id: searchedItem._id,
         nombre: searchedItem.nombre

@@ -22,7 +22,7 @@ const Rubros = () => {
 
   useEffect(() => {
     const fetchRubros = async() => {
-      const data = await api.rubros.getAll({page, limit, filters});
+      const data = await api.rubros.findAll({page, limit, filters});
       setRubros(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);

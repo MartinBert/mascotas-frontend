@@ -7,7 +7,7 @@ const checkStorageStatus = (err) => {
     }
 }
 
-const getAll = async(params) => {
+const findAll = async(params) => {
     const {page, limit, filters} = params
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos?page=${page}&limit=${limit}&filters=${filters}`, headers);
@@ -18,7 +18,7 @@ const getAll = async(params) => {
     }
 }
 
-const getById = async(id) => {
+const findById = async(id) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/${id}`, headers);
         return response.data;
@@ -79,8 +79,8 @@ const modifyStock = async(body) => {
 } 
 
 const productos = {
-    getAll,
-    getById,
+    findAll,
+    findById,
     getByBarcode,
     deleteById,
     save,

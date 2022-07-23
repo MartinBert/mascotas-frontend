@@ -22,7 +22,7 @@ const CuentasCorrientes = () => {
 
   useEffect(() => {
     const fetchCuentasCorrientes = async() => {
-      const data = await api.cuentasCorrientes.getAll({page, limit, filters});
+      const data = await api.cuentasCorrientes.findAll({page, limit, filters});
       setCuentasCorrientes(data.docs);
       setTotalDocs(data.totalDocs);
       setLoading(false);
