@@ -28,6 +28,16 @@ const findById = async(id) => {
     }
 }
 
+const findMultipleIds = async(ids) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/clientes/multiple/idList?ids=${JSON.stringify(ids)}`, headers);
+        return response.data;
+    }catch(err){
+        checkStorageStatus(err);
+        console.error(err);
+    }
+}
+
 const findByName = async(name) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/clientes/name/${name}`, headers);
@@ -71,6 +81,7 @@ const deleteCliente = async(id) => {
 const clientes = {
     findAll,
     findById,
+    findMultipleIds,
     findByName,
     save,
     edit,

@@ -4,7 +4,7 @@ import api from '../../../services';
 
 const {Option} = Select;
 
-const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToUse, label, setResultSearch, selectedSearch, dispatch, action, returnCompleteModel}) => {
+const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToUse, label, setResultSearch, dispatch, action, returnCompleteModel}) => {
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState([]);
 
@@ -20,12 +20,15 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToU
     } 
 
     const returnResults = async(items) => {
-        if(items.length === 0) return;
         if(setResultSearch) return setResultSearch(items[0]);
         if(returnCompleteModel){
-            const result = await api[controllerToUse].findMultipleIds(items.map(item => item.value));
-            console.log(result)
-            return dispatch({type: action, payload: result})
+            if(multiple){
+                const result = await api[controllerToUse].findMultipleIds(items.map(item => item.value));
+                return dispatch({type: action, payload: result})
+            }else{
+                const result = await api[controllerToUse].findById(items.value);
+                return dispatch({type: action, payload: result})
+            }
         }else{
             return dispatch({type: action, payload: items})
         }
@@ -35,7 +38,7 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToU
             id="generic_autocomplete"
             mode={(multiple) ? "tags" : null}
             showSearch={true}
-            filterOption={(input) => options.map(option => option.nombre.includes(input)[0])}
+            filterOption={(input) => options.map(option => option[keyToCompare].includes(input)[0])}
             labelInValue
             placeholder={label}
             loading={loading}

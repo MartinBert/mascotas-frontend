@@ -28,6 +28,16 @@ const findById = async(id) => {
     }
 }
 
+const findMultipleIds = async(ids) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers);
+        return response.data;
+    }catch(err){
+        checkStorageStatus(err);
+        console.error(err);
+    }
+}
+
 const getByBarcode = async(barcode) => {
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/barcode/${barcode}`, headers);
@@ -81,6 +91,7 @@ const modifyStock = async(body) => {
 const productos = {
     findAll,
     findById,
+    findMultipleIds,
     getByBarcode,
     deleteById,
     save,

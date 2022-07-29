@@ -28,6 +28,16 @@ const findById = async(id) => {
     }
 }
 
+const findMultipleIds = async(ids) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers);
+        return response.data;
+    }catch(err){
+        checkStorageStatus(err);
+        console.error(err);
+    }
+}
+
 const save = async(salida) => {
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/salidas`, salida, headers);
@@ -61,6 +71,7 @@ const deleteById = async(id) => {
 const salidas = {
     findAll,
     findById,
+    findMultipleIds,
     save,
     edit,
     deleteById

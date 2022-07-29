@@ -266,24 +266,21 @@ const reducer = (state, action) => {
           completeLengthWithZero(action.payload, 8),
       };
     case actions.SET_PAYMENT_METHODS:
+      const paymentMethodNames = action.payload.map(paymentMethod => paymentMethod.nombre);
+      const paymentPlansMapping = action.payload.map(paymentMethod => paymentMethod.planes);
+      const paymentPlans = []
+      paymentPlansMapping.forEach(paymentPlanMapping => {
+        paymentPlanMapping.forEach(plan => {
+          paymentPlans.push(plan);
+        })
+      })
+      const paymentPlanNames = paymentPlans.map(paymentPlan => paymentPlan.nombre);
       return {
         ...state,
-        mediosPago: [
-          ...state.mediosPago,
-          action.payload
-        ],
-        mediosPagoNombres: [
-          ...state.mediosPagoNombres,
-          action.payload.nombre
-        ],
-        planesPago: [
-          ...state.planesPago,
-          ...action.payload.planes
-        ],
-        planesPagoNombres: [
-          ...state.planesPagoNombres,
-          ...action.payload.planes.map(item => item.nombre)
-        ]
+        mediosPago: action.payload,
+        mediosPagoNombres: paymentMethodNames,
+        planesPago: paymentPlans,
+        planesPagoNombres: paymentPlanNames
       }
     case actions.SET_TOTAL:
       let total = 0;
