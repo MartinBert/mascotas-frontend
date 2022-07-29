@@ -45,6 +45,7 @@ const ClientesForm = () => {
     const fetchCliente = async () => {
       const searchedItem = await api.clientes.findById(id);
       setCliente(searchedItem);
+      setSelectedCondition(searchedItem.condicionFiscal);
       setLoading(false);
     };
     fetchCliente();
@@ -82,10 +83,9 @@ const ClientesForm = () => {
 
   const setSelectedConditionToBusiness = async (condition) => {
     setSelectedCondition(condition);
-    const response = await api.condicionesfiscales.findById(condition._id);
     setCliente({
       ...cliente,
-      condicionFiscal: response,
+      condicionFiscal: condition,
     });
   };
 
@@ -152,8 +152,10 @@ const ClientesForm = () => {
                 label="Condición Fiscal"
                 modelToFind="condicionfiscal"
                 keyToCompare="nombre"
+                controllerToUse="condicionesfiscales"
                 setResultSearch={setSelectedConditionToBusiness}
                 selectedSearch={selectedCondition}
+                returnCompleteModel={true}
               />
             </div>
           </Form.Item>

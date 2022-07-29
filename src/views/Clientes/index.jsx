@@ -58,7 +58,9 @@ const Clientes = () => {
     },
     {
       title: 'Cond. Fiscal',
-      dataIndex: 'condicionFiscal',
+      render: (data) => (
+        data.condicionFiscal.nombre
+      )
     },
     {
       title: 'Email',
