@@ -45,7 +45,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                     onChange={(e) => {
                         dispatch({
                             type: (state.discountSurchargeModalOperation === 'discount') ? SET_GLOBAL_DISCOUNT_PERCENT : SET_GLOBAL_SURCHARGE_PERCENT, 
-                            payload: parseFloat(e.target.value)
+                            payload: (!e.target.value) ? 0 : parseFloat(e.target.value)
                         })
                         dispatch({
                             type: (state.discountSurchargeModalOperation === 'discount') ? SET_GLOBAL_SURCHARGE_PERCENT : SET_GLOBAL_DISCOUNT_PERCENT, 
