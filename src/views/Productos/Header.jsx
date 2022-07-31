@@ -165,8 +165,10 @@ const Header = ({setFilters, filters, setLoading}) => {
                             label="Filtrar por marcas"
                             modelToFind="marca"
                             keyToCompare="nombre"
+                            controller="marcas"
                             setResultSearch={setSelectedBrand}
                             selectedSearch={selectedBrand}
+                            returnCompleteModel={true}
                             styles={{backgroundColor: '#fff'}}
                         />
                     </Col>
@@ -175,8 +177,10 @@ const Header = ({setFilters, filters, setLoading}) => {
                             label="Filtrar por rubros"
                             modelToFind="rubro"
                             keyToCompare="nombre"
+                            controller="rubros"
                             setResultSearch={setSelectedHeading}
                             selectedSearch={selectedHeading}
+                            returnCompleteModel={true}
                             styles={{backgroundColor: '#fff'}}
                         />
                     </Col>

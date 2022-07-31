@@ -4,7 +4,7 @@ import api from '../../../services';
 
 const {Option} = Select;
 
-const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToUse, selectedSearch, label, setResultSearch, dispatch, action, returnCompleteModel}) => {
+const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controller, selectedSearch, label, setResultSearch, dispatch, action, returnCompleteModel}) => {
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState([]);
 
@@ -20,14 +20,12 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToU
     } 
 
     const returnResults = async(items) => {
-
         const singleObject = async() => {
-            return await api[controllerToUse].findById(items.value);
+            return await api[controller].findById(items.value);
         }
         const collectionObject = async() => {
-            return await api[controllerToUse].findMultipleIds(items.map(item => item.value));
+            return await api[controller].findMultipleIds(items.map(item => item.value));
         } 
-
         if(returnCompleteModel){
             if(setResultSearch)return setResultSearch((multiple) ? await collectionObject() : await singleObject());
             return dispatch({type: action, payload: (multiple) ? await collectionObject() : await singleObject()});
@@ -48,7 +46,17 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controllerToU
             onSearch={(e) => {handleSearch(e)}}
             onChange={(e) => {returnResults(e)}}
             style={{ width: '100%' }}
-            defaultValue={(selectedSearch) ? (<Option key={selectedSearch[keyToCompare]}></Option>) : null}
+            defaultValue={
+            (selectedSearch) 
+                ? (multiple) 
+                    ? (Array.isArray(selectedSearch))
+                        ? selectedSearch.map(item => <Option key={item[keyToCompare]}></Option>)
+                        : [<Option key={selectedSearch[keyToCompare]}></Option>] 
+                    : <Option key={selectedSearch[keyToCompare]}></Option> 
+                : (multiple)
+                    ? []
+                    : null
+            }
         >
             {options.map(d => (<Option key={d._id}>{d[keyToCompare]}</Option>))}
         </Select>

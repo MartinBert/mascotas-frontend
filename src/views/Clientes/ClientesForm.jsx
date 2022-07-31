@@ -152,7 +152,7 @@ const ClientesForm = () => {
                 label="Condición Fiscal"
                 modelToFind="condicionfiscal"
                 keyToCompare="nombre"
-                controllerToUse="condicionesfiscales"
+                controller="condicionesfiscales"
                 setResultSearch={setSelectedConditionToBusiness}
                 selectedSearch={selectedCondition}
                 returnCompleteModel={true}

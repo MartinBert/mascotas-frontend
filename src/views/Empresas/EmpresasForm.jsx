@@ -129,19 +129,17 @@ const EmpresasForm = () => {
 
   const setSelectedConditionToBusiness = async (condition) => {
     setSelectedCondition(condition);
-    const response = await api.condicionesfiscales.findById(condition._id);
     setEmpresa({
       ...empresa,
-      condicionFiscal: response,
+      condicionFiscal: condition,
     });
   };
 
-  const setSelectedSalePointToBusiness = async (salePoint) => {
-    setSelectedSalePoint(salePoint);
-    const response = await api.puntosventa.findById(salePoint._id);
+  const setSelectedSalePointToBusiness = async (salePoints) => {
+    setSelectedSalePoint(salePoints);
     setEmpresa({
       ...empresa,
-      puntosVenta: [response],
+      puntosVenta: salePoints,
     });
   };
 
@@ -276,6 +274,8 @@ const EmpresasForm = () => {
             label="Condición Fiscal"
             modelToFind="condicionfiscal"
             keyToCompare="nombre"
+            controller="condicionesfiscales"
+            returnCompleteModel={true}
             setResultSearch={setSelectedConditionToBusiness}
             selectedSearch={selectedCondition}
             styles={{ backgroundColor: "#fff" }}
@@ -284,8 +284,11 @@ const EmpresasForm = () => {
         <Col span={6} style={{ marginBottom: "10px" }}>
           <GenericAutocomplete
             label="Punto de venta"
+            multiple={true}
             modelToFind="puntoventa"
             keyToCompare="nombre"
+            controller="puntosventa"
+            returnCompleteModel={true}
             setResultSearch={setSelectedSalePointToBusiness}
             selectedSearch={selectedSalePoint}
             styles={{ backgroundColor: "#fff" }}

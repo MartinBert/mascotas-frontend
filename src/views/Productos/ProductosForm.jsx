@@ -250,6 +250,8 @@ const ProductosForm = () => {
                                         label="Marca"
                                         modelToFind="marca"
                                         keyToCompare="nombre"
+                                        controller="marcas"
+                                        returnCompleteModel={true}
                                         setResultSearch={setSelectedBrandToProduct}
                                         selectedSearch={selectedBrand}
                                     />
@@ -264,6 +266,8 @@ const ProductosForm = () => {
                                         label="Rubro"
                                         modelToFind="rubro"
                                         keyToCompare="nombre"
+                                        controller="rubros"
+                                        returnCompleteModel={true}
                                         setResultSearch={setSelectedHeadingToProduct}
                                         selectedSearch={selectedHeading}
                                     />
@@ -278,6 +282,8 @@ const ProductosForm = () => {
                                         label="U. Medida"
                                         modelToFind="unidadmedida"
                                         keyToCompare="nombre"
+                                        controller="unidadesmedida"
+                                        returnCompleteModel={true}
                                         setResultSearch={setSelectedMeasureToProduct}
                                         selectedSearch={selectedMeasure}
                                     />
