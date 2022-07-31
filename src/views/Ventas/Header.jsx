@@ -133,9 +133,16 @@ const Header = ({
           </Col>
           <Col xl={6} lg={8} md={8}>
             <Select
-              defaultValue={"1"}
+              onChange={e => {
+                dispatch({type: SET_PAYMENT_PLANS, payload: e})
+              }}
+              mode="tags"
+              style={{width: '100%'}}
             >
-              <Option value="1">Seleccione un plan de pago</Option>
+              {(state.planesPagoToSelect) 
+                ? state.planesPagoToSelect.map(item => <Option key={item._id} value={JSON.stringify(item)}>{item.nombre}</Option>) 
+                : null
+              }
             </Select>
           </Col>
         </Row>

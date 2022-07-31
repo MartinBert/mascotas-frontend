@@ -42,11 +42,6 @@ const MediosPagoForm = () => {
     const handleSubmit = () => {
         if(planLines.length === 0 && mediopago.planes.length === 0){
             questionAlert('Si no carga ningún plan el porcentaje de variación del medio de pago será nulo, ¿Desea continuar?')
-            .then(result => {
-                if(result.isConfirmed){
-                    console.log(mediopago);
-                }
-            })
         }else{
             planLines.forEach(el => {
                 if(!el.nombre || !el.cuotas || !el.porcentaje) return errorAlert('Campos incompletos en planes de pago');
@@ -188,8 +183,6 @@ const MediosPagoForm = () => {
                                                                     return el;
                                                                 })
                                                             )
-
-                                                            console.log(planLines);
                                                         }}
                                                     />
                                                 </Form.Item>

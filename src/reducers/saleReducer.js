@@ -33,6 +33,7 @@ const initialState = {
   clienteDireccion: null,
   mediosPago: [],
   mediosPagoNombres: [],
+  planesPagoToSelect: [],
   planesPago: [],
   planesPagoNombres: [],
   fechaEmision: null,
@@ -67,6 +68,7 @@ const actions = {
   SET_CLIENT: "SET_CLIENT",
   SET_DOCUMENT: "SET_DOCUMENT",
   SET_PAYMENT_METHODS: "SET_PAYMENT_METHODS",
+  SET_PAYMENT_PLANS: "SET_PAYMENT_PLANS",
   SET_COMPANY: "SET_COMPANY",
   SET_SALE_POINT: "SET_SALE_POINT",
   SET_DATES: "SET_DATES",
@@ -75,6 +77,7 @@ const actions = {
 };
 
 const calculateLineTotal = (line) => {
+  console.log(line)
   const totalWithoutModifications =
     line.productoPrecioUnitario * line.cantidadUnidades;
   const totalWithSurcharge =
@@ -172,43 +175,19 @@ const reducer = (state, action) => {
       return {
         ...state,
         renglones: action.payload.map((product) => {
-          let linePresent = [];
-          state.renglones.forEach((line) => {
-            if (line._id === product._id) {
-              linePresent.push({
-                _id: product._id,
-                productoNombre: line.nombre,
-                productoCodigoBarras: line.codigoBarras,
-                productoPrecioUnitario: line.precioUnitario,
-                productoPorcentajeIva: line.productoPorcentajeIva,
-                productoImporteIva: line.productoImporteIva,
-                cantidadUnidades: line.cantidadUnidades,
-                porcentajeDescuentoRenglon: line.porcentajeDescuentoRenglon,
-                importeDescuentoRenglon: line.importeDescuentoRenglon,
-                porcentajeRecargoRenglon: line.porcentajeRecargoRenglon,
-                importeRecargoRenglon: line.importeRecargoRenglon,
-                totalRenglon: line.totalRenglon,
-              });
-            }
-          });
-
-          if (linePresent.length > 0) {
-            return linePresent[0];
-          } else {
-            return {
-              _id: product._id,
-              productoNombre: product.nombre,
-              productoCodigoBarras: product.codigoBarras,
-              productoPrecioUnitario: product.precioUnitario,
-              productoPorcentajeIva: product.porcentajeIvaVenta,
-              productoImporteIva: product.ivaVenta,
-              cantidadUnidades: 1,
-              porcentajeDescuentoRenglon: 0,
-              importeDescuentoRenglon: 0,
-              porcentajeRecargoRenglon: 0,
-              importeRecargoRenglon: 0,
-              totalRenglon: product.precioUnitario,
-            };
+          return {
+            _id: product._id,
+            productoNombre: product.nombre,
+            productoCodigoBarras: product.codigoBarras,
+            productoPrecioUnitario: product.precioUnitario,
+            productoPorcentajeIva: product.porcentajeIvaVenta,
+            productoImporteIva: product.ivaVenta,
+            cantidadUnidades: 1,
+            porcentajeDescuentoRenglon: 0,
+            importeDescuentoRenglon: 0,
+            porcentajeRecargoRenglon: 0,
+            importeRecargoRenglon: 0,
+            totalRenglon: product.precioUnitario * 1,
           }
         }),
       };
@@ -274,13 +253,19 @@ const reducer = (state, action) => {
           paymentPlans.push(plan);
         })
       })
-      const paymentPlanNames = paymentPlans.map(paymentPlan => paymentPlan.nombre);
       return {
         ...state,
         mediosPago: action.payload,
         mediosPagoNombres: paymentMethodNames,
-        planesPago: paymentPlans,
-        planesPagoNombres: paymentPlanNames
+        planesPagoToSelect: paymentPlans,
+      }
+    case actions.SET_PAYMENT_PLANS:
+      const plans = action.payload.map(item => JSON.parse(item));
+      const planNames = plans.map(item => item.nombre);
+      return{
+        ...state,
+        planesPago: plans,
+        planesPagoNombres: planNames
       }
     case actions.SET_TOTAL:
       let total = 0;

@@ -159,7 +159,6 @@ const EmpresasForm = () => {
   const uploadImageToServer = async (file) => {
     const response = await api.uploader.uploadImage(file);
     if (response.file) {
-      console.log(file);
       setUploadedImages(response.file);
       return response.code;
     }

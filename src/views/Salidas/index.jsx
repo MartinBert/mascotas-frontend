@@ -28,7 +28,6 @@ const Salidas = () => {
     useEffect(() => {
       const fetchSalidas = async() => {
         const response = await api.salidas.findAll({page, limit, filters: JSON.stringify(filters)});
-        console.log(response.data.docs);
         setSalidas(response.data.docs);
         setTotalDocs(response.data.totalDocs);
         setLoading(false);
@@ -68,7 +67,6 @@ const Salidas = () => {
         title: 'Productos que salieron',
         render: data => (
           <div onClick={() => {
-            console.log(data.productos)
             setDetailsData(data.productos);
             setDetailsVisible(true)
           }}>
