@@ -51,19 +51,17 @@ const UsuariosForm = () => {
 
   const setSelectedCompanyToUser = async(company) => {
     setSelectedCompany(company);
-    const response = await api.empresas.findById(company._id);
     setUsuario({
         ...usuario,
-        empresa: response
+        empresa: company
     })
   }
 
   const setSelectedSalePointToUser = async(salePoint) => {
     setSelectedSalePoint(salePoint);
-    const response = await api.puntosventa.findById(salePoint._id);
     setUsuario({
         ...usuario,
-        puntoVenta: response
+        puntoVenta: salePoint
     })
   }
 
@@ -170,6 +168,8 @@ const UsuariosForm = () => {
                 label="Empresa"
                 modelToFind="empresa"
                 keyToCompare="razonSocial"
+                controller="empresas"
+                returnCompleteModel={true}
                 setResultSearch={setSelectedCompanyToUser}
                 selectedSearch={selectedCompany}
               />
@@ -182,6 +182,8 @@ const UsuariosForm = () => {
                 label="Punto de venta"
                 modelToFind="puntoventa"
                 keyToCompare="nombre"
+                controller="puntosventa"
+                returnCompleteModel={true}
                 setResultSearch={setSelectedSalePointToUser}
                 selectedSearch={selectedSalePoint}
               />
