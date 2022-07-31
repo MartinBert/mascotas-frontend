@@ -164,6 +164,8 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                         label="Filtrar por marcas"
                         modelToFind="marca"
                         keyToCompare="nombre"
+                        controller="marcas"
+                        returnCompleteModel={true}
                         setResultSearch={setSelectedBrand}
                         selectedSearch={selectedBrand}
                         styles={{backgroundColor: '#fff'}}
@@ -174,6 +176,8 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                         label="Filtrar por rubros"
                         modelToFind="rubro"
                         keyToCompare="nombre"
+                        controller="rubros"
+                        returnCompleteModel={true}
                         setResultSearch={setSelectedHeading}
                         selectedSearch={selectedHeading}
                         styles={{backgroundColor: '#fff'}}
