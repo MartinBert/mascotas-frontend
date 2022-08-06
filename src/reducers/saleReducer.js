@@ -175,6 +175,8 @@ const reducer = (state, action) => {
       return {
         ...state,
         renglones: action.payload.map((product) => {
+          const linePresent = state.renglones.find(renglon => renglon._id === product._id);
+          if(linePresent) return linePresent;
           return {
             _id: product._id,
             productoNombre: product.nombre,
