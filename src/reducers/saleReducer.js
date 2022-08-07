@@ -343,6 +343,21 @@ const reducer = (state, action) => {
       };
     case actions.SET_IVAS:
       if(state.renglones.length === 0) return state;
+      if(state.totalDescuento){
+        const importeDescuentoSobreRenglon = state.totalDescuento / state.renglones.length;
+        state.renglones = state.renglones.map(renglon => {
+          renglon.totalRenglon = roundTwoDecimals(renglon.totalRenglon - importeDescuentoSobreRenglon);
+          return renglon;
+        });
+      }
+
+      if(state.totalRecargo){
+        const importeRecargoSobreRenglon = state.totalRecargo / state.renglones.length;
+        state.renglones = state.renglones.map(renglon => {
+          renglon.totalRenglon = roundTwoDecimals(renglon.totalRenglon + importeRecargoSobreRenglon);
+          return renglon;
+        });
+      }
 
       let baseImponible21 = 0;
       let baseImponible10 = 0;
