@@ -2,7 +2,6 @@ import dateHelper from './dateHelper.js';
 
 const {dateToAfip} = dateHelper;
 
-
 const formatBody = (saleData) => {
     let documentoTipo = null;
 
@@ -51,7 +50,7 @@ const formatBody = (saleData) => {
     };
 
     if(saleData.documentoLetra === 'C') delete(body.Iva);
-    console.log(body)
+
     return body;
 }
 
