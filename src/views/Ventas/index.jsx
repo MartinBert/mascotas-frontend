@@ -2,8 +2,10 @@ import React, { useEffect, useReducer } from "react";
 import Header from "./Header";
 import reducers from "../../reducers";
 import DiscountSurchargeModal from "./DiscountSurchargeModal";
+import FinalizeSaleModal from "./FinalizeSaleModal";
 import Lines from "./Lines";
 import api from "../../services";
+import {Row, Col, Spin} from 'antd';
 
 const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates();
 const { initialState, reducer, actions } = reducers.saleReducer;
@@ -14,7 +16,7 @@ const Ventas = () => {
     productReducer,
     productInitialState
   );
-  const { SET_COMPANY, SET_SALE_POINT, SET_DATES } = actions;
+  const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL } = actions;
 
   useEffect(() => {
     if (state.empresa) return;
@@ -35,27 +37,51 @@ const Ventas = () => {
 
   return (
     <>
-      <Header
-        productState={productState}
-        productDispatch={productDispatch}
-        productActions={productActions}
-        actions={actions}
-        dispatch={dispatch}
-        state={state}
-      />
-      <Lines
-        productState={productState}
-        productDispatch={productDispatch}
-        productActions={productActions}
-        state={state}
-        dispatch={dispatch}
-        actions={actions}
-      />
-      <DiscountSurchargeModal
-        state={state}
-        dispatch={dispatch}
-        actions={actions}
-      />
+      {
+        (!state.loadingView)
+        ?
+          <Row>
+          <Col span={24}>
+            <Header
+              productState={productState}
+              productDispatch={productDispatch}
+              productActions={productActions}
+              actions={actions}
+              dispatch={dispatch}
+              state={state}
+            />
+          </Col>
+          <Col span={24}>
+            <Lines
+              productState={productState}
+              productDispatch={productDispatch}
+              productActions={productActions}
+              state={state}
+              dispatch={dispatch}
+              actions={actions}
+            />
+          </Col>
+          <Col span={6} style={{marginTop: "25px"}}>
+            <button
+                    className="btn-primary"
+                    onClick={() => {dispatch({ type: SHOW_FINALIZE_SALE_MODAL }) }}
+                >
+                    Finalizar venta
+            </button>
+          </Col>
+        </Row>
+        : <Spin/>
+      }
+        <DiscountSurchargeModal
+          state={state}
+          dispatch={dispatch}
+          actions={actions}
+        />
+        <FinalizeSaleModal
+          state={state}
+          dispatch={dispatch}
+          actions={actions}
+        />
     </>
   );
 };

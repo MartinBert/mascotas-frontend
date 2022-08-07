@@ -9,7 +9,8 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
         SET_GLOBAL_DISCOUNT_PERCENT, 
         SET_GLOBAL_SURCHARGE_PERCENT,
         SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION,
-        SET_TOTAL
+        SET_TOTAL,
+        SET_IVAS
     } = actions;
 
     return (
@@ -30,6 +31,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                     onChange={(e) => {
                         dispatch({type: SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION, payload: e})
                         dispatch({type: SET_TOTAL})
+                        if(state.documentoLetra) dispatch({ type: SET_IVAS, payload: state.documentoLetra})
                     }}
                     value={state.discountSurchargeModalOperation}
                 >
@@ -52,6 +54,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                             payload:0
                         })
                         dispatch({type: SET_TOTAL})
+                        if(state.documentoLetra) dispatch({ type: SET_IVAS, payload: state.documentoLetra})
                     }}
                 /> 
             </Col>

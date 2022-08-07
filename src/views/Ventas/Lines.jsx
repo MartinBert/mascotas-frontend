@@ -20,6 +20,7 @@ const Lines = ({
     SET_LINE_QUANTITY,
     SET_PRODUCTS,
     SET_TOTAL,
+    SET_IVAS
   } = actions;
 
   const columnsForTable = [
@@ -45,6 +46,7 @@ const Lines = ({
               },
             });
             dispatch({ type: SET_TOTAL });
+            if(state.documentoLetra) dispatch({ type: SET_IVAS, payload: state.documentoLetra})
           }}
         />
       ),
@@ -72,6 +74,7 @@ const Lines = ({
               },
             });
             dispatch({ type: SET_TOTAL });
+            if(state.documentoLetra) dispatch({ type: SET_IVAS, payload: state.documentoLetra})
           }}
         />
       ),
@@ -95,6 +98,7 @@ const Lines = ({
               },
             });
             dispatch({ type: SET_TOTAL });
+            if(state.documentoLetra) dispatch({ type: SET_IVAS, payload: state.documentoLetra})
           }}
         />
       ),
@@ -121,12 +125,15 @@ const Lines = ({
     dispatch({ type: SET_LINES, payload: productState.selectedProducts });
     dispatch({ type: SET_PRODUCTS, payload: productState.selectedProducts });
     dispatch({ type: SET_TOTAL });
+    if(state.documentoLetra) dispatch({ type: SET_IVAS, payload: state.documentoLetra})
   }, [
     productState.selectedProducts,
     dispatch,
     SET_LINES,
     SET_PRODUCTS,
     SET_TOTAL,
+    SET_IVAS,
+    state.documentoLetra
   ]);
 
   return (

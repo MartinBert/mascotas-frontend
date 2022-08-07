@@ -8,6 +8,8 @@ const initialState = {
   //----------------------------------------------- Generics state of view -----------------------------------------------------------/
   discountSurchargeModalVisible: false,
   discountSurchargeModalOperation: "discount",
+  finalizeSaleModalIsVisible: false,
+  loadingView: false,
 
   //------------------------------------------------- State of sale data -------------------------------------------------------------/
   productos: [],
@@ -31,6 +33,7 @@ const initialState = {
   cliente: null,
   clienteRazonSocial: null,
   clienteDireccion: null,
+  clienteIdentificador: null,
   mediosPago: [],
   mediosPagoNombres: [],
   planesPagoToSelect: [],
@@ -38,6 +41,8 @@ const initialState = {
   planesPagoNombres: [],
   fechaEmision: null,
   fechaEmisionString: null,
+  cae: null,
+  vencimientoCae: null,
   porcentajeDescuentoGlobal: 0,
   porcentajeRecargoGlobal: 0,
   totalDescuento: 0,
@@ -45,6 +50,12 @@ const initialState = {
   totalDescuentoLineas: 0,
   totalRecargoLineas: 0,
   porcentajeIva: 0,
+  iva21: 0,
+  iva10: 0,
+  iva27: 0,
+  baseImponible21: 0,
+  baseImponible10: 0,
+  baseImponible27: 0,
   importeIva: 0,
   subTotal: 0,
   total: 0,
@@ -54,8 +65,12 @@ const actions = {
   //---------------------------------------------- Generics actions of view ----------------------------------------------------------/
   SHOW_DISCOUNT_SURCHARGE_MODAL: "SHOW_DISCOUNT_SURCHARGE_MODAL",
   HIDE_DISCOUNT_SURCHARGE_MODAL: "HIDE_DISCOUNT_SURCHARGE_MODAL",
-  SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION:
-    "SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION",
+  SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: "SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION",
+  SHOW_FINALIZE_SALE_MODAL: "SHOW_FINALIZE_SALE_MODAL",
+  HIDE_FINALIZE_SALE_MODAL: "HIDE_FINALIZE_SALE_MODAL",
+  FINALIZE_SALE: "FINALIZE_SALE",
+  LOADING_VIEW: "LOADING_VIEW",
+  RESET_STATE: "RESET_STATE",
 
   //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
   SET_GLOBAL_DISCOUNT_PERCENT: "SET_GLOBAL_DISCOUNT_PERCENT",
@@ -73,6 +88,7 @@ const actions = {
   SET_SALE_POINT: "SET_SALE_POINT",
   SET_DATES: "SET_DATES",
   SET_VOUCHER_NUMBERS: "SET_VOUCHER_NUMBERS",
+  SET_IVAS: "SET_IVAS",
   SET_TOTAL: "SET_TOTAL",
 };
 
@@ -122,6 +138,25 @@ const reducer = (state, action) => {
         ...state,
         discountSurchargeModalOperation: action.payload,
       };
+    case actions.SHOW_FINALIZE_SALE_MODAL:
+      return {
+        ...state,
+        finalizeSaleModalIsVisible: true
+      };
+    case actions.HIDE_FINALIZE_SALE_MODAL:
+      return {
+        ...state,
+        finalizeSaleModalIsVisible: false
+      };
+    case actions.FINALIZE_SALE:
+      state.cae = action.payload.CAE;
+      state.vencimientoCae = action.payload.CAEFchVto;
+      return state;
+    case actions.LOADING_VIEW:
+      return {
+        ...state,
+        loadingView: !state.loadingView
+      }
 
     //--------------------------------------------- Reducers of sale data -------------------------------------------------------/
     case actions.SET_GLOBAL_DISCOUNT_PERCENT:
@@ -204,6 +239,7 @@ const reducer = (state, action) => {
         cliente: action.payload,
         clienteRazonSocial: action.payload.razonSocial,
         clienteDireccion: action.payload.direccion,
+        clienteIdentificador: action.payload.cuit
       };
     case actions.SET_DOCUMENT:
       return {
@@ -305,6 +341,92 @@ const reducer = (state, action) => {
         totalDescuento,
         totalRecargo,
       };
+    case actions.SET_IVAS:
+      if(state.renglones.length === 0) return state;
+
+      let baseImponible21 = 0;
+      let baseImponible10 = 0;
+      let baseImponible27 = 0;
+      let iva21 = 0;
+      let iva10 = 0;
+      let iva27 = 0;
+      const iva21productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 21);
+      const iva10productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 10.5);
+      const iva27productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 27);
+      const iva21Total = roundTwoDecimals(iva21productos.reduce((acc, item) => acc + item.totalRenglon, 0));
+      const iva10Total = roundTwoDecimals(iva10productos.reduce((acc, item) => acc + item.totalRenglon, 0));
+      const iva27Total = roundTwoDecimals(iva27productos.reduce((acc, item) => acc + item.totalRenglon, 0));
+
+      baseImponible21 = roundTwoDecimals((action.payload === "A" || action.payload === "B") ? (iva21Total / 1.21) : iva21Total);
+      baseImponible10 = roundTwoDecimals((action.payload === "A" || action.payload === "B") ? (iva10Total / 1.105) : iva10Total);
+      baseImponible27 = roundTwoDecimals((action.payload === "A" || action.payload === "B") ? (iva27Total / 1.27) : iva27Total);
+      iva21 = roundTwoDecimals(iva21Total - baseImponible21);
+      iva10 = roundTwoDecimals(iva10Total - baseImponible10);
+      iva27 = roundTwoDecimals(iva27Total - baseImponible27);
+      
+      state.baseImponible21 = baseImponible21;
+      state.baseImponible10 = baseImponible10;
+      state.baseImponible27 = baseImponible27;
+      state.iva21 = iva21;
+      state.iva10 = iva10;
+      state.iva27 = iva27;
+      state.importeIva = roundTwoDecimals(state.iva21 + state.iva10 + state.iva27);
+      state.subTotal = roundTwoDecimals(state.total - state.importeIva);
+      return state;
+    case actions.RESET_STATE:
+      return {
+        discountSurchargeModalVisible: false,
+        discountSurchargeModalOperation: "discount",
+        finalizeSaleModalIsVisible: false,
+        loadingView: false,
+        productos: [],
+        renglones: [],
+        documento: null,
+        documentoLetra: null,
+        documentoFiscal: null,
+        documentoCodigo: null,
+        empresa: null,
+        empresaRazonSocial: null,
+        empresaDireccion: null,
+        empresaCondicionIva: null,
+        empresaCuit: null,
+        empresaIngresosBrutos: null,
+        empresaInicioActividad: null,
+        puntoVenta: null,
+        puntoVentaNumero: null,
+        puntoVentaNombre: null,
+        numeroFactura: null,
+        numeroCompletoFactura: null,
+        cliente: null,
+        clienteRazonSocial: null,
+        clienteDireccion: null,
+        clienteIdentificador: null,
+        mediosPago: [],
+        mediosPagoNombres: [],
+        planesPagoToSelect: [],
+        planesPago: [],
+        planesPagoNombres: [],
+        fechaEmision: null,
+        fechaEmisionString: null,
+        cae: null,
+        vencimientoCae: null,
+        porcentajeDescuentoGlobal: 0,
+        porcentajeRecargoGlobal: 0,
+        totalDescuento: 0,
+        totalRecargo: 0,
+        totalDescuentoLineas: 0,
+        totalRecargoLineas: 0,
+        porcentajeIva: 0,
+        iva21: 0,
+        iva10: 0,
+        iva27: 0,
+        baseImponible21: 0,
+        baseImponible10: 0,
+        baseImponible27: 0,
+        importeIva: 0,
+        subTotal: 0,
+        total: 0,
+      }
     default:
       return state;
   }
