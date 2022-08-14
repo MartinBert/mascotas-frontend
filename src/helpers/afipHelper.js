@@ -3,12 +3,6 @@ import dateHelper from './dateHelper.js';
 const {dateToAfip} = dateHelper;
 
 const formatBody = (saleData) => {
-    let documentoTipo = null;
-
-    if(saleData.documentoLetra === "A") documentoTipo = 80;
-    if(saleData.documentoLetra === "B") documentoTipo = 96;
-    if(saleData.documentoLetra === "C") documentoTipo = 86;
-
     const ivas = []
     if(saleData.iva21 > 0) ivas.push({
         Id: 5, // Id del tipo de IVA (ver tipos disponibles) 
@@ -33,7 +27,7 @@ const formatBody = (saleData) => {
         PtoVta: saleData.puntoVentaNumero, // Punto de venta
         CbteTipo: saleData.documentoCodigo, // Tipo de comprobante (ver tipos disponibles) 
         Concepto: 1, // Concepto del Comprobante: (1)Productos, (2)Servicios, (3)Productos y Servicios
-        DocTipo: documentoTipo, // Tipo de documento del comprador (ver tipos disponibles)
+        DocTipo: saleData.clienteDocumentoReceptor, // Tipo de documento del comprador (ver tipos disponibles)
         DocNro: saleData.clienteIdentificador, // Numero de documento del comprador
         CbteDesde: saleData.numeroFactura, // Numero de comprobante o numero del primer comprobante en caso de ser mas de uno
         CbteHasta: saleData.numeroFactura, // Numero de comprobante o numero del ultimo comprobante en caso de ser mas de uno

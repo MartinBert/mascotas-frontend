@@ -18,9 +18,17 @@ const dateToAfip = (unformattedDate) => {
     return year+((month.toString().length === 1) ? '0' + month.toString() : month.toString())+((day.toString().length === 1) ? '0' + day.toString() : day.toString());
 }
 
+const dateToQrAfip = (unformattedDate) => {
+    const year = unformattedDate.getFullYear();
+    const month = parseInt(unformattedDate.getMonth()) + 1;
+    const day = unformattedDate.getDate();
+    return year+'-'+((month.toString().length === 1) ? '0' + month.toString() : month.toString())+'-'+((day.toString().length === 1) ? '0' + day.toString() : day.toString());
+}
+
 const dateHelper = {
     simpleDateWithHours,
-    dateToAfip
+    dateToAfip,
+    dateToQrAfip
 }
 
 export default dateHelper;

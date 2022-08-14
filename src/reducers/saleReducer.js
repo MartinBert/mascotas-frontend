@@ -37,6 +37,7 @@ const initialState = {
   clienteDireccion: null,
   clienteIdentificador: null,
   clienteCondicionIva: null,
+  clienteDocumentoReceptor: null,
   mediosPago: [],
   mediosPagoNombres: [],
   planesPagoToSelect: [],
@@ -245,7 +246,8 @@ const reducer = (state, action) => {
         clienteRazonSocial: action.payload.razonSocial,
         clienteDireccion: action.payload.direccion,
         clienteIdentificador: action.payload.cuit,
-        clienteCondicionIva: action.payload.condicionFiscal.nombre
+        clienteCondicionIva: action.payload.condicionFiscal.nombre,
+        clienteDocumentoReceptor: action.payload.documentoReceptor
       };
     case actions.SET_DOCUMENT:
       return {
@@ -254,6 +256,7 @@ const reducer = (state, action) => {
         documentoLetra: action.payload.letra,
         documentoFiscal: action.payload.fiscal,
         documentoCodigo: action.payload.codigoUnico,
+        documentoDocumentoReceptor: action.payload.documentoReceptor
       };
     case actions.SET_COMPANY:
       return {

@@ -22,6 +22,7 @@ const ClientesForm = () => {
     direccion: "",
     ciudad: "",
     provincia: "",
+    documentoReceptor: "",
   });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -134,6 +135,21 @@ const ClientesForm = () => {
             </div>
             <div>
               <Input name="cuit" value={cliente.cuit} />
+            </div>
+          </Form.Item>
+        </Col>
+        <Col xl={6} lg={8} md={12} sm={12} xs={24}>
+          <Form.Item
+            onChange={(e) => {
+              loadClienteData(e);
+            }}
+            required={true}
+          >
+            <div>
+              <p>*Tipo doc. receptor:</p>
+            </div>
+            <div>
+              <Input name="documentoReceptor" value={cliente.documentoReceptor} />
             </div>
           </Form.Item>
         </Col>
