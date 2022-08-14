@@ -4,19 +4,21 @@ import helpers from '../../helpers';
 import api from '../../services';
 
 const {formatBody} = helpers.afipHelper;
+const {createVoucherPdf} = helpers.pdf;
 
 const FinalizeSaleModal = ({ state, dispatch, actions}) => {
   const { HIDE_FINALIZE_SALE_MODAL, FINALIZE_SALE, LOADING_VIEW } = actions;
 
   const startCloseSale = async() => {
-    dispatch({type: LOADING_VIEW});
-    dispatch({type: HIDE_FINALIZE_SALE_MODAL});
-    const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
-    const bodyToAfip = formatBody(state);
-    const responseOfAfip = await api.afip.generateVoucher(loggedUser.empresa.cuit, bodyToAfip);
-    dispatch({type: FINALIZE_SALE, payload: responseOfAfip});
-    dispatch({type: LOADING_VIEW});
-    window.location.reload();
+    // dispatch({type: LOADING_VIEW});
+    // dispatch({type: HIDE_FINALIZE_SALE_MODAL});
+    // const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
+    // const bodyToAfip = formatBody(state);
+    // const responseOfAfip = await api.afip.generateVoucher(loggedUser.empresa.cuit, bodyToAfip);
+    // dispatch({type: FINALIZE_SALE, payload: responseOfAfip});
+    createVoucherPdf(state)
+    // dispatch({type: LOADING_VIEW});
+    // window.location.reload();
   }
 
   return (

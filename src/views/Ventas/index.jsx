@@ -82,6 +82,7 @@ const Ventas = () => {
           dispatch={dispatch}
           actions={actions}
         />
+        <div id="voucher" style={{width: "790px"}}></div>
     </>
   );
 };

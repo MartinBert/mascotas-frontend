@@ -25,15 +25,18 @@ const initialState = {
   empresaCuit: null,
   empresaIngresosBrutos: null,
   empresaInicioActividad: null,
+  empresaLogo: null,
   puntoVenta: null,
   puntoVentaNumero: null,
   puntoVentaNombre: null,
   numeroFactura: null,
   numeroCompletoFactura: null,
+  condicionVenta: 'Contado',
   cliente: null,
   clienteRazonSocial: null,
   clienteDireccion: null,
   clienteIdentificador: null,
+  clienteCondicionIva: null,
   mediosPago: [],
   mediosPagoNombres: [],
   planesPagoToSelect: [],
@@ -149,9 +152,11 @@ const reducer = (state, action) => {
         finalizeSaleModalIsVisible: false
       };
     case actions.FINALIZE_SALE:
-      state.cae = action.payload.CAE;
-      state.vencimientoCae = action.payload.CAEFchVto;
-      return state;
+      return {
+        ...state,
+        cae: action.payload.CAE,
+        vencimientoCae: action.payload.CAEFchVto
+      };
     case actions.LOADING_VIEW:
       return {
         ...state,
@@ -239,7 +244,8 @@ const reducer = (state, action) => {
         cliente: action.payload,
         clienteRazonSocial: action.payload.razonSocial,
         clienteDireccion: action.payload.direccion,
-        clienteIdentificador: action.payload.cuit
+        clienteIdentificador: action.payload.cuit,
+        clienteCondicionIva: action.payload.condicionFiscal.nombre
       };
     case actions.SET_DOCUMENT:
       return {
@@ -259,6 +265,7 @@ const reducer = (state, action) => {
         empresaCuit: action.payload.cuit,
         empresaIngresosBrutos: action.payload.ingresosBrutos,
         empresaInicioActividad: action.payload.fechaInicioActividad,
+        empresaLogo: action.payload.logo.url
       };
     case actions.SET_SALE_POINT:
       return {
