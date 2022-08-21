@@ -23,12 +23,14 @@ const Header = ({
     SET_DOCUMENT,
     SET_VOUCHER_NUMBERS,
     SET_PAYMENT_METHODS,
-    SET_PAYMENT_PLANS
+    SET_PAYMENT_PLANS,
+    SET_TOTAL
   } = actions;
 
   useEffect(
     () => {
       if (!state.documento) return;
+      dispatch({type: SET_TOTAL});
       const fetchLastVoucherNumber = async () => {
         const lastVoucherNumber = await api.afip.findLastVoucherNumber(
           state.empresaCuit,

@@ -92,12 +92,10 @@ const actions = {
   SET_SALE_POINT: "SET_SALE_POINT",
   SET_DATES: "SET_DATES",
   SET_VOUCHER_NUMBERS: "SET_VOUCHER_NUMBERS",
-  SET_IVAS: "SET_IVAS",
   SET_TOTAL: "SET_TOTAL",
 };
 
 const calculateLineTotal = (line) => {
-  console.log(line)
   const totalWithoutModifications =
     line.productoPrecioUnitario * line.cantidadUnidades;
   const totalWithSurcharge =
@@ -316,88 +314,72 @@ const reducer = (state, action) => {
         planesPagoNombres: planNames
       }
     case actions.SET_TOTAL:
-      let total = 0;
-      let totalDescuentoLineas = 0;
-      let totalRecargoLineas = 0;
-      let totalDescuento = 0;
-      let totalRecargo = 0;
-      if (state.renglones.length > 0) {
-        const totalLinesSum = state.renglones.reduce(
-          (acc, el) => acc + el.totalRenglon,
-          0
-        );
-        totalRecargo = roundTwoDecimals(
-          totalLinesSum * decimalPercent(state.porcentajeRecargoGlobal)
-        );
-        totalDescuento = roundTwoDecimals(
-          totalLinesSum * decimalPercent(state.porcentajeDescuentoGlobal)
-        );
-        total = roundTwoDecimals(totalLinesSum + totalRecargo - totalDescuento);
-        totalDescuentoLineas = roundTwoDecimals(
-          state.renglones.reduce(
-            (acc, el) => acc + el.importeDescuentoRenglon,
-            0
-          )
-        );
-        totalRecargoLineas = roundTwoDecimals(
-          state.renglones.reduce((acc, el) => acc + el.importeRecargoRenglon, 0)
-        );
-      }
+      if (state.renglones.length === 0) return state;
+      const totalLinesSum = state.renglones.reduce((acc, el) => acc + el.totalRenglon, 0);
+      const totalRecargo = roundTwoDecimals(totalLinesSum * decimalPercent(state.porcentajeRecargoGlobal));
+      const totalDescuento = roundTwoDecimals(totalLinesSum * decimalPercent(state.porcentajeDescuentoGlobal));
+      const totalDescuentoLineas = roundTwoDecimals(
+        state.renglones.reduce((acc, el) => acc + el.importeDescuentoRenglon, 0)
+      );
+      const totalRecargoLineas = roundTwoDecimals(
+        state.renglones.reduce((acc, el) => acc + el.importeRecargoRenglon, 0)
+      );
+      const iva21productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 21);
+      const iva10productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 10.5);
+      const iva27productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 27);
+      const iva21Total = roundTwoDecimals(
+        iva21productos.reduce(
+          (acc, item) => 
+            acc 
+            + (item.totalRenglon + (item.totalRenglon * decimalPercent(state.porcentajeRecargoGlobal)) 
+            - (item.totalRenglon * decimalPercent(state.porcentajeDescuentoGlobal)))
+          , 0
+        )
+      );
+      const iva10Total = roundTwoDecimals(
+        iva10productos.reduce(
+          (acc, item) => 
+            acc 
+            + (item.totalRenglon + (item.totalRenglon * decimalPercent(state.porcentajeRecargoGlobal)) 
+            - (item.totalRenglon * decimalPercent(state.porcentajeDescuentoGlobal)))
+          , 0
+        )
+      );
+      const iva27Total = roundTwoDecimals(
+        iva27productos.reduce(
+          (acc, item) => 
+            acc 
+            + (item.totalRenglon + (item.totalRenglon * decimalPercent(state.porcentajeRecargoGlobal)) 
+            - (item.totalRenglon * decimalPercent(state.porcentajeDescuentoGlobal)))
+          , 0
+        )
+      );
+      const baseImponible21 = roundTwoDecimals((state.documentoLetra === "A" || state.documentoLetra === "B") ? (iva21Total / 1.21) : iva21Total);
+      const baseImponible10 = roundTwoDecimals((state.documentoLetra === "A" || state.documentoLetra === "B") ? (iva10Total / 1.105) : iva10Total);
+      const baseImponible27 = roundTwoDecimals((state.documentoLetra === "A" || state.documentoLetra === "B") ? (iva27Total / 1.27) : iva27Total);
+      const iva21 = roundTwoDecimals(iva21Total - baseImponible21);
+      const iva10 = roundTwoDecimals(iva10Total - baseImponible10);
+      const iva27 = roundTwoDecimals(iva27Total - baseImponible27);
+      const importeIva = roundTwoDecimals(iva21 + iva10 + iva27);
+      const total = roundTwoDecimals(totalLinesSum + totalRecargo - totalDescuento);
+      const subTotal = roundTwoDecimals(total - importeIva);
+      
       return {
         ...state,
-        total,
         totalDescuentoLineas,
         totalRecargoLineas,
         totalDescuento,
         totalRecargo,
+        baseImponible21,
+        baseImponible10,
+        baseImponible27,
+        iva21,
+        iva10,
+        iva27,
+        importeIva,
+        subTotal,
+        total,
       };
-    case actions.SET_IVAS:
-      if(state.renglones.length === 0) return state;
-      if(state.totalDescuento){
-        const importeDescuentoSobreRenglon = state.totalDescuento / state.renglones.length;
-        state.renglones = state.renglones.map(renglon => {
-          renglon.totalRenglon = roundTwoDecimals(renglon.totalRenglon - importeDescuentoSobreRenglon);
-          return renglon;
-        });
-      }
-
-      if(state.totalRecargo){
-        const importeRecargoSobreRenglon = state.totalRecargo / state.renglones.length;
-        state.renglones = state.renglones.map(renglon => {
-          renglon.totalRenglon = roundTwoDecimals(renglon.totalRenglon + importeRecargoSobreRenglon);
-          return renglon;
-        });
-      }
-
-      let baseImponible21 = 0;
-      let baseImponible10 = 0;
-      let baseImponible27 = 0;
-      let iva21 = 0;
-      let iva10 = 0;
-      let iva27 = 0;
-      const iva21productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 21);
-      const iva10productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 10.5);
-      const iva27productos = state.renglones.filter(renglon => renglon.productoPorcentajeIva === 27);
-      const iva21Total = roundTwoDecimals(iva21productos.reduce((acc, item) => acc + item.totalRenglon, 0));
-      const iva10Total = roundTwoDecimals(iva10productos.reduce((acc, item) => acc + item.totalRenglon, 0));
-      const iva27Total = roundTwoDecimals(iva27productos.reduce((acc, item) => acc + item.totalRenglon, 0));
-
-      baseImponible21 = roundTwoDecimals((action.payload === "A" || action.payload === "B") ? (iva21Total / 1.21) : iva21Total);
-      baseImponible10 = roundTwoDecimals((action.payload === "A" || action.payload === "B") ? (iva10Total / 1.105) : iva10Total);
-      baseImponible27 = roundTwoDecimals((action.payload === "A" || action.payload === "B") ? (iva27Total / 1.27) : iva27Total);
-      iva21 = roundTwoDecimals(iva21Total - baseImponible21);
-      iva10 = roundTwoDecimals(iva10Total - baseImponible10);
-      iva27 = roundTwoDecimals(iva27Total - baseImponible27);
-      
-      state.baseImponible21 = baseImponible21;
-      state.baseImponible10 = baseImponible10;
-      state.baseImponible27 = baseImponible27;
-      state.iva21 = iva21;
-      state.iva10 = iva10;
-      state.iva27 = iva27;
-      state.importeIva = roundTwoDecimals(state.iva21 + state.iva10 + state.iva27);
-      state.subTotal = roundTwoDecimals(state.total - state.importeIva);
-      return state;
     case actions.RESET_STATE:
       return {
         discountSurchargeModalVisible: false,

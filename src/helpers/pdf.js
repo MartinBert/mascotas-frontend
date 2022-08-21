@@ -28,7 +28,7 @@ const createVoucherPdf = async(saleData) => {
                 <p>Cond. frente a IVA: ${saleData.empresaCondicionIva}</p>
             </div>
             <div style="width: 20%; text-align: center; margin-top: 15px; padding-left: 15px; padding-right: 15px;">
-                <div style="background-color: #e8e6e6; border: 1px solid">
+                <div style="background-color: #4a4a4a; border: 1px solid">
                     <h1 style="font-size: 52px; font-weight: bold; color: #fff; margin-top: 15px">${saleData.documentoLetra}</h1>
                 </div>
                 <p style="vertical-align: text-top;">Código ${saleData.documentoCodigo}</p>
@@ -44,7 +44,7 @@ const createVoucherPdf = async(saleData) => {
         <div style="width: 100%;">
             <hr>
         </div>
-        <div style="width: 100%; background-color: #e8e6e6; padding: 15px">
+        <div style="width: 100%; background-color: #949494; padding: 15px">
             <div style="width: 100%; display: flex">
                 <div style="width: 33.3%;">
                     Razón social: ${saleData.clienteRazonSocial}
@@ -121,15 +121,15 @@ const createVoucherPdf = async(saleData) => {
             </div>
             <div style="width: 100%; padding: 10px; display: flex">
                 <div style="width: 20%">
-                    <p>Sub total: $${saleData.subTotal}</p>
+                ${(saleData.iva21) ? `<p>Sub total: $${saleData.subTotal}</p>` : ''}
                 </div>
                 <div style="width: 20%">
-                    ${(saleData.iva21) ? `<p>Iva 21%: $${saleData.iva21}</p>`: ''}
-                    ${(saleData.iva10) ? `<p>Iva 10.5%: $${saleData.iva10}</p>`: ''}
-                    ${(saleData.iva27) ? `<p>Iva 27%: $${saleData.iva27}</p>`: ''}
+                    ${(saleData.iva21) ? `<p>Iva 21%: $${saleData.iva21}</p>` : ''}
+                    ${(saleData.iva10) ? `<p>Iva 10.5%: $${saleData.iva10}</p>` : ''}
+                    ${(saleData.iva27) ? `<p>Iva 27%: $${saleData.iva27}</p>` : ''}
                 </div>
                 <div style="width: 20%">
-                    <p>Total IVA: $${saleData.importeIva}</p>
+                ${(saleData.iva21) ? `<p>Total IVA: $${saleData.importeIva}</p>` : ''}
                 </div>
                 <div style="width: 20%">
                     <p>Descuento: $${saleData.totalDescuento + saleData.totalDescuentoLineas}</p>
