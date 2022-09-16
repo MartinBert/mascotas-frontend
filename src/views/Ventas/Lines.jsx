@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Table, Input } from "antd";
+import { Table, Input, Checkbox, Row, Col } from "antd";
 import icons from "../../components/icons";
 
 const { Delete } = icons;
@@ -14,6 +14,7 @@ const Lines = ({
 }) => {
   const { DELETE_PRODUCT } = productActions;
   const {
+    SET_FRACTIONED,
     SET_LINES,
     SET_LINE_DISCOUNT_PERCENT,
     SET_LINE_SURCHARGE_PERCENT,
@@ -24,34 +25,64 @@ const Lines = ({
 
   const columnsForTable = [
     {
-      title: "Nombre",
-      dataIndex: "productoNombre",
+      title: "Fracc.",
+      render: (product) => (
+        <Checkbox onChange={(e) => {
+          product.fraccionar = e.target.checked;
+          dispatch({type: SET_FRACTIONED, payload: product})
+        }}/>
+      ),
     },
     {
-      title: "Cant. unidades",
+      title: "Nombre",
+      dataIndex: "productoNombre",
+      width: 300
+    },
+    {
+      title: "Cantidad",
+      render: (product) => (
+        <Row gutter={8}>
+          <Col span={16}>
+            <Input
+              color="primary"
+              type="number"
+              placeholder="Cantidad"
+              value={product.cantidadUnidades}
+              onChange={(e) => {
+                dispatch({
+                  type: SET_LINE_QUANTITY,
+                  payload: {
+                    _id: product._id,
+                    cantidadUnidades:
+                      e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
+                  },
+                });
+                dispatch({ type: SET_TOTAL });
+              }}
+            />
+          </Col>
+          {
+            (product.fraccionar)
+            ?
+            <Col span={8}>
+              <p>/ {product.productoFraccionamiento}</p>
+            </Col>
+            : null
+          }
+        </Row>
+      ),
+    },
+    {
+      title: "Prec. U.",
       render: (product) => (
         <Input
           color="primary"
           type="number"
-          placeholder="Cantidad"
-          value={product.cantidadUnidades}
-          onChange={(e) => {
-            dispatch({
-              type: SET_LINE_QUANTITY,
-              payload: {
-                _id: product._id,
-                cantidadUnidades:
-                  e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
-              },
-            });
-            dispatch({ type: SET_TOTAL });
-          }}
+          placeholder="Prec. U."
+          value={product.productoPrecioUnitario}
+          disabled={true}
         />
       ),
-    },
-    {
-      title: "P. U.",
-      dataIndex: "productoPrecioUnitario",
     },
     {
       title: "Porc. descuento",
@@ -101,7 +132,15 @@ const Lines = ({
     },
     {
       title: "Total",
-      dataIndex: "totalRenglon",
+      render: (product) => (
+        <Input
+          color="primary"
+          type="number"
+          placeholder="Total"
+          value={product.totalRenglon}
+          disabled={true}
+        />
+      ),
     },
     {
       title: "Eliminar",

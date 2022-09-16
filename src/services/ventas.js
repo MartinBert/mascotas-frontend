@@ -51,7 +51,7 @@ const findByName = async(name) => {
 const save = async(venta) => {
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/ventas`, venta, headers);
-        return response.data.message;
+        return response.data;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);
@@ -61,7 +61,7 @@ const save = async(venta) => {
 const edit = async(venta) => {
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/${venta._id}`, venta, headers);
-        return response.data.message;
+        return response.data;
     }catch(err){
         checkStorageStatus(err);
         console.error(err);

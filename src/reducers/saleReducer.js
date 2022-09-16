@@ -53,7 +53,6 @@ const initialState = {
   totalRecargo: 0,
   totalDescuentoLineas: 0,
   totalRecargoLineas: 0,
-  porcentajeIva: 0,
   iva21: 0,
   iva10: 0,
   iva27: 0,
@@ -81,6 +80,7 @@ const actions = {
   SET_GLOBAL_SURCHARGE_PERCENT: "SET_GLOBAL_SURCHARGE_PERCENT",
   SET_PRODUCTS: "SET_PRODUCTS",
   SET_LINES: "SET_LINES",
+  SET_FRACTIONED: "SET_FRACTIONED",
   SET_LINE_QUANTITY: "SET_LINE_QUANTITY",
   SET_LINE_DISCOUNT_PERCENT: "SET_LINE_DISCOUNT_PERCENT",
   SET_LINE_SURCHARGE_PERCENT: "SET_LINE_SURCHARGE_PERCENT",
@@ -96,14 +96,10 @@ const actions = {
 };
 
 const calculateLineTotal = (line) => {
-  const totalWithoutModifications =
-    line.productoPrecioUnitario * line.cantidadUnidades;
-  const totalWithSurcharge =
-    totalWithoutModifications *
-    (1 + decimalPercent(line.porcentajeRecargoRenglon));
-  const totalWithDiscount =
-    totalWithoutModifications *
-    (1 - decimalPercent(line.porcentajeDescuentoRenglon));
+  const quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades;
+  const totalWithoutModifications = line.productoPrecioUnitario * quantity;
+  const totalWithSurcharge = totalWithoutModifications * (1 + decimalPercent(line.porcentajeRecargoRenglon));
+  const totalWithDiscount = totalWithoutModifications * (1 - decimalPercent(line.porcentajeDescuentoRenglon));
   const surcharge = totalWithSurcharge - totalWithoutModifications;
   const discount = totalWithoutModifications - totalWithDiscount;
   const total = totalWithoutModifications + surcharge - discount;
@@ -111,7 +107,8 @@ const calculateLineTotal = (line) => {
 };
 
 const basePrice = (line) => {
-  return line.productoPrecioUnitario * line.cantidadUnidades;
+  const quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades;
+  return line.productoPrecioUnitario * quantity;
 };
 
 const reducer = (state, action) => {
@@ -223,6 +220,8 @@ const reducer = (state, action) => {
             productoPrecioUnitario: product.precioUnitario,
             productoPorcentajeIva: product.porcentajeIvaVenta,
             productoImporteIva: product.ivaVenta,
+            productoFraccionamiento: (product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1,
+            fraccionar: false,
             cantidadUnidades: 1,
             porcentajeDescuentoRenglon: 0,
             importeDescuentoRenglon: 0,
@@ -232,6 +231,20 @@ const reducer = (state, action) => {
           }
         }),
       };
+    case actions.SET_FRACTIONED:
+      return {
+        ...state,
+        renglones: state.renglones.map(item => {
+          const checked = action.payload.fraccionar;
+          if(item._id === action.payload._id){
+            if(checked){
+              item = action.payload;
+              item.cantidadUnidades = item.productoFraccionamiento;
+            }
+          }
+          return item
+        })
+      }
     case actions.SET_PRODUCTS:
       return {
         ...state,
@@ -423,7 +436,6 @@ const reducer = (state, action) => {
         totalRecargo: 0,
         totalDescuentoLineas: 0,
         totalRecargoLineas: 0,
-        porcentajeIva: 0,
         iva21: 0,
         iva10: 0,
         iva27: 0,

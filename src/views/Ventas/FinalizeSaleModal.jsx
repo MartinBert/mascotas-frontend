@@ -17,9 +17,53 @@ const FinalizeSaleModal = ({ state, dispatch, actions}) => {
     dispatch({type: FINALIZE_SALE, payload: responseOfAfip});
   }
 
+  const applyStockModification = async(state) => {
+    const processStock = async() => {
+      try{
+        for(const product of state.productos){
+          const lineOfProduct = state.renglones.find(item => item._id = product._id);
+          await api.productos.modifyStock(
+            {
+              product,
+              [(lineOfProduct.fraccionar) ? 'fractionedQuantity' : 'quantity']:  lineOfProduct.cantidadUnidades
+            }
+          )
+        }
+        return true;
+      }catch(err){
+        console.error(err);
+        return false;
+      }
+    }
+    return {isModified: await processStock()};
+  }
+
+  const saveSale = async() => {
+    const result = await api.ventas.save(state);
+    if(result.code === 200){
+      createVoucherPdf(state);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000)
+    }else{
+      console.log('No se pudo guardar la venta')
+    }
+  }
+
+  const errorToModifyStock = () => {
+    console.error('Error al modificar stock')
+  }
+
   useEffect(() => {
     if(state.cae === null) return;
-    createVoucherPdf(state);
+    applyStockModification(state)
+    .then(stock => {
+      if(stock.isModified)return saveSale();
+      return errorToModifyStock()
+    })
+    .catch(err => {
+      console.error(err);
+    })
   }, 
   //eslint-disable-next-line
   [state.cae])

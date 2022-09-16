@@ -58,6 +58,12 @@ const ProductosForm = () => {
                     nombre : 'no especificado'};
             } else {setSelectedHeading({_id: product.rubro._id, nombre: product.rubro.nombre});}
 
+            if(product.unidadMedida === null){
+                product.unidadMedida = {
+                    _id : 'no especificado',
+                    nombre : 'no especificado'};
+            } else {setSelectedMeasure({_id: product.unidadMedida._id, nombre: product.unidadMedida.nombre});}
+
             setProduct(product);
             setLoading(false);
         }
@@ -313,6 +319,20 @@ const ProductosForm = () => {
                                         placeholder="Cantidad de stock"
                                         type="number"
                                         value={product.cantidadStock}
+                                        onChange={e => { setFormDataToProduct(e) }} 
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                    required
+                                    label="Cant. fracc."
+                                >
+                                    <Input 
+                                        name="cantidadFraccionadaStock"
+                                        placeholder="Cantidad de stock fraccionado"
+                                        type="number"
+                                        value={product.cantidadFraccionadaStock}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
                                 </Form.Item>
