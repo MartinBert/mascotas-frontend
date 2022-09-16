@@ -3,10 +3,9 @@ import api from '../../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../../components/icons';
 import Header from './Header';
-import {DeleteModal} from '../../../components/generics';
 import {useHistory} from 'react-router-dom';
 
-const { Edit, Delete } = icons;
+const { Edit } = icons;
 
 const VentasList = () => {
   const [ventas, setVentas] = useState(null);
@@ -15,9 +14,6 @@ const VentasList = () => {
   const [totalDocs, setTotalDocs] = useState(null);
   const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState(null);
-  const [deleteVisible, setDeleteVisible] = useState(false);
-  const [deleteEntityId, setDeleteEntityId] = useState(null);
-  const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
   const history = useHistory();
 
   useEffect(() => {
@@ -28,20 +24,7 @@ const VentasList = () => {
       setLoading(false);
     }
     fetchVentasList();
-  },[page, limit, filters, loading, deleteEntityIdConfirmation])
-
-  useEffect(() => {
-    if(deleteEntityId === null) return;
-    const deleteBrand = async() => {
-      setLoading(true);
-      api.ventas.deleteVenta(deleteEntityId)
-      .then(() => {
-        setDeleteEntityId(null)
-        setLoading(false);
-      })
-    }
-    deleteBrand();
-  }, [deleteEntityId])
+  },[page, limit, filters, loading])
 
   const editBrand = (id) => {
     history.push(`/ventas/${id}`);
@@ -49,8 +32,22 @@ const VentasList = () => {
 
   const columnsForTable = [
     {
-      title: 'Nombre',
-      dataIndex: 'nombre',
+      title: 'Fecha',
+      render: (venta) => (
+        <p>{venta.fechaEmisionString}</p>
+      ),
+    },
+    {
+      title: 'Cliente',
+      render: (venta) => (
+        <p>{venta.clienteRazonSocial}</p>
+      ),
+    },
+    {
+      title: 'Comprobante',
+      render: (venta) => (
+        <p>{venta.documento.nombre}</p>
+      ),
     },
     {
       title: 'Acciones',
@@ -58,12 +55,6 @@ const VentasList = () => {
         <Row>
           <div onClick={() => {editBrand(_id)}}>
             <Edit/>
-          </div>
-          <div onClick={() => {
-            setDeleteEntityIdConfirmation(_id);
-            setDeleteVisible(true);
-          }}>
-            <Delete/>
           </div>
         </Row>
       )
@@ -92,14 +83,6 @@ const VentasList = () => {
               tableLayout='auto'
               size="small"
               loading={loading}
-          />
-          <DeleteModal
-            title="Eliminar venta"
-            deleteVisible={deleteVisible}
-            setLoading={setLoading}
-            setDeleteVisible={setDeleteVisible}
-            setDeleteEntityId={setDeleteEntityId}
-            deleteEntityIdConfirmation={deleteEntityIdConfirmation}
           />
         </Col>
     </Row>
