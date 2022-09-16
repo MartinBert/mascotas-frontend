@@ -46,7 +46,7 @@ const FinalizeSaleModal = ({ state, dispatch, actions}) => {
         window.location.reload();
       }, 1000)
     }else{
-      console.log('No se pudo guardar la venta')
+      console.error('No se pudo guardar la venta')
     }
   }
 
