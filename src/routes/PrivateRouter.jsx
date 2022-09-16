@@ -57,32 +57,33 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
                 title: 'Ventas',
                 key: 'sub1',
                 items: [
-                    createSubMenuItem('1', <FaShoppingCart/>, '/ventas', 'Ventas'),
-                    createSubMenuItem('2', <FaFile/>, '/documentos', 'Documentos'),
-                    createSubMenuItem('3', <FaUsers/>, '/clientes', 'Clientes'),
-                    createSubMenuItem('4', <FaMoneyBillWave/>, '/mediospago', 'Medios de pago')
+                    createSubMenuItem('1', <FaShoppingCart/>, '/venta', 'Ventas'),
+                    createSubMenuItem('2', <FaShoppingCart/>, '/listaVentas', 'Lista de ventas'),
+                    createSubMenuItem('3', <FaFile/>, '/documentos', 'Documentos'),
+                    createSubMenuItem('4', <FaUsers/>, '/clientes', 'Clientes'),
+                    createSubMenuItem('5', <FaMoneyBillWave/>, '/mediospago', 'Medios de pago')
                 ]
             },
             {
                 title: 'Productos y stock',
                 key: 'sub2',
                 items: [
-                    createSubMenuItem('5', <FaBookmark/>, '/productos', 'Productos'),
-                    createSubMenuItem('6', <FaDollarSign/>, '/salidas', 'Salidas'),
-                    createSubMenuItem('7', <FaDollarSign/>, '/entradas', 'Entradas'),
-                    createSubMenuItem('8', <FaTag/>, '/marcas', 'Marcas'),
-                    createSubMenuItem('9', <FaTags/>, '/rubros', 'Rubros'),
-                    createSubMenuItem('10', <FaTags/>, '/unidadesmedida', 'Unid. medida'),
+                    createSubMenuItem('6', <FaBookmark/>, '/productos', 'Productos'),
+                    createSubMenuItem('7', <FaDollarSign/>, '/salidas', 'Salidas'),
+                    createSubMenuItem('8', <FaDollarSign/>, '/entradas', 'Entradas'),
+                    createSubMenuItem('9', <FaTag/>, '/marcas', 'Marcas'),
+                    createSubMenuItem('10', <FaTags/>, '/rubros', 'Rubros'),
+                    createSubMenuItem('11', <FaTags/>, '/unidadesmedida', 'Unid. medida'),
                 ]
             },
             {
                 title: 'Configuraciones',
                 key: 'sub3',
                 items: [
-                    createSubMenuItem('11', <FaUser/>, '/usuarios', 'Usuarios'),
-                    createSubMenuItem('12', <FaBusinessTime/>, '/empresas', 'Empresas'),
-                    createSubMenuItem('13', <FaCodeBranch/>, '/puntosventa', 'Puntos de venta'),
-                    createSubMenuItem('14', <FaAddressBook/>, '/condicionesfiscales', 'Condiciones fiscales'),
+                    createSubMenuItem('12', <FaUser/>, '/usuarios', 'Usuarios'),
+                    createSubMenuItem('13', <FaBusinessTime/>, '/empresas', 'Empresas'),
+                    createSubMenuItem('14', <FaCodeBranch/>, '/puntosventa', 'Puntos de venta'),
+                    createSubMenuItem('15', <FaAddressBook/>, '/condicionesfiscales', 'Condiciones fiscales'),
                 ]
             },
         ]
