@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { Row, Col, Select } from "antd";
+import { Row, Col, Select, Spin } from "antd";
 import {
   ProductSelectionModal,
   GenericAutocomplete,
 } from "../../components/generics";
 import api from "../../services";
+import {errorAlert} from '../../components/alerts';
 
 const {Option} = Select;
 
@@ -18,6 +19,7 @@ const Header = ({
 }) => {
   const { SHOW_MODAL } = productActions;
   const {
+    LOADING_DOCUMENT_INDEX,
     SHOW_DISCOUNT_SURCHARGE_MODAL,
     SET_CLIENT,
     SET_DOCUMENT,
@@ -30,6 +32,8 @@ const Header = ({
   useEffect(
     () => {
       if (!state.documento) return;
+      dispatch({type: LOADING_DOCUMENT_INDEX})
+      let attemps = 0;
       dispatch({type: SET_TOTAL});
       const fetchLastVoucherNumber = async () => {
         const lastVoucherNumber = await api.afip.findLastVoucherNumber(
@@ -37,13 +41,15 @@ const Header = ({
           state.puntoVentaNumero,
           state.documentoCodigo
         );
-        if(!lastVoucherNumber) {
-          setTimeout(() => {
-            return fetchLastVoucherNumber();
-          }, 100)
-        }
+        console.log(lastVoucherNumber)
+        if(lastVoucherNumber === undefined && attemps < 10) return setTimeout(() => {
+          attemps++;
+          return fetchLastVoucherNumber()
+        }, 500)
+        if(lastVoucherNumber === undefined) return errorAlert('No se pudo recuperar la correlación de AFIP del último comprobante emitido, intente nuevamente más tarde.').then(() => {window.location.reload()})
         const nextVoucher = lastVoucherNumber + 1;
         dispatch({ type: SET_VOUCHER_NUMBERS, payload: nextVoucher });
+        dispatch({type: LOADING_DOCUMENT_INDEX})
       };
       fetchLastVoucherNumber();
     },
@@ -91,7 +97,7 @@ const Header = ({
           </Col>
         </Row>
         <Row gutter={8}>
-          <Col xl={6} lg={8} md={8}>
+          <Col xl={6} lg={6} md={12}>
             <GenericAutocomplete
               label="Cliente"
               modelToFind="cliente"
@@ -103,7 +109,7 @@ const Header = ({
               returnCompleteModel={true}
             />
           </Col>
-          <Col xl={6} lg={8} md={8}>
+          <Col xl={6} lg={6} md={12}>
             <GenericAutocomplete
               label="Documento"
               modelToFind="documento"
@@ -115,7 +121,10 @@ const Header = ({
               returnCompleteModel={true}
             />
           </Col>
-          <Col xl={12} lg={8} md={8}>
+          <Col xl={6} lg={6} md={12}>
+            {(state.loadingDocumentIndex) ? <span><Spin/>Esperando a AFIP...</span> : null}
+          </Col>
+          <Col xl={6} lg={6} md={12}>
             <span style={{ textAlign: "right" }}>
               <h1>Total: {state.total}</h1>
             </span>

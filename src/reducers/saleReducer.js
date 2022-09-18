@@ -10,6 +10,7 @@ const initialState = {
   discountSurchargeModalOperation: "discount",
   finalizeSaleModalIsVisible: false,
   loadingView: false,
+  loadingDocumentIndex: false,
 
   //------------------------------------------------- State of sale data -------------------------------------------------------------/
   indice: null,
@@ -73,6 +74,7 @@ const actions = {
   SHOW_FINALIZE_SALE_MODAL: "SHOW_FINALIZE_SALE_MODAL",
   HIDE_FINALIZE_SALE_MODAL: "HIDE_FINALIZE_SALE_MODAL",
   FINALIZE_SALE: "FINALIZE_SALE",
+  LOADING_DOCUMENT_INDEX: "LOADING_DOCUMENT_INDEX",
   LOADING_VIEW: "LOADING_VIEW",
   RESET_STATE: "RESET_STATE",
 
@@ -155,6 +157,11 @@ const reducer = (state = initialState, action) => {
         cae: action.payload.CAE,
         vencimientoCae: action.payload.CAEFchVto
       };
+    case actions.LOADING_DOCUMENT_INDEX:
+      return {
+        ...state,
+        loadingDocumentIndex: !state.loadingDocumentIndex
+      }
     case actions.LOADING_VIEW:
       return {
         ...state,
