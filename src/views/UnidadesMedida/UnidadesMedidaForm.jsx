@@ -38,7 +38,8 @@ const UnidadesMedidaForm = () => {
       const searchedItem = await api.unidadesmedida.findById(id);
       setUnidadMedida({
         _id: searchedItem._id,
-        nombre: searchedItem.nombre
+        nombre: searchedItem.nombre,
+        fraccionamiento: searchedItem.fraccionamiento
       })
       setLoading(false);
     }

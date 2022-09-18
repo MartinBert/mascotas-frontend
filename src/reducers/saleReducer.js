@@ -14,6 +14,7 @@ const initialState = {
 
   //------------------------------------------------- State of sale data -------------------------------------------------------------/
   indice: null,
+  usuario: null,
   productos: [],
   renglones: [],
   documento: null,
@@ -80,6 +81,7 @@ const actions = {
 
   //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
   SET_INDEX: "SET_INDEX",
+  SET_USER: "SET_USER",
   SET_GLOBAL_DISCOUNT_PERCENT: "SET_GLOBAL_DISCOUNT_PERCENT",
   SET_GLOBAL_SURCHARGE_PERCENT: "SET_GLOBAL_SURCHARGE_PERCENT",
   SET_PRODUCTS: "SET_PRODUCTS",
@@ -173,6 +175,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         indice: action.payload
+      }
+    case actions.SET_USER:
+      return {
+        ...state,
+        usuario: action.payload
       }
     case actions.SET_GLOBAL_DISCOUNT_PERCENT:
       return {

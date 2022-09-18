@@ -11,27 +11,22 @@ import {errorAlert} from "../../components/alerts";
 const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates();
 const { initialState, reducer, actions } = reducers.saleReducer;
 
-const Ventas = () => {
+const Ventas = ({userState}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [productState, productDispatch] = useReducer(
     productReducer,
     productInitialState
   );
-  const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL, SET_INDEX } = actions;
+  const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL, SET_INDEX, SET_USER } = actions;
 
   useEffect(() => {
-    const fetchLoggedUserData = async () => {
-      const loggedUser = await api.usuarios.findById(
-        localStorage.getItem("userId")
-      );
-      dispatch({ type: SET_COMPANY, payload: loggedUser.empresa });
-      dispatch({ type: SET_SALE_POINT, payload: loggedUser.puntoVenta });
-    };
+    dispatch({type: SET_COMPANY, payload: userState.user.empresa});
+    dispatch({type: SET_SALE_POINT, payload: userState.user.puntoVenta});
+    dispatch({type: SET_USER, payload: userState.user})
     const fetchLastVoucherIndex = async() => {
       const lastIndex = await api.ventas.findLastIndex();
       dispatch({type: SET_INDEX, payload: lastIndex + 1})
     }
-    fetchLoggedUserData();
     fetchLastVoucherIndex();
   }, 
   //eslint-disable-next-line
@@ -108,6 +103,7 @@ const Ventas = () => {
           state={state}
           dispatch={dispatch}
           actions={actions}
+          userState={userState}
         />
         <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
     </>

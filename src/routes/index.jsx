@@ -69,16 +69,25 @@ const routes = [
 
 const {reducer, initialState} = reducers.privateRouteReducer;
 
-const AppRouter  = () => {
-
+const AppRouter  = ({userState, userDispatch, userActions}) => {
     const [state, dispatch] = useReducer(reducer, initialState);
-
     return (
         <Router>
             <Switch>
                 {routes.map(route => (
                     (route.private)
-                    ? <PrivateRouter path={route.path} component={route.component} key={route.id} activeKey={route.activeKey} state={state} dispatch={dispatch}/>
+                    ? 
+                    <PrivateRouter 
+                        path={route.path} 
+                        component={route.component} 
+                        key={route.id} 
+                        activeKey={route.activeKey} 
+                        state={state} 
+                        dispatch={dispatch} 
+                        userState={userState}
+                        userDispatch={userDispatch}
+                        userActions={userActions} 
+                    />
                     : <PublicRouter path={route.path} component={route.component} key={route.id} />
                 ))}
             </Switch>

@@ -14,7 +14,6 @@ const CondicionesFiscalesForm = () => {
   const {id} = useParams(); 
   const [condicionFiscal, setCondicionFiscal] = useState({
     nombre: '',
-    porcentajeIva: 21,
     adicionaIva: true
   });
   const [error, setError] = useState(false);
@@ -39,7 +38,8 @@ const CondicionesFiscalesForm = () => {
       const searchedItem = await api.condicionesfiscales.findById(id);
       setCondicionFiscal({
         _id: searchedItem._id,
-        nombre: searchedItem.nombre
+        nombre: searchedItem.nombre,
+        adicionaIva: searchedItem.adicionaIva
       })
       setLoading(false);
     }
@@ -86,11 +86,11 @@ const CondicionesFiscalesForm = () => {
       autoComplete="off"
       style={{marginTop: '10px'}}
     >
-    <Row gutter={8}>
-      <Col span={24}>
-        <h1>{(id === "nuevo") ? "Crear nueva condicion fiscal" : "Editar condicion fiscal"}</h1>
-      </Col>
-      <Col span={12}>
+      <Row gutter={8}>
+        <Col span={24}>
+          <h1>{(id === "nuevo") ? "Crear nueva condicion fiscal" : "Editar condicion fiscal"}</h1>
+        </Col>
+        <Col span={12}>
         {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
             <div style={{display: 'flex'}}>
               <div style={{marginRight: '15px'}}><p>*Nombre:</p></div>
@@ -109,12 +109,7 @@ const CondicionesFiscalesForm = () => {
             />
           </div>
         </Col>
-        <Col span={8}>
-            <div style={{display: 'flex'}}>
-              <div style={{marginRight: '15px'}}><p>*Porc. IVA:</p></div>
-              <Input type="number" name="porcentajeIva" value={condicionFiscal.porcentajeIva} style={{width: '150px'}} onChange={(e) => {loadCondicionFiscalData(e)}}/>
-            </div>
-        </Col>
+        <Col span={6}></Col>
         <Col span={6} style={{display: 'flex', marginTop: '15px'}}>
           <button className="btn-primary" type="submit">
             Guardar

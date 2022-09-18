@@ -81,7 +81,7 @@ const Entradas = () => {
       {
         title: 'Usuario',
         dataIndex: 'usuario',
-        render: usuario => usuario.nombre
+        render: usuario => (usuario) ? usuario.nombre : 'Usuario inexistente'
       },
       {
         title: 'Acciones',

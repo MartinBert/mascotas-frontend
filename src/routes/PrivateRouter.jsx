@@ -21,7 +21,7 @@ import {
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 
-const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}) => {
+const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch, userState, userDispatch, userActions}) => {
     const history = useHistory();
     const [collapsed, setCollapsed] = useState(false);
     const [userStatus, setUserStatus] = useState(false);
@@ -29,7 +29,7 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
         if (userStatus) return;
         const verifyUser = () => {
             const token = localStorage.getItem('token');
-            if (!token) return redirectToLogin();
+            if(!token) return redirectToLogin();
             setUserStatus(true);
             if(state.openKeys.length === 0){
                 dispatch({type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1']});
@@ -105,6 +105,9 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
     ) 
 
     return (
+        (userState.loading)
+        ? <Spin/>
+        :
         <Layout style={{ height: '100%' }}>
             <Sider
                 trigger={null}
@@ -163,7 +166,7 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch}
                         }}
                     >
                         <Route exact path={path}>
-                            <Component />
+                            <Component userState={userState} userDispatch={userDispatch} userAction={userActions}/>
                         </Route>
                     </Content>
                     : <Spin />}

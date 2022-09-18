@@ -34,6 +34,12 @@ const VentasList = () => {
       ),
     },
     {
+      title: 'Usuario',
+      render: (venta) => (
+        <p>{(venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente'}</p>
+      ),
+    },
+    {
       title: 'Cliente',
       render: (venta) => (
         <p>{venta.clienteRazonSocial}</p>

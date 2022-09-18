@@ -34,7 +34,7 @@ const Header = ({ filters, setFilters }) => {
                     return acc;
                 }, ''),
                 entrada.costoTotal,
-                entrada.usuario.nombre
+                (entrada.usuario) ? entrada.usuario.nombre : 'Usuario inexistente'
             ])
         }
         return processedLines;

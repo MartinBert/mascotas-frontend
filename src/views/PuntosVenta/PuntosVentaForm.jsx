@@ -38,7 +38,8 @@ const PuntosVentaForm = () => {
       const searchedItem = await api.puntosventa.findById(id);
       setPuntoVenta({
         _id: searchedItem._id,
-        nombre: searchedItem.nombre
+        nombre: searchedItem.nombre,
+        numero: searchedItem.numero
       })
       setLoading(false);
     }

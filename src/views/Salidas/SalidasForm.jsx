@@ -11,7 +11,7 @@ const { Add, Delete } = icons;
 const {reducer, initialState, actions} = reducers.productSelectionModalReducer;
 const {DELETE_PRODUCT} = actions;
 
-const SalidasForm = () => {
+const SalidasForm = ({userState}) => {
 
     //------------------------------------------------------ State declarations ------------------------------------------------------/
     const { id } = useParams();
@@ -44,16 +44,7 @@ const SalidasForm = () => {
 
     useEffect(() => {
         if (!salidaIsReady) return;
-        if (!salida.usuario) {
-            const fetchLoggedUser = async () => {
-                const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
-                setSalida({
-                    ...salida,
-                    usuario: loggedUser
-                })
-            }
-            fetchLoggedUser();
-        }
+        if (!salida.usuario) setSalida({...salida,usuario: userState.user})
         setLoading(false);
     },
     //eslint-disable-next-line

@@ -7,15 +7,14 @@ import { errorAlert, successAlert } from '../../components/alerts';
 const {formatBody} = helpers.afipHelper;
 const {createVoucherPdf} = helpers.pdf;
 
-const FinalizeSaleModal = ({ state, dispatch, actions}) => {
+const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
   const { HIDE_FINALIZE_SALE_MODAL, FINALIZE_SALE, LOADING_VIEW } = actions;
 
   const startCloseSale = async() => {
     dispatch({type: HIDE_FINALIZE_SALE_MODAL});
     dispatch({type: LOADING_VIEW})
-    const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
     const bodyToAfip = formatBody(state);
-    const responseOfAfip = await api.afip.generateVoucher(loggedUser.empresa.cuit, bodyToAfip);
+    const responseOfAfip = await api.afip.generateVoucher(userState.user.empresa.cuit, bodyToAfip);
     dispatch({type: FINALIZE_SALE, payload: responseOfAfip});
   }
 
