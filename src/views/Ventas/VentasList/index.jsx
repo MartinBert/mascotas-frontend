@@ -68,7 +68,7 @@ const VentasList = () => {
     <Row>
       <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
       <Col span={24} style={{marginBottom: '10px'}}>
-        <Header setFilters={setFilters}/>
+        <Header setFilters={setFilters} ventas={ventas}/>
       </Col>
       <Col span={24}>
         <Table 
