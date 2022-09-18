@@ -23,7 +23,7 @@ const FinalizeSaleModal = ({ state, dispatch, actions}) => {
     const processStock = async() => {
       try{
         for(const product of state.productos){
-          const lineOfProduct = state.renglones.find(item => item._id = product._id);
+          const lineOfProduct = state.renglones.find(item => item._id === product._id);
           await api.productos.modifyStock(
             {
               product,
