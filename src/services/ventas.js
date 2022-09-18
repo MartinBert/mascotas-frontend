@@ -30,7 +30,7 @@ const findById = async(id) => {
 
 const findMultipleIds = async(ids) => {
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers);
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/multiple/idList?ids=${JSON.stringify(ids)}`, headers);
         return response.data;
     }catch(err){
         checkStorageStatus(err);
@@ -38,9 +38,9 @@ const findMultipleIds = async(ids) => {
     }
 }
 
-const findByName = async(name) => {
+const findLastIndex = async() => {
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/name/${name}`, headers);
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/last/index/number`, headers)
         return response.data;
     }catch(err){
         checkStorageStatus(err);
@@ -82,7 +82,7 @@ const ventas = {
     findAll,
     findById,
     findMultipleIds,
-    findByName,
+    findLastIndex,
     save,
     edit,
     deleteVenta

@@ -39,6 +39,11 @@ const FinalizeSaleModal = ({ state, dispatch, actions}) => {
   }
 
   const saveSale = async() => {
+    const sale = state;
+    sale.renglones = sale.renglones.map(renglon => {
+      delete renglon._id;
+      return renglon;
+    })
     const result = await api.ventas.save(state);
     if(result.code === 200){
       createVoucherPdf(state);

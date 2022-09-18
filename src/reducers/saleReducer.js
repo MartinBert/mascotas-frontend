@@ -12,6 +12,7 @@ const initialState = {
   loadingView: false,
 
   //------------------------------------------------- State of sale data -------------------------------------------------------------/
+  indice: null,
   productos: [],
   renglones: [],
   documento: null,
@@ -76,6 +77,7 @@ const actions = {
   RESET_STATE: "RESET_STATE",
 
   //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
+  SET_INDEX: "SET_INDEX",
   SET_GLOBAL_DISCOUNT_PERCENT: "SET_GLOBAL_DISCOUNT_PERCENT",
   SET_GLOBAL_SURCHARGE_PERCENT: "SET_GLOBAL_SURCHARGE_PERCENT",
   SET_PRODUCTS: "SET_PRODUCTS",
@@ -160,6 +162,11 @@ const reducer = (state, action) => {
       }
 
     //--------------------------------------------- Reducers of sale data -------------------------------------------------------/
+    case actions.SET_INDEX:
+      return {
+        ...state,
+        indice: action.payload
+      }
     case actions.SET_GLOBAL_DISCOUNT_PERCENT:
       return {
         ...state,

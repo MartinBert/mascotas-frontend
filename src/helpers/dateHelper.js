@@ -1,28 +1,32 @@
+const twoCharsPattern = (value) => {
+    return (value.length === 1) ? '0' + value : value;
+}
+
 const simpleDateWithHours = (unformattedDate) => {
-    if(typeof(unformattedDate) === 'string'){
-        unformattedDate = new Date(unformattedDate);
-    }
-    const year = unformattedDate.getFullYear();
-    const month = parseInt(unformattedDate.getMonth()) + 1;
-    const day = unformattedDate.getDate();
-    const hour = unformattedDate.getHours();
-    const minutes = unformattedDate.getMinutes();
-    const seconds = unformattedDate.getSeconds();
-    return day + '/' + ((month.toString().length === 1) ? '0' + month.toString() : month.toString()) + '/' + year + ' ' + hour + ':' + minutes + ':' + seconds;
+    const date = new Date(unformattedDate);
+    const year = date.getFullYear().toString();
+    const month = (parseInt(date.getMonth()) + 1).toString();
+    const day = date.getDate().toString();
+    const hour = date.getHours().toString();
+    const minutes = date.getMinutes().toString();
+    const seconds = date.getSeconds().toString();
+    return twoCharsPattern(day) + '/' + twoCharsPattern(month) + '/' + year + ' ' + twoCharsPattern(hour) + ':' + twoCharsPattern(minutes) + ':' + twoCharsPattern(seconds);
 }
 
 const dateToAfip = (unformattedDate) => {
-    const year = unformattedDate.getFullYear();
-    const month = parseInt(unformattedDate.getMonth()) + 1;
-    const day = unformattedDate.getDate();
-    return year+((month.toString().length === 1) ? '0' + month.toString() : month.toString())+((day.toString().length === 1) ? '0' + day.toString() : day.toString());
+    const date = new Date(unformattedDate);
+    const year = date.getFullYear().toString();
+    const month = (parseInt(date.getMonth()) + 1).toString();
+    const day = date.getDate().toString();
+    return year + twoCharsPattern(month) + twoCharsPattern(day);
 }
 
 const dateToQrAfip = (unformattedDate) => {
-    const year = unformattedDate.getFullYear();
-    const month = parseInt(unformattedDate.getMonth()) + 1;
-    const day = unformattedDate.getDate();
-    return year+'-'+((month.toString().length === 1) ? '0' + month.toString() : month.toString())+'-'+((day.toString().length === 1) ? '0' + day.toString() : day.toString());
+    const date = new Date(unformattedDate);
+    const year = date.getFullYear().toString();
+    const month = (parseInt(date.getMonth()) + 1).toString();
+    const day = date.getDate().toString();
+    return year + '-' + twoCharsPattern(month) + '-' + twoCharsPattern(day);
 }
 
 const dateHelper = {

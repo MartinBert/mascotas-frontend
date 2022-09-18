@@ -3,9 +3,10 @@ import api from '../../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../../components/icons';
 import Header from './Header';
-import {useHistory} from 'react-router-dom';
+import helpers from '../../../helpers';
 
-const { Edit } = icons;
+const {PrintPdf} = icons;
+const {createVoucherPdf} = helpers.pdf;
 
 const VentasList = () => {
   const [ventas, setVentas] = useState(null);
@@ -14,7 +15,6 @@ const VentasList = () => {
   const [totalDocs, setTotalDocs] = useState(null);
   const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState(null);
-  const history = useHistory();
 
   useEffect(() => {
     const fetchVentasList = async() => {
@@ -25,10 +25,6 @@ const VentasList = () => {
     }
     fetchVentasList();
   },[page, limit, filters, loading])
-
-  const editBrand = (id) => {
-    history.push(`/ventas/${id}`);
-  }
 
   const columnsForTable = [
     {
@@ -51,10 +47,11 @@ const VentasList = () => {
     },
     {
       title: 'Acciones',
-      render: ({_id}) => (
+      render: (venta) => (
         <Row>
-          <div onClick={() => {editBrand(_id)}}>
-            <Edit/>
+          <div onClick={() => {
+            createVoucherPdf(venta)}}>
+            <PrintPdf/>
           </div>
         </Row>
       )
@@ -84,6 +81,7 @@ const VentasList = () => {
               size="small"
               loading={loading}
           />
+          <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
         </Col>
     </Row>
   )

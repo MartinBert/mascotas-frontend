@@ -16,10 +16,9 @@ const Ventas = () => {
     productReducer,
     productInitialState
   );
-  const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL } = actions;
+  const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL, SET_INDEX } = actions;
 
   useEffect(() => {
-    if (state.empresa) return;
     const fetchLoggedUserData = async () => {
       const loggedUser = await api.usuarios.findById(
         localStorage.getItem("userId")
@@ -27,13 +26,22 @@ const Ventas = () => {
       dispatch({ type: SET_COMPANY, payload: loggedUser.empresa });
       dispatch({ type: SET_SALE_POINT, payload: loggedUser.puntoVenta });
     };
+    const fetchLastVoucherIndex = async() => {
+      const lastIndex = await api.ventas.findLastIndex();
+      dispatch({type: SET_INDEX, payload: lastIndex + 1})
+    }
     fetchLoggedUserData();
-  });
+    fetchLastVoucherIndex();
+  }, 
+  //eslint-disable-next-line
+  []);
 
   useEffect(() => {
     if (state.fechaEmision) return;
     dispatch({ type: SET_DATES });
-  });
+  }, 
+  //eslint-disable-next-line
+  []);
 
   return (
     <>
@@ -82,7 +90,7 @@ const Ventas = () => {
           dispatch={dispatch}
           actions={actions}
         />
-        <div id="voucher" style={{width: "793px", height: "1122px"}}></div>
+        <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
     </>
   );
 };
