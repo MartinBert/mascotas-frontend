@@ -41,7 +41,6 @@ const Header = ({
           state.puntoVentaNumero,
           state.documentoCodigo
         );
-        console.log(lastVoucherNumber)
         if(lastVoucherNumber === undefined && attemps < 10) return setTimeout(() => {
           attemps++;
           return fetchLastVoucherNumber()
@@ -138,16 +137,15 @@ const Header = ({
               selectedSearch={state.mediosPago}
               dispatch={dispatch}
               action={SET_PAYMENT_METHODS}
-              multiple={true}
               returnCompleteModel={true}
             />
           </Col>
           <Col xl={6} lg={8} md={8}>
             <Select
               onChange={e => {
-                dispatch({type: SET_PAYMENT_PLANS, payload: e})
+                dispatch({type: SET_PAYMENT_PLANS, payload: [e]})
+                dispatch({type: SET_TOTAL})
               }}
-              mode="tags"
               style={{width: '100%'}}
             >
               {(state.planesPagoToSelect) 

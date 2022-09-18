@@ -318,8 +318,8 @@ const reducer = (state = initialState, action) => {
           completeLengthWithZero(action.payload, 8),
       };
     case actions.SET_PAYMENT_METHODS:
-      const paymentMethodNames = action.payload.map(paymentMethod => paymentMethod.nombre);
-      const paymentPlansMapping = action.payload.map(paymentMethod => paymentMethod.planes);
+      const paymentMethodNames = [action.payload.data].map(paymentMethod => paymentMethod.nombre);
+      const paymentPlansMapping = [action.payload.data].map(paymentMethod => paymentMethod.planes);
       const paymentPlans = []
       paymentPlansMapping.forEach(paymentPlanMapping => {
         paymentPlanMapping.forEach(plan => {
@@ -328,7 +328,7 @@ const reducer = (state = initialState, action) => {
       })
       return {
         ...state,
-        mediosPago: action.payload,
+        mediosPago: [action.payload.data],
         mediosPagoNombres: paymentMethodNames,
         planesPagoToSelect: paymentPlans,
       }
@@ -342,9 +342,19 @@ const reducer = (state = initialState, action) => {
       }
     case actions.SET_TOTAL:
       if (state.renglones.length === 0) return state;
+      const recargoGlobal = (state.planesPago.length < 1) 
+                              ? decimalPercent(state.porcentajeRecargoGlobal) 
+                              : (state.planesPago[0].porcentaje <= 0)
+                                  ? decimalPercent(state.porcentajeRecargoGlobal)
+                                  : decimalPercent(state.porcentajeRecargoGlobal) + decimalPercent(state.planesPago[0].porcentaje);
+      const descuentoGlobal = (state.planesPago.length < 1) 
+                              ? decimalPercent(state.porcentajeDescuentoGlobal) 
+                              : (state.planesPago[0].porcentaje >= 0)
+                                  ? decimalPercent(state.porcentajeDescuentoGlobal)
+                                  : decimalPercent(state.porcentajeDescuentoGlobal) + decimalPercent((state.planesPago[0].porcentaje * -1));
       const totalLinesSum = state.renglones.reduce((acc, el) => acc + el.totalRenglon, 0);
-      const totalRecargo = roundTwoDecimals(totalLinesSum * decimalPercent(state.porcentajeRecargoGlobal));
-      const totalDescuento = roundTwoDecimals(totalLinesSum * decimalPercent(state.porcentajeDescuentoGlobal));
+      const totalRecargo = roundTwoDecimals(totalLinesSum * recargoGlobal);
+      const totalDescuento = roundTwoDecimals(totalLinesSum * descuentoGlobal);
       const totalDescuentoLineas = roundTwoDecimals(
         state.renglones.reduce((acc, el) => acc + el.importeDescuentoRenglon, 0)
       );
@@ -358,8 +368,8 @@ const reducer = (state = initialState, action) => {
         iva21productos.reduce(
           (acc, item) => 
             acc 
-            + (item.totalRenglon + (item.totalRenglon * decimalPercent(state.porcentajeRecargoGlobal)) 
-            - (item.totalRenglon * decimalPercent(state.porcentajeDescuentoGlobal)))
+            + (item.totalRenglon + (item.totalRenglon * recargoGlobal) 
+            - (item.totalRenglon * descuentoGlobal))
           , 0
         )
       );
@@ -367,8 +377,8 @@ const reducer = (state = initialState, action) => {
         iva10productos.reduce(
           (acc, item) => 
             acc 
-            + (item.totalRenglon + (item.totalRenglon * decimalPercent(state.porcentajeRecargoGlobal)) 
-            - (item.totalRenglon * decimalPercent(state.porcentajeDescuentoGlobal)))
+            + (item.totalRenglon + (item.totalRenglon * recargoGlobal) 
+            - (item.totalRenglon * descuentoGlobal))
           , 0
         )
       );
@@ -376,8 +386,8 @@ const reducer = (state = initialState, action) => {
         iva27productos.reduce(
           (acc, item) => 
             acc 
-            + (item.totalRenglon + (item.totalRenglon * decimalPercent(state.porcentajeRecargoGlobal)) 
-            - (item.totalRenglon * decimalPercent(state.porcentajeDescuentoGlobal)))
+            + (item.totalRenglon + (item.totalRenglon * recargoGlobal) 
+            - (item.totalRenglon * descuentoGlobal))
           , 0
         )
       );
