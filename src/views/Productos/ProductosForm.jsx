@@ -46,19 +46,19 @@ const ProductosForm = () => {
             const response = await api.productos.findById(id);
             const product = response.data;
 
-            if(product.marca === null){
+            if(!product.marca){
                 product.marca = {
                     _id : 'no especificado',
                     nombre : 'no especificado'};
             } else {setSelectedBrand({_id: product.marca._id, nombre: product.marca.nombre});}
 
-            if(product.rubro === null){
+            if(!product.rubro){
                 product.rubro = {
                     _id : 'no especificado',
                     nombre : 'no especificado'};
             } else {setSelectedHeading({_id: product.rubro._id, nombre: product.rubro.nombre});}
 
-            if(product.unidadMedida === null){
+            if(!product.unidadMedida){
                 product.unidadMedida = {
                     _id : 'no especificado',
                     nombre : 'no especificado'};
