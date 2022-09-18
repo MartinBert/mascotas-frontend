@@ -17,7 +17,7 @@ const createVoucherPdf = async(saleData) => {
     const frameToCanvas = document.getElementById('voucher')
     const htmlObject = document.createElement('div');
     htmlObject.innerHTML = `
-    <div style="width: 793px; height: 1122px; position: relative; line-height: 1;">
+    <div id='pdfVoucherContainer' style="width: 793px; height: 1122px; line-height: 1;">
         <div style="display: flex; width: 100%; text-align: center">
             <div style="width: 40%; margin-top: 15px; padding-left: 20px;">
                 <div style="width: 100%; display: flex; justify-content: center;">
@@ -161,6 +161,7 @@ const createVoucherPdf = async(saleData) => {
         const doc = new jsPDF();
         doc.addImage(img, 'JPEG', 0, 0);
         doc.save(saleData.numeroCompletoFactura);
+        document.getElementById('voucher').innerHTML = '';
     });
 }
 

@@ -6,6 +6,7 @@ import FinalizeSaleModal from "./FinalizeSaleModal";
 import Lines from "./Lines";
 import api from "../../services";
 import {Row, Col, Spin} from 'antd';
+import {errorAlert} from "../../components/alerts";
 
 const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates();
 const { initialState, reducer, actions } = reducers.saleReducer;
@@ -43,6 +44,18 @@ const Ventas = () => {
   //eslint-disable-next-line
   []);
 
+  const checkState = async() => {
+    const result = new Promise(resolve => {
+      if(!state.renglones || state.renglones.length < 1) resolve('Debe seleccionar al menos un producto para realizar la venta.')
+      if(!state.cliente) resolve('Debe seleccionar un cliente para realizar la venta.')
+      if(!state.documento) resolve('Debe indicar el documento/comprobante de la operación.')
+      if(!state.mediosPago || state.mediosPago.length < 1) resolve('Debe seleccionar al menos un medio de pago para realizar la venta.')
+      if(!state.planesPago || state.planesPago.length < 1) resolve('Debe seleccionar al menos un plan de pago para realizar la venta.')
+      resolve('OK')
+    })
+    return await result;
+  }
+
   return (
     <>
       {
@@ -72,9 +85,15 @@ const Ventas = () => {
           <Col span={6} style={{marginTop: "25px"}}>
             <button
                     className="btn-primary"
-                    onClick={() => {dispatch({ type: SHOW_FINALIZE_SALE_MODAL }) }}
+                    onClick={() => {
+                      checkState()
+                      .then(result => {
+                        if(result === 'OK') return dispatch({ type: SHOW_FINALIZE_SALE_MODAL })
+                        return errorAlert(result);
+                      })
+                    }}
                 >
-                    Finalizar venta
+                  Finalizar venta
             </button>
           </Col>
         </Row>

@@ -2,15 +2,17 @@ import React, { useEffect } from "react";
 import {Modal, Row, Col} from 'antd';
 import helpers from '../../helpers';
 import api from '../../services';
+import { errorAlert, successAlert } from '../../components/alerts';
 
 const {formatBody} = helpers.afipHelper;
 const {createVoucherPdf} = helpers.pdf;
 
 const FinalizeSaleModal = ({ state, dispatch, actions}) => {
-  const { HIDE_FINALIZE_SALE_MODAL, FINALIZE_SALE } = actions;
+  const { HIDE_FINALIZE_SALE_MODAL, FINALIZE_SALE, LOADING_VIEW } = actions;
 
   const startCloseSale = async() => {
     dispatch({type: HIDE_FINALIZE_SALE_MODAL});
+    dispatch({type: LOADING_VIEW})
     const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
     const bodyToAfip = formatBody(state);
     const responseOfAfip = await api.afip.generateVoucher(loggedUser.empresa.cuit, bodyToAfip);
@@ -47,16 +49,11 @@ const FinalizeSaleModal = ({ state, dispatch, actions}) => {
     const result = await api.ventas.save(state);
     if(result.code === 200){
       createVoucherPdf(state);
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000)
+      successAlert('Venta realizada')
+      .then(() => {window.location.reload()})
     }else{
-      console.error('No se pudo guardar la venta')
+      errorAlert('No se pudo guardar la venta')
     }
-  }
-
-  const errorToModifyStock = () => {
-    console.error('Error al modificar stock')
   }
 
   useEffect(() => {
@@ -64,7 +61,7 @@ const FinalizeSaleModal = ({ state, dispatch, actions}) => {
     applyStockModification(state)
     .then(stock => {
       if(stock.isModified)return saveSale();
-      return errorToModifyStock()
+      return errorAlert('Error al modificar stock')
     })
     .catch(err => {
       console.error(err);

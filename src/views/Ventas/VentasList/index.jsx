@@ -60,29 +60,29 @@ const VentasList = () => {
 
   return (
     <Row>
-        <Col span={24} style={{marginBottom: '10px'}}>
-          <Header setFilters={setFilters}/>
-        </Col>
-        <Col span={24}>
-          <Table 
-              width={"100%"}
-              dataSource={ventas}
-              columns={columnsForTable}
-              pagination={{
-                  defaultCurrent: page,
-                  limit: limit,
-                  total: totalDocs,
-                  showSizeChanger: true,
-                  onChange: (e) => { setPage(e) },
-                  onShowSizeChange: (e, val) => { setLimit(val) }
-              }}
-              rowKey='_id'
-              tableLayout='auto'
-              size="small"
-              loading={loading}
-          />
-          <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
-        </Col>
+      <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
+      <Col span={24} style={{marginBottom: '10px'}}>
+        <Header setFilters={setFilters}/>
+      </Col>
+      <Col span={24}>
+        <Table 
+            width={"100%"}
+            dataSource={ventas}
+            columns={columnsForTable}
+            pagination={{
+                defaultCurrent: page,
+                limit: limit,
+                total: totalDocs,
+                showSizeChanger: true,
+                onChange: (e) => { setPage(e) },
+                onShowSizeChange: (e, val) => { setLimit(val) }
+            }}
+            rowKey='_id'
+            tableLayout='auto'
+            size="small"
+            loading={loading}
+        />
+      </Col>
     </Row>
   )
 }

@@ -113,7 +113,7 @@ const basePrice = (line) => {
   return line.productoPrecioUnitario * quantity;
 };
 
-const reducer = (state, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     //-------------------------------------------- Generic reducers of view -------------------------------------------------------/
     case actions.SHOW_DISCOUNT_SURCHARGE_MODAL:
@@ -400,59 +400,6 @@ const reducer = (state, action) => {
         subTotal,
         total,
       };
-    case actions.RESET_STATE:
-      return {
-        discountSurchargeModalVisible: false,
-        discountSurchargeModalOperation: "discount",
-        finalizeSaleModalIsVisible: false,
-        loadingView: false,
-        productos: [],
-        renglones: [],
-        documento: null,
-        documentoLetra: null,
-        documentoFiscal: null,
-        documentoCodigo: null,
-        empresa: null,
-        empresaRazonSocial: null,
-        empresaDireccion: null,
-        empresaCondicionIva: null,
-        empresaCuit: null,
-        empresaIngresosBrutos: null,
-        empresaInicioActividad: null,
-        puntoVenta: null,
-        puntoVentaNumero: null,
-        puntoVentaNombre: null,
-        numeroFactura: null,
-        numeroCompletoFactura: null,
-        cliente: null,
-        clienteRazonSocial: null,
-        clienteDireccion: null,
-        clienteIdentificador: null,
-        mediosPago: [],
-        mediosPagoNombres: [],
-        planesPagoToSelect: [],
-        planesPago: [],
-        planesPagoNombres: [],
-        fechaEmision: null,
-        fechaEmisionString: null,
-        cae: null,
-        vencimientoCae: null,
-        porcentajeDescuentoGlobal: 0,
-        porcentajeRecargoGlobal: 0,
-        totalDescuento: 0,
-        totalRecargo: 0,
-        totalDescuentoLineas: 0,
-        totalRecargoLineas: 0,
-        iva21: 0,
-        iva10: 0,
-        iva27: 0,
-        baseImponible21: 0,
-        baseImponible10: 0,
-        baseImponible27: 0,
-        importeIva: 0,
-        subTotal: 0,
-        total: 0,
-      }
     default:
       return state;
   }
