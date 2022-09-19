@@ -7,24 +7,12 @@ const { dateHelper } = helpers;
 const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
     const columns = [
         {
-            title: 'Precio Unitario',
-            dataIndex: 'precioUnitario',
-        },
-        {
-            title: 'Margen de Ganancia',
-            dataIndex: 'margenGanancia',
-        },
-        {
             title: 'Iva venta',
             dataIndex: 'ivaVenta',
         },
         {
             title: 'Precio de Venta',
             dataIndex: 'precioVenta',
-        },
-        {
-            title: 'Ganancia Neta',
-            dataIndex: 'gananciaNeta',
         },
     ]
     return (
@@ -36,20 +24,38 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
         width={800}
     >
         <Row>
-            <Col span={24}>
-                <div>
-                    <h3>
-                        Marca: {(detailsData && detailsData.marca) ? detailsData.marca.nombre : "Sin Marca"}
-                    </h3>
-                </div>
-                <div>
-                    <h3>
-                        Rubro: {(detailsData && detailsData.rubro) ? detailsData.rubro.nombre : "Sin Rubro"}
-                    </h3>
-                </div>
-                <div>
-                    <h3>Última modificación: {(detailsData) ? dateHelper.simpleDateWithHours(detailsData.updatedAt) : null}</h3>
-                </div>
+            <Col span={24} style={{marginBottom: '15px'}}>
+                <Row>
+                    <Col span={16} style={{marginTop: '25px'}}>
+                        <div>
+                            <h3>
+                                Marca: {(detailsData && detailsData.marca) ? detailsData.marca.nombre : "Sin Marca"}
+                            </h3>
+                        </div>
+                        <div>
+                            <h3>
+                                Rubro: {(detailsData && detailsData.rubro) ? detailsData.rubro.nombre : "Sin Rubro"}
+                            </h3>
+                        </div>
+                        <div>
+                            <h3>Última modificación: {(detailsData) ? dateHelper.simpleDateWithHours(detailsData.updatedAt) : null}</h3>
+                        </div>
+                    </Col>
+                    {
+                        (detailsData && detailsData.imagenes[0])
+                        ?
+                        <Col span={8}>
+                            <img 
+                                src={detailsData.imagenes[0].url} 
+                                alt="producto" 
+                                height="150" 
+                                width="150"
+                                onClick={() => window.open(detailsData.imagenes[0].url, '_blank')}
+                            />
+                        </Col>
+                        : null
+                    }
+                </Row>
             </Col>
             <Col span={24}>
                 <Table 
