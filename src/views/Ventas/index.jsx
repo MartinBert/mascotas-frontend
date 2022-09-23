@@ -106,6 +106,7 @@ const Ventas = ({userState}) => {
           userState={userState}
         />
         <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
+        <div id="ticket" style={{width: "303px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
     </>
   );
 };

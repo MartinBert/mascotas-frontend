@@ -6,7 +6,7 @@ import Header from './Header';
 import helpers from '../../../helpers';
 
 const {PrintPdf} = icons;
-const {createVoucherPdf} = helpers.pdf;
+const {createVoucherPdf, createTicketPdf} = helpers.pdf;
 
 const VentasList = () => {
   const [ventas, setVentas] = useState(null);
@@ -56,7 +56,11 @@ const VentasList = () => {
       render: (venta) => (
         <Row>
           <div onClick={() => {
-            createVoucherPdf(venta)}}>
+            (venta.documentoFiscal) 
+              ? createVoucherPdf(venta)
+              : createTicketPdf(venta)
+            }}
+          >
             <PrintPdf/>
           </div>
         </Row>
@@ -67,6 +71,7 @@ const VentasList = () => {
   return (
     <Row>
       <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
+      <div id="ticket" style={{width: "303px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
       <Col span={24} style={{marginBottom: '10px'}}>
         <Header setFilters={setFilters} ventas={ventas}/>
       </Col>

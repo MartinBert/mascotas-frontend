@@ -65,6 +65,7 @@ const initialState = {
   importeIva: 0,
   subTotal: 0,
   total: 0,
+  closedSale: false
 };
 
 const actions = {
@@ -74,7 +75,8 @@ const actions = {
   SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: "SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION",
   SHOW_FINALIZE_SALE_MODAL: "SHOW_FINALIZE_SALE_MODAL",
   HIDE_FINALIZE_SALE_MODAL: "HIDE_FINALIZE_SALE_MODAL",
-  FINALIZE_SALE: "FINALIZE_SALE",
+  CLOSE_FISCAL_OPERATION: "CLOSE_FISCAL_OPERATION",
+  CLOSE_NO_FISCAL_OPERATION: "CLOSE_NO_FISCAL_OPERATION",
   LOADING_DOCUMENT_INDEX: "LOADING_DOCUMENT_INDEX",
   LOADING_VIEW: "LOADING_VIEW",
   RESET_STATE: "RESET_STATE",
@@ -153,12 +155,18 @@ const reducer = (state = initialState, action) => {
         ...state,
         finalizeSaleModalIsVisible: false
       };
-    case actions.FINALIZE_SALE:
+    case actions.CLOSE_FISCAL_OPERATION:
       return {
         ...state,
         cae: action.payload.CAE,
-        vencimientoCae: action.payload.CAEFchVto
+        vencimientoCae: action.payload.CAEFchVto,
+        closedSale: true
       };
+    case actions.CLOSE_NO_FISCAL_OPERATION:
+      return {
+        ...state,
+        closedSale: true
+      }
     case actions.LOADING_DOCUMENT_INDEX:
       return {
         ...state,
@@ -239,8 +247,8 @@ const reducer = (state = initialState, action) => {
             productoNombre: product.nombre,
             productoCodigoBarras: product.codigoBarras,
             productoPrecioUnitario: product.precioUnitario,
-            productoPorcentajeIva: product.porcentajeIvaVenta,
-            productoImporteIva: product.ivaVenta,
+            productoPorcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
+            productoImporteIva: (product.ivaVenta) ? product.ivaVenta : 0,
             productoFraccionamiento: (product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1,
             fraccionar: false,
             cantidadUnidades: 1,

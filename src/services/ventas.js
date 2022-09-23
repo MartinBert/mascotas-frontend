@@ -48,6 +48,16 @@ const findLastIndex = async() => {
     }
 }
 
+const findLastVoucherNumber = async(code) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/last/voucher/number/${code}`, headers)
+        return response.data;
+    }catch(err){
+        checkStorageStatus(err);
+        console.error(err);
+    }
+}
+
 const save = async(venta) => {
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/ventas`, venta, headers);
@@ -83,6 +93,7 @@ const ventas = {
     findById,
     findMultipleIds,
     findLastIndex,
+    findLastVoucherNumber,
     save,
     edit,
     deleteVenta

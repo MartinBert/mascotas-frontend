@@ -35,7 +35,8 @@ const Header = ({
       dispatch({type: LOADING_DOCUMENT_INDEX})
       let attemps = 0;
       dispatch({type: SET_TOTAL});
-      const fetchLastVoucherNumber = async () => {
+
+      const fetchLastFiscalVoucherNumber = async () => {
         const lastVoucherNumber = await api.afip.findLastVoucherNumber(
           state.empresaCuit,
           state.puntoVentaNumero,
@@ -43,14 +44,27 @@ const Header = ({
         );
         if(lastVoucherNumber === undefined && attemps < 10) return setTimeout(() => {
           attemps++;
-          return fetchLastVoucherNumber()
+          return fetchLastFiscalVoucherNumber()
         }, 500)
         if(lastVoucherNumber === undefined) return errorAlert('No se pudo recuperar la correlación de AFIP del último comprobante emitido, intente nuevamente más tarde.').then(() => {window.location.reload()})
         const nextVoucher = lastVoucherNumber + 1;
         dispatch({ type: SET_VOUCHER_NUMBERS, payload: nextVoucher });
         dispatch({type: LOADING_DOCUMENT_INDEX})
       };
-      fetchLastVoucherNumber();
+
+      const fetchLastNoFiscalVoucherNumber = async() => {
+        const lastVoucherNumber = await api.ventas.findLastVoucherNumber(state.documentoCodigo);
+        if(lastVoucherNumber === undefined && attemps < 10) return setTimeout(() => {
+          attemps++;
+          return fetchLastNoFiscalVoucherNumber()
+        }, 500)
+        if(lastVoucherNumber === undefined) return errorAlert('No se pudo recuperar la correlación de comprobantes, intente más tarde.').then(() => {window.location.reload()})
+        const nextVoucher = lastVoucherNumber + 1;
+        dispatch({ type: SET_VOUCHER_NUMBERS, payload: nextVoucher });
+        dispatch({type: LOADING_DOCUMENT_INDEX})
+      }
+
+      (state.documentoFiscal) ? fetchLastFiscalVoucherNumber() : fetchLastNoFiscalVoucherNumber();
     },
     //eslint-disable-next-line
     [state.documento]
@@ -121,7 +135,7 @@ const Header = ({
             />
           </Col>
           <Col xl={6} lg={6} md={12}>
-            {(state.loadingDocumentIndex) ? <span><Spin/>Esperando a AFIP...</span> : null}
+            {(state.loadingDocumentIndex) ? <span><Spin/>Procesando...</span> : null}
           </Col>
           <Col xl={6} lg={6} md={12}>
             <span style={{ textAlign: "right" }}>

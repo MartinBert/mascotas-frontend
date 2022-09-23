@@ -9,15 +9,9 @@ const {completeLengthWithZero} = stringHelper;
 const {simpleDateWithHours} = dateHelper;
 const {AfipQR} = qr;
 
-const createVoucherPdf = async(saleData) => {
-    const qrToVoucher = new AfipQR(saleData);
-    const qrImage = await QRCode.toDataURL(qrToVoucher.url);
-
-    //voucher html generation
-    const frameToCanvas = document.getElementById('voucher')
-    const htmlObject = document.createElement('div');
-    htmlObject.innerHTML = `
-    <div id='pdfVoucherContainer' style="width: 793px; height: 1122px; line-height: 1;">
+const voucherTemplate = (saleData, qrImage) => {
+    return `
+    <div style="width: 793px; height: 1122px; line-height: 1;">
         <div style="display: flex; width: 100%; text-align: center">
             <div style="width: 40%; margin-top: 15px; padding-left: 20px;">
                 <div style="width: 100%; display: flex; justify-content: center;">
@@ -90,7 +84,7 @@ const createVoucherPdf = async(saleData) => {
             (saleData.totalDescuento) 
             ?
             `
-            <div style="width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; ont-size: 10px;">
+            <div style="width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 10px;">
                 <div style="width: 8%;">-</div>
                 <div style="width: 60%;">DESCUENTO EFECTUADO</div>
                 <div style="width: 8%;">${saleData.totalDescuento}</div>
@@ -154,19 +148,130 @@ const createVoucherPdf = async(saleData) => {
         </div>
     </div>
     `
-    frameToCanvas.appendChild(htmlObject);
+}
 
-    html2canvas(htmlObject, {allowTaint: true, useCORS: true}).then(function (canvas) {
-        const img = canvas.toDataURL("image/png");
-        const doc = new jsPDF();
-        doc.addImage(img, 'JPEG', 0, 0);
-        doc.save(saleData.numeroCompletoFactura);
-        document.getElementById('voucher').innerHTML = '';
-    });
+const ticketTemplate = (saleData) => {
+    return `
+    <div style="width: 303px; height: 1122px; line-height: 1;">
+        <div style="width: 100%; text-align: center; font-size: 9px;">
+            <div style="width: 100%; text-align: center; margin-top: 15px;">
+                <div style="background-color: #4a4a4a; border: 1px solid">
+                    <h1 style="font-size: 32px; font-weight: bold; color: #fff; margin-top: 15px">${saleData.documentoLetra}</h1>
+                </div>
+                <p style="vertical-align: text-top;">Código ${saleData.documentoCodigo}</p>
+            </div>
+            <div style="width: 100%; margin-top: 15px; padding-left: 20px; text-align: left;">
+                <p style="margin-top: 5px;">Razón social: ${saleData.empresaRazonSocial}</p>
+                <p>Dirección: ${saleData.empresaDireccion}</p>
+                <p>Fecha emision: ${simpleDateWithHours(saleData.fechaEmision)}</p>
+            </div>
+        </div>
+        <div style="width: 100%;">
+            <hr>
+        </div>
+        <div style="width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-bottom: 15px; font-weight: bold; font-size: 9px;">
+            <div style="width: 20%;">Cant.</div>
+            <div style="width: 60%;">Producto</div>
+            <div style="width: 20%; text-align: right;">Total</div>
+        </div>
+        ${saleData.renglones.map(renglon => {
+            return `
+            <div style="width: 100%; display: flex; padding-left: 15px; padding-right: 15px; font-size: 9px;">
+                <div style="width: 20%;">${renglon.cantidadUnidades}</div>
+                <div style="width: 60%;">${renglon.productoNombre}</div>
+                <div style="width: 20%; text-align: right;">${renglon.totalRenglon}</div>
+            </div>
+            `
+        })}
+        ${
+            (saleData.totalDescuento) 
+            ?
+            `
+            <div style="width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 9px;">
+                <div style="width: 20%;">-</div>
+                <div style="width: 60%;">DESCUENTO EFECTUADO</div>
+                <div style="width: 20%; text-align: right;">${saleData.totalDescuento}</div>
+            </div>
+            `
+            :'' 
+        }
+        ${
+            (saleData.totalRecargo) 
+            ?`
+            <div style="width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 9px;">
+                <div style="width: 20%;">-</div>
+                <div style="width: 60%;">RECARGO EFECTUADO</div>
+                <div style="width: 20%; text-align: right;">${saleData.totalRecargo}</div>
+            </div>
+            `
+            :'' 
+        }
+        <div style="width: 100%; position: absolute; bottom: 0; font-size: 9px;">
+            <div style="width: 100%;">
+                <hr>
+            </div>
+            <div style="width: 100%; padding: 10px; display: flex; text-align: center;">
+                <div style="width: 33%">
+                    <p>Descuento: $${saleData.totalDescuento + saleData.totalDescuentoLineas}</p>
+                </div>
+                <div style="width: 33%">
+                    <p>Recargo: $${saleData.totalRecargo + saleData.totalRecargoLineas}</p>
+                </div>
+                <div style="width: 33%">
+                    <p>Total: $${saleData.total}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+}
+
+const processCanvas = async(frameToCanvas, htmlObject, docName, size) => {
+    const canvasResult = new Promise(resolve => {
+        try{
+            frameToCanvas.appendChild(htmlObject);
+            html2canvas(htmlObject, {allowTaint: true, useCORS: true}).then(function (canvas) {
+                const img = canvas.toDataURL("image/png");
+                const doc = new jsPDF('p', 'mm', size);
+                doc.addImage(img, 'JPEG', 0, 0);
+                doc.save(docName);
+                document.getElementById('voucher').innerHTML = '';
+                resolve({isProcesseed: true})
+            });
+        }catch(err){
+            console.error(err)
+            resolve({isProcesseed: false})
+        }
+    })
+
+    return await canvasResult;
+}
+
+const createVoucherPdf = async(saleData) => {
+    const qrToVoucher = new AfipQR(saleData);
+    const qrImage = await QRCode.toDataURL(qrToVoucher.url);
+    const frameToCanvas = document.getElementById('voucher')
+    const htmlObject = document.createElement('div');
+    const docName = saleData.numeroCompletoFactura;
+    const size = [297, 210]; //Expresed in mm
+    htmlObject.innerHTML = voucherTemplate(saleData, qrImage)
+    const doc = await processCanvas(frameToCanvas, htmlObject, docName, size);
+    return {isCreated: doc.isProcesseed}
+}
+
+const createTicketPdf = async(saleData) => {
+    const frameToCanvas = document.getElementById('ticket')
+    const htmlObject = document.createElement('div');
+    const docName = saleData.numeroCompletoFactura;
+    const size = [297, 80]; //Expresed in mm
+    htmlObject.innerHTML = ticketTemplate(saleData)
+    const doc = await processCanvas(frameToCanvas, htmlObject, docName, size);
+    return {isCreated: doc.isProcesseed}
 }
 
 const pdf = {
-    createVoucherPdf
+    createVoucherPdf,
+    createTicketPdf
 }
 
 export default pdf;
