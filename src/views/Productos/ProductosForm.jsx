@@ -78,7 +78,7 @@ const ProductosForm = () => {
         const ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))));
         const ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta));
         const gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia));
-        const precioVenta = parseFloat(product.precioUnitario) + ivaVenta + gananciaNeta;
+        const precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + ivaVenta + gananciaNeta);
         setProduct({
             ...product,
             ivaCompra,

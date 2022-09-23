@@ -110,36 +110,12 @@ const PriceModificatorModal = ({
     for (let product of addedProducts) {
       product.precioUnitario =
         selectedModificationType === "1"
-          ? roundTwoDecimals(
-              Number(product.precioUnitario) *
-                (1 + decimalPercent(modificationValue))
-            )
-          : roundTwoDecimals(
-              Number(product.precioUnitario) + Number(modificationValue)
-            );
-      const calculeWithoutIva = roundTwoDecimals(
-        Number(product.precioUnitario) *
-          (1 + decimalPercent(product.margenGanancia))
-      );
-      const calculeWithIva = roundTwoDecimals(
-        Number(product.precioUnitario) *
-          (1 + decimalPercent(product.margenGanancia)) *
-          (1 + decimalPercent(product.iva))
-      );
-      const realProfitWithoutIva = roundTwoDecimals(
-        calculeWithoutIva - Number(product.precioUnitario)
-      );
-      const realProfitWithIva = roundTwoDecimals(
-        calculeWithIva / (1 + decimalPercent(product.iva)) -
-          Number(product.precioUnitario)
-      );
-      if (product.iva > 0) {
-        product.precioVenta = calculeWithoutIva;
-        product.gananciaNeta = realProfitWithoutIva;
-      } else {
-        product.precioVenta = calculeWithIva;
-        product.gananciaNeta = realProfitWithIva;
-      }
+          ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
+          : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue));
+      product.ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))));
+      product.ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta));
+      product.gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia));
+      product.precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNeta);
       api.productos.edit(product);
     }
     setPriceModalVisible(false);
