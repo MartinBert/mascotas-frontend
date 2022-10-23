@@ -246,7 +246,7 @@ const reducer = (state = initialState, action) => {
             _id: product._id,
             productoNombre: product.nombre,
             productoCodigoBarras: product.codigoBarras,
-            productoPrecioUnitario: product.precioUnitario,
+            productoPrecioUnitario: product.precioVenta,
             productoPorcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
             productoImporteIva: (product.ivaVenta) ? product.ivaVenta : 0,
             productoFraccionamiento: (product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1,
@@ -256,7 +256,7 @@ const reducer = (state = initialState, action) => {
             importeDescuentoRenglon: 0,
             porcentajeRecargoRenglon: 0,
             importeRecargoRenglon: 0,
-            totalRenglon: product.precioUnitario * 1,
+            totalRenglon: product.precioVenta * 1,
           }
         }),
       };
@@ -265,10 +265,18 @@ const reducer = (state = initialState, action) => {
         ...state,
         renglones: state.renglones.map(item => {
           const checked = action.payload.fraccionar;
+          const productUnfractionedPrice = state.productos.find(product => product._id === item._id).precioVenta;
+          const productFractionedPrice = state.productos.find(product => product._id === item._id).precioVentaFraccionado;
           if(item._id === action.payload._id){
+            item = action.payload;
             if(checked){
-              item = action.payload;
               item.cantidadUnidades = item.productoFraccionamiento;
+              item.productoPrecioUnitario = productFractionedPrice;
+              item.totalRenglon = productFractionedPrice;
+            }else{
+              item.cantidadUnidades = 1;
+              item.productoPrecioUnitario = productUnfractionedPrice;
+              item.totalRenglon = productUnfractionedPrice;
             }
           }
           return item

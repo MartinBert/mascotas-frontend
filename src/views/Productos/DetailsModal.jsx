@@ -11,8 +11,12 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             dataIndex: 'ivaVenta',
         },
         {
-            title: 'Precio de Venta',
+            title: 'Precio de venta',
             dataIndex: 'precioVenta',
+        },
+        {
+            title: 'Precio de vta. prod. fraccionado',
+            dataIndex: 'precioVentaFraccionado',
         },
     ]
     return (

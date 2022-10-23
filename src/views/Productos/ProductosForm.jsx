@@ -27,8 +27,11 @@ const ProductosForm = () => {
         cantidadFraccionadaStock: 1,
         precioUnitario: 0,
         margenGanancia: 0,
+        margenGananciaFraccionado: 0,
         precioVenta: 0,
+        precioVentaFraccionado: 0,
         gananciaNeta: 0,
+        gananciaNetaFraccionado: 0,
         porcentajeIvaCompra: 0,
         porcentajeIvaVenta: 0,
         ivaCompra: 0,
@@ -79,16 +82,21 @@ const ProductosForm = () => {
         const ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta));
         const gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia));
         const precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + ivaVenta + gananciaNeta);
+        const gananciaNetaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGananciaFraccionado));
+        const precioVentaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) + ivaVenta + gananciaNetaFraccionado);
+
         setProduct({
             ...product,
             ivaCompra,
             ivaVenta,
             gananciaNeta,
-            precioVenta
+            gananciaNetaFraccionado,
+            precioVenta,
+            precioVentaFraccionado
         })
     }, 
     //eslint-disable-next-line
-    [product.precioUnitario, product.margenGanancia, product.porcentajeIvaCompra, product.porcentajeIvaVenta])
+    [product.precioUnitario, product.margenGanancia, product.margenGananciaFraccionado,product.porcentajeIvaCompra, product.porcentajeIvaVenta])
 
     const setFormDataToProduct = async(e) =>{
         setProduct({
@@ -369,6 +377,20 @@ const ProductosForm = () => {
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
+                                    required
+                                    label="% Ganancia Fracc."
+                                >
+                                    <Input 
+                                        name="margenGananciaFraccionado"
+                                        placeholder="Margen de ganancia prod. fracc."
+                                        type="number"
+                                        value={product.margenGananciaFraccionado}
+                                        onChange={e => { setFormDataToProduct(e) }} 
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
                                         required
                                         label="Porc. Iva Compra"
                                     >
@@ -403,7 +425,6 @@ const ProductosForm = () => {
                                             type="number"
                                             value={product.ivaCompra}
                                             disabled={true}
-                                            onChange={e => { setFormDataToProduct(e) }} 
                                         />
                                 </Form.Item>
                             </Col>
@@ -417,14 +438,13 @@ const ProductosForm = () => {
                                             type="number"
                                             value={product.ivaVenta}
                                             disabled={true}
-                                            onChange={e => { setFormDataToProduct(e) }} 
                                         />
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Prec. vta."
+                                    label="Prec. Vta."
                                 >
                                     <Input 
                                         name="precioVenta"
@@ -432,7 +452,20 @@ const ProductosForm = () => {
                                         type="number"
                                         value={product.precioVenta}
                                         disabled={true}
-                                        onChange={e => { setFormDataToProduct(e) }} 
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                    required
+                                    label="Prec. Vta. Fracc."
+                                >
+                                    <Input 
+                                        name="precioVentaFraccionado"
+                                        placeholder="Precio de venta de producto fraccionado"
+                                        type="number"
+                                        value={product.precioVentaFraccionado}
+                                        disabled={true}
                                     />
                                 </Form.Item>
                             </Col>
@@ -447,7 +480,20 @@ const ProductosForm = () => {
                                             type="number"
                                             value={product.gananciaNeta}
                                             disabled={true}
-                                            onChange={e => { setFormDataToProduct(e) }} 
+                                        />
+                                </Form.Item>
+                            </Col>
+                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                <Form.Item 
+                                        required
+                                        label="Gan. Neta. Fracc."
+                                    >
+                                        <Input 
+                                            name="gananciaNetaFraccionado"
+                                            placeholder="Ganancia Neta prod. fracc."
+                                            type="number"
+                                            value={product.gananciaNetaFraccionado}
+                                            disabled={true}
                                         />
                                 </Form.Item>
                             </Col>

@@ -30,6 +30,7 @@ const Lines = ({
         <Checkbox onChange={(e) => {
           product.fraccionar = e.target.checked;
           dispatch({type: SET_FRACTIONED, payload: product})
+          dispatch({type: SET_TOTAL})
         }}/>
       ),
     },
