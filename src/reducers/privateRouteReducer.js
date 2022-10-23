@@ -1,5 +1,6 @@
 const initialState = {
-    openKeys: []
+    openSubmenuKey: [],
+    openKey: []
 }
 
 const reducer = (state, action) => {
@@ -7,7 +8,12 @@ const reducer = (state, action) => {
         case 'SET_OPEN_SUBMENU_KEY':
             return {
                 ...state,
-                openKeys: action.payload 
+                openSubmenuKey: action.payload 
+            }
+        case 'SET_OPEN_KEY':
+            return {
+                ...state,
+                openKey: action.payload 
             }
         default:
             return state

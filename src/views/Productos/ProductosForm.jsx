@@ -6,7 +6,8 @@ import { GenericAutocomplete } from '../../components/generics';
 import { UploadOutlined } from '@ant-design/icons';
 import graphics from '../../components/graphics';
 import helper from '../../helpers'
-import { errorAlert, successAlert } from '../../components/alerts';
+import { errorAlert, questionAlert, successAlert } from '../../components/alerts';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const { Spinner } = graphics;
 const roundTwoDecimals = helper.mathHelper.roundTwoDecimals;
@@ -68,6 +69,7 @@ const ProductosForm = () => {
             } else {setSelectedMeasure({_id: product.unidadMedida._id, nombre: product.unidadMedida.nombre});}
 
             setProduct(product);
+            setUploadedImages(product.imagenes);
             setLoading(false);
         }
         if(id !== "nuevo"){
@@ -134,10 +136,7 @@ const ProductosForm = () => {
     }
     
     const saveProduct = () => {
-        if(!product.imagenes || product.imagenes.length === 0){
-            product.imagenes = uploadedImages;
-        }
-
+        product.imagenes = uploadedImages;
         const saveProduct = async() => {
             const response = await api.productos.save(product);
             if(response.code === 200){
@@ -164,12 +163,6 @@ const ProductosForm = () => {
     }
 
     const handleCancel = () => {
-        if(uploadedImages.length > 0){
-            removeImage(uploadedImages[0]._id)
-            .then(() => {
-                redirectToProducts();
-            })
-        }
         redirectToProducts();
     }
 
@@ -193,7 +186,10 @@ const ProductosForm = () => {
     const uploadImageToServer = async(file) => {
         const response = await api.uploader.uploadImage(file);
         if(response.file){
-            setUploadedImages(response.file);
+            setUploadedImages([
+                ...uploadedImages,
+                ...response.file
+            ]);
             return response.code;
         }
     }
@@ -497,13 +493,51 @@ const ProductosForm = () => {
                                         />
                                 </Form.Item>
                             </Col>
-                            <Col span={6} style={{marginBottom: '20px'}}>
+                            <Col span={6}>
                             <Upload 
                             {...uploaderProps}
                             >
-                                <button type="button" className="btn-primary" icon={<UploadOutlined />} disabled={(uploadedImages.length > 0) ? true : false}>Subir imagen</button>
+                                <button type="button" className="btn-primary" icon={<UploadOutlined />}>Subir imagen</button>
                             </Upload>
                             </Col>
+                            {
+                                (product.imagenes && product.imagenes.length > 0)
+                                ?
+                                <Col span={24} style={{display: 'flex', marginBottom: '20px'}}>
+                                    {product.imagenes.map(imageData => (
+                                        <div style={{position: 'relative', border: '1px solid', borderRadius: '2px 2px 2px 2px', marginRight: '10px'}} key={imageData._id}>
+                                            <div 
+                                                style={{
+                                                    padding: '3px', 
+                                                    backgroundColor: 'black', 
+                                                    position: 'absolute', 
+                                                    right: '2px', 
+                                                    top: '2px', 
+                                                    width: '25px',
+                                                    height: '25px',
+                                                    textAlign: 'center',
+                                                    borderRadius: '5px 5px 5px 5px',
+                                                    cursor: 'pointer'
+                                                }}
+                                                onClick={() => {
+                                                    questionAlert('Esto eliminará permanentemente la imágen del producto, ¿Desea continuar?')
+                                                    .then(result => {
+                                                        const reload = async() => {
+                                                            await api.uploader.deleteImage(imageData._id)
+                                                            window.location.reload();
+                                                        }
+                                                        if(result.isConfirmed)return reload(); 
+                                                    })
+                                                }}
+                                            >
+                                                <FaTrashAlt color='red'/>
+                                            </div>
+                                            <img src={imageData.url} alt="Producto Mascotafeliz" width="100" height="100"/>
+                                        </div>
+                                    ))}
+                                </Col>
+                                : null
+                            }
                             <Col span={24} align="start" style={{display: 'flex'}}>
                                 <Form.Item style={{marginRight: '15px'}}>
                                     <button                                         

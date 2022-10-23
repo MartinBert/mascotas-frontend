@@ -90,7 +90,14 @@ const Productos = ({userState}) => {
       {
         title: 'Imagen',
         render: (product) => (
-          <OpenImage alt='Ver imagen' imageUrl={(product.imagenes[0]) ? product.imagenes[0].url : '/no-image.png'}/>
+          <OpenImage 
+            alt='Ver imagen' 
+            imageUrl={
+              (product.imagenes && product.imagenes.length > 0) 
+                ? product.imagenes[product.imagenes.length - 1].url 
+                : '/no-image.png'
+            }
+          />
         ),
         visible:true
       },

@@ -66,6 +66,7 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
                     dataSource={[detailsData]} 
                     columns={columns}
                     pagination={false}
+                    rowKey='_id'
                 />
             </Col>
         </Row>
