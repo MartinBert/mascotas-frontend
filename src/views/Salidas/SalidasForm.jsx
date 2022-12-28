@@ -80,7 +80,7 @@ const SalidasForm = ({userState}) => {
     //----------------------------------------------- Submit form action -----------------------------------------------------------/
     const handleSubmit = async() => {
         try{
-            if(id !== "nuevo"){
+            if(id !== 'nuevo'){
                 for(let product of salida.productos){
                     const firstSalidaRequest = await api.salidas.findById(id);
                     const firstSalidaInstance = firstSalidaRequest.data;
@@ -155,17 +155,17 @@ const SalidasForm = ({userState}) => {
                     ? <Spin />
                     :
                     <Form
-                        autoComplete="off"
+                        autoComplete='off'
                         onFinish={() => { handleSubmit() }}
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item
-                                    label="Descripción"
+                                    label='Descripción'
                                 >
                                     <Input
-                                        name="descripcion"
-                                        placeholder="Descripción"
+                                        name='descripcion'
+                                        placeholder='Descripción'
                                         value={salida.descripcion}
                                         onChange={(e) => {
                                             setSalida({
@@ -178,10 +178,10 @@ const SalidasForm = ({userState}) => {
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item
-                                    label="Fecha"
+                                    label='Fecha'
                                 >
                                     <DatePicker
-                                        name="fecha"
+                                        name='fecha'
                                         locale='es-es'
                                         onChange={(e) => {
                                             setSalida({
@@ -194,11 +194,11 @@ const SalidasForm = ({userState}) => {
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item
-                                    label="Ganancia neta total"
+                                    label='Ganancia neta total'
                                 >
                                     <Input
-                                        name="gananciaNetaTotal"
-                                        placeholder="Ganancia neta total"
+                                        name='gananciaNetaTotal'
+                                        placeholder='Ganancia neta total'
                                         value={total}
                                         disabled={true}
                                     />
@@ -219,8 +219,8 @@ const SalidasForm = ({userState}) => {
                                                 >
                                                     <Input
                                                         disabled
-                                                        name="nombre"
-                                                        placeholder="Nombre del producto"
+                                                        name='nombre'
+                                                        placeholder='Nombre del producto'
                                                         value={item.nombre}
                                                         onChange={(e) => {
                                                             setSalida({
@@ -242,8 +242,8 @@ const SalidasForm = ({userState}) => {
                                                 >
                                                     <Input
                                                         disabled
-                                                        name="barcode"
-                                                        placeholder="Codigo de barras de producto"
+                                                        name='barcode'
+                                                        placeholder='Codigo de barras de producto'
                                                         value={item.codigoBarras}
                                                         onChange={(e) => {
                                                             setSalida({
@@ -264,9 +264,9 @@ const SalidasForm = ({userState}) => {
                                                     required
                                                 >
                                                     <Input
-                                                        name="quantity"
-                                                        placeholder="Cantidad"
-                                                        type="number"
+                                                        name='quantity'
+                                                        placeholder='Cantidad'
+                                                        type='number'
                                                         value={item.cantidadesSalientes}
                                                         disabled={(item.cantidadesFraccionadasSalientes) ? true : false}
                                                         onChange={(e) => {
@@ -288,9 +288,9 @@ const SalidasForm = ({userState}) => {
                                                     required
                                                 >
                                                     <Input
-                                                        name="fractionedQuantity"
-                                                        placeholder="Cantidad fraccionada"
-                                                        type="number"
+                                                        name='fractionedQuantity'
+                                                        placeholder='Cantidad fraccionada'
+                                                        type='number'
                                                         value={item.cantidadesFraccionadasSalientes}
                                                         disabled={(item.cantidadesSalientes) ? true : false}
                                                         onChange={(e) => {
@@ -321,18 +321,18 @@ const SalidasForm = ({userState}) => {
                                     : null
                                 }
                             </Col>
-                            <Col span={24} align="start" style={{ display: 'flex' }}>
+                            <Col span={24} align='start' style={{ display: 'flex' }}>
                                 <Row>
                                     <Col span={12} style={{ display: 'flex' }}>
                                         <button
-                                            type="submit"
-                                            className="btn-primary"
+                                            type='submit'
+                                            className='btn-primary'
                                             style={{ marginRight: '15px' }}
                                         >
                                             Guardar
                                         </button>
                                         <button
-                                            className="btn-secondary"
+                                            className='btn-secondary'
                                             onClick={() => { redirectToSalidas() }}
                                         >
                                             Cancelar

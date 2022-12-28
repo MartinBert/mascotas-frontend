@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import api from "../../services";
-import { Row, Col, Form, Input, Checkbox } from "antd";
-import { useHistory, useParams } from "react-router-dom";
-import messages from "../../components/messages";
-import graphics from "../../components/graphics";
-import { GenericAutocomplete } from "../../components/generics";
-import { errorAlert, successAlert } from "../../components/alerts";
+import React, { useState, useEffect } from 'react';
+import api from '../../services';
+import { Row, Col, Form, Input, Checkbox } from 'antd';
+import { useHistory, useParams } from 'react-router-dom';
+import messages from '../../components/messages';
+import graphics from '../../components/graphics';
+import { GenericAutocomplete } from '../../components/generics';
+import { errorAlert, successAlert } from '../../components/alerts';
 
 const { Error } = messages;
 const { Spinner } = graphics;
@@ -34,7 +34,7 @@ const UsuariosForm = () => {
   //eslint-disable-next-line
   useEffect(() => {
     if (usuario.nombre) return;
-    if (id === "nuevo") {
+    if (id === 'nuevo') {
       setLoading(false);
       return;
     }
@@ -75,24 +75,24 @@ const UsuariosForm = () => {
       const response = usuario._id
         ? await api.usuarios.edit(usuario)
         : await api.usuarios.save(usuario);
-      if (response === "OK") return success();
+      if (response === 'OK') return success();
       return fail();
     };
     saveItem();
   };
 
   const redirectToUsuarios = () => {
-    history.push("/usuarios");
+    history.push('/usuarios');
   };
 
   const success = () => {
-    successAlert("El registro se guardo en la base de datos").then(() => {
+    successAlert('El registro se guardo en la base de datos').then(() => {
       redirectToUsuarios();
     });
   };
 
   const fail = () => {
-    errorAlert("Error al guardar el registro");
+    errorAlert('Error al guardar el registro');
   };
 
   return (
@@ -101,59 +101,59 @@ const UsuariosForm = () => {
         <Spinner />
       ) : (
         <Col span={12}>
-          <h1>{id === "nuevo" ? "Crear nuevo usuario" : "Editar usuario"}</h1>
+          <h1>{id === 'nuevo' ? 'Crear nuevo usuario' : 'Editar usuario'}</h1>
           {error ? (
-            <Error message="Debe completar todos los campos obligatorios *" />
+            <Error message='Debe completar todos los campos obligatorios *' />
           ) : null}
           <Form
-            name="basic"
+            name='basic'
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             initialValues={{ remember: true }}
             onFinish={() => {
               save();
             }}
-            autoComplete="off"
-            style={{ marginTop: "10px" }}
+            autoComplete='off'
+            style={{ marginTop: '10px' }}
           >
             <Form.Item
-              label="Nombre"
+              label='Nombre'
               onChange={(e) => {
                 loadUsuarioData(e);
               }}
               required={true}
             >
-              <Input name="nombre" value={usuario.nombre} className="ml-5" />
+              <Input name='nombre' value={usuario.nombre} className='ml-5' />
             </Form.Item>
             <Form.Item
-              label="Email"
+              label='Email'
               onChange={(e) => {
                 loadUsuarioData(e);
               }}
               required={true}
             >
-              <Input name="email" value={usuario.email} className="ml-5" />
+              <Input name='email' value={usuario.email} className='ml-5' />
             </Form.Item>
             <Form.Item
-              label="Password"
+              label='Password'
               onChange={(e) => {
                 loadUsuarioData(e);
               }}
               required={true}
             >
               <Input
-                name="password"
+                name='password'
                 value={usuario.password}
-                type="password"
-                className="ml-5"
+                type='password'
+                className='ml-5'
               />
             </Form.Item>
             <Form.Item
-              label="Perfil administrador"
+              label='Perfil administrador'
               required={true}
             >
               <Checkbox 
-                name="perfil"
+                name='perfil'
                 checked={usuario.perfil}
                 onChange={(e) => {
                   loadUsuarioData(e);
@@ -161,28 +161,28 @@ const UsuariosForm = () => {
               ></Checkbox>
             </Form.Item>
             <Form.Item
-              label="Empresa"
+              label='Empresa'
               required={true}
             >
               <GenericAutocomplete
-                label="Empresa"
-                modelToFind="empresa"
-                keyToCompare="razonSocial"
-                controller="empresas"
+                label='Empresa'
+                modelToFind='empresa'
+                keyToCompare='razonSocial'
+                controller='empresas'
                 returnCompleteModel={true}
                 setResultSearch={setSelectedCompanyToUser}
                 selectedSearch={selectedCompany}
               />
             </Form.Item>
             <Form.Item
-              label="Punto de venta"
+              label='Punto de venta'
               required={true}
             >
               <GenericAutocomplete
-                label="Punto de venta"
-                modelToFind="puntoventa"
-                keyToCompare="nombre"
-                controller="puntosventa"
+                label='Punto de venta'
+                modelToFind='puntoventa'
+                keyToCompare='nombre'
+                controller='puntosventa'
                 returnCompleteModel={true}
                 setResultSearch={setSelectedSalePointToUser}
                 selectedSearch={selectedSalePoint}
@@ -190,15 +190,15 @@ const UsuariosForm = () => {
             </Form.Item>
             <Row>
               <Col span={8} style={{display: 'flex'}}>
-                <button type="submit" className="btn-primary">
+                <button type='submit' className='btn-primary'>
                   Guardar
                 </button>
                 <button
-                  className="btn-secondary"
+                  className='btn-secondary'
                   onClick={() => {
                     redirectToUsuarios();
                   }}
-                  style={{ marginLeft: "10px"}}
+                  style={{ marginLeft: '10px'}}
                 >
                   Cancelar
                 </button>

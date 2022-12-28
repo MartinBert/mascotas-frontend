@@ -50,21 +50,21 @@ const findByName = async(name) => {
 
 const save = async(cliente) => {
     try{
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/clientes`, cliente, headers);
-        return response.data.message;
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/clientes`, cliente, headers)
+        return response.data
     }catch(err){
-        checkStorageStatus(err);
-        console.error(err);
+        checkStorageStatus(err)
+        console.error(err)
     }
 }
 
 const edit = async(cliente) => {
     try{
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/clientes/${cliente._id}`, cliente, headers);
-        return response.data.message;
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/clientes/${cliente._id}`, cliente, headers)
+        return response.data
     }catch(err){
-        checkStorageStatus(err);
-        console.error(err);
+        checkStorageStatus(err)
+        console.error(err)
     }
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {Modal, Row, Col} from 'antd';
 import helpers from '../../helpers';
 import api from '../../services';
@@ -88,13 +88,13 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
     <Modal
       title={(<h3>Finalizar venta</h3>)}
       visible={state.finalizeSaleModalIsVisible}
-      cancelButtonProps={{ style: { display: "none" } }}
+      cancelButtonProps={{ style: { display: 'none' } }}
       closable={false}
       footer={[
-        <Row gutter={8} align="end" key="1">
+        <Row gutter={8} align='end' key='1'>
             <Col span={6}>
                 <button
-                    className="btn-secondary"
+                    className='btn-secondary'
                     onClick={() => {dispatch({ type: HIDE_FINALIZE_SALE_MODAL})}}
                 >
                     Cancelar
@@ -102,7 +102,7 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
             </Col>
             <Col span={6}>
                 <button
-                    className="btn-primary"
+                    className='btn-primary'
                     onClick={() => { startCloseSale() }}
                 >
                     Aceptar
@@ -112,7 +112,7 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
       ]}
       width={600}
     >
-      <Row justify="space between" gutter={16}>
+      <Row justify='space between' gutter={16}>
         <Col span={24}>
             <h3><b>¡Atencion!</b>, esta acción finalizará la venta, ¿desea continuar?</h3>
         </Col>

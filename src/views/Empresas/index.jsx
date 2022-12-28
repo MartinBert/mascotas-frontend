@@ -55,7 +55,7 @@ const Empresas = () => {
     },
     {
       title: 'Cuit',
-      dataIndex: 'razonSocial',
+      dataIndex: 'cuit',
     },
     {
       title: 'Logo',
@@ -86,7 +86,7 @@ const Empresas = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={empresas}
               columns={columnsForTable}
               pagination={{
@@ -99,11 +99,11 @@ const Empresas = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar empresa"
+            title='Eliminar empresa'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

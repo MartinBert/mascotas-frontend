@@ -58,7 +58,7 @@ const Usuarios = () => {
       },
       {
         title: 'Perfil',
-        render: (data) => ((data.perfil) ? "Super administrador" : "Administrador")
+        render: (data) => ((data.perfil) ? 'Super administrador' : 'Administrador')
       },
       {
         title: 'Acciones',
@@ -85,7 +85,7 @@ const Usuarios = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={usuarios}
               columns={columnsForTable}
               pagination={{
@@ -99,10 +99,10 @@ const Usuarios = () => {
               loading={loading}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
           />
           <DeleteModal
-            title="Eliminar usuario"
+            title='Eliminar usuario'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

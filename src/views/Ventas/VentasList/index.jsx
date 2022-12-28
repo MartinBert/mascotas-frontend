@@ -70,14 +70,14 @@ const VentasList = () => {
 
   return (
     <Row>
-      <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
-      <div id="ticket" style={{width: "303px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
+      <div id='voucher' style={{width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0}}></div>
+      <div id='ticket' style={{width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0}}></div>
       <Col span={24} style={{marginBottom: '10px'}}>
         <Header setFilters={setFilters} ventas={ventas}/>
       </Col>
       <Col span={24}>
         <Table 
-            width={"100%"}
+            width={'100%'}
             dataSource={ventas}
             columns={columnsForTable}
             pagination={{
@@ -90,7 +90,7 @@ const VentasList = () => {
             }}
             rowKey='_id'
             tableLayout='auto'
-            size="small"
+            size='small'
             loading={loading}
         />
       </Col>

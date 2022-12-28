@@ -16,7 +16,6 @@ const decimalPercent = helper.mathHelper.decimalPercent;
 const ProductosForm = () => {
     const { id } = useParams();
     const history = useHistory();
-    const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState({
         nombre: '',
         codigoProducto: '',
@@ -39,6 +38,7 @@ const ProductosForm = () => {
         ivaVenta: 0,
         imagenes: null,
     })
+    const [loading, setLoading] = useState(true);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [selectedHeading, setSelectedHeading] = useState(null);
     const [selectedMeasure, setSelectedMeasure] = useState(null);
@@ -68,14 +68,14 @@ const ProductosForm = () => {
                     nombre : 'no especificado'};
             } else {setSelectedMeasure({_id: product.unidadMedida._id, nombre: product.unidadMedida.nombre});}
 
-            setProduct(product);
-            setUploadedImages(product.imagenes);
-            setLoading(false);
+            setProduct(product)
+            setUploadedImages(product.imagenes)
+            setLoading(false)
         }
-        if(id !== "nuevo"){
+        if(id !== 'nuevo'){
             fetchProductById(id)
         }else{
-            setLoading(false);
+            setLoading(false)
         }
     }, [loading, id])
 
@@ -134,7 +134,7 @@ const ProductosForm = () => {
             cantidadFraccionadaStock: response.fraccionamiento
         })
     }
-    
+    console.log(product)
     const saveProduct = () => {
         product.imagenes = uploadedImages;
         const saveProduct = async() => {
@@ -209,17 +209,17 @@ const ProductosForm = () => {
                     :
                     <Form 
                         onFinish={() => { saveProduct() }} 
-                        autoComplete="off"
+                        autoComplete='off'
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Nombre"
+                                    label='Nombre'
                                 >
                                     <Input 
-                                        name="nombre"
-                                        placeholder="Nombre"
+                                        name='nombre'
+                                        placeholder='Nombre'
                                         value={product.nombre}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
@@ -228,11 +228,11 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Código prod."
+                                    label='Código prod.'
                                 >
                                     <Input 
-                                        name="codigoProducto"
-                                        placeholder="Código de producto"
+                                        name='codigoProducto'
+                                        placeholder='Código de producto'
                                         value={product.codigoProducto}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
@@ -241,11 +241,11 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Cód. barras"
+                                    label='Cód. barras'
                                 >
                                     <Input 
-                                        name="codigoBarras" 
-                                        placeholder="Código de barras"
+                                        name='codigoBarras' 
+                                        placeholder='Código de barras'
                                         value={product.codigoBarras}
                                         onChange={e => { setFormDataToProduct(e) }}
                                     />
@@ -254,13 +254,13 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Marca"
+                                    label='Marca'
                                 >
                                     <GenericAutocomplete
-                                        label="Marca"
-                                        modelToFind="marca"
-                                        keyToCompare="nombre"
-                                        controller="marcas"
+                                        label='Marca'
+                                        modelToFind='marca'
+                                        keyToCompare='nombre'
+                                        controller='marcas'
                                         returnCompleteModel={true}
                                         setResultSearch={setSelectedBrandToProduct}
                                         selectedSearch={selectedBrand}
@@ -270,13 +270,13 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Rubro"
+                                    label='Rubro'
                                 >
                                     <GenericAutocomplete
-                                        label="Rubro"
-                                        modelToFind="rubro"
-                                        keyToCompare="nombre"
-                                        controller="rubros"
+                                        label='Rubro'
+                                        modelToFind='rubro'
+                                        keyToCompare='nombre'
+                                        controller='rubros'
                                         returnCompleteModel={true}
                                         setResultSearch={setSelectedHeadingToProduct}
                                         selectedSearch={selectedHeading}
@@ -286,13 +286,13 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="U. Medida"
+                                    label='U. Medida'
                                 >
                                     <GenericAutocomplete
-                                        label="U. Medida"
-                                        modelToFind="unidadmedida"
-                                        keyToCompare="nombre"
-                                        controller="unidadesmedida"
+                                        label='U. Medida'
+                                        modelToFind='unidadmedida'
+                                        keyToCompare='nombre'
+                                        controller='unidadesmedida'
                                         returnCompleteModel={true}
                                         setResultSearch={setSelectedMeasureToProduct}
                                         selectedSearch={selectedMeasure}
@@ -302,12 +302,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Fraccionamiento"
+                                    label='Fraccionamiento'
                                 >
                                     <Input 
-                                        name="cantidadFraccionadaStock"
-                                        placeholder="Fraccionamiento"
-                                        type="number"
+                                        name='cantidadFraccionadaStock'
+                                        placeholder='Fraccionamiento'
+                                        type='number'
                                         value={(product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1}
                                         disabled={true}
                                     />
@@ -316,12 +316,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Cant. stock"
+                                    label='Cant. stock'
                                 >
                                     <Input 
-                                        name="cantidadStock"
-                                        placeholder="Cantidad de stock"
-                                        type="number"
+                                        name='cantidadStock'
+                                        placeholder='Cantidad de stock'
+                                        type='number'
                                         value={product.cantidadStock}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
@@ -330,12 +330,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Cant. fracc."
+                                    label='Cant. fracc.'
                                 >
                                     <Input 
-                                        name="cantidadFraccionadaStock"
-                                        placeholder="Cantidad de stock fraccionado"
-                                        type="number"
+                                        name='cantidadFraccionadaStock'
+                                        placeholder='Cantidad de stock fraccionado'
+                                        type='number'
                                         value={product.cantidadFraccionadaStock}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
@@ -344,12 +344,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Prec. unit."
+                                    label='Prec. unit.'
                                 >
                                     <Input 
-                                        name="precioUnitario"
-                                        placeholder="Precio unitario"
-                                        type="number"
+                                        name='precioUnitario'
+                                        placeholder='Precio unitario'
+                                        type='number'
                                         value={product.precioUnitario}
                                         onChange={e => { 
                                             setFormDataToProduct(e)
@@ -360,12 +360,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="% Ganancia"
+                                    label='% Ganancia'
                                 >
                                     <Input 
-                                        name="margenGanancia"
-                                        placeholder="Margen de ganancia"
-                                        type="number"
+                                        name='margenGanancia'
+                                        placeholder='Margen de ganancia'
+                                        type='number'
                                         value={product.margenGanancia}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
@@ -374,12 +374,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="% Ganancia Fracc."
+                                    label='% Ganancia Fracc.'
                                 >
                                     <Input 
-                                        name="margenGananciaFraccionado"
-                                        placeholder="Margen de ganancia prod. fracc."
-                                        type="number"
+                                        name='margenGananciaFraccionado'
+                                        placeholder='Margen de ganancia prod. fracc.'
+                                        type='number'
                                         value={product.margenGananciaFraccionado}
                                         onChange={e => { setFormDataToProduct(e) }} 
                                     />
@@ -388,11 +388,11 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="Porc. Iva Compra"
+                                        label='Porc. Iva Compra'
                                     >
                                         <Input
-                                            name="porcentajeIvaCompra"
-                                            type="number"
+                                            name='porcentajeIvaCompra'
+                                            type='number'
                                             value={product.porcentajeIvaCompra}
                                             onChange={e => { setFormDataToProduct(e) }} 
                                         />
@@ -401,11 +401,11 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="Porc. Iva Venta"
+                                        label='Porc. Iva Venta'
                                     >
                                         <Input
-                                            name="porcentajeIvaVenta"
-                                            type="number"
+                                            name='porcentajeIvaVenta'
+                                            type='number'
                                             value={product.porcentajeIvaVenta}
                                             onChange={e => { setFormDataToProduct(e) }} 
                                         />
@@ -414,11 +414,11 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="Iva Compra"
+                                        label='Iva Compra'
                                     >
                                         <Input
-                                            name="ivaCompra"
-                                            type="number"
+                                            name='ivaCompra'
+                                            type='number'
                                             value={product.ivaCompra}
                                             disabled={true}
                                         />
@@ -427,11 +427,11 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="Iva Venta"
+                                        label='Iva Venta'
                                     >
                                         <Input
-                                            name="ivaVenta"
-                                            type="number"
+                                            name='ivaVenta'
+                                            type='number'
                                             value={product.ivaVenta}
                                             disabled={true}
                                         />
@@ -440,12 +440,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Prec. Vta."
+                                    label='Prec. Vta.'
                                 >
                                     <Input 
-                                        name="precioVenta"
-                                        placeholder="Precio de venta"
-                                        type="number"
+                                        name='precioVenta'
+                                        placeholder='Precio de venta'
+                                        type='number'
                                         value={product.precioVenta}
                                         disabled={true}
                                     />
@@ -454,12 +454,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Prec. Vta. Fracc."
+                                    label='Prec. Vta. Fracc.'
                                 >
                                     <Input 
-                                        name="precioVentaFraccionado"
-                                        placeholder="Precio de venta de producto fraccionado"
-                                        type="number"
+                                        name='precioVentaFraccionado'
+                                        placeholder='Precio de venta de producto fraccionado'
+                                        type='number'
                                         value={product.precioVentaFraccionado}
                                         disabled={true}
                                     />
@@ -468,12 +468,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="Gan. Neta"
+                                        label='Gan. Neta'
                                     >
                                         <Input 
-                                            name="gananciaNeta"
-                                            placeholder="Ganancia Neta"
-                                            type="number"
+                                            name='gananciaNeta'
+                                            placeholder='Ganancia Neta'
+                                            type='number'
                                             value={product.gananciaNeta}
                                             disabled={true}
                                         />
@@ -482,12 +482,12 @@ const ProductosForm = () => {
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                         required
-                                        label="Gan. Neta. Fracc."
+                                        label='Gan. Neta. Fracc.'
                                     >
                                         <Input 
-                                            name="gananciaNetaFraccionado"
-                                            placeholder="Ganancia Neta prod. fracc."
-                                            type="number"
+                                            name='gananciaNetaFraccionado'
+                                            placeholder='Ganancia Neta prod. fracc.'
+                                            type='number'
                                             value={product.gananciaNetaFraccionado}
                                             disabled={true}
                                         />
@@ -497,7 +497,7 @@ const ProductosForm = () => {
                             <Upload 
                             {...uploaderProps}
                             >
-                                <button type="button" className="btn-primary" icon={<UploadOutlined />}>Subir imagen</button>
+                                <button type='button' className='btn-primary' icon={<UploadOutlined />}>Subir imagen</button>
                             </Upload>
                             </Col>
                             {
@@ -532,26 +532,26 @@ const ProductosForm = () => {
                                             >
                                                 <FaTrashAlt color='red'/>
                                             </div>
-                                            <img src={imageData.url} alt="Producto Mascotafeliz" width="100" height="100"/>
+                                            <img src={imageData.url} alt='Producto Mascotafeliz' width='100' height='100'/>
                                         </div>
                                     ))}
                                 </Col>
                                 : null
                             }
-                            <Col span={24} align="start" style={{display: 'flex'}}>
+                            <Col span={24} align='start' style={{display: 'flex'}}>
                                 <Form.Item style={{marginRight: '15px'}}>
                                     <button                                         
-                                        type="submit"
-                                        className="btn-primary"                                     
+                                        type='submit'
+                                        className='btn-primary'                                     
                                     >
                                         Guardar
                                     </button>
                                 </Form.Item>
                                 <Form.Item>
                                     <button 
-                                        className="btn-secondary" 
+                                        className='btn-secondary' 
                                         onClick={() => {handleCancel()}}
-                                        type="button"
+                                        type='button'
                                     >
                                         Cancelar
                                     </button>
@@ -561,7 +561,7 @@ const ProductosForm = () => {
                     </Form>
                 }
             </Col>
-            <Col span={24} align="justify">
+            <Col span={24} align='justify'>
                 <h1>
                     Para realizar ventas AFIP exige que se declare el IVA de la operación, 
                     el porcentaje del mismo puede variar dependiendo del producto, pero generalmente es del 21%.

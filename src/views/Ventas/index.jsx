@@ -1,12 +1,12 @@
-import React, { useEffect, useReducer } from "react";
-import Header from "./Header";
-import reducers from "../../reducers";
-import DiscountSurchargeModal from "./DiscountSurchargeModal";
-import FinalizeSaleModal from "./FinalizeSaleModal";
-import Lines from "./Lines";
-import api from "../../services";
+import React, { useEffect, useReducer } from 'react';
+import Header from './Header';
+import reducers from '../../reducers';
+import DiscountSurchargeModal from './DiscountSurchargeModal';
+import FinalizeSaleModal from './FinalizeSaleModal';
+import Lines from './Lines';
+import api from '../../services';
 import {Row, Col, Spin} from 'antd';
-import {errorAlert} from "../../components/alerts";
+import {errorAlert} from '../../components/alerts';
 
 const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates();
 const { initialState, reducer, actions } = reducers.saleReducer;
@@ -77,9 +77,9 @@ const Ventas = ({userState}) => {
               actions={actions}
             />
           </Col>
-          <Col span={6} style={{marginTop: "25px"}}>
+          <Col span={6} style={{marginTop: '25px'}}>
             <button
-                    className="btn-primary"
+                    className='btn-primary'
                     onClick={() => {
                       checkState()
                       .then(result => {
@@ -105,8 +105,8 @@ const Ventas = ({userState}) => {
           actions={actions}
           userState={userState}
         />
-        <div id="voucher" style={{width: "793px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
-        <div id="ticket" style={{width: "303px", height: "1122px", zIndex: -9999, position: "absolute", top: 0, left: 0}}></div>
+        <div id='voucher' style={{width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0}}></div>
+        <div id='ticket' style={{width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0}}></div>
     </>
   );
 };

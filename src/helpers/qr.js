@@ -21,11 +21,11 @@ class AfipQR {
             ctz: 1,
             tipoDocRec: parseInt(saleData.clienteDocumentoReceptor),
             nroDocRec: parseInt(saleData.clienteIdentificador),
-            tipoCodAut: "E",
+            tipoCodAut: 'E',
             codAut: parseInt(saleData.cae),
         }
         this.baseUrl = 'https://www.afip.gob.ar/fe/qr/?p='
-        this.encodedData = Buffer.from(JSON.stringify(this.data)).toString("base64");
+        this.encodedData = Buffer.from(JSON.stringify(this.data)).toString('base64');
         this.url = this.baseUrl + this.encodedData
     }
 }

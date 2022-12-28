@@ -43,8 +43,8 @@ const Header = ({setFilters, filters, setLoading}) => {
 
     const exportExcel = async() => {
         const response = await api.productos.findAll({page: 0, limit: 1000000, filters: null});
-        const nameOfSheet = "Hoja de productos";
-        const nameOfDocument = "Lista de productos";
+        const nameOfSheet = 'Hoja de productos';
+        const nameOfDocument = 'Lista de productos';
         const columnHeaders = [
             'Producto' , 
             'Marca', 
@@ -65,8 +65,8 @@ const Header = ({setFilters, filters, setLoading}) => {
         for await (let product of products){
             processedLines.push([
                 product.nombre,
-                (product.marca) ? product.marca.nombre : "Sin Marca",
-                (product.rubro) ? product.rubro.nombre : "Sin Rubro",
+                (product.marca) ? product.marca.nombre : 'Sin Marca',
+                (product.rubro) ? product.rubro.nombre : 'Sin Rubro',
                 '$'+product.precioUnitario,
                 '$'+product.iva,
                 '$'+product.precioVenta,
@@ -85,16 +85,16 @@ const Header = ({setFilters, filters, setLoading}) => {
                 <Row gutter={8}>
                     <Col>
                         <button
-                            className="btn-primary"
+                            className='btn-primary'
                         > 
-                            <Link to="/productos/nuevo">
+                            <Link to='/productos/nuevo'>
                                 Nuevo    
                             </Link>
                         </button>
                     </Col>
                     <Col>                       
                         <button
-                            className="btn-primary"
+                            className='btn-primary'
                             onClick={() => {setPriceModalVisible(true)}}
                         >
                                 Modificar precios    
@@ -102,19 +102,19 @@ const Header = ({setFilters, filters, setLoading}) => {
                     </Col>
                     <Col>                       
                         <button
-                            className="btn-primary"
+                            className='btn-primary'
                             onClick={() => {exportExcel()}}
                         >
                             Exportar Excel
                         </button>
                     </Col>
                 </Row>
-                <Row justify="space between" gutter={16}>
+                <Row justify='space between' gutter={16}>
                 <Col span={6}>
                         <Input 
-                            color="primary" 
+                            color='primary' 
                             style={{ width: 200, marginBottom: '10px' }}
-                            placeholder="Buscar por nombre"
+                            placeholder='Buscar por nombre'
                             onChange={(e) => { setFilters(
                                 {
                                     ...filters,
@@ -126,9 +126,9 @@ const Header = ({setFilters, filters, setLoading}) => {
                     </Col>
                     <Col span={6}>
                         <Input 
-                            color="primary" 
+                            color='primary' 
                             style={{ width: 200, marginBottom: '10px' }}
-                            placeholder="Buscar por codigo de barras"
+                            placeholder='Buscar por codigo de barras'
                             onChange={(e) => { setFilters(
                                 {
                                     ...filters,
@@ -140,9 +140,9 @@ const Header = ({setFilters, filters, setLoading}) => {
                     </Col>
                     <Col span={6}>
                         <Input 
-                            color="primary" 
+                            color='primary' 
                             style={{ width: 200, marginBottom: '10px' }}
-                            placeholder="Buscar por codigo de producto"
+                            placeholder='Buscar por codigo de producto'
                             onChange={(e) => { setFilters(
                                 {
                                     ...filters,
@@ -154,7 +154,7 @@ const Header = ({setFilters, filters, setLoading}) => {
                     </Col>
                     <Col span={6}>
                         <Button 
-                            type="danger" 
+                            type='danger' 
                             onClick={() => {cleanFilters()}}
                         > 
                             Limpiar filtros
@@ -162,10 +162,10 @@ const Header = ({setFilters, filters, setLoading}) => {
                     </Col>
                     <Col span={8}>
                         <GenericAutocomplete
-                            label="Filtrar por marcas"
-                            modelToFind="marca"
-                            keyToCompare="nombre"
-                            controller="marcas"
+                            label='Filtrar por marcas'
+                            modelToFind='marca'
+                            keyToCompare='nombre'
+                            controller='marcas'
                             setResultSearch={setSelectedBrand}
                             selectedSearch={selectedBrand}
                             returnCompleteModel={true}
@@ -174,10 +174,10 @@ const Header = ({setFilters, filters, setLoading}) => {
                     </Col>
                     <Col span={8}>
                         <GenericAutocomplete
-                            label="Filtrar por rubros"
-                            modelToFind="rubro"
-                            keyToCompare="nombre"
-                            controller="rubros"
+                            label='Filtrar por rubros'
+                            modelToFind='rubro'
+                            keyToCompare='nombre'
+                            controller='rubros'
                             setResultSearch={setSelectedHeading}
                             selectedSearch={selectedHeading}
                             returnCompleteModel={true}

@@ -88,18 +88,18 @@ const MediosPagoForm = () => {
                     ? <Spinner/>
                     :
                     <Form 
-                        autoComplete="off"
+                        autoComplete='off'
                         onFinish={() => {handleSubmit()}}
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
                                 <Form.Item 
                                     required
-                                    label="Nombre"
+                                    label='Nombre'
                                 >
                                     <Input 
-                                        name="nombre"
-                                        placeholder="Nombre"
+                                        name='nombre'
+                                        placeholder='Nombre'
                                         value={mediopago.nombre}
                                         onChange={(e) => {
                                             setMedioPago({
@@ -113,7 +113,7 @@ const MediosPagoForm = () => {
                             <Col xl={18} lg={16} md={12} sm={24} xs={24} style={{display: 'flex'}}>
                                 <Form.Item 
                                     required
-                                    label="Suma en arqueo: "
+                                    label='Suma en arqueo: '
                                 >
                                     <Checkbox 
                                         onChange={(e) => {setMedioPago({
@@ -126,7 +126,7 @@ const MediosPagoForm = () => {
                                 <Form.Item 
                                     style={{marginLeft: '15px'}}
                                     required
-                                    label="Suma en cierre z: "
+                                    label='Suma en cierre z: '
                                 >
                                     <Checkbox 
                                         onChange={(e) => {setMedioPago({
@@ -172,7 +172,7 @@ const MediosPagoForm = () => {
                                                     required
                                                 >
                                                     <Input 
-                                                        name="nombre"
+                                                        name='nombre'
                                                         value={item.nombre}
                                                         onChange={(e) => {
                                                             setPlanLines(
@@ -192,8 +192,8 @@ const MediosPagoForm = () => {
                                                     required
                                                 >
                                                     <Input 
-                                                        name="cuotas"
-                                                        type="number"
+                                                        name='cuotas'
+                                                        type='number'
                                                         value={item.cuotas}
                                                         onChange={(e) => {
                                                             setPlanLines(
@@ -213,9 +213,9 @@ const MediosPagoForm = () => {
                                                     required
                                                 >
                                                     <Input 
-                                                        name="porcentaje"
-                                                        placeholder="Cant. de cuotas"
-                                                        type="number"
+                                                        name='porcentaje'
+                                                        placeholder='Cant. de cuotas'
+                                                        type='number'
                                                         value={item.porcentaje}
                                                         onChange={(e) => {
                                                             setPlanLines(
@@ -244,18 +244,18 @@ const MediosPagoForm = () => {
                                 : null
                             }
                             </Col>
-                            <Col span={24} align="start" style={{display: 'flex'}}>
+                            <Col span={24} align='start' style={{display: 'flex'}}>
                                 <Form.Item style={{marginRight: '15px'}}>
                                     <button                                         
-                                        type="submit"
-                                        className="btn-primary"      
+                                        type='submit'
+                                        className='btn-primary'      
                                     >
                                         Guardar
                                     </button>
                                 </Form.Item>
                                 <Form.Item>
                                     <button
-                                        className="btn-secondary"
+                                        className='btn-secondary'
                                         onClick={() => {redirectToMediosPago()}}
                                     >
                                         Cancelar

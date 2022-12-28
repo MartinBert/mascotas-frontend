@@ -22,8 +22,8 @@ const Header = ({setFilters, ventas}) => {
     }
 
     const exportExcel = () => {
-        const nameOfSheet = "Hoja de ventas";
-        const nameOfDocument = "Lista de ventas";
+        const nameOfSheet = 'Hoja de ventas';
+        const nameOfDocument = 'Lista de ventas';
         const columnHeaders = [
             'Fecha',
             'Usuario',
@@ -38,10 +38,10 @@ const Header = ({setFilters, ventas}) => {
     return(
         <Row>
             <Col span={24}>
-                <Row align="end">
+                <Row align='end'>
                     <Col span={4}>
                         <button 
-                            className="btn-primary"
+                            className='btn-primary'
                             onClick={() => {exportExcel()}}
                         > 
                                 Reporte de ventas    
@@ -50,8 +50,8 @@ const Header = ({setFilters, ventas}) => {
                     <Col span={16}></Col>
                     <Col span={4}>
                         <Input 
-                            type="primary" 
-                            placeholder="Buscar venta"
+                            type='primary' 
+                            placeholder='Buscar venta'
                             onChange={(e) => { setFilters(JSON.stringify({
                                 nombre: e.target.value,
                             }))}}

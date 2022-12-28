@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect} from 'react';
 import api from '../../services';
-import { Row, Col, Form, Input } from "antd";
-import { useHistory, useParams } from "react-router-dom";
+import { Row, Col, Form, Input } from 'antd';
+import { useHistory, useParams } from 'react-router-dom';
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -61,7 +61,7 @@ const PuntosVentaForm = () => {
   };
 
   const redirectToPuntosVenta = () => {
-    history.push("/puntosventa")
+    history.push('/puntosventa')
   }
 
   const success = () => {
@@ -78,27 +78,27 @@ const PuntosVentaForm = () => {
     (loading) ? <Spinner/> 
     :
     <Form
-      name="basic"
+      name='basic'
       labelCol={{ span: 8 }}
       wrapperCol={{ span: 16 }}
       initialValues={{ remember: true }}
       onFinish={() => { save() }}
-      autoComplete="off"
+      autoComplete='off'
       style={{marginTop: '10px'}}
     >
     <Row>
       <Col span={24}>
-        <h1>{(id === "nuevo") ? "Crear nuevo punto de venta" : "Editar punto de venta"}</h1>
+        <h1>{(id === 'nuevo') ? 'Crear nuevo punto de venta' : 'Editar punto de venta'}</h1>
       </Col>
       <Col span={12} >
-        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
+        {(error) ? <Error message='Debe completar todos los campos obligatorios *'/> : null}
           <Form.Item
             onChange={(e) => {loadPuntoVentaData(e)}}
             required={true}
           >
             <div style={{display: 'flex'}}>
               <div style={{marginRight: '15px'}}><p>*Nombre:</p></div>
-              <Input name="nombre" value={puntoVenta.nombre}/>
+              <Input name='nombre' value={puntoVenta.nombre}/>
             </div>
           </Form.Item>
         </Col>
@@ -109,15 +109,15 @@ const PuntosVentaForm = () => {
           >
             <div style={{display: 'flex'}}>
               <div style={{marginRight: '15px'}}><p>*Número:</p></div>
-              <Input type="number" name="numero" value={puntoVenta.numero}/>
+              <Input type='number' name='numero' value={puntoVenta.numero}/>
             </div>
           </Form.Item>
         </Col>
         <Col span={8} style={{display: 'flex'}}>
-          <button className="btn-primary" type="submit">
+          <button className='btn-primary' type='submit'>
             Guardar
           </button>
-          <button className="btn-secondary" type="button" onClick={() => {redirectToPuntosVenta()}} style={{marginLeft: "10px"}}>
+          <button className='btn-secondary' type='button' onClick={() => {redirectToPuntosVenta()}} style={{marginLeft: '10px'}}>
             Cancelar
           </button>
         </Col>

@@ -9,19 +9,19 @@ const Header = ({setFilters}) => {
         <Row>
             
             <Col span={24}>
-                <Row align="end">
+                <Row align='end'>
                     <Col span={20}>
                         <Button 
-                            className="btn-primary-bg"> 
-                            <Link to="/cuentasCorrientes/nuevo">
+                            className='btn-primary-bg'> 
+                            <Link to='/cuentasCorrientes/nuevo'>
                                 Nuevo    
                             </Link>
                         </Button>
                     </Col>
                     <Col span={4}>
                         <Input 
-                            type="primary" 
-                            placeholder="Buscar cuenta corriente"
+                            type='primary' 
+                            placeholder='Buscar cuenta corriente'
                             onChange={(e) => { setFilters(JSON.stringify({
                                 cliente: e.target.value,
                             }))}}

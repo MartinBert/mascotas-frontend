@@ -109,7 +109,7 @@ const Documentos = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={documentos}
               columns={columnsForTable}
               pagination={{
@@ -122,11 +122,11 @@ const Documentos = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar documento"
+            title='Eliminar documento'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

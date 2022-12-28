@@ -77,7 +77,7 @@ const Marcas = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={marcas}
               columns={columnsForTable}
               pagination={{
@@ -90,11 +90,11 @@ const Marcas = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar marca"
+            title='Eliminar marca'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

@@ -81,7 +81,7 @@ const PuntosVenta = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={puntosVenta}
               columns={columnsForTable}
               pagination={{
@@ -94,11 +94,11 @@ const PuntosVenta = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal 
-            title="Eliminar punto de venta"
+            title='Eliminar punto de venta'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

@@ -44,7 +44,7 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
     ]
     return (
         <Modal
-            title="Detalle de producto"
+            title='Detalle de producto'
             visible={detailsVisible}
             onCancel={() => { setDetailsVisible(false) }}
             footer={false}

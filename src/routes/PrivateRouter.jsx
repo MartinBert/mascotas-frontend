@@ -98,7 +98,7 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch,
     ]
 
     const toolbarSubMenu = [
-        getItem('sub1', null, <FaUser style={{ color: "#fff", cursor: 'pointer', width: '25px', height: '25px' }} />, null, toolbarMenu)
+        getItem('sub1', null, <FaUser style={{ color: '#fff', cursor: 'pointer', width: '25px', height: '25px' }} />, null, toolbarMenu)
     ]
 
     const redirectToPath = (e) => {
@@ -116,10 +116,10 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch,
                 collapsed={collapsed}
                 style={{ background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)' }}
             >
-                <div style={{ height: "57px", background: "transparent", marginTop: "3px", marginLeft: "3px" }}></div>
+                <div style={{ height: '57px', background: 'transparent', marginTop: '3px', marginLeft: '3px' }}></div>
                 <Menu
                     theme='dark'
-                    mode="inline"
+                    mode='inline'
                     style={{ background: 'transparent' }}
                     defaultSelectedKeys={[(activeKey) ? activeKey[0] : '1']}
                     defaultOpenKeys={[(activeKey) ? activeKey[1] : 'sub1']}
@@ -127,14 +127,14 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch,
                     items={subMenusToSidebar}
                 />
             </Sider>
-            <Layout className="site-layout" style={{ height: '100%' }}>
-                <Header className="site-layout-background" style={{ padding: 0, background: 'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)', display: 'flex', justifyContent: 'space-between' }}>
+            <Layout className='site-layout' style={{ height: '100%' }}>
+                <Header className='site-layout-background' style={{ padding: 0, background: 'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)', display: 'flex', justifyContent: 'space-between' }}>
                     <div>
-                        <FaBars style={{ color: "#fff", marginLeft: '20px', cursor: 'pointer' }} onClick={() => { toggle() }} />
+                        <FaBars style={{ color: '#fff', marginLeft: '20px', cursor: 'pointer' }} onClick={() => { toggle() }} />
                     </div>
                     <div>
                         <Menu
-                            mode="horizontal"
+                            mode='horizontal'
                             onClick={() => {
                                 localStorage.clear();
                                 history.push('/login');
@@ -147,7 +147,7 @@ const PrivateRouter = ({ path, component: Component, activeKey, state, dispatch,
                 </Header>
                 {(userStatus) ?
                     <Content
-                        className="site-layout-background"
+                        className='site-layout-background'
                         style={{
                             margin: '24px 16px',
                             padding: 24,

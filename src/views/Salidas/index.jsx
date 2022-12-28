@@ -108,7 +108,7 @@ const Salidas = () => {
             </Col>
             <Col span={24}>
                 <Table 
-                    width={"100%"}
+                    width={'100%'}
                     dataSource={salidas}
                     columns={columnsForTable}
                     pagination={{
@@ -122,7 +122,7 @@ const Salidas = () => {
                     loading={loading}
                     rowKey='_id'
                     tableLayout='auto'
-                    size="small"
+                    size='small'
                 />
             </Col>
             <DetailsModal 
@@ -131,7 +131,7 @@ const Salidas = () => {
               detailsData={detailsData}
             />
             <DeleteModal
-              title="Eliminar salida"
+              title='Eliminar salida'
               deleteVisible={deleteVisible}
               setLoading={setLoading}
               setDeleteVisible={setDeleteVisible}

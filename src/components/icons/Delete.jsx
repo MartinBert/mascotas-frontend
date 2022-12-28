@@ -4,9 +4,9 @@ import { FaTrash } from 'react-icons/fa';
 const Delete = () => {
     return (
         <FaTrash
-            title="Eliminar"
+            title='Eliminar'
             style={{cursor: 'pointer'}}
-            color="#ff4d4f"
+            color='#ff4d4f'
         />
     )
 }

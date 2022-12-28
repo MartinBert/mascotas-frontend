@@ -105,7 +105,7 @@ const MediosPago = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={mediospago}
               columns={columnsForTable}
               pagination={{
@@ -118,11 +118,11 @@ const MediosPago = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar medio de pago"
+            title='Eliminar medio de pago'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

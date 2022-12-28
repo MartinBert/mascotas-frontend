@@ -23,7 +23,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
         }}
         width={1200}
     >
-        <Row justify="space between" gutter={16}>
+        <Row justify='space between' gutter={16}>
             <Col span={6}>
                 <Select
                     style={{width: '100%'}}
@@ -39,9 +39,9 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
             </Col>
             <Col span={6}>
                 <Input 
-                    color="primary"
-                    type="number"
-                    placeholder="Ingrese el porcentaje de modificación"
+                    color='primary'
+                    type='number'
+                    placeholder='Ingrese el porcentaje de modificación'
                     onChange={(e) => {
                         dispatch({
                             type: (state.discountSurchargeModalOperation === 'discount') ? SET_GLOBAL_DISCOUNT_PERCENT : SET_GLOBAL_SURCHARGE_PERCENT, 

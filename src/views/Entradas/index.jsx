@@ -108,7 +108,7 @@ const Entradas = () => {
             </Col>
             <Col span={24}>
                 <Table 
-                    width={"100%"}
+                    width={'100%'}
                     dataSource={entradas}
                     columns={columnsForTable}
                     pagination={{
@@ -122,7 +122,7 @@ const Entradas = () => {
                     loading={loading}
                     rowKey='_id'
                     tableLayout='auto'
-                    size="small"
+                    size='small'
                 />
             </Col>
             <DetailsModal 
@@ -131,7 +131,7 @@ const Entradas = () => {
               detailsData={detailsData}
             />
             <DeleteModal
-              title="Eliminar entrada"
+              title='Eliminar entrada'
               deleteVisible={deleteVisible}
               setLoading={setLoading}
               setDeleteVisible={setDeleteVisible}

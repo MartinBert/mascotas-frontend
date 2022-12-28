@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
-import { Table, Input, Checkbox, Row, Col } from "antd";
-import icons from "../../components/icons";
+import React, { useEffect } from 'react';
+import { Table, Input, Checkbox, Row, Col } from 'antd';
+import icons from '../../components/icons';
 
 const { Delete } = icons;
 
@@ -25,7 +25,7 @@ const Lines = ({
 
   const columnsForTable = [
     {
-      title: "Fracc.",
+      title: 'Fracc.',
       render: (product) => (
         <Checkbox onChange={(e) => {
           product.fraccionar = e.target.checked;
@@ -35,19 +35,19 @@ const Lines = ({
       ),
     },
     {
-      title: "Nombre",
-      dataIndex: "productoNombre",
+      title: 'Nombre',
+      dataIndex: 'productoNombre',
       width: 300
     },
     {
-      title: "Cantidad",
+      title: 'Cantidad',
       render: (product) => (
         <Row gutter={8}>
           <Col span={16}>
             <Input
-              color="primary"
-              type="number"
-              placeholder="Cantidad"
+              color='primary'
+              type='number'
+              placeholder='Cantidad'
               value={product.cantidadUnidades}
               onChange={(e) => {
                 dispatch({
@@ -74,24 +74,24 @@ const Lines = ({
       ),
     },
     {
-      title: "Prec. U.",
+      title: 'Prec. U.',
       render: (product) => (
         <Input
-          color="primary"
-          type="number"
-          placeholder="Prec. U."
+          color='primary'
+          type='number'
+          placeholder='Prec. U.'
           value={product.productoPrecioUnitario}
           disabled={true}
         />
       ),
     },
     {
-      title: "Porc. descuento",
+      title: 'Porc. descuento',
       render: (product) => (
         <Input
-          color="primary"
-          type="number"
-          placeholder="Porc. descuento"
+          color='primary'
+          type='number'
+          placeholder='Porc. descuento'
           value={product.porcentajeDescuentoRenglon}
           disabled={product.porcentajeRecargoRenglon > 0}
           onChange={(e) => {
@@ -109,12 +109,12 @@ const Lines = ({
       ),
     },
     {
-      title: "Porc. recargo",
+      title: 'Porc. recargo',
       render: (product) => (
         <Input
-          color="primary"
-          type="number"
-          placeholder="Porc. recargo"
+          color='primary'
+          type='number'
+          placeholder='Porc. recargo'
           value={product.porcentajeRecargoRenglon}
           disabled={product.porcentajeDescuentoRenglon > 0}
           onChange={(e) => {
@@ -132,19 +132,19 @@ const Lines = ({
       ),
     },
     {
-      title: "Total",
+      title: 'Total',
       render: (product) => (
         <Input
-          color="primary"
-          type="number"
-          placeholder="Total"
+          color='primary'
+          type='number'
+          placeholder='Total'
           value={product.totalRenglon}
           disabled={true}
         />
       ),
     },
     {
-      title: "Eliminar",
+      title: 'Eliminar',
       render: (product) => (
         <div
           onClick={() => {
@@ -173,14 +173,14 @@ const Lines = ({
 
   return (
     <Table
-      style={{ marginTop: "20px" }}
-      width={"100%"}
+      style={{ marginTop: '20px' }}
+      width={'100%'}
       dataSource={state.renglones}
       columns={columnsForTable}
       pagination={false}
-      rowKey="_id"
-      tableLayout="auto"
-      size="small"
+      rowKey='_id'
+      tableLayout='auto'
+      size='small'
     />
   );
 };

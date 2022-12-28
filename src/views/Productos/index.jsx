@@ -128,7 +128,7 @@ const Productos = ({userState}) => {
         </Col>
         <Col span={24}>
           <Table
-              width={"100%"}
+              width={'100%'}
               dataSource={products}
               columns={columnsForTable}
               pagination={{
@@ -144,7 +144,7 @@ const Productos = ({userState}) => {
               loading={loading}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
           />
         </Col>
         <DetailsModal 
@@ -154,7 +154,7 @@ const Productos = ({userState}) => {
         />
       </Row>
       <DeleteModal
-        title="Eliminar producto"
+        title='Eliminar producto'
         deleteVisible={deleteVisible}
         setLoading={setLoading}
         setDeleteVisible={setDeleteVisible}

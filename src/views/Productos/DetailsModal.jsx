@@ -21,7 +21,7 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
     ]
     return (
     <Modal 
-        title="Detalle de producto" 
+        title='Detalle de producto' 
         visible={detailsVisible}
         onCancel={() => {setDetailsVisible(false)}}
         footer={false}
@@ -33,12 +33,12 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
                     <Col span={16} style={{marginTop: '25px'}}>
                         <div>
                             <h3>
-                                Marca: {(detailsData && detailsData.marca) ? detailsData.marca.nombre : "Sin Marca"}
+                                Marca: {(detailsData && detailsData.marca) ? detailsData.marca.nombre : 'Sin Marca'}
                             </h3>
                         </div>
                         <div>
                             <h3>
-                                Rubro: {(detailsData && detailsData.rubro) ? detailsData.rubro.nombre : "Sin Rubro"}
+                                Rubro: {(detailsData && detailsData.rubro) ? detailsData.rubro.nombre : 'Sin Rubro'}
                             </h3>
                         </div>
                         <div>
@@ -51,9 +51,9 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
                         <Col span={8}>
                             <img 
                                 src={detailsData.imagenes[0].url} 
-                                alt="producto" 
-                                height="150" 
-                                width="150"
+                                alt='producto' 
+                                height='150' 
+                                width='150'
                                 onClick={() => window.open(detailsData.imagenes[0].url, '_blank')}
                             />
                         </Col>

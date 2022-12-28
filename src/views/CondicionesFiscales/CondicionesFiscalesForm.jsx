@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect} from 'react';
 import api from '../../services';
-import { Row, Col, Form, Input, Checkbox } from "antd";
-import { useHistory, useParams } from "react-router-dom";
+import { Row, Col, Form, Input, Checkbox } from 'antd';
+import { useHistory, useParams } from 'react-router-dom';
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -61,7 +61,7 @@ const CondicionesFiscalesForm = () => {
   };
 
   const redirectToCondicionesFiscales = () => {
-    history.push("/condicionesfiscales")
+    history.push('/condicionesfiscales')
   }
 
   const success = () => {
@@ -78,23 +78,23 @@ const CondicionesFiscalesForm = () => {
     (loading) ? <Spinner/> 
     :
     <Form
-      name="basic"
+      name='basic'
       labelCol={{ span: 8 }}
       wrapperCol={{ span: 16 }}
       initialValues={{ remember: true }}
       onFinish={() => { save() }}
-      autoComplete="off"
+      autoComplete='off'
       style={{marginTop: '10px'}}
     >
       <Row gutter={8}>
         <Col span={24}>
-          <h1>{(id === "nuevo") ? "Crear nueva condicion fiscal" : "Editar condicion fiscal"}</h1>
+          <h1>{(id === 'nuevo') ? 'Crear nueva condicion fiscal' : 'Editar condicion fiscal'}</h1>
         </Col>
         <Col span={12}>
-        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
+        {(error) ? <Error message='Debe completar todos los campos obligatorios *'/> : null}
             <div style={{display: 'flex'}}>
               <div style={{marginRight: '15px'}}><p>*Nombre:</p></div>
-              <Input name="nombre" value={condicionFiscal.nombre} style={{width: '100%'}} onChange={(e) => {loadCondicionFiscalData(e)}}/>
+              <Input name='nombre' value={condicionFiscal.nombre} style={{width: '100%'}} onChange={(e) => {loadCondicionFiscalData(e)}}/>
             </div>
         </Col>
         <Col span={4} style={{display: 'flex'}}>
@@ -111,10 +111,10 @@ const CondicionesFiscalesForm = () => {
         </Col>
         <Col span={6}></Col>
         <Col span={6} style={{display: 'flex', marginTop: '15px'}}>
-          <button className="btn-primary" type="submit">
+          <button className='btn-primary' type='submit'>
             Guardar
           </button>
-          <button className="btn-secondary" type="button" onClick={() => {redirectToCondicionesFiscales()}} style={{marginLeft: "10px"}}>
+          <button className='btn-secondary' type='button' onClick={() => {redirectToCondicionesFiscales()}} style={{marginLeft: '10px'}}>
             Cancelar
           </button>
         </Col>

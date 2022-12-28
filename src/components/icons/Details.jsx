@@ -6,7 +6,7 @@ const Details = ({title}) => {
         <FaEye 
             title={title} 
             style={{cursor: 'pointer'}}
-            color="#1890ff"
+            color='#1890ff'
         />
     )
 }

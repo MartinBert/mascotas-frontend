@@ -105,7 +105,7 @@ const CuentasCorrientes = () => {
         </Col>
         <Col span={24}> 
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={cuentasCorrientes}
               columns={columnsForTable}
               pagination={{
@@ -118,11 +118,11 @@ const CuentasCorrientes = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar cuenta corriente"
+            title='Eliminar cuenta corriente'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { GenericAutocomplete } from "../../components/generics";
-import { Modal, Row, Col, Select, Input, Table, Checkbox } from "antd";
-import { errorAlert, successAlert } from "../../components/alerts";
-import helper from "../../helpers";
-import api from "../../services";
-import icons from "../../components/icons";
+import React, { useState, useEffect } from 'react';
+import { GenericAutocomplete } from '../../components/generics';
+import { Modal, Row, Col, Select, Input, Table, Checkbox } from 'antd';
+import { errorAlert, successAlert } from '../../components/alerts';
+import helper from '../../helpers';
+import api from '../../services';
+import icons from '../../components/icons';
 
 const { Option } = Select;
 const { Delete } = icons;
@@ -19,7 +19,7 @@ const PriceModificatorModal = ({
   const [headings, setHeadings] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedHeading, setSelectedHeading] = useState(null);
-  const [productNameSearch, setProductNameSearch] = useState("");
+  const [productNameSearch, setProductNameSearch] = useState('');
   const [products, setProducts] = useState(null);
   const [productsLoading, setProductsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,8 +30,8 @@ const PriceModificatorModal = ({
   const [selectedModificationType, setSelectedModificationType] =
     useState(null);
   const modificationTypes = [
-    { key: 1, value: "Porcentual" },
-    { key: 2, value: "Monto fijo" },
+    { key: 1, value: 'Porcentual' },
+    { key: 2, value: 'Monto fijo' },
   ];
 
   useEffect(() => {
@@ -99,17 +99,17 @@ const PriceModificatorModal = ({
     setLoading(true);
     if (!selectedModificationType)
       return errorAlert(
-        "Debe seleccionar el tipo de modificación a aplicar en el precio de los productos..."
+        'Debe seleccionar el tipo de modificación a aplicar en el precio de los productos...'
       );
     if (modificationValue === 0)
-      return errorAlert("El valor de la modificación no puede ser 0...");
+      return errorAlert('El valor de la modificación no puede ser 0...');
     if (addedProducts.length < 1)
       return errorAlert(
-        "Debe seleccionar al menos 1 producto para modificar su precio..."
+        'Debe seleccionar al menos 1 producto para modificar su precio...'
       );
     for (let product of addedProducts) {
       product.precioUnitario =
-        selectedModificationType === "1"
+        selectedModificationType === '1'
           ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
           : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue));
       product.ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))));
@@ -120,7 +120,7 @@ const PriceModificatorModal = ({
     }
     setPriceModalVisible(false);
     cleanModificator();
-    successAlert("Los precios fueron modificados!").then(() => {
+    successAlert('Los precios fueron modificados!').then(() => {
       window.location.reload();
     });
   };
@@ -140,13 +140,13 @@ const PriceModificatorModal = ({
   const cleanFilters = () => {
     setSelectedBrand(null);
     setSelectedHeading(null);
-    setProductNameSearch("");
+    setProductNameSearch('');
   };
 
   const cleanModificator = () => {
     setSelectedBrand(null);
     setSelectedHeading(null);
-    setProductNameSearch("");
+    setProductNameSearch('');
     setAddedProducts([]);
     setModificationValue(0);
     setSelectedModificationType(null);
@@ -162,17 +162,17 @@ const PriceModificatorModal = ({
 
   const columnsForTable = [
     {
-      title: "Nombre",
-      dataIndex: "nombre",
+      title: 'Nombre',
+      dataIndex: 'nombre',
     },
     {
-      title: "Cod prod.",
-      dataIndex: "codigoProducto",
+      title: 'Cod prod.',
+      dataIndex: 'codigoProducto',
     },
     {
-      title: "Agregar",
+      title: 'Agregar',
       render: (product) => (
-        <Row style={{ display: "inline-flex" }}>
+        <Row style={{ display: 'inline-flex' }}>
           <Checkbox
             onChange={() => {
               addProductToModification(product);
@@ -186,15 +186,15 @@ const PriceModificatorModal = ({
 
   const columnsInAddedProductsTable = [
     {
-      title: "Nombre",
-      dataIndex: "nombre",
+      title: 'Nombre',
+      dataIndex: 'nombre',
     },
     {
-      title: "Cod. barras",
-      dataIndex: "codigoBarras",
+      title: 'Cod. barras',
+      dataIndex: 'codigoBarras',
     },
     {
-      title: "Quitar producto",
+      title: 'Quitar producto',
       render: (product) => (
         <div
           onClick={() => {
@@ -227,36 +227,36 @@ const PriceModificatorModal = ({
         <Col span={24}>
           <h3>Filtrar artículos</h3>
         </Col>
-        <Col span={24} style={{ marginBottom: "15px" }}>
+        <Col span={24} style={{ marginBottom: '15px' }}>
           <Row gutter={8}>
             <Col span={6}>
               <GenericAutocomplete
-                label="Filtrar por marcas"
-                modelToFind="marca"
-                keyToCompare="nombre"
-                controller="marcas"
+                label='Filtrar por marcas'
+                modelToFind='marca'
+                keyToCompare='nombre'
+                controller='marcas'
                 returnCompleteModel={true}
                 setResultSearch={setSelectedBrand}
                 selectedSearch={selectedBrand}
-                styles={{ backgroundColor: "#fff" }}
+                styles={{ backgroundColor: '#fff' }}
               />
             </Col>
             <Col span={6}>
               <GenericAutocomplete
-                label="Filtrar por rubros"
-                modelToFind="rubro"
-                keyToCompare="nombre"
-                controller="rubros"
+                label='Filtrar por rubros'
+                modelToFind='rubro'
+                keyToCompare='nombre'
+                controller='rubros'
                 returnCompleteModel={true}
                 setResultSearch={setSelectedHeading}
                 selectedSearch={selectedHeading}
-                styles={{ backgroundColor: "#fff" }}
+                styles={{ backgroundColor: '#fff' }}
               />
             </Col>
             <Col span={6}>
               <Input
-                color="primary"
-                placeholder="Nombre"
+                color='primary'
+                placeholder='Nombre'
                 onChange={(e) => {
                   setProductNameSearch(e.target.value);
                 }}
@@ -265,7 +265,7 @@ const PriceModificatorModal = ({
             </Col>
             <Col span={6}>
               <button
-                className="btn-secondary"
+                className='btn-secondary'
                 onClick={() => {
                   cleanFilters();
                 }}
@@ -274,10 +274,10 @@ const PriceModificatorModal = ({
               </button>
             </Col>
           </Row>
-          <Row style={{ marginTop: "15px" }} align="start" gutter={8}>
+          <Row style={{ marginTop: '15px' }} align='start' gutter={8}>
             <Col>
               <Select
-                placeholder="Tipo de modificación"
+                placeholder='Tipo de modificación'
                 onChange={(e) => {
                   setSelectedModificationType(e);
                 }}
@@ -292,9 +292,9 @@ const PriceModificatorModal = ({
             </Col>
             <Col>
               <Input
-                color="primary"
-                type="number"
-                placeholder="Porcentaje o monto fijo de modificación"
+                color='primary'
+                type='number'
+                placeholder='Porcentaje o monto fijo de modificación'
                 onChange={(e) => {
                   setModificationValue(e.target.value);
                 }}
@@ -303,7 +303,7 @@ const PriceModificatorModal = ({
             </Col>
             <Col>
               <button
-                className="btn-primary"
+                className='btn-primary'
                 onClick={() => {
                   checkPage();
                 }}
@@ -313,7 +313,7 @@ const PriceModificatorModal = ({
             </Col>
             <Col>
               <button
-                className="btn-secondary"
+                className='btn-secondary'
                 onClick={() => {
                   uncheckPage();
                 }}
@@ -326,11 +326,11 @@ const PriceModificatorModal = ({
       </Row>
       <Row gutter={8}>
         <Col span={12}>
-          <div align="center">
+          <div align='center'>
             <h3>Tabla de selección de artículos</h3>
           </div>
           <Table
-            width={"100%"}
+            width={'100%'}
             dataSource={products}
             columns={columnsForTable}
             pagination={{
@@ -346,23 +346,23 @@ const PriceModificatorModal = ({
               },
             }}
             loading={productsLoading}
-            rowKey="_id"
-            tableLayout="auto"
-            size="small"
+            rowKey='_id'
+            tableLayout='auto'
+            size='small'
           />
         </Col>
         <Col span={12}>
-          <div align="center">
+          <div align='center'>
             <h3>Artículos seleccionados</h3>
           </div>
           <Table
-            width={"100%"}
+            width={'100%'}
             dataSource={addedProducts}
             columns={columnsInAddedProductsTable}
             pagination={false}
-            rowKey="_id"
-            tableLayout="auto"
-            size="small"
+            rowKey='_id'
+            tableLayout='auto'
+            size='small'
           />
         </Col>
       </Row>
@@ -370,7 +370,7 @@ const PriceModificatorModal = ({
         <Col span={16}></Col>
         <Col span={4}>
           <button
-            className="btn-secondary"
+            className='btn-secondary'
             onClick={() => {
               setPriceModalVisible(false);
             }}
@@ -380,7 +380,7 @@ const PriceModificatorModal = ({
         </Col>
         <Col span={4}>
           <button
-            className="btn-primary"
+            className='btn-primary'
             onClick={() => {
               handleOk();
             }}

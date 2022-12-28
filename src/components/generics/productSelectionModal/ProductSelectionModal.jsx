@@ -108,12 +108,12 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
     >
         <Row>
           <Col span={24} style={{marginBottom: '10px'}}>
-          <Row justify="space between" gutter={16}>
+          <Row justify='space between' gutter={16}>
                 <Col span={6}>
                     <Input 
-                        color="primary" 
+                        color='primary' 
                         style={{ width: 200, marginBottom: '10px' }}
-                        placeholder="Buscar por nombre"
+                        placeholder='Buscar por nombre'
                         onChange={(e) => { setFilters(
                             {
                                 ...filters,
@@ -125,9 +125,9 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 </Col>
                 <Col span={6}>
                     <Input 
-                        color="primary" 
+                        color='primary' 
                         style={{ width: 200, marginBottom: '10px' }}
-                        placeholder="Buscar por codigo de barras"
+                        placeholder='Buscar por codigo de barras'
                         onChange={(e) => { setFilters(
                             {
                                 ...filters,
@@ -139,9 +139,9 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 </Col>
                 <Col span={6}>
                     <Input 
-                        color="primary" 
+                        color='primary' 
                         style={{ width: 200, marginBottom: '10px' }}
-                        placeholder="Buscar por codigo de producto"
+                        placeholder='Buscar por codigo de producto'
                         onChange={(e) => { setFilters(
                             {
                                 ...filters,
@@ -153,7 +153,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 </Col>
                 <Col span={6}>
                     <Button 
-                        type="danger" 
+                        type='danger' 
                         onClick={() => {cleanFilters()}}
                     > 
                         Limpiar filtros
@@ -161,10 +161,10 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 </Col>
                 <Col span={8}>
                     <GenericAutocomplete
-                        label="Filtrar por marcas"
-                        modelToFind="marca"
-                        keyToCompare="nombre"
-                        controller="marcas"
+                        label='Filtrar por marcas'
+                        modelToFind='marca'
+                        keyToCompare='nombre'
+                        controller='marcas'
                         returnCompleteModel={true}
                         setResultSearch={setSelectedBrand}
                         selectedSearch={selectedBrand}
@@ -173,10 +173,10 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 </Col>
                 <Col span={8}>
                     <GenericAutocomplete
-                        label="Filtrar por rubros"
-                        modelToFind="rubro"
-                        keyToCompare="nombre"
-                        controller="rubros"
+                        label='Filtrar por rubros'
+                        modelToFind='rubro'
+                        keyToCompare='nombre'
+                        controller='rubros'
                         returnCompleteModel={true}
                         setResultSearch={setSelectedHeading}
                         selectedSearch={selectedHeading}
@@ -187,7 +187,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
           </Col>
           <Col span={24}>
             <Table
-                width={"100%"}
+                width={'100%'}
                 dataSource={products}
                 columns={columnsForTable}
                 pagination={{
@@ -201,7 +201,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 loading={loading}
                 rowKey='_id'
                 tableLayout='auto'
-                size="small"
+                size='small'
             />
           </Col>
         </Row>

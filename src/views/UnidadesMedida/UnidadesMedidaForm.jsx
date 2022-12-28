@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect} from 'react';
 import api from '../../services';
-import { Row, Col, Form, Input } from "antd";
-import { useHistory, useParams } from "react-router-dom";
+import { Row, Col, Form, Input } from 'antd';
+import { useHistory, useParams } from 'react-router-dom';
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -61,7 +61,7 @@ const UnidadesMedidaForm = () => {
   };
 
   const redirectToUnidadesMedida = () => {
-    history.push("/unidadesmedida")
+    history.push('/unidadesmedida')
   }
 
   const success = () => {
@@ -78,47 +78,47 @@ const UnidadesMedidaForm = () => {
     (loading) ? <Spinner/> 
     :
     <Form
-      name="basic"
+      name='basic'
       labelCol={{ span: 8 }}
       wrapperCol={{ span: 16 }}
       initialValues={{ remember: true }}
       onFinish={() => { save() }}
-      autoComplete="off"
+      autoComplete='off'
       style={{marginTop: '10px'}}
     >
     <Row>
       <Col span={24}>
-        <h1>{(id === "nuevo") ? "Crear nueva unidad de medida" : "Editar unidad de medida"}</h1>
+        <h1>{(id === 'nuevo') ? 'Crear nueva unidad de medida' : 'Editar unidad de medida'}</h1>
       </Col>
       <Col span={12} >
-        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
+        {(error) ? <Error message='Debe completar todos los campos obligatorios *'/> : null}
           <Form.Item
             onChange={(e) => {loadUnidadMedidaData(e)}}
             required={true}
           >
             <div style={{display: 'flex'}}>
               <div style={{marginRight: '15px'}}><p>*Nombre:</p></div>
-              <Input name="nombre" value={unidadMedida.nombre}/>
+              <Input name='nombre' value={unidadMedida.nombre}/>
             </div>
           </Form.Item>
         </Col>
       <Col span={12} >
-        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
+        {(error) ? <Error message='Debe completar todos los campos obligatorios *'/> : null}
           <Form.Item
             onChange={(e) => {loadUnidadMedidaData(e)}}
             required={true}
           >
             <div style={{display: 'flex'}}>
               <div style={{marginRight: '15px'}}><p>*Fraccionamiento:</p></div>
-              <Input name="fraccionamiento" type="number" value={unidadMedida.fraccionamiento}/>
+              <Input name='fraccionamiento' type='number' value={unidadMedida.fraccionamiento}/>
             </div>
           </Form.Item>
         </Col>
         <Col span={8} style={{display: 'flex'}}>
-          <button className="btn-primary" type="submit">
+          <button className='btn-primary' type='submit'>
             Guardar
           </button>
-          <button className="btn-secondary" type="button" onClick={() => {redirectToUnidadesMedida()}} style={{marginLeft: "10px"}}>
+          <button className='btn-secondary' type='button' onClick={() => {redirectToUnidadesMedida()}} style={{marginLeft: '10px'}}>
             Cancelar
           </button>
         </Col>

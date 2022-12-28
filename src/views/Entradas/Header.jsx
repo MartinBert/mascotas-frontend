@@ -10,8 +10,8 @@ const {simpleDateWithHours} = helpers.dateHelper;
 const Header = ({ filters, setFilters }) => {
     const exportExcel = async() => {
         const response = await api.entradas.findAll({page: 0, limit: 1000000, filters: null});
-        const nameOfSheet = "Hoja de entradas";
-        const nameOfDocument = "Lista de entradas";
+        const nameOfSheet = 'Hoja de entradas';
+        const nameOfDocument = 'Lista de entradas';
         const columnHeaders = [
             'Fecha',
             'Descripción' , 
@@ -43,9 +43,9 @@ const Header = ({ filters, setFilters }) => {
     return (
         <Row gutter={8}>
             <Col span={4}>
-                <Link to="/entradas/nuevo">
+                <Link to='/entradas/nuevo'>
                     <button 
-                        className="btn-primary"
+                        className='btn-primary'
                     >
                         Nueva entrada
                     </button>
@@ -53,17 +53,17 @@ const Header = ({ filters, setFilters }) => {
             </Col>
             <Col span={4}>
                 <button
-                    className="btn-primary"
+                    className='btn-primary'
                     onClick={() => {exportExcel()}}
                 >
                     Exportar Excel
                 </button>
             </Col>
-            <Col span={16} align="right">
+            <Col span={16} align='right'>
                 <Input 
-                    color="primary" 
+                    color='primary' 
                     style={{ width: 200, marginBottom: '10px' }}
-                    placeholder="Buscar por descripción"
+                    placeholder='Buscar por descripción'
                     onChange={(e) => { setFilters(
                         {
                             ...filters,

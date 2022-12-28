@@ -1,4 +1,4 @@
-import helpers from "../helpers";
+import helpers from '../helpers';
 
 const { decimalPercent, roundTwoDecimals } = helpers.mathHelper;
 const { simpleDateWithHours } = helpers.dateHelper;
@@ -7,7 +7,7 @@ const { completeLengthWithZero } = helpers.stringHelper;
 const initialState = {
   //----------------------------------------------- Generics state of view -----------------------------------------------------------/
   discountSurchargeModalVisible: false,
-  discountSurchargeModalOperation: "discount",
+  discountSurchargeModalOperation: 'discount',
   finalizeSaleModalIsVisible: false,
   loadingView: false,
   loadingDocumentIndex: false,
@@ -70,37 +70,37 @@ const initialState = {
 
 const actions = {
   //---------------------------------------------- Generics actions of view ----------------------------------------------------------/
-  SHOW_DISCOUNT_SURCHARGE_MODAL: "SHOW_DISCOUNT_SURCHARGE_MODAL",
-  HIDE_DISCOUNT_SURCHARGE_MODAL: "HIDE_DISCOUNT_SURCHARGE_MODAL",
-  SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: "SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION",
-  SHOW_FINALIZE_SALE_MODAL: "SHOW_FINALIZE_SALE_MODAL",
-  HIDE_FINALIZE_SALE_MODAL: "HIDE_FINALIZE_SALE_MODAL",
-  CLOSE_FISCAL_OPERATION: "CLOSE_FISCAL_OPERATION",
-  CLOSE_NO_FISCAL_OPERATION: "CLOSE_NO_FISCAL_OPERATION",
-  LOADING_DOCUMENT_INDEX: "LOADING_DOCUMENT_INDEX",
-  LOADING_VIEW: "LOADING_VIEW",
-  RESET_STATE: "RESET_STATE",
+  SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
+  HIDE_DISCOUNT_SURCHARGE_MODAL: 'HIDE_DISCOUNT_SURCHARGE_MODAL',
+  SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION',
+  SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
+  HIDE_FINALIZE_SALE_MODAL: 'HIDE_FINALIZE_SALE_MODAL',
+  CLOSE_FISCAL_OPERATION: 'CLOSE_FISCAL_OPERATION',
+  CLOSE_NO_FISCAL_OPERATION: 'CLOSE_NO_FISCAL_OPERATION',
+  LOADING_DOCUMENT_INDEX: 'LOADING_DOCUMENT_INDEX',
+  LOADING_VIEW: 'LOADING_VIEW',
+  RESET_STATE: 'RESET_STATE',
 
   //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
-  SET_INDEX: "SET_INDEX",
-  SET_USER: "SET_USER",
-  SET_GLOBAL_DISCOUNT_PERCENT: "SET_GLOBAL_DISCOUNT_PERCENT",
-  SET_GLOBAL_SURCHARGE_PERCENT: "SET_GLOBAL_SURCHARGE_PERCENT",
-  SET_PRODUCTS: "SET_PRODUCTS",
-  SET_LINES: "SET_LINES",
-  SET_FRACTIONED: "SET_FRACTIONED",
-  SET_LINE_QUANTITY: "SET_LINE_QUANTITY",
-  SET_LINE_DISCOUNT_PERCENT: "SET_LINE_DISCOUNT_PERCENT",
-  SET_LINE_SURCHARGE_PERCENT: "SET_LINE_SURCHARGE_PERCENT",
-  SET_CLIENT: "SET_CLIENT",
-  SET_DOCUMENT: "SET_DOCUMENT",
-  SET_PAYMENT_METHODS: "SET_PAYMENT_METHODS",
-  SET_PAYMENT_PLANS: "SET_PAYMENT_PLANS",
-  SET_COMPANY: "SET_COMPANY",
-  SET_SALE_POINT: "SET_SALE_POINT",
-  SET_DATES: "SET_DATES",
-  SET_VOUCHER_NUMBERS: "SET_VOUCHER_NUMBERS",
-  SET_TOTAL: "SET_TOTAL",
+  SET_INDEX: 'SET_INDEX',
+  SET_USER: 'SET_USER',
+  SET_GLOBAL_DISCOUNT_PERCENT: 'SET_GLOBAL_DISCOUNT_PERCENT',
+  SET_GLOBAL_SURCHARGE_PERCENT: 'SET_GLOBAL_SURCHARGE_PERCENT',
+  SET_PRODUCTS: 'SET_PRODUCTS',
+  SET_LINES: 'SET_LINES',
+  SET_FRACTIONED: 'SET_FRACTIONED',
+  SET_LINE_QUANTITY: 'SET_LINE_QUANTITY',
+  SET_LINE_DISCOUNT_PERCENT: 'SET_LINE_DISCOUNT_PERCENT',
+  SET_LINE_SURCHARGE_PERCENT: 'SET_LINE_SURCHARGE_PERCENT',
+  SET_CLIENT: 'SET_CLIENT',
+  SET_DOCUMENT: 'SET_DOCUMENT',
+  SET_PAYMENT_METHODS: 'SET_PAYMENT_METHODS',
+  SET_PAYMENT_PLANS: 'SET_PAYMENT_PLANS',
+  SET_COMPANY: 'SET_COMPANY',
+  SET_SALE_POINT: 'SET_SALE_POINT',
+  SET_DATES: 'SET_DATES',
+  SET_VOUCHER_NUMBERS: 'SET_VOUCHER_NUMBERS',
+  SET_TOTAL: 'SET_TOTAL',
 };
 
 const calculateLineTotal = (line) => {
@@ -133,11 +133,11 @@ const reducer = (state = initialState, action) => {
         discountSurchargeModalVisible: false,
       };
     case actions.SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION:
-      if (action.payload === "discount") {
+      if (action.payload === 'discount') {
         state.porcentajeDescuentoGlobal = state.porcentajeRecargoGlobal;
         state.porcentajeRecargoGlobal = 0;
       }
-      if (action.payload === "surcharge") {
+      if (action.payload === 'surcharge') {
         state.porcentajeRecargoGlobal = state.porcentajeDescuentoGlobal;
         state.porcentajeDescuentoGlobal = 0;
       }
@@ -337,7 +337,7 @@ const reducer = (state = initialState, action) => {
         numeroFactura: action.payload,
         numeroCompletoFactura:
           completeLengthWithZero(state.puntoVentaNumero, 4) +
-          "-" +
+          '-' +
           completeLengthWithZero(action.payload, 8),
       };
     case actions.SET_PAYMENT_METHODS:
@@ -414,9 +414,9 @@ const reducer = (state = initialState, action) => {
           , 0
         )
       );
-      const baseImponible21 = roundTwoDecimals((state.documentoLetra === "A" || state.documentoLetra === "B") ? (iva21Total / 1.21) : iva21Total);
-      const baseImponible10 = roundTwoDecimals((state.documentoLetra === "A" || state.documentoLetra === "B") ? (iva10Total / 1.105) : iva10Total);
-      const baseImponible27 = roundTwoDecimals((state.documentoLetra === "A" || state.documentoLetra === "B") ? (iva27Total / 1.27) : iva27Total);
+      const baseImponible21 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva21Total / 1.21) : iva21Total);
+      const baseImponible10 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva10Total / 1.105) : iva10Total);
+      const baseImponible27 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva27Total / 1.27) : iva27Total);
       const iva21 = roundTwoDecimals(iva21Total - baseImponible21);
       const iva10 = roundTwoDecimals(iva10Total - baseImponible10);
       const iva27 = roundTwoDecimals(iva27Total - baseImponible27);

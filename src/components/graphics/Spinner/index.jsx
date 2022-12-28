@@ -3,9 +3,9 @@ import './spinner.css'
 import { Row } from 'antd';
 
 const Spinner = () => (
-    <Row align="center">
+    <Row align='center'>
         <div>
-            <div className="lds-hourglass"></div>
+            <div className='lds-hourglass'></div>
         </div>
     </Row>
 )

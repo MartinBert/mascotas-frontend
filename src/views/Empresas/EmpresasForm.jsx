@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
-import api from "../../services";
-import { Row, Col, Form, Input, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { useHistory, useParams } from "react-router-dom";
-import graphics from "../../components/graphics";
-import { GenericAutocomplete } from "../../components/generics";
-import { errorAlert, successAlert } from "../../components/alerts";
+import React, { useState, useEffect } from 'react';
+import api from '../../services';
+import { Row, Col, Form, Input, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { useHistory, useParams } from 'react-router-dom';
+import graphics from '../../components/graphics';
+import { GenericAutocomplete } from '../../components/generics';
+import { errorAlert, successAlert } from '../../components/alerts';
 const { Spinner } = graphics;
 
 const EmpresasForm = () => {
   const history = useHistory();
   const { id } = useParams();
   const [empresa, setEmpresa] = useState({
-    razonSocial: "",
-    cuit: "",
-    actividad: "",
+    razonSocial: '',
+    cuit: '',
+    actividad: '',
     fechaInicioActividad: null,
-    ingresosBrutos: "",
-    direccion: "",
-    telefono: "",
-    email: "",
+    ingresosBrutos: '',
+    direccion: '',
+    telefono: '',
+    email: '',
     logo: null,
     condicionFiscal: null,
     puntosVenta: null,
@@ -28,6 +28,9 @@ const EmpresasForm = () => {
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [selectedSalePoint, setSelectedSalePoint] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  console.log(empresa.puntosVenta)
+  console.log(selectedSalePoint)
 
   const loadEmpresaData = (e) => {
     setEmpresa({
@@ -39,7 +42,7 @@ const EmpresasForm = () => {
   //eslint-disable-next-line
   useEffect(() => {
     if (empresa.razonSocial) return;
-    if (id === "nuevo") {
+    if (id === 'nuevo') {
       setLoading(false);
       return;
     }
@@ -89,11 +92,11 @@ const EmpresasForm = () => {
     const saveBusiness = async () => {
       const response = await api.empresas.save(empresa);
       if (response.code === 200) {
-        successAlert("El registro fue grabado con exito").then(
+        successAlert('El registro fue grabado con exito').then(
           redirectToEmpresas()
         );
       } else {
-        errorAlert("Error al guardar el registro");
+        errorAlert('Error al guardar el registro');
       }
     };
 
@@ -106,7 +109,7 @@ const EmpresasForm = () => {
       }
     };
 
-    if (id === "nuevo") {
+    if (id === 'nuevo') {
       saveBusiness();
     } else {
       editBusiness();
@@ -114,17 +117,17 @@ const EmpresasForm = () => {
   };
 
   const redirectToEmpresas = () => {
-    history.push("/empresas");
+    history.push('/empresas');
   };
 
   const success = () => {
-    successAlert("El registro se guardo en la base de datos").then(() => {
+    successAlert('El registro se guardo en la base de datos').then(() => {
       redirectToEmpresas();
     });
   };
 
   const fail = () => {
-    errorAlert("Error al guardar el registro");
+    errorAlert('Error al guardar el registro');
   };
 
   const setSelectedConditionToBusiness = async (condition) => {
@@ -144,8 +147,8 @@ const EmpresasForm = () => {
   };
 
   const uploaderProps = {
-    name: "file",
-    accept: ".jpg,.png",
+    name: 'file',
+    accept: '.jpg,.png',
     multiple: false,
     onChange: (info) => {
       uploadImageToServer(info.file)
@@ -174,131 +177,131 @@ const EmpresasForm = () => {
     <Spinner />
   ) : (
     <Form
-      name="basic"
+      name='basic'
       labelCol={{ span: 8 }}
       wrapperCol={{ span: 16 }}
       initialValues={{ remember: true }}
       onFinish={() => {
         save();
       }}
-      autoComplete="off"
-      style={{ marginTop: "10px" }}
+      autoComplete='off'
+      style={{ marginTop: '10px' }}
     >
       <Row gutter={8}>
         <Col span={24}>
-          <h1>{id === "nuevo" ? "Crear nueva empresa" : "Editar empresa"}</h1>
+          <h1>{id === 'nuevo' ? 'Crear nueva empresa' : 'Editar empresa'}</h1>
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <Input
-            name="razonSocial"
-            placeholder="Razón social"
+            name='razonSocial'
+            placeholder='Razón social'
             value={empresa.razonSocial}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <Input
-            name="cuit"
-            placeholder="CUIT"
+            name='cuit'
+            placeholder='CUIT'
             value={empresa.cuit}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <Input
-            name="telefono"
-            placeholder="Teléfono"
+            name='telefono'
+            placeholder='Teléfono'
             value={empresa.telefono}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <Input
-            name="email"
-            placeholder="Email"
+            name='email'
+            placeholder='Email'
             value={empresa.email}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={12} style={{ marginBottom: "10px" }}>
+        <Col span={12} style={{ marginBottom: '10px' }}>
           <Input
-            name="direccion"
-            placeholder="Dirección"
+            name='direccion'
+            placeholder='Dirección'
             value={empresa.direccion}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={12} style={{ marginBottom: "10px" }}>
+        <Col span={12} style={{ marginBottom: '10px' }}>
           <Input
-            name="actividad"
-            placeholder="Actividad principal"
+            name='actividad'
+            placeholder='Actividad principal'
             value={empresa.actividad}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <Input
-            name="fechaInicioActividad"
-            placeholder="Fecha de inicio de actividad"
+            name='fechaInicioActividad'
+            placeholder='Fecha de inicio de actividad'
             value={empresa.fechaInicioActividad}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <Input
-            name="ingresosBrutos"
-            placeholder="Ingresos brutos"
+            name='ingresosBrutos'
+            placeholder='Ingresos brutos'
             value={empresa.ingresosBrutos}
             onChange={(e) => {
               loadEmpresaData(e);
             }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <GenericAutocomplete
-            label="Condición Fiscal"
-            modelToFind="condicionfiscal"
-            keyToCompare="nombre"
-            controller="condicionesfiscales"
+            label='Condición Fiscal'
+            modelToFind='condicionfiscal'
+            keyToCompare='nombre'
+            controller='condicionesfiscales'
             returnCompleteModel={true}
             setResultSearch={setSelectedConditionToBusiness}
             selectedSearch={selectedCondition}
-            styles={{ backgroundColor: "#fff" }}
+            styles={{ backgroundColor: '#fff' }}
           />
         </Col>
-        <Col span={6} style={{ marginBottom: "10px" }}>
+        <Col span={6} style={{ marginBottom: '10px' }}>
           <GenericAutocomplete
-            label="Punto de venta"
+            label='Punto de venta'
             multiple={true}
-            modelToFind="puntoventa"
-            keyToCompare="nombre"
-            controller="puntosventa"
+            modelToFind='puntoventa'
+            keyToCompare='nombre'
+            controller='puntosventa'
             returnCompleteModel={true}
             setResultSearch={setSelectedSalePointToBusiness}
             selectedSearch={selectedSalePoint}
-            styles={{ backgroundColor: "#fff" }}
+            styles={{ backgroundColor: '#fff' }}
           />
         </Col>
-        <Col span={24} style={{ marginBottom: "10px" }}>
+        <Col span={24} style={{ marginBottom: '10px' }}>
           <Upload {...uploaderProps}>
             <button
-              style={{ width: "200px", marginBottom: 0 }}
-              type="button"
-              className="btn-primary"
+              style={{ width: '200px', marginBottom: 0 }}
+              type='button'
+              className='btn-primary'
               icon={<UploadOutlined />}
               disabled={uploadedImages.length > 0 ? true : false}
             >
@@ -306,17 +309,17 @@ const EmpresasForm = () => {
             </button>
           </Upload>
         </Col>
-        <Col span={6} style={{ display: "flex" }}>
-          <button className="btn-primary" type="submit">
+        <Col span={6} style={{ display: 'flex' }}>
+          <button className='btn-primary' type='submit'>
             Guardar
           </button>
           <button
-            className="btn-secondary"
-            type="button"
+            className='btn-secondary'
+            type='button'
             onClick={() => {
               redirectToEmpresas();
             }}
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: '10px' }}
           >
             Cancelar
           </button>

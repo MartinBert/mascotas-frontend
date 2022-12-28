@@ -4,9 +4,9 @@ import { FaEdit } from 'react-icons/fa';
 const Edit = () => {
     return (
         <FaEdit
-            title="Editar" 
+            title='Editar' 
             style={{cursor: 'pointer'}}
-            color="#1890ff"
+            color='#1890ff'
         />
     )
 }

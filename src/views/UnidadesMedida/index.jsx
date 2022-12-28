@@ -81,7 +81,7 @@ const UnidadesMedida = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={unidadesMedida}
               columns={columnsForTable}
               pagination={{
@@ -94,11 +94,11 @@ const UnidadesMedida = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal
-            title="Eliminar unidad de medida"
+            title='Eliminar unidad de medida'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

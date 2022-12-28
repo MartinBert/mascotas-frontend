@@ -8,10 +8,10 @@ const Header = ({setFilters}) => {
         <Row>
             
             <Col span={24}>
-                <Row align="end">
+                <Row align='end'>
                     <Col span={4}>
-                        <Link to="/puntosventa/nuevo">
-                            <button className="btn-primary"> 
+                        <Link to='/puntosventa/nuevo'>
+                            <button className='btn-primary'> 
                                     Nuevo    
                             </button>
                         </Link>
@@ -19,8 +19,8 @@ const Header = ({setFilters}) => {
                     <Col span={16}></Col>
                     <Col span={4}>
                         <Input 
-                            type="primary" 
-                            placeholder="Buscar punto de venta"
+                            type='primary' 
+                            placeholder='Buscar punto de venta'
                             onChange={(e) => { setFilters(JSON.stringify({
                                 nombre: e.target.value,
                             }))}}

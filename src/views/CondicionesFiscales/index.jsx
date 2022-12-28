@@ -87,7 +87,7 @@ const CondicionesFiscales = () => {
         </Col>
         <Col span={24}>
           <Table 
-              width={"100%"}
+              width={'100%'}
               dataSource={condicionesFiscales}
               columns={columnsForTable}
               pagination={{
@@ -100,11 +100,11 @@ const CondicionesFiscales = () => {
               }}
               rowKey='_id'
               tableLayout='auto'
-              size="small"
+              size='small'
               loading={loading}
           />
           <DeleteModal 
-            title="Eliminar condición fiscal"
+            title='Eliminar condición fiscal'
             deleteVisible={deleteVisible}
             setLoading={setLoading}
             setDeleteVisible={setDeleteVisible}

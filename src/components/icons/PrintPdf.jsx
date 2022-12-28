@@ -4,9 +4,9 @@ import { FaFilePdf } from 'react-icons/fa';
 const PrintPdf = () => {
     return (
         <FaFilePdf
-            title="Imprimir" 
+            title='Imprimir' 
             style={{cursor: 'pointer'}}
-            color="#1890ff"
+            color='#1890ff'
         />
     )
 }

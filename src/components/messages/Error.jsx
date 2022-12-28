@@ -4,9 +4,9 @@ import { Alert } from 'antd';
 const Error = ({message}) => {
     return (
         <Alert
-            message="Error"
+            message='Error'
             description={message}
-            type="error"
+            type='error'
             showIcon
         />
     )

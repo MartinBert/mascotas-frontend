@@ -1,203 +1,134 @@
-import React, {useState, useEffect} from "react";
-import api from '../../services';
-import { Row, Col, Form, Input, Checkbox } from "antd";
-import { useHistory, useParams } from "react-router-dom";
-import messages from '../../components/messages';
-import graphics from '../../components/graphics';
+import React, { useState, useEffect } from 'react'
+import api from '../../services'
+import helpers from '../../helpers'
+import { Row, Col, Form, Input, Checkbox, Button } from 'antd'
+import { useHistory, useParams } from 'react-router-dom'
+import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
-const { Error } = messages;
-const { Spinner } = graphics;
+const { Spinner } = graphics
+const { formHelpers } = helpers
 
 const DocumentosForm = () => {
-  const history = useHistory();
-  const {id} = useParams(); 
-  const [documento, setDocumento] = useState({
-    nombre: '',
-    fiscal: false,
-    ticket: false,
-    presupuesto: false,
-    remito: false,
-    letra: '',
-    codigoUnico: ''
-  });
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  const loadDocumentoData = (e) => {
-    setDocumento({
-      ...documento,
-      [e.target.name] : e.target.value
+    const { id } = useParams()
+    const history = useHistory()
+    const [documento, setDocumento] = useState({
+        nombre: '',
+        fiscal: false,
+        ticket: false,
+        presupuesto: false,
+        remito: false,
+        letra: '',
+        codigoUnico: 0,
+        _id: null
     })
-  }
+    const [loading, setLoading] = useState(true)
 
-  //eslint-disable-next-line
-  useEffect(() => {
-    if(documento.nombre) return;
-    if(id === 'nuevo'){
-      setLoading(false);
-      return;
+    const loadInputsData = (e) => {
+        setDocumento({
+            ...documento,
+            [e.target.name]: e.target.value
+        })
     }
 
-    const fetchDocumento = async() => {
-      const searchedItem = await api.documentos.findById(id);
-      setDocumento(searchedItem);
-      setLoading(false);
-    }
-    fetchDocumento()
-  })
-
-  const save = () => {
-    if(!documento.nombre){
-      setError(true);
-      return;
+    const loadCheckboxsData = (e) => {
+        setDocumento({
+            ...documento,
+            [e.target.id]: e.target.checked
+        })
     }
 
-    const saveItem = async() => {
-      const response = (documento._id) ? await api.documentos.edit(documento) : await api.documentos.save(documento);
-      if(response === 'OK') return success();
-      return fail();
+    //eslint-disable-next-line
+    useEffect(() => {
+        const fetchDocumento = async (id) => {
+            const searchedItem = await api.documentos.findById(id)
+            setDocumento(searchedItem)
+            setLoading(false)
+        }
+        if (id !== 'nuevo') fetchDocumento(id)
+        else setLoading(false)
+    }, [loading, id])
+
+    const save = async () => {
+        if (id && formHelpers.noEmptyKeys(documento) === true) {
+            const response = (id === 'nuevo') ? await api.documentos.save(documento) : await api.documentos.edit(documento)
+            if (response.code === 200) {
+                successAlert('El registro se guardó correctamente.')
+                redirectToDocumentos()
+            } else errorAlert('Error al guardar el registro.')
+        } else errorAlert('Ocurrió un error, inténtelo de nuevo.')
     }
-    saveItem();
-  };
 
-  const redirectToDocumentos = () => {
-    history.push("/documentos")
-  }
+    const redirectToDocumentos = () => {
+        history.push('/documentos')
+    }
 
-  const success = () => {
-    successAlert('El registro se guardo en la base de datos').then(() => {
-      redirectToDocumentos();
-    })
-  }
+    const inputsProps = [
+        { label: 'Nombre', name: 'nombre', required: true, value: documento.nombre },
+        { label: 'Letra', name: 'letra', required: true, value: documento.letra },
+        { label: 'Código Único', name: 'codigoUnico', required: true, value: documento.codigoUnico }
+    ]
 
-  const fail = () => {
-    errorAlert('Error al guardar el registro')
-  }
+    const checkboxsProps = [
+        { label: 'Fiscal', name: 'fiscal', required: true, checked: documento.fiscal },
+        { label: 'Ticket', name: 'ticket', required: true, checked: documento.ticket },
+        { label: 'Presupuesto', name: 'presupuesto', required: true, checked: documento.presupuesto },
+        { label: 'Remito', name: 'remito', required: true, checked: documento.remito }
+    ]
 
-  return (
-    (loading) ? <Spinner/> 
-    :
-    <Form
-      initialValues={{ remember: true }}
-      onFinish={() => { save() }}
-      autoComplete="off"
-      style={{marginTop: '10px'}}
-    >
-    <Row gutter={8}>
-      <Col span={24}>
-        <h1>{(id === "nuevo") ? "Crear nuevo documento" : "Editar documento"}</h1>
-        {(error) ? <Error message="Debe completar todos los campos obligatorios *"/> : null}
-      </Col>
-      <Col xl={6} lg={8} md={12} sm={12} xs={24}>
-        <Form.Item
-          onChange={(e) => {loadDocumentoData(e)}}
-          required={true}
-        >
-          <div><p>*Nombre:</p></div>
-          <div>
-            <Input name="nombre" value={documento.nombre}/>
-          </div>
-        </Form.Item>
-      </Col>
-      <Col xl={18} lg={16} md={12} sm={12} xs={24} style={{display: 'flex'}}>
-        <Form.Item
-          required={true}
-          style={{marginRight: '25px'}}
-        >
-          <div><p>Fiscal:</p></div>
-          <div>
-            <Checkbox 
-              onChange={(e) => {setDocumento({
-                  ...documento,
-                  fiscal: e.target.checked
-              })}} 
-              checked={documento.fiscal}
-            />
-          </div>
-        </Form.Item>
-        <Form.Item
-          required={true}
-          style={{marginRight: '25px'}}
-        >
-          <div><p>Ticket:</p></div>
-          <div>
-            <Checkbox 
-              onChange={(e) => {setDocumento({
-                  ...documento,
-                  ticket: e.target.checked
-              })}} 
-              checked={documento.ticket}
-            />
-          </div>
-        </Form.Item>
-        <Form.Item
-          required={true}
-          style={{marginRight: '25px'}}
-        >
-          <div><p>Presupuesto:</p></div>
-          <div>
-            <Checkbox 
-              onChange={(e) => {setDocumento({
-                  ...documento,
-                  presupuesto: e.target.checked
-              })}} 
-              checked={documento.presupuesto}
-            />
-          </div>
-        </Form.Item>
-        <Form.Item
-          required={true}
-        >
-          <div><p>Remito:</p></div>
-          <div>
-            <Checkbox 
-              onChange={(e) => {setDocumento({
-                  ...documento,
-                  remito: e.target.checked
-              })}} 
-              checked={documento.remito}
-            />
-          </div>
-        </Form.Item>
-      </Col>
-      <Col xl={6} lg={8} md={12} sm={12} xs={24}>
-        <Form.Item
-          onChange={(e) => {loadDocumentoData(e)}}
-          required={true}
-        >
-          <div><p>*Letra:</p></div>
-          <div>
-            <Input name="letra" value={documento.letra}/>
-          </div>
-        </Form.Item>
-      </Col>
-      <Col xl={6} lg={8} md={12} sm={12} xs={24}>
-        <Form.Item
-          onChange={(e) => {loadDocumentoData(e)}}
-          required={true}
-        >
-          <div><p>*Código único:</p></div>
-          <div>
-            <Input name="codigoUnico" value={documento.codigoUnico}/>
-          </div>
-        </Form.Item>
-      </Col>
-      <Col span={24}>
-        <Row>
-          <Col span={6} style={{display: 'flex'}}>
-            <button className="btn-primary" type="submit">
-              Guardar
-            </button>
-            <button className="btn-secondary" onClick={() => {redirectToDocumentos()}} style={{marginLeft: "10px"}}>
-              Cancelar
-            </button>
-          </Col>
-        </Row>
-      </Col>
-    </Row>
-  </Form>
-  );
-};
+    return loading
+        ? <Spinner />
+        : (
+            <Form
+                onFinish={() => save()}
+                initialValues={documento}
+                autoComplete='off'
+            >
+                <h1>{(id === 'nuevo') ? 'Crear nuevo documento' : 'Editar documento'}</h1>
+                <Col justify='center' span={12} offset={6}>
+                    {inputsProps.map(input => {
+                        return (
+                            <Form.Item
+                                label={input.label}
+                                name={input.name}
+                                onChange={e => loadInputsData(e)}
+                                rules={[{ required: input.required, message: `¡Ingrese ${input.label.toUpperCase()} del documento!` }]}
+                                key={input.name}
+                            >
+                                <Input name={input.name} value={input.value} />
+                            </Form.Item>
+                        )
+                    })}
+                    <Row>
+                        {checkboxsProps.map(checkbox => {
+                            return (
+                                <Form.Item
+                                    label={checkbox.label}
+                                    name={checkbox.name}
+                                    required={checkbox.required}
+                                    key={checkbox.name}
+                                >
+                                    <Checkbox onChange={e => loadCheckboxsData(e)} checked={checkbox.checked} />
+                                </Form.Item>
+                            )
+                        })}
+                    </Row>
+                </Col>
+                <Row justify='center' gutter={24}>
+                    <Col>
+                        <Button className='btn-primary' htmlType='submit'>
+                            Guardar
+                        </Button>
+                    </Col>
+                    <Col>
+                        <Button className='btn-secondary' onClick={() => { redirectToDocumentos() }}>
+                            Cancelar
+                        </Button>
+                    </Col>
+                </Row>
+            </Form >
+        )
+}
 
-export default DocumentosForm;
+export default DocumentosForm

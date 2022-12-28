@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { Row, Col, Select, Spin } from "antd";
+import React, { useEffect } from 'react';
+import { Row, Col, Select, Spin } from 'antd';
 import {
   ProductSelectionModal,
   GenericAutocomplete,
-} from "../../components/generics";
-import api from "../../services";
+} from '../../components/generics';
+import api from '../../services';
 import {errorAlert} from '../../components/alerts';
 
 const {Option} = Select;
@@ -76,7 +76,7 @@ const Header = ({
         <Row gutter={8}>
           <Col xl={4} lg={6} md={6}>
             <button
-              className="btn-primary"
+              className='btn-primary'
               onClick={() => {
                 productDispatch({ type: SHOW_MODAL });
               }}
@@ -86,7 +86,7 @@ const Header = ({
           </Col>
           <Col xl={4} lg={6} md={6}>
             <button
-              className="btn-primary"
+              className='btn-primary'
               onClick={() => {
                 dispatch({ type: SHOW_DISCOUNT_SURCHARGE_MODAL });
               }}
@@ -97,7 +97,7 @@ const Header = ({
           <Col xl={16} lg={12} md={12}>
             {state.porcentajeDescuentoGlobal !== 0 ||
             state.porcentajeRecargoGlobal !== 0 ? (
-              <span style={{ textAlign: "right" }}>
+              <span style={{ textAlign: 'right' }}>
                 {state.porcentajeDescuentoGlobal !== 0 ? (
                   <h1>
                     Descuento de {state.porcentajeDescuentoGlobal}% aplicado
@@ -112,10 +112,10 @@ const Header = ({
         <Row gutter={8}>
           <Col xl={6} lg={6} md={12}>
             <GenericAutocomplete
-              label="Cliente"
-              modelToFind="cliente"
-              keyToCompare="razonSocial"
-              controller="clientes"
+              label='Cliente'
+              modelToFind='cliente'
+              keyToCompare='razonSocial'
+              controller='clientes'
               selectedSearch={state.cliente}
               dispatch={dispatch}
               action={SET_CLIENT}
@@ -124,10 +124,10 @@ const Header = ({
           </Col>
           <Col xl={6} lg={6} md={12}>
             <GenericAutocomplete
-              label="Documento"
-              modelToFind="documento"
-              keyToCompare="nombre"
-              controller="documentos"
+              label='Documento'
+              modelToFind='documento'
+              keyToCompare='nombre'
+              controller='documentos'
               selectedSearch={state.documento}
               dispatch={dispatch}
               action={SET_DOCUMENT}
@@ -138,16 +138,16 @@ const Header = ({
             {(state.loadingDocumentIndex) ? <span><Spin/>Procesando...</span> : null}
           </Col>
           <Col xl={6} lg={6} md={12}>
-            <span style={{ textAlign: "right" }}>
+            <span style={{ textAlign: 'right' }}>
               <h1>Total: {state.total}</h1>
             </span>
           </Col>
           <Col xl={6} lg={8} md={8}>
             <GenericAutocomplete
-              label="Medio de pago"
-              modelToFind="mediopago"
-              keyToCompare="nombre"
-              controller="mediospago"
+              label='Medio de pago'
+              modelToFind='mediopago'
+              keyToCompare='nombre'
+              controller='mediospago'
               selectedSearch={state.mediosPago}
               dispatch={dispatch}
               action={SET_PAYMENT_METHODS}

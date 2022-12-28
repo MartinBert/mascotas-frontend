@@ -49,12 +49,12 @@ const LoginForm = () => {
             }}
             onSubmitCapture={(e) => { login(e) }}
         >
-            {(error) ? <Error message="Credenciales invalidas"/> : null}
+            {(error) ? <Error message='Credenciales invalidas'/> : null}
             <Form.Item>
                 <Input 
-                    type="email"
-                    name="email"
-                    placeholder="Usuario"
+                    type='email'
+                    name='email'
+                    placeholder='Usuario'
                     onChange={ (e) => {loadCredentials(e)} }
                     required
                     style={{marginTop: '25px'}}
@@ -63,9 +63,9 @@ const LoginForm = () => {
 
             <Form.Item>
                 <Input.Password 
-                    type="password"
-                    name="password"
-                    placeholder="Contraseña"
+                    type='password'
+                    name='password'
+                    placeholder='Contraseña'
                     onChange={ (e) => {loadCredentials(e)} }
                     required
                 />
@@ -78,8 +78,8 @@ const LoginForm = () => {
                 }}
             >
                 <Button 
-                    type="primary" 
-                    htmlType="submit"
+                    type='primary' 
+                    htmlType='submit'
                 >
                     Login
                 </Button>
