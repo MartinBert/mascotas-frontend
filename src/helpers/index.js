@@ -2,7 +2,7 @@ import mathHelper from './mathHelper';
 import dateHelper from './dateHelper';
 import stringHelper from './stringHelper';
 import afipHelper from './afipHelper';
-import formHelpers from './formHelpers';
+import formHelper from './formHelper';
 import excel from './excel';
 import pdf from './pdf';
 
@@ -11,7 +11,7 @@ const helpers = {
     dateHelper,
     stringHelper,
     afipHelper,
-    formHelpers,
+    formHelper,
     excel,
     pdf
 }

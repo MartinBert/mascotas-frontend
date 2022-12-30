@@ -1,6 +1,6 @@
-import dateHelper from './dateHelper.js';
+import dateHelper from './dateHelper.js'
 
-const {dateToAfip} = dateHelper;
+const {dateToAfip} = dateHelper
 
 const formatBody = (saleData) => {
     const ivas = []
@@ -43,13 +43,13 @@ const formatBody = (saleData) => {
         Iva: ivas
     };
 
-    if(saleData.documentoLetra === 'C') delete(body.Iva);
+    if(saleData.documentoLetra === 'C') delete(body.Iva)
 
-    return body;
+    return body
 }
 
 const afipHelper = {
     formatBody
 }
 
-export default afipHelper;
+export default afipHelper

@@ -25,9 +25,23 @@ const generateVoucher = async(cuit, voucher) => {
     }
 }
 
+const getMinimumBillingAmount = async () => {
+    // This function continues to work even if AFIP changes the number of digits.
+    try{
+        const afipBiller = await axios.get('https://www.afip.gob.ar/facturador')
+        const res = afipBiller.data.substr(afipBiller.data.indexOf('$'), 12)
+        const validCharacter = '0123456789.,$'
+        const minimumBillingAmount = (res.split('').filter(c => validCharacter.includes(c))).join('')
+        return minimumBillingAmount
+    }catch(err){
+        console.error(err)
+    }
+}
+
 const marcas = {
     findLastVoucherNumber,
-    generateVoucher
+    generateVoucher,
+    getMinimumBillingAmount
 }
 
 export default marcas;

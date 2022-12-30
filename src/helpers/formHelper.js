@@ -4,8 +4,8 @@ const noEmptyKeys = (obj) => {
     return validation
 }
 
-const formHelpers = {
+const formHelper = {
     noEmptyKeys
 }
 
-export default formHelpers
+export default formHelper

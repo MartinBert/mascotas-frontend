@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import api from '../../services'
 import helpers from '../../helpers'
-import { Row, Col, Form, Input, Checkbox, Button } from 'antd'
+import { Row, Col, Form, Input, Checkbox, Button, Popover } from 'antd'
 import { useHistory, useParams } from 'react-router-dom'
 import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
 const { Spinner } = graphics
-const { formHelpers } = helpers
+const { formHelper } = helpers
 
 const DocumentosForm = () => {
 
     const { id } = useParams()
     const history = useHistory()
+    const [loading, setLoading] = useState(true)
     const [documento, setDocumento] = useState({
         nombre: '',
         fiscal: false,
@@ -23,7 +24,6 @@ const DocumentosForm = () => {
         codigoUnico: 0,
         _id: null
     })
-    const [loading, setLoading] = useState(true)
 
     const loadInputsData = (e) => {
         setDocumento({
@@ -41,6 +41,7 @@ const DocumentosForm = () => {
 
     //eslint-disable-next-line
     useEffect(() => {
+
         const fetchDocumento = async (id) => {
             const searchedItem = await api.documentos.findById(id)
             setDocumento(searchedItem)
@@ -51,7 +52,7 @@ const DocumentosForm = () => {
     }, [loading, id])
 
     const save = async () => {
-        if (id && formHelpers.noEmptyKeys(documento) === true) {
+        if (id && formHelper.noEmptyKeys(documento) === true) {
             const response = (id === 'nuevo') ? await api.documentos.save(documento) : await api.documentos.edit(documento)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')
@@ -65,9 +66,18 @@ const DocumentosForm = () => {
     }
 
     const inputsProps = [
-        { label: 'Nombre', name: 'nombre', required: true, value: documento.nombre },
-        { label: 'Letra', name: 'letra', required: true, value: documento.letra },
-        { label: 'Código Único', name: 'codigoUnico', required: true, value: documento.codigoUnico }
+        {
+            label: 'Nombre', name: 'nombre', required: true, value: documento.nombre,
+            popover: { id: 'nombre', placement: 'right', title: '', content: 'Por ejemplo, "FACTURA C", "PRESUPUESTO", etc.', trigger: 'click' }
+        },
+        {
+            label: 'Letra', name: 'letra', required: true, value: documento.letra,
+            popover: { id: 'letra', placement: 'right', title: '', content: <a href='https://www.afip.gob.ar/facturacion/regimen-general/comprobantes.asp' target='_blank' rel='noreferrer'>¿Qué tipo de documento debo utilizar?</a>, trigger: 'click' }
+        },
+        {
+            label: 'Código Único', name: 'codigoUnico', required: true, value: documento.codigoUnico,
+            popover: { id: 'codigoUnico', placement: 'right', title: '', content: <a href='https://www.afip.gob.ar/fe/documentos/TABLACOMPROBANTES.xls' target='_blank' rel='noreferrer'>¿Qué código corresponde al documento que quiero registrar?</a>, trigger: 'click' }
+        }
     ]
 
     const checkboxsProps = [
@@ -86,7 +96,7 @@ const DocumentosForm = () => {
                 autoComplete='off'
             >
                 <h1>{(id === 'nuevo') ? 'Crear nuevo documento' : 'Editar documento'}</h1>
-                <Col justify='center' span={12} offset={6}>
+                <Col justify='center' span={6} offset={9}>
                     {inputsProps.map(input => {
                         return (
                             <Form.Item
@@ -96,11 +106,25 @@ const DocumentosForm = () => {
                                 rules={[{ required: input.required, message: `¡Ingrese ${input.label.toUpperCase()} del documento!` }]}
                                 key={input.name}
                             >
-                                <Input name={input.name} value={input.value} />
+                                <Row justify='end'>
+                                    <Col><Input name={input.name} value={input.value} /></Col>
+                                    <Col align='middle'>
+                                        <Popover
+                                            placement={input.popover.placement}
+                                            title={input.popover.title}
+                                            content={input.popover.content}
+                                            trigger={input.popover.trigger}
+                                            
+                                            key={input.popover.id}
+                                        >
+                                            <Button shape='circle'>?</Button>
+                                        </Popover>
+                                    </Col>
+                                </Row>
                             </Form.Item>
                         )
                     })}
-                    <Row>
+                    <Row justify='space-between'>
                         {checkboxsProps.map(checkbox => {
                             return (
                                 <Form.Item

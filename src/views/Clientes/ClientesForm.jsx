@@ -8,7 +8,7 @@ import { errorAlert, successAlert } from '../../components/alerts'
 import helpers from '../../helpers'
 
 const { Spinner } = graphics
-const { formHelpers } = helpers
+const { formHelper } = helpers
 
 const ClientesForm = () => {
 
@@ -67,7 +67,7 @@ const ClientesForm = () => {
     }
 
     const save = async () => {
-        if (id && formHelpers.noEmptyKeys(cliente) === true) {
+        if (id && formHelper.noEmptyKeys(cliente) === true) {
             const response = (id === 'nuevo') ? await api.clientes.save(cliente) : await api.clientes.edit(cliente)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')
