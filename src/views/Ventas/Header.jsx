@@ -87,25 +87,21 @@ const Header = ({
                         <button
                             className='btn-primary'
                             onClick={() => {
-                                dispatch({ type: SHOW_DISCOUNT_SURCHARGE_MODAL })
+                                dispatch({
+                                    type: SHOW_DISCOUNT_SURCHARGE_MODAL
+                                })
                             }}
                         >
                             Descuento/Recargo
                         </button>
                     </Col>
                     <Col xl={16} lg={12} md={12}>
-                        {state.porcentajeDescuentoGlobal !== 0 ||
-                            state.porcentajeRecargoGlobal !== 0 ? (
-                            <span style={{ textAlign: 'right' }}>
-                                {state.porcentajeDescuentoGlobal !== 0 ? (
-                                    <h1>
-                                        Descuento de {state.porcentajeDescuentoGlobal}% aplicado
-                                    </h1>
-                                ) : (
-                                    <h1>Recargo de {state.porcentajeRecargoGlobal}% aplicado</h1>
-                                )}
-                            </span>
-                        ) : null}
+                        {(state.porcentajeDescuentoGlobal !== 0 || state.porcentajeRecargoGlobal !== 0)
+                            ? <span style={{ textAlign: 'right' }}>
+                                {state.porcentajeDescuentoGlobal !== 0
+                                    ? <h1>Descuento de {state.porcentajeDescuentoGlobal}% aplicado</h1>
+                                    : <h1>Recargo de {state.porcentajeRecargoGlobal}% aplicado</h1>}</span>
+                            : null}
                     </Col>
                 </Row>
                 <Row gutter={8}>

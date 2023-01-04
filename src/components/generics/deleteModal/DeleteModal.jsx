@@ -9,7 +9,7 @@ const DeleteModal = ({deleteVisible, setDeleteVisible, deleteEntityIdConfirmatio
     return (
     <Modal 
         title={title} 
-        visible={deleteVisible}
+        open={deleteVisible}
         onCancel={() => {
             setDeleteVisible(false);
             setLoading(true);

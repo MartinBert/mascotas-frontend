@@ -218,7 +218,7 @@ const PriceModificatorModal = ({
   return (
     <Modal
       header={false}
-      visible={priceModalVisible}
+      open={priceModalVisible}
       footer={null}
       width={1200}
       closable={false}

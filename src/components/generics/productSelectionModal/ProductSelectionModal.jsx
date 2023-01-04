@@ -100,7 +100,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
     return (
     <Modal 
         title={'Seleccionar producto' + ((state.selectionLimit > 1) ? 's' : '')}
-        visible={state.visible}
+        open={state.open}
         cancelButtonProps={{ style: { display: 'none' } }}
         closable={false}
         onOk={() => {dispatch({type: HIDE_MODAL})}}

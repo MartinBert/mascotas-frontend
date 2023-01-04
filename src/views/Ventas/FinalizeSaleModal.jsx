@@ -87,7 +87,7 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
   return (
     <Modal
       title={(<h3>Finalizar venta</h3>)}
-      visible={state.finalizeSaleModalIsVisible}
+      open={state.finalizeSaleModalIsVisible}
       cancelButtonProps={{ style: { display: 'none' } }}
       closable={false}
       footer={[

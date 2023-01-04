@@ -1,5 +1,5 @@
 const initialState = {
-    visible: false,
+    open: false,
     selectionLimit: 100000000,
     selectedProducts: []
 }
@@ -33,12 +33,12 @@ const reducer = (state = initialState, action) => {
         case actions.SHOW_MODAL:
             return {
                 ...state,
-                visible: true
+                open: true
             }
         case actions.HIDE_MODAL:
             return {
                 ...state,
-                visible: false
+                open: false
             }
         case actions.SET_SELECTION_LIMIT:
             return {
@@ -52,7 +52,7 @@ const reducer = (state = initialState, action) => {
             }
         case actions.CLEAN_STATE:
             return {
-                visible: false,
+                open: false,
                 selectionLimit: null,
                 selectedProducts: []
             }

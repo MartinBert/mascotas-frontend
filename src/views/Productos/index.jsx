@@ -61,22 +61,22 @@ const Productos = ({userState}) => {
       {
         title: 'Nombre',
         dataIndex: 'nombre',
-        visible:true
+        open:true
       },
       {
         title: 'Codigo de producto',
         dataIndex: 'codigoProducto',
-        visible:true
+        open:true
       },
       {
         title: 'Codigo de barras',
         dataIndex: 'codigoBarras',
-        visible:true
+        open:true
       },
       {
         title: 'Stock',
         dataIndex: 'cantidadStock',
-        visible:true
+        open:true
       },
       {
         title: 'Detalles',
@@ -85,7 +85,7 @@ const Productos = ({userState}) => {
             <Details title='Ver detalle'/>
           </div>
         ),
-        visible: userState.user.perfil
+        open: userState.user.perfil
       },
       {
         title: 'Imagen',
@@ -99,7 +99,7 @@ const Productos = ({userState}) => {
             }
           />
         ),
-        visible:true
+        open:true
       },
       {
         title: 'Acciones',
@@ -116,9 +116,9 @@ const Productos = ({userState}) => {
             </div>
           </Row>
         ),
-        visible:true
+        open:true
       },
-  ].filter(item => item.visible)
+  ].filter(item => item.open)
 
   return (
     <>

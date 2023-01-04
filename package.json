@@ -11,7 +11,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "antd": "^4.16.11",
-    "axios": "^0.21.1",
+    "axios": "^0.27.2",
     "file-saver": "^2.0.5",
     "form-data": "^4.0.0",
     "html2canvas": "^1.4.1",
@@ -27,6 +27,7 @@
     "react-scripts": "4.0.3",
     "sass": "^1.44.0",
     "shortid": "^2.2.16",
+    "soap": "^1.0.0",
     "sweetalert2": "^11.1.2",
     "web-vitals": "^1.1.2",
     "xlsx": "^0.18.2"
