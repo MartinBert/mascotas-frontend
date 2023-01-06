@@ -27,19 +27,6 @@ const generateVoucher = async (cuit, voucher) => {
     }
 }
 
-// const url = 'https://awshomo.afip.gov.ar/sr-padron/webservices/personaServiceA4?WSDL'
-// const args = {
-//     token: '',
-//     sign: '',
-//     cuitRepresentada: '',
-//     idPersona: ''
-// }
-// soap.createClient(url, {}, function (err, client) {
-//     client.getPersona(args, function (err, result) {
-//         console.log(result)
-//     })
-// })
-
 const getMinimumBillingAmount = async () => {
     // This function continues to work even if AFIP changes the number of digits.
     try {

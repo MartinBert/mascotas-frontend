@@ -21,8 +21,8 @@ const Lines = ({
         SET_LINE_DISCOUNT_PERCENT,
         SET_LINE_SURCHARGE_PERCENT,
         SET_LINE_QUANTITY,
-        SET_LINE_TOTAL,
-        SET_LINE_TOTAL_FIXED,
+        SET_NET_PRICE,
+        SET_NET_PRICE_FIXED,
         SET_PRODUCTS,
         SET_TOTAL,
     } = actions
@@ -39,9 +39,12 @@ const Lines = ({
             ),
         },
         {
-            title: 'Nombre',
+            title: 'Producto',
             dataIndex: 'productoNombre',
             width: 300
+        },
+        {
+
         },
         {
             title: 'Cantidad',
@@ -52,15 +55,14 @@ const Lines = ({
                             color='primary'
                             type='number'
                             placeholder='Cantidad'
-                            disabled={product.totalRenglonFijo === true ? true : false}
+                            disabled={product.precioNetoFijo === true ? true : false}
                             value={roundTwoDecimals(product.cantidadUnidades)}
                             onChange={(e) => {
                                 dispatch({
                                     type: SET_LINE_QUANTITY,
                                     payload: {
                                         _id: product._id,
-                                        cantidadUnidades:
-                                            e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
+                                        cantidadUnidades: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
                                     },
                                 })
                                 dispatch({ type: SET_TOTAL })
@@ -91,7 +93,7 @@ const Lines = ({
             ),
         },
         {
-            title: 'Porc. descuento',
+            title: '% Descuento',
             render: (product) => (
                 <Input
                     color='primary'
@@ -104,8 +106,7 @@ const Lines = ({
                             type: SET_LINE_DISCOUNT_PERCENT,
                             payload: {
                                 _id: product._id,
-                                porcentajeDescuentoRenglon:
-                                    e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
+                                porcentajeDescuentoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
                             },
                         })
                         dispatch({ type: SET_TOTAL })
@@ -114,7 +115,7 @@ const Lines = ({
             ),
         },
         {
-            title: 'Porc. recargo',
+            title: '% Recargo',
             render: (product) => (
                 <Input
                     color='primary'
@@ -127,8 +128,7 @@ const Lines = ({
                             type: SET_LINE_SURCHARGE_PERCENT,
                             payload: {
                                 _id: product._id,
-                                porcentajeRecargoRenglon:
-                                    e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
+                                porcentajeRecargoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
                             },
                         })
                         dispatch({ type: SET_TOTAL })
@@ -137,13 +137,25 @@ const Lines = ({
             ),
         },
         {
-            title: 'Total',
+            title: 'Precio bruto',
+            render: (product) => (
+                <Input
+                    color='primary'
+                    type='number'
+                    placeholder='Precio bruto'
+                    value={roundTwoDecimals(product.cantidadUnidades * product.productoPrecioUnitario)}
+                    disabled={true}
+                />
+            ),
+        },
+        {
+            title: 'Precio neto',
             render: (product) => (
                 <Row align='middle'>
                     <Col span={3}>
                         <Checkbox onChange={(e) => {
-                            product.totalRenglonFijo = e.target.checked
-                            dispatch({ type: SET_LINE_TOTAL_FIXED, payload: product })
+                            product.precioNetoFijo = e.target.checked
+                            dispatch({ type: SET_NET_PRICE_FIXED, payload: product })
                             dispatch({ type: SET_TOTAL })
                         }} />
                     </Col>
@@ -152,15 +164,14 @@ const Lines = ({
                             color='primary'
                             type='number'
                             placeholder='Total'
-                            disabled={product.totalRenglonFijo === true ? true : false}
-                            value={product.totalRenglon}
+                            disabled={product.precioNetoFijo === true ? true : false}
+                            value={product.precioNeto}
                             onChange={(e) => {
                                 dispatch({
-                                    type: SET_LINE_TOTAL,
+                                    type: SET_NET_PRICE,
                                     payload: {
                                         _id: product._id,
-                                        totalRenglon:
-                                            e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
+                                        precioNeto: e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
                                     },
                                 })
                                 dispatch({ type: SET_TOTAL })
@@ -170,7 +181,7 @@ const Lines = ({
             )
         },
         {
-            title: 'Eliminar',
+            title: 'Quitar',
             render: (product) => (
                 <div
                     onClick={() => {

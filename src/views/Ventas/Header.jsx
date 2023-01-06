@@ -99,8 +99,8 @@ const Header = ({
                         {(state.porcentajeDescuentoGlobal !== 0 || state.porcentajeRecargoGlobal !== 0)
                             ? <span style={{ textAlign: 'right' }}>
                                 {state.porcentajeDescuentoGlobal !== 0
-                                    ? <h1>Descuento de {state.porcentajeDescuentoGlobal}% aplicado</h1>
-                                    : <h1>Recargo de {state.porcentajeRecargoGlobal}% aplicado</h1>}</span>
+                                    ? <h1>Descuento de {state.porcentajeDescuentoGlobal}% aplicado a toda la factura</h1>
+                                    : <h1>Recargo de {state.porcentajeRecargoGlobal}% aplicado a toda la factura</h1>}</span>
                             : null}
                     </Col>
                 </Row>
@@ -134,7 +134,7 @@ const Header = ({
                     </Col>
                     <Col xl={6} lg={6} md={12}>
                         <span style={{ textAlign: 'right' }}>
-                            <h1>Total: {state.total}</h1>
+                            <h1>Neto Total: {state.total}</h1>
                         </span>
                     </Col>
                     <Col xl={6} lg={8} md={8}>

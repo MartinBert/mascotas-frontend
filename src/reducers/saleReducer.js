@@ -90,8 +90,8 @@ const actions = {
     SET_LINES: 'SET_LINES',
     SET_FRACTIONED: 'SET_FRACTIONED',
     SET_LINE_QUANTITY: 'SET_LINE_QUANTITY',
-    SET_LINE_TOTAL: 'SET_LINE_TOTAL',
-    SET_LINE_TOTAL_FIXED: 'SET_LINE_TOTAL_FIXED',
+    SET_NET_PRICE: 'SET_NET_PRICE',
+    SET_NET_PRICE_FIXED: 'SET_NET_PRICE_FIXED',
     SET_LINE_DISCOUNT_PERCENT: 'SET_LINE_DISCOUNT_PERCENT',
     SET_LINE_SURCHARGE_PERCENT: 'SET_LINE_SURCHARGE_PERCENT',
     SET_CLIENT: 'SET_CLIENT',
@@ -105,49 +105,88 @@ const actions = {
     SET_TOTAL: 'SET_TOTAL',
 }
 
-const calculateLineTotal = (line) => {
-    const quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades
+const calculateLineTotal = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
+    let quantity = 0
+    if (line.precioNetoFijo === true) quantity = line.precioNeto / line.productoPrecioUnitario
+    else quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades
     const totalWithoutModifications = line.productoPrecioUnitario * quantity
-    const totalWithSurcharge = totalWithoutModifications * (1 + decimalPercent(line.porcentajeRecargoRenglon))
-    const totalWithDiscount = totalWithoutModifications * (1 - decimalPercent(line.porcentajeDescuentoRenglon))
-    const surcharge = totalWithSurcharge - totalWithoutModifications
-    const discount = totalWithoutModifications - totalWithDiscount
-    const total = totalWithoutModifications + surcharge - discount
-    return roundTwoDecimals(total)
+    const totalWithModifications = totalWithoutModifications * (1
+        + decimalPercent(line.porcentajeRecargoRenglon)
+        + decimalPercent(porcentajeRecargoGlobal)
+        - decimalPercent(line.porcentajeDescuentoRenglon)
+        - decimalPercent(porcentajeDescuentoGlobal)
+        + porcentajePlanDePago
+    )
+    return roundTwoDecimals(totalWithModifications)
 }
 
-const calculateQuantity = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal) => {
-    const quantityWithoutModifications = line.totalRenglon / line.productoPrecioUnitario
+const calculateLineTotalSurcharge = (line, porcentajeRecargoGlobal, porcentajePlanDePago) => {
+    let quantity = 0
+    if (line.precioNetoFijo === true) quantity = line.precioNeto / line.productoPrecioUnitario
+    else quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades
+    const porcPlanPago = (porcentajePlanDePago > 0) ? porcentajePlanDePago : 0
+    const totalWithoutModifications = line.productoPrecioUnitario * quantity
+    const totalWithModifications = totalWithoutModifications * (1
+        + decimalPercent(line.porcentajeRecargoRenglon)
+        + decimalPercent(porcentajeRecargoGlobal)
+        + porcPlanPago
+    )
+    const lineSurcharge = totalWithModifications - totalWithoutModifications
+    return roundTwoDecimals(lineSurcharge)
+}
+
+const calculateLineTotalDiscount = (line, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
+    let quantity = 0
+    if (line.precioNetoFijo === true) quantity = line.precioNeto / line.productoPrecioUnitario
+    else quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades
+    const porcPlanPago = (porcentajePlanDePago < 0) ? porcentajePlanDePago : 0
+    const totalWithoutModifications = line.productoPrecioUnitario * quantity
+    const totalWithModifications = totalWithoutModifications * (1
+        - decimalPercent(line.porcentajeDescuentoRenglon)
+        - decimalPercent(porcentajeDescuentoGlobal)
+        + porcPlanPago
+    )
+    const lineDiscount = totalWithoutModifications - totalWithModifications
+    return roundTwoDecimals(lineDiscount)
+}
+
+const calculateQuantity = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
+    const quantityWithoutModifications = line.precioNeto / line.productoPrecioUnitario
     let quantityWithModifications = 0
     if (line.porcentajeRecargoRenglon > 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon))
+        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) - porcentajePlanDePago)
     } else if (line.porcentajeRecargoRenglon > 0 && porcentajeRecargoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) - decimalPercent(porcentajeRecargoGlobal))
+        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) - decimalPercent(porcentajeRecargoGlobal) - porcentajePlanDePago)
     } else if (line.porcentajeRecargoRenglon > 0 && porcentajeDescuentoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) + decimalPercent(porcentajeDescuentoGlobal))
+        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) + decimalPercent(porcentajeDescuentoGlobal) - porcentajePlanDePago)
     } else if (line.porcentajeDescuentoRenglon > 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon))
+        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) - porcentajePlanDePago)
     } else if (line.porcentajeDescuentoRenglon > 0 && porcentajeRecargoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) - decimalPercent(porcentajeRecargoGlobal))
+        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) - decimalPercent(porcentajeRecargoGlobal) - porcentajePlanDePago)
     } else if (line.porcentajeDescuentoRenglon > 0 && porcentajeDescuentoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) + decimalPercent(porcentajeDescuentoGlobal))
+        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) + decimalPercent(porcentajeDescuentoGlobal) - porcentajePlanDePago)
     } else if (line.porcentajeRecargoRenglon === 0 && porcentajeRecargoGlobal > 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(porcentajeRecargoGlobal))
+        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(porcentajeRecargoGlobal) - porcentajePlanDePago)
     } else if (line.porcentajeRecargoRenglon === 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(porcentajeDescuentoGlobal))
+        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(porcentajeDescuentoGlobal) - porcentajePlanDePago)
     } else if (line.porcentajeRecargoRenglon === 0 && line.porcentajeDescuentoRenglon === 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications
+        quantityWithModifications = quantityWithoutModifications * (1 - porcentajePlanDePago)
     }
     return quantityWithModifications
 }
 
-const basePrice = (line) => {
-    const quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades
-    return line.productoPrecioUnitario * quantity
+const updateValues = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
+    if (line.precioNetoFijo === true) {
+        line.cantidadUnidades = calculateQuantity(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
+    } else {
+        line.precioNeto = calculateLineTotal(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
+        line.importeRecargoRenglon = calculateLineTotalSurcharge(line, porcentajeRecargoGlobal, porcentajePlanDePago)
+        line.importeDescuentoRenglon = calculateLineTotalDiscount(line, porcentajeDescuentoGlobal, porcentajePlanDePago)
+    }
 }
 
 const baseQuantity = (line) => {
-    return line.totalRenglon / line.productoPrecioUnitario
+    return line.precioNeto / line.productoPrecioUnitario
 }
 
 const reducer = (state = initialState, action) => {
@@ -167,28 +206,18 @@ const reducer = (state = initialState, action) => {
             if (action.payload === 'discount') {
                 state.porcentajeDescuentoGlobal = state.porcentajeRecargoGlobal
                 state.porcentajeRecargoGlobal = 0
+                const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                 state.renglones.map((line) => {
-                    if (line.totalRenglonFijo === true) {
-                        line.cantidadUnidades = calculateQuantity(line, 0, state.porcentajeDescuentoGlobal)
-                        line.cantidadAgregadaPorDescuento = line.cantidadUnidades - baseQuantity(line)
-                    } else if (line.totalRenglonFijo === false) {
-                        line.totalRenglon = calculateLineTotal(line)
-                        line.importeDescuentoRenglon = basePrice(line) - line.totalRenglon
-                    }
+                    updateValues(line, 0, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
                     return line
                 })
             }
             if (action.payload === 'surcharge') {
                 state.porcentajeRecargoGlobal = state.porcentajeDescuentoGlobal
                 state.porcentajeDescuentoGlobal = 0
+                const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                 state.renglones.map((line) => {
-                    if (line.totalRenglonFijo === true) {
-                        line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, 0)
-                        line.cantidadQuitadaPorRecargo = baseQuantity(line) - line.cantidadUnidades
-                    } else if (line.totalRenglonFijo === false) {
-                        line.totalRenglon = calculateLineTotal(line)
-                        line.importeDescuentoRenglon = basePrice(line) - line.totalRenglon
-                    }
+                    updateValues(line, state.porcentajeRecargoGlobal, 0, porcentajePlanDePago)
                     return line
                 })
             }
@@ -245,22 +274,18 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 porcentajeDescuentoGlobal: action.payload,
                 renglones: state.renglones.map((line) => {
-                    if (line.totalRenglonFijo === true) {
-                        line.cantidadUnidades = calculateQuantity(line, 0, action.payload)
-                        line.cantidadAgregadaPorDescuento = line.cantidadUnidades - baseQuantity(line)
-                    }
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    updateValues(line, 0, action.payload, porcentajePlanDePago)
                     return line
                 }),
-            }   
+            }
         case actions.SET_GLOBAL_SURCHARGE_PERCENT:
             return {
                 ...state,
                 porcentajeRecargoGlobal: action.payload,
                 renglones: state.renglones.map((line) => {
-                    if (line.totalRenglonFijo === true) {
-                        line.cantidadUnidades = calculateQuantity(line, action.payload, 0)
-                        line.cantidadAgregadaPorDescuento = line.cantidadUnidades - baseQuantity(line)
-                    }
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    updateValues(line, action.payload, 0, porcentajePlanDePago)
                     return line
                 }),
             }
@@ -270,35 +295,38 @@ const reducer = (state = initialState, action) => {
                 renglones: state.renglones.map((line) => {
                     if (line._id === action.payload._id) {
                         line.cantidadUnidades = action.payload.cantidadUnidades
-                        if (line.totalRenglonFijo === false) {
-                            line.totalRenglon = calculateLineTotal(line)
+                        if (line.precioNetoFijo === false) {
+                            const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                            line.precioNeto = calculateLineTotal(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
+                            line.precioBruto = line.cantidadUnidades * line.productoPrecioUnitario
                         }
                     }
                     return line
                 }),
             }
-        case actions.SET_LINE_TOTAL:
+        case actions.SET_NET_PRICE:
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     if (line._id === action.payload._id) {
-                        line.totalRenglon = action.payload.totalRenglon
-                        line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal)
+                        line.precioNeto = action.payload.precioNeto
+                        line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
                     }
                     return line
                 }),
             }
-        case actions.SET_LINE_TOTAL_FIXED:
+        case actions.SET_NET_PRICE_FIXED:
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     if (line._id === action.payload._id) {
-                        line.totalRenglonFijo = action.payload.totalRenglonFijo
-                        if (line.totalRenglonFijo === true) {
-                            line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal)
-                            line.cantidadAgregadaPorDescuento = line.cantidadUnidades - baseQuantity(line)
-                        } else if (line.totalRenglonFijo === false) {
+                        line.precioNetoFijo = action.payload.precioNetoFijo
+                        if (line.precioNetoFijo === true) line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
+                        else {
                             line.cantidadUnidades = baseQuantity(line)
+                            line.precioNeto = calculateLineTotal(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
                         }
                     }
                     return line
@@ -308,15 +336,10 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     if (line._id === action.payload._id) {
                         line.porcentajeDescuentoRenglon = action.payload.porcentajeDescuentoRenglon
-                        if (line.totalRenglonFijo === true) {
-                            line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal)
-                            line.cantidadAgregadaPorDescuento = line.cantidadUnidades - baseQuantity(line)
-                        } else if (line.totalRenglonFijo === false) {
-                            line.totalRenglon = calculateLineTotal(line)
-                            line.importeDescuentoRenglon = basePrice(line) - line.totalRenglon
-                        }
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
                     }
                     return line
                 }),
@@ -325,15 +348,10 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     if (line._id === action.payload._id) {
                         line.porcentajeRecargoRenglon = action.payload.porcentajeRecargoRenglon
-                        if (line.totalRenglonFijo === true) {
-                            line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal)
-                            line.cantidadQuitadaPorRecargo = baseQuantity(line) - line.cantidadUnidades
-                        } else if (line.totalRenglonFijo === false) {
-                            line.totalRenglon = calculateLineTotal(line)
-                            line.importeRecargoRenglon = line.totalRenglon - basePrice(line)
-                        }
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
                     }
                     return line
                 }),
@@ -358,10 +376,9 @@ const reducer = (state = initialState, action) => {
                         importeDescuentoRenglon: 0,
                         porcentajeRecargoRenglon: 0,
                         importeRecargoRenglon: 0,
-                        cantidadAgregadaPorDescuento: 0,
-                        cantidadQuitadaPorRecargo: 0,
-                        totalRenglon: 0,
-                        totalRenglonFijo: false
+                        precioNeto: 0,
+                        precioNetoFijo: false,
+                        precioBruto: 0
                     }
                 }),
             }
@@ -377,11 +394,11 @@ const reducer = (state = initialState, action) => {
                         if (checked) {
                             item.cantidadUnidades = item.productoFraccionamiento
                             item.productoPrecioUnitario = productFractionedPrice
-                            item.totalRenglon = productFractionedPrice
+                            item.precioNeto = productFractionedPrice
                         } else {
                             item.cantidadUnidades = 1
                             item.productoPrecioUnitario = productUnfractionedPrice
-                            item.totalRenglon = productUnfractionedPrice
+                            item.precioNeto = productUnfractionedPrice
                         }
                     }
                     return item
@@ -463,6 +480,15 @@ const reducer = (state = initialState, action) => {
         case actions.SET_PAYMENT_PLANS:
             const plans = action.payload.map(item => JSON.parse(item))
             const planNames = plans.map(item => item.nombre)
+            const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent((JSON.parse(action.payload[0])).porcentaje) : 0
+            state.renglones.map((line) => {
+                if (line.precioNetoFijo === true) line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado)
+                else {
+                    line.cantidadUnidades = baseQuantity(line)
+                    line.precioNeto = calculateLineTotal(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado)
+                }
+                return line
+            })
             return {
                 ...state,
                 planesPago: plans,
@@ -471,42 +497,24 @@ const reducer = (state = initialState, action) => {
         case actions.SET_TOTAL:
             if (state.renglones.length === 0) return state
 
-            // ---------------- GLOBAL Variations of Prices  ---------------- //
-            const recargoGlobal = (state.planesPago.length < 1)
-                ? decimalPercent(state.porcentajeRecargoGlobal)
-                : (state.planesPago[0].porcentaje <= 0)
-                    ? decimalPercent(state.porcentajeRecargoGlobal)
-                    : decimalPercent(state.porcentajeRecargoGlobal) + decimalPercent(state.planesPago[0].porcentaje)
-            const descuentoGlobal = (state.planesPago.length < 1)
-                ? decimalPercent(state.porcentajeDescuentoGlobal)
-                : (state.planesPago[0].porcentaje >= 0)
-                    ? decimalPercent(state.porcentajeDescuentoGlobal)
-                    : decimalPercent(state.porcentajeDescuentoGlobal) + decimalPercent((state.planesPago[0].porcentaje * -1))
+            // ---------------- Cálculos correspondientes a ítems de precio VARIABLE ---------------- //
+            const variableAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo === false)
+            const variableLinesSumBasePrice = variableAmountLines.reduce((acc, el) => acc + el.precioBruto, 0)
+            const totalDescuentoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.importeDescuentoRenglon, 0))
+            const totalRecargoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.importeRecargoRenglon, 0))
 
-            // ---------------- VARIABLE Amount Lines ---------------- //
-            const variableAmountLines = state.renglones.filter(renglon => renglon.totalRenglonFijo === false)
-            const variableLinesSum = variableAmountLines.reduce((acc, el) => acc + el.totalRenglon, 0)
-            const totalRecargoVariable = roundTwoDecimals(variableLinesSum * recargoGlobal)
-            const totalDescuentoVariable = roundTwoDecimals(variableLinesSum * descuentoGlobal)
-            const totalDescuentoLineasVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.importeDescuentoRenglon, 0))
-            const totalRecargoLineasVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.importeRecargoRenglon, 0))
+            // ---------------- Cálculos correspondientes a ítems de precio FIJADO ---------------- //
+            const fixedAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo === true)
+            const fixedLinesSumBasePrice = fixedAmountLines.reduce((acc, el) => acc + el.precioNeto, 0)
+            const totalDescuentoFijo = 0    // Cero porque el cliente abona un monto fijo.
+            const totalRecargoFijo = 0      // Cero porque el cliente abona un monto fijo.
 
-            // ---------------- FIXED Amount Lines ---------------- //
-            const fixedAmountLines = state.renglones.filter(renglon => renglon.totalRenglonFijo === true)
-            const fixedLinesSum = fixedAmountLines.reduce((acc, el) => acc + el.totalRenglon, 0)
-            const totalRecargoFijo = 0
-            const totalDescuentoFijo = 0
-            const totalDescuentoLineasFijo = 0
-            const totalRecargoLineasFijo = 0
-
-            // ---------------- TOTALS (VARIABLE Lines + FIXED Lines)  ---------------- //
-            const totalLinesSum = variableLinesSum + fixedLinesSum
+            // ---------------- TOTALES (ítems de precio VARIABLE + ítems de precio FIJADO) ---------------- //
+            const totalLinesSum = variableLinesSumBasePrice + fixedLinesSumBasePrice
             const totalRecargo = totalRecargoVariable + totalRecargoFijo
             const totalDescuento = totalDescuentoVariable + totalDescuentoFijo
-            const totalDescuentoLineas = totalDescuentoLineasVariable + totalDescuentoLineasFijo
-            const totalRecargoLineas = totalRecargoLineasVariable + totalRecargoLineasFijo
 
-            // ---------------- IVA Calculation ---------------- //
+            // ---------------- Cálculo de IVA, total y subtotal de la factura ---------------- //
             const iva21productosMontoVariable = variableAmountLines.filter(renglon => renglon.productoPorcentajeIva === 21)
             const iva21productosMontoFijo = fixedAmountLines.filter(renglon => renglon.productoPorcentajeIva === 21)
             const iva10productosMontoVariable = variableAmountLines.filter(renglon => renglon.productoPorcentajeIva === 10.5)
@@ -514,19 +522,16 @@ const reducer = (state = initialState, action) => {
             const iva27productosMontoVariable = variableAmountLines.filter(renglon => renglon.productoPorcentajeIva === 27)
             const iva27productosMontoFijo = fixedAmountLines.filter(renglon => renglon.productoPorcentajeIva === 27)
             const iva21Total = roundTwoDecimals(
-                iva21productosMontoVariable.reduce(
-                    (acc, item) => acc + (item.totalRenglon + (item.totalRenglon * recargoGlobal) - (item.totalRenglon * descuentoGlobal)), 0)
-                + iva21productosMontoFijo.reduce((acc, item) => acc + item.totalRenglon, 0)
+                iva21productosMontoVariable.reduce((acc, el) => acc + el.precioNeto, 0)
+                + iva21productosMontoFijo.reduce((acc, el) => acc + el.precioNeto, 0)
             )
             const iva10Total = roundTwoDecimals(
-                iva10productosMontoVariable.reduce(
-                    (acc, item) => acc + (item.totalRenglon + (item.totalRenglon * recargoGlobal) - (item.totalRenglon * descuentoGlobal)), 0)
-                + iva10productosMontoFijo.reduce((acc, item) => acc + item.totalRenglon, 0)
+                iva10productosMontoVariable.reduce((acc, el) => acc + el.precioNeto, 0)
+                + iva10productosMontoFijo.reduce((acc, el) => acc + el.precioNeto, 0)
             )
             const iva27Total = roundTwoDecimals(
-                iva27productosMontoVariable.reduce(
-                    (acc, item) => acc + (item.totalRenglon + (item.totalRenglon * recargoGlobal) - (item.totalRenglon * descuentoGlobal)), 0)
-                + iva27productosMontoFijo.reduce((acc, item) => acc + item.totalRenglon, 0)
+                iva27productosMontoVariable.reduce((acc, el) => acc + el.precioNeto, 0)
+                + iva27productosMontoFijo.reduce((acc, el) => acc + el.precioNeto, 0)
             )
             const baseImponible21 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva21Total / 1.21) : iva21Total)
             const baseImponible10 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva10Total / 1.105) : iva10Total)
@@ -540,8 +545,6 @@ const reducer = (state = initialState, action) => {
 
             return {
                 ...state,
-                totalDescuentoLineas,
-                totalRecargoLineas,
                 totalDescuento,
                 totalRecargo,
                 baseImponible21,
