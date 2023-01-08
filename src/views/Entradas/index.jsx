@@ -49,6 +49,7 @@ const Entradas = () => {
     }, [deleteEntityId])
 
     const editEntrada = (id) => {
+      console.log('test');
       history.push(`/entradas/${id}`);
     }
 
