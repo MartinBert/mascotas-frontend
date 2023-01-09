@@ -3,7 +3,7 @@ import { Table, Input, Checkbox, Row, Col } from 'antd'
 import icons from '../../components/icons'
 import helpers from '../../helpers'
 
-const { roundTwoDecimals } = helpers.mathHelper
+const { round, roundTwoDecimals } = helpers.mathHelper
 const { Delete } = icons
 
 const Lines = ({
@@ -14,6 +14,7 @@ const Lines = ({
     dispatch,
     actions,
 }) => {
+
     const { DELETE_PRODUCT } = productActions
     const {
         SET_FRACTIONED,
@@ -31,11 +32,13 @@ const Lines = ({
         {
             title: 'Fracc.',
             render: (product) => (
-                <Checkbox onChange={(e) => {
-                    product.fraccionar = e.target.checked
-                    dispatch({ type: SET_FRACTIONED, payload: product })
-                    dispatch({ type: SET_TOTAL })
-                }} />
+                <Checkbox
+                    checked={product.fraccionar === true ? true : false}
+                    onChange={(e) => {
+                        product.fraccionar = e.target.checked
+                        dispatch({ type: SET_FRACTIONED, payload: product })
+                        dispatch({ type: SET_TOTAL })
+                    }} />
             ),
         },
         {
@@ -44,40 +47,42 @@ const Lines = ({
             width: 300
         },
         {
-
-        },
-        {
             title: 'Cantidad',
             render: (product) => (
-                <Row gutter={8}>
-                    <Col span={16}>
-                        <Input
-                            color='primary'
-                            type='number'
-                            placeholder='Cantidad'
-                            disabled={product.precioNetoFijo === true ? true : false}
-                            value={roundTwoDecimals(product.cantidadUnidades)}
-                            onChange={(e) => {
-                                dispatch({
-                                    type: SET_LINE_QUANTITY,
-                                    payload: {
-                                        _id: product._id,
-                                        cantidadUnidades: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
-                                    },
-                                })
-                                dispatch({ type: SET_TOTAL })
-                            }}
-                        />
-                    </Col>
-                    {
-                        (product.fraccionar)
-                            ?
-                            <Col span={8}>
-                                <p>/ {product.productoFraccionamiento}</p>
-                            </Col>
-                            : null
-                    }
-                </Row>
+                <>
+                    <Row gutter={8}>
+                        <Col span={16}>
+                            <Input
+                                color='primary'
+                                type='number'
+                                placeholder='Cantidad'
+                                disabled={product.precioNetoFijo === true ? true : false}
+                                value={product.fraccionar === true ? round(product.cantidadUnidades) : roundTwoDecimals(product.cantidadUnidades)}
+                                onChange={(e) => {
+                                    dispatch({
+                                        type: SET_LINE_QUANTITY,
+                                        payload: {
+                                            _id: product._id,
+                                            cantidadUnidades: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
+                                        },
+                                    })
+                                    dispatch({ type: SET_TOTAL })
+                                }}
+                            />
+                        </Col>
+                        {
+                            (product.fraccionar)
+                                ?
+                                <Col span={8}>
+                                    <p>/ {product.productoFraccionamiento}</p>
+                                </Col>
+                                : null
+                        }
+                    </Row>
+                    <Row align='middle'>
+                        <span>{product.cantidadKg} kg  {product.cantidadg} g</span>
+                    </Row>
+                </>
             ),
         },
         {
@@ -87,7 +92,7 @@ const Lines = ({
                     color='primary'
                     type='number'
                     placeholder='Prec. U.'
-                    value={product.productoPrecioUnitario}
+                    value={product.cantidadUnidades > 0 ? product.productoPrecioUnitario : 0}
                     disabled={true}
                 />
             ),
@@ -143,7 +148,7 @@ const Lines = ({
                     color='primary'
                     type='number'
                     placeholder='Precio bruto'
-                    value={roundTwoDecimals(product.cantidadUnidades * product.productoPrecioUnitario)}
+                    value={roundTwoDecimals(product.precioBruto)}
                     disabled={true}
                 />
             ),
@@ -183,13 +188,13 @@ const Lines = ({
         {
             title: 'Quitar',
             render: (product) => (
-                <div
+                <Col align='middle'
                     onClick={() => {
                         productDispatch({ type: DELETE_PRODUCT, payload: product })
                     }}
                 >
                     <Delete />
-                </div>
+                </Col>
             ),
         },
     ]

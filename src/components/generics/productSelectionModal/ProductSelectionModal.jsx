@@ -110,7 +110,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
           <Col span={24} style={{marginBottom: '10px'}}>
           <Row justify='space between' gutter={16}>
                 <Col span={6}>
-                    <Input 
+                    <Input
                         color='primary' 
                         style={{ width: 200, marginBottom: '10px' }}
                         placeholder='Buscar por nombre'
@@ -124,7 +124,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                     /> 
                 </Col>
                 <Col span={6}>
-                    <Input 
+                    <Input
                         color='primary' 
                         style={{ width: 200, marginBottom: '10px' }}
                         placeholder='Buscar por codigo de barras'
@@ -135,7 +135,7 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                             }
                         )}}
                         value={(filters) ? filters.codigoBarras : null}
-                    /> 
+                    />
                 </Col>
                 <Col span={6}>
                     <Input 
@@ -149,10 +149,10 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                             }
                         )}}
                         value={(filters) ? filters.codigoProducto : null}
-                    /> 
+                    />
                 </Col>
                 <Col span={6}>
-                    <Button 
+                    <Button
                         type='danger' 
                         onClick={() => {cleanFilters()}}
                     > 
