@@ -50,12 +50,10 @@ const initialState = {
     fechaEmisionString: null,
     cae: null,
     vencimientoCae: null,
-    porcentajeDescuentoGlobal: 0,
     porcentajeRecargoGlobal: 0,
+    porcentajeDescuentoGlobal: 0,
     totalDescuento: 0,
     totalRecargo: 0,
-    totalDescuentoLineas: 0,
-    totalRecargoLineas: 0,
     iva21: 0,
     iva10: 0,
     iva27: 0,
@@ -107,14 +105,14 @@ const actions = {
 
 const quantity = (line) => {
     let quantity = 0
-    if (line.precioNetoFijo) quantity = line.precioNeto / line.productoPrecioUnitario
-    if (line.fraccionar) quantity = line.cantidadUnidades / line.productoFraccionamiento
+    if (line.precioNetoFijo) quantity = line.precioNeto / line.precioUnitario
+    if (line.fraccionar) quantity = line.cantidadUnidades / line.fraccionamiento
     else quantity = line.cantidadUnidades
     return quantity
 }
 
 const calculateNetPrice = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
-    const totalWithoutModifications = line.productoPrecioUnitario * quantity(line)
+    const totalWithoutModifications = line.precioUnitario * quantity(line)
     const totalWithModifications = totalWithoutModifications * (1
         + decimalPercent(line.porcentajeRecargoRenglon)
         + decimalPercent(porcentajeRecargoGlobal)
@@ -126,14 +124,14 @@ const calculateNetPrice = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlo
 }
 
 const calculateGrossPrice = (line) => {
-    const quantity = (line.fraccionar) ? line.cantidadUnidades / line.productoFraccionamiento : line.cantidadUnidades
-    const grossPrice = quantity * line.productoPrecioUnitario
+    const quantity = (line.fraccionar) ? line.cantidadUnidades / line.fraccionamiento : line.cantidadUnidades
+    const grossPrice = quantity * line.precioUnitario
     return grossPrice
 }
 
 const calculateSurchargeOnGrossPrice = (line, porcentajeRecargoGlobal, porcentajePlanDePago) => {
     const porcPlanPago = (porcentajePlanDePago > 0) ? porcentajePlanDePago : 0
-    const totalWithoutModifications = line.productoPrecioUnitario * quantity(line)
+    const totalWithoutModifications = line.precioUnitario * quantity(line)
     const totalWithModifications = totalWithoutModifications * (1
         + decimalPercent(line.porcentajeRecargoRenglon)
         + decimalPercent(porcentajeRecargoGlobal)
@@ -145,7 +143,7 @@ const calculateSurchargeOnGrossPrice = (line, porcentajeRecargoGlobal, porcentaj
 
 const calculateDiscountOnGrossPrice = (line, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
     const porcPlanPago = (porcentajePlanDePago < 0) ? porcentajePlanDePago : 0
-    const totalWithoutModifications = line.productoPrecioUnitario * quantity(line)
+    const totalWithoutModifications = line.precioUnitario * quantity(line)
     const totalWithModifications = totalWithoutModifications * (1
         - decimalPercent(line.porcentajeDescuentoRenglon)
         - decimalPercent(porcentajeDescuentoGlobal)
@@ -157,8 +155,8 @@ const calculateDiscountOnGrossPrice = (line, porcentajeDescuentoGlobal, porcenta
 
 const spanQuantity = (line) => {
     if (line.fraccionar) {
-        line.cantidadKg = previousInteger(line.cantidadUnidades / line.productoFraccionamiento)
-        line.cantidadg = line.cantidadUnidades % line.productoFraccionamiento
+        line.cantidadKg = previousInteger(line.cantidadUnidades / line.fraccionamiento)
+        line.cantidadg = line.cantidadUnidades % line.fraccionamiento
     } else {
         let remainder = (roundTwoDecimals(line.cantidadUnidades - previousInteger(line.cantidadUnidades)))
         const grams = (remainder >= 0.1) ? remainder * 1000 : remainder * 10000
@@ -169,8 +167,8 @@ const spanQuantity = (line) => {
 
 const calculateQuantity = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
     const quantityWithoutModifications = (line.fraccionar)
-        ? (line.precioNeto / line.productoPrecioUnitario) * line.productoFraccionamiento
-        : line.precioNeto / line.productoPrecioUnitario
+        ? (line.precioNeto / line.precioUnitario) * line.fraccionamiento
+        : line.precioNeto / line.precioUnitario
     let quantityWithModifications = 0
     if (line.porcentajeRecargoRenglon > 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
         quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) - porcentajePlanDePago)
@@ -191,12 +189,20 @@ const calculateQuantity = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlo
     } else if (line.porcentajeRecargoRenglon === 0 && line.porcentajeDescuentoRenglon === 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
         quantityWithModifications = quantityWithoutModifications * (1 - porcentajePlanDePago)
     }
-    spanQuantity(line)
+
+    const removedQuantity = (line.porcentajeRecargoRenglon > 0 || porcentajeRecargoGlobal > 0 || porcentajePlanDePago > 0)
+        ? quantityWithoutModifications - quantityWithModifications
+        : 0
+    const addedQuantity = (line.porcentajeDescuentoRenglon > 0 || porcentajeDescuentoGlobal > 0 || porcentajePlanDePago < 0)
+        ? quantityWithModifications - quantityWithoutModifications
+        : 0
+    line.cantidadQuitadaPorRecargo_enKg = (line.fraccionar) ? removedQuantity / line.fraccionamiento : removedQuantity
+    line.cantidadAgregadaPorDescuento_enKg = (line.fraccionar) ? addedQuantity / line.fraccionamiento : addedQuantity
     return quantityWithModifications
 }
 
 const calculateBaseQuantity = (line) => {
-    return line.precioNeto / line.productoPrecioUnitario
+    return line.precioNeto / line.precioUnitario
 }
 
 const updateValues1 = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
@@ -204,30 +210,32 @@ const updateValues1 = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal,
         line.cantidadUnidades = calculateQuantity(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
     } else {
         line.precioNeto = calculateNetPrice(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
-        line.importeRecargoRenglon = calculateSurchargeOnGrossPrice(line, porcentajeRecargoGlobal, porcentajePlanDePago)
-        line.importeDescuentoRenglon = calculateDiscountOnGrossPrice(line, porcentajeDescuentoGlobal, porcentajePlanDePago)
+        line.recargo = calculateSurchargeOnGrossPrice(line, porcentajeRecargoGlobal, porcentajePlanDePago)
+        line.descuento = calculateDiscountOnGrossPrice(line, porcentajeDescuentoGlobal, porcentajePlanDePago)
     }
+    line.precioBruto = calculateGrossPrice(line)
+    spanQuantity(line)
 }
 
 const updateValues2 = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice) => {
     const fixed = line.precioNetoFijo
     const fractioned = line.fraccionar
     if (fixed && fractioned) {
-        line.productoPrecioUnitario = productFractionedPrice
+        line.precioUnitario = productFractionedPrice
         line.cantidadUnidades = calculateQuantity(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
-        line.precioBruto = calculateGrossPrice(line)
     } else if (!fixed && fractioned) {
-        line.productoPrecioUnitario = productFractionedPrice
+        line.precioUnitario = productFractionedPrice
         line.precioNeto = calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
     } else if (fixed && !fractioned) {
-        line.productoPrecioUnitario = productUnfractionedPrice
+        line.precioUnitario = productUnfractionedPrice
         line.cantidadUnidades = calculateQuantity(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
-        line.precioBruto = calculateGrossPrice(line)
     } else if (!fixed && !fractioned) {
-        line.productoPrecioUnitario = productUnfractionedPrice
+        line.precioUnitario = productUnfractionedPrice
         line.cantidadUnidades = calculateBaseQuantity(line)
         line.precioNeto = calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
     }
+    line.precioBruto = calculateGrossPrice(line)
+    spanQuantity(line)
 }
 
 const reducer = (state = initialState, action) => {
@@ -355,10 +363,11 @@ const reducer = (state = initialState, action) => {
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         (line.fraccionar)
-                            ? line.productoPrecioUnitario = productFractionedPrice
-                            : line.productoPrecioUnitario = productUnfractionedPrice
+                            ? line.precioUnitario = productFractionedPrice
+                            : line.precioUnitario = productUnfractionedPrice
                         line.precioNeto = action.payload.precioNeto
                         line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
+                        spanQuantity(line)
                         line.precioBruto = calculateGrossPrice(line)
                     }
                     return line
@@ -412,20 +421,22 @@ const reducer = (state = initialState, action) => {
                     if (linePresent) return linePresent
                     return {
                         _id: product._id,
-                        productoNombre: product.nombre,
-                        productoCodigoBarras: product.codigoBarras,
-                        productoPrecioUnitario: product.precioVenta,
-                        productoPorcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
-                        productoImporteIva: (product.ivaVenta) ? product.ivaVenta : 0,
-                        productoFraccionamiento: (product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1,
+                        nombre: product.nombre,
+                        codigoBarras: product.codigoBarras,
+                        precioUnitario: product.precioVenta,
+                        porcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
+                        importeIva: (product.ivaVenta) ? product.ivaVenta : 0,
+                        fraccionamiento: (product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1,
                         fraccionar: false,
                         cantidadUnidades: 0,
+                        cantidadQuitadaPorRecargo_enKg: 0,
+                        cantidadAgregadaPorDescuento_enKg: 0,
                         cantidadKg: 0,
                         cantidadg: 0,
-                        porcentajeDescuentoRenglon: 0,
-                        importeDescuentoRenglon: 0,
                         porcentajeRecargoRenglon: 0,
-                        importeRecargoRenglon: 0,
+                        porcentajeDescuentoRenglon: 0,
+                        recargo: 0,
+                        descuento: 0,
                         precioNeto: 0,
                         precioNetoFijo: false,
                         precioBruto: 0
@@ -529,6 +540,7 @@ const reducer = (state = initialState, action) => {
                 (line.precioNetoFijo)
                     ? line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado)
                     : line.precioNeto = calculateNetPrice(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado)
+                spanQuantity(line)
                 return line
             })
             return {
@@ -542,8 +554,8 @@ const reducer = (state = initialState, action) => {
             // ---------------- Cálculos correspondientes a ítems de precio VARIABLE ---------------- //
             const variableAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo === false)
             const variableLinesSumBasePrice = variableAmountLines.reduce((acc, el) => acc + el.precioBruto, 0)
-            const totalDescuentoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.importeDescuentoRenglon, 0))
-            const totalRecargoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.importeRecargoRenglon, 0))
+            const totalDescuentoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.descuento, 0))
+            const totalRecargoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.recargo, 0))
 
             // ---------------- Cálculos correspondientes a ítems de precio FIJADO ---------------- //
             const fixedAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo === true)
@@ -557,12 +569,12 @@ const reducer = (state = initialState, action) => {
             const totalDescuento = totalDescuentoVariable + totalDescuentoFijo
 
             // ---------------- Cálculo de IVA, total y subtotal de la factura ---------------- //
-            const iva21productosMontoVariable = variableAmountLines.filter(renglon => renglon.productoPorcentajeIva === 21)
-            const iva21productosMontoFijo = fixedAmountLines.filter(renglon => renglon.productoPorcentajeIva === 21)
-            const iva10productosMontoVariable = variableAmountLines.filter(renglon => renglon.productoPorcentajeIva === 10.5)
-            const iva10productosMontoFijo = fixedAmountLines.filter(renglon => renglon.productoPorcentajeIva === 10.5)
-            const iva27productosMontoVariable = variableAmountLines.filter(renglon => renglon.productoPorcentajeIva === 27)
-            const iva27productosMontoFijo = fixedAmountLines.filter(renglon => renglon.productoPorcentajeIva === 27)
+            const iva21productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 21)
+            const iva21productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 21)
+            const iva10productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 10.5)
+            const iva10productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 10.5)
+            const iva27productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 27)
+            const iva27productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 27)
             const iva21Total = roundTwoDecimals(
                 iva21productosMontoVariable.reduce((acc, el) => acc + el.precioNeto, 0)
                 + iva21productosMontoFijo.reduce((acc, el) => acc + el.precioNeto, 0)

@@ -43,7 +43,7 @@ const Lines = ({
         },
         {
             title: 'Producto',
-            dataIndex: 'productoNombre',
+            dataIndex: 'nombre',
             width: 300
         },
         {
@@ -74,13 +74,13 @@ const Lines = ({
                             (product.fraccionar)
                                 ?
                                 <Col span={8}>
-                                    <p>/ {product.productoFraccionamiento}</p>
+                                    <p>/ {product.fraccionamiento}</p>
                                 </Col>
                                 : null
                         }
                     </Row>
                     <Row align='middle'>
-                        <span>{product.cantidadKg} kg  {product.cantidadg} g</span>
+                        <span>{product.cantidadKg} kg  {round(product.cantidadg)} g</span>
                     </Row>
                 </>
             ),
@@ -92,7 +92,7 @@ const Lines = ({
                     color='primary'
                     type='number'
                     placeholder='Prec. U.'
-                    value={product.cantidadUnidades > 0 ? product.productoPrecioUnitario : 0}
+                    value={product.cantidadUnidades > 0 ? product.precioUnitario : 0}
                     disabled={true}
                 />
             ),
