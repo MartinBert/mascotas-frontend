@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services';
-import { Row, Col, Form, Input, Upload } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { useHistory, useParams } from 'react-router-dom';
-import graphics from '../../components/graphics';
-import { GenericAutocomplete } from '../../components/generics';
-import { errorAlert, successAlert } from '../../components/alerts';
-const { Spinner } = graphics;
+import React, { useState, useEffect } from 'react'
+import api from '../../services'
+import { Row, Col, Form, Input, Upload } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
+import { useHistory, useParams } from 'react-router-dom'
+import graphics from '../../components/graphics'
+import { GenericAutocomplete } from '../../components/generics'
+import { errorAlert, successAlert } from '../../components/alerts'
+const { Spinner } = graphics
 
 const EmpresasForm = () => {
-  const history = useHistory();
-  const { id } = useParams();
+  const history = useHistory()
+  const { id } = useParams()
   const [empresa, setEmpresa] = useState({
     razonSocial: '',
     cuit: '',
@@ -23,32 +23,29 @@ const EmpresasForm = () => {
     logo: null,
     condicionFiscal: null,
     puntosVenta: null,
-  });
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [selectedCondition, setSelectedCondition] = useState(null);
-  const [selectedSalePoint, setSelectedSalePoint] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  console.log(empresa.puntosVenta)
-  console.log(selectedSalePoint)
+  })
+  const [uploadedImages, setUploadedImages] = useState([])
+  const [selectedCondition, setSelectedCondition] = useState(null)
+  const [selectedSalePoint, setSelectedSalePoint] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const loadEmpresaData = (e) => {
     setEmpresa({
       ...empresa,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   //eslint-disable-next-line
   useEffect(() => {
-    if (empresa.razonSocial) return;
+    if (empresa.razonSocial) return
     if (id === 'nuevo') {
-      setLoading(false);
-      return;
+      setLoading(false)
+      return
     }
 
     const fetchEmpresa = async () => {
-      const searchedItem = await api.empresas.findById(id);
+      const searchedItem = await api.empresas.findById(id)
       const {
         _id,
         razonSocial,
@@ -62,7 +59,7 @@ const EmpresasForm = () => {
         logo,
         condicionFiscal,
         puntosVenta
-      } = searchedItem;
+      } = searchedItem
       setEmpresa({
         _id,
         razonSocial,
@@ -76,75 +73,75 @@ const EmpresasForm = () => {
         logo,
         condicionFiscal,
         puntosVenta
-      });
-      setSelectedCondition(condicionFiscal);
-      setSelectedSalePoint(puntosVenta[0]);
-      setLoading(false);
-    };
-    fetchEmpresa();
-  });
+      })
+      setSelectedCondition(condicionFiscal)
+      setSelectedSalePoint(puntosVenta[0])
+      setLoading(false)
+    }
+    fetchEmpresa()
+  })
 
   const save = () => {
     if (!empresa.logo) {
-      empresa.logo = uploadedImages[0];
+      empresa.logo = uploadedImages[0]
     }
 
     const saveBusiness = async () => {
-      const response = await api.empresas.save(empresa);
+      const response = await api.empresas.save(empresa)
       if (response.code === 200) {
         successAlert('El registro fue grabado con exito').then(
           redirectToEmpresas()
-        );
+        )
       } else {
-        errorAlert('Error al guardar el registro');
+        errorAlert('Error al guardar el registro')
       }
-    };
+    }
 
     const editBusiness = async () => {
-      const response = await api.empresas.edit(empresa);
+      const response = await api.empresas.edit(empresa)
       if (response.code === 200) {
-        success();
+        success()
       } else {
-        fail();
+        fail()
       }
-    };
+    }
 
     if (id === 'nuevo') {
-      saveBusiness();
+      saveBusiness()
     } else {
-      editBusiness();
+      editBusiness()
     }
-  };
+  }
 
   const redirectToEmpresas = () => {
-    history.push('/empresas');
-  };
+    history.push('/empresas')
+  }
 
   const success = () => {
     successAlert('El registro se guardo en la base de datos').then(() => {
-      redirectToEmpresas();
-    });
-  };
+      redirectToEmpresas()
+    })
+  }
 
   const fail = () => {
-    errorAlert('Error al guardar el registro');
-  };
+    errorAlert('Error al guardar el registro')
+  }
 
   const setSelectedConditionToBusiness = async (condition) => {
-    setSelectedCondition(condition);
+    setSelectedCondition(condition)
     setEmpresa({
       ...empresa,
       condicionFiscal: condition,
-    });
-  };
+    })
+  }
 
   const setSelectedSalePointToBusiness = async (salePoints) => {
-    setSelectedSalePoint(salePoints);
+    setSelectedSalePoint(salePoints)
     setEmpresa({
       ...empresa,
       puntosVenta: salePoints,
-    });
-  };
+    })
+  }
 
   const uploaderProps = {
     name: 'file',
@@ -154,24 +151,24 @@ const EmpresasForm = () => {
       uploadImageToServer(info.file)
     },
     onRemove: () => {
-      removeImage(uploadedImages[0]._id);
+      removeImage(uploadedImages[0]._id)
     },
     beforeUpload: () => false
-  };
+  }
 
   const uploadImageToServer = async (file) => {
-    const response = await api.uploader.uploadImage(file);
+    const response = await api.uploader.uploadImage(file)
     if (response.file) {
-      setUploadedImages(response.file);
-      return response.code;
+      setUploadedImages(response.file)
+      return response.code
     }
-  };
+  }
 
   const removeImage = async (id) => {
-    const response = await api.uploader.deleteImage(id);
-    setUploadedImages([]);
-    return response;
-  };
+    const response = await api.uploader.deleteImage(id)
+    setUploadedImages([])
+    return response
+  }
 
   return loading ? (
     <Spinner />
@@ -182,7 +179,7 @@ const EmpresasForm = () => {
       wrapperCol={{ span: 16 }}
       initialValues={{ remember: true }}
       onFinish={() => {
-        save();
+        save()
       }}
       autoComplete='off'
       style={{ marginTop: '10px' }}
@@ -197,7 +194,7 @@ const EmpresasForm = () => {
             placeholder='Razón social'
             value={empresa.razonSocial}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -207,7 +204,7 @@ const EmpresasForm = () => {
             placeholder='CUIT'
             value={empresa.cuit}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -217,7 +214,7 @@ const EmpresasForm = () => {
             placeholder='Teléfono'
             value={empresa.telefono}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -227,7 +224,7 @@ const EmpresasForm = () => {
             placeholder='Email'
             value={empresa.email}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -237,7 +234,7 @@ const EmpresasForm = () => {
             placeholder='Dirección'
             value={empresa.direccion}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -247,7 +244,7 @@ const EmpresasForm = () => {
             placeholder='Actividad principal'
             value={empresa.actividad}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -257,7 +254,7 @@ const EmpresasForm = () => {
             placeholder='Fecha de inicio de actividad'
             value={empresa.fechaInicioActividad}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -267,7 +264,7 @@ const EmpresasForm = () => {
             placeholder='Ingresos brutos'
             value={empresa.ingresosBrutos}
             onChange={(e) => {
-              loadEmpresaData(e);
+              loadEmpresaData(e)
             }}
           />
         </Col>
@@ -286,7 +283,7 @@ const EmpresasForm = () => {
         <Col span={6} style={{ marginBottom: '10px' }}>
           <GenericAutocomplete
             label='Punto de venta'
-            multiple={true}
+            // multiple={true}
             modelToFind='puntoventa'
             keyToCompare='nombre'
             controller='puntosventa'
@@ -317,7 +314,7 @@ const EmpresasForm = () => {
             className='btn-secondary'
             type='button'
             onClick={() => {
-              redirectToEmpresas();
+              redirectToEmpresas()
             }}
             style={{ marginLeft: '10px' }}
           >
@@ -326,7 +323,7 @@ const EmpresasForm = () => {
         </Col>
       </Row>
     </Form>
-  );
-};
+  )
+}
 
-export default EmpresasForm;
+export default EmpresasForm

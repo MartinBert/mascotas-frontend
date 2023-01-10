@@ -1,13 +1,45 @@
 import {jsPDF} from 'jspdf';
 import stringHelper from './stringHelper.js';
 import dateHelper from './dateHelper.js';
+import mathHelper from './mathHelper.js';
 import qr from './qr.js';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode';
 
 const {completeLengthWithZero} = stringHelper;
 const {simpleDateWithHours} = dateHelper;
+const {roundTwoDecimals} = mathHelper;
 const {AfipQR} = qr;
+
+const showSurchargesAndDiscounts = 
+    [/*${
+        (saleData.totalDescuento)
+        ? `
+        <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 10px;'>
+            <div style='width: 12%;'>-</div>
+            <div style='width: 34%;'>DESCUENTO TOTAL APLICADO</div>
+            <div style='width: 10%;'>-</div>
+            <div style='width: 10%;'>-</div>
+            <div style='width: 12%;'>-</div>
+            <div style='width: 12%;'>-</div>
+            <div style='width: 10%; text-align: right;'>- ${saleData.totalDescuento}</div>
+        </div> `
+        :''
+    }
+    ${
+        (saleData.totalRecargo) 
+        ? `
+        <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 10px;'>
+            <div style='width: 12%;'>-</div>
+            <div style='width: 34%;'>RECARGO TOTAL PLICADO</div>
+            <div style='width: 10%;'>-</div>
+            <div style='width: 10%;'>-</div>
+            <div style='width: 12%;'>-</div>
+            <div style='width: 12%;'>-</div>
+            <div style='width: 10%; text-align: right;'>${saleData.totalRecargo}</div>
+        </div> `
+        :'' 
+    }*/]
 
 const voucherTemplate = (saleData, qrImage) => {
     return `
@@ -61,54 +93,34 @@ const voucherTemplate = (saleData, qrImage) => {
             <hr>
         </div>
         <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-bottom: 15px; font-weight: bold;'>
-            <div style='width: 8%;'>Cant.</div>
-            <div style='width: 60%;'>Producto</div>
-            <div style='width: 8%;'>P. Unit.</div>
-            <div style='width: 8%;'>Desc.</div>
-            <div style='width: 8%;'>Rec.</div>
-            <div style='width: 8%; text-align: right;'>Total</div>
+            <div style='width: 12%;'>Cantidad</div>
+            <div style='width: 34%;'>Producto</div>
+            <div style='width: 10%;'>P. Unitario</div>
+            <div style='width: 10%;'>P. Bruto</div>
+            <div style='width: 12%;'>Descuento</div>
+            <div style='width: 12%;'>Recargo</div>
+            <div style='width: 10%; text-align: right;'>P. Neto</div>
         </div>
         ${saleData.renglones.map(renglon => {
             return `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; font-size: 10px;'>
-                <div style='width: 8%;'>${renglon.cantidadUnidades}</div>
-                <div style='width: 60%;'>${renglon.productoNombre}</div>
-                <div style='width: 8%;'>${renglon.productoPrecioUnitario}</div>
-                <div style='width: 8%;'>${renglon.importeDescuentoRenglon}</div>
-                <div style='width: 8%;'>${renglon.importeRecargoRenglon}</div>
-                <div style='width: 8%; text-align: right;'>${renglon.totalRenglon}</div>
+                <div style='width: 12%;'>${
+                    renglon.fraccionar
+                        ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                        : roundTwoDecimals(renglon.cantidadUnidades)
+                }</div>
+                <div style='width: 34%;'>${renglon.nombre}</div>
+                <div style='width: 10%;'>${renglon.precioUnitario}</div>
+                <div style='width: 10%;'>${renglon.precioBruto}</div>
+                <div style='width: 12%;'>${renglon.descuento}</div>
+                <div style='width: 12%;'>${renglon.recargo}</div>
+                <div style='width: 10%; text-align: right;'>${renglon.precioNeto}</div>
             </div>
             `
         })}
-        ${
-            (saleData.totalDescuento) 
-            ?
-            `
-            <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 10px;'>
-                <div style='width: 8%;'>-</div>
-                <div style='width: 60%;'>DESCUENTO EFECTUADO</div>
-                <div style='width: 8%;'>${saleData.totalDescuento}</div>
-                <div style='width: 8%;'>-</div>
-                <div style='width: 8%;'>-</div>
-                <div style='width: 8%; text-align: right;'>${saleData.totalDescuento}</div>
-            </div>
-            `
-            :'' 
-        }
-        ${
-            (saleData.totalRecargo) 
-            ?`
-            <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 10px;'>
-                <div style='width: 8%;'>-</div>
-                <div style='width: 60%;'>RECARGO EFECTUADO</div>
-                <div style='width: 8%;'>${saleData.totalRecargo}</div>
-                <div style='width: 8%;'>-</div>
-                <div style='width: 8%;'>-</div>
-                <div style='width: 8%; text-align: right;'>${saleData.totalRecargo}</div>
-            </div>
-            `
-            :'' 
-        }
+
+        <!-- ------------ OPTIONAL, INSERT const showSurchargesAndDiscounts ------------ -->
+        
         <div style='width: 100%; position: absolute; bottom: 0'>
             <div style='width: 100%;'>
                 <hr>
@@ -125,11 +137,7 @@ const voucherTemplate = (saleData, qrImage) => {
                 <div style='width: 20%'>
                 ${(saleData.iva21) ? `<p>Total IVA: $${saleData.importeIva}</p>` : ''}
                 </div>
-                <div style='width: 20%'>
-                    <p>Descuento: $${saleData.totalDescuento + saleData.totalDescuentoLineas}</p>
-                    <p>Recargo: $${saleData.totalRecargo + saleData.totalRecargoLineas}</p>
-                </div>
-                <div style='width: 20%'>
+                <div style='width: 40%; text-align: right;'>
                     <p>Total: $${saleData.total}</p>
                 </div>
             </div>
@@ -178,8 +186,8 @@ const ticketTemplate = (saleData) => {
             return `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; font-size: 9px;'>
                 <div style='width: 20%;'>${renglon.cantidadUnidades}</div>
-                <div style='width: 60%;'>${renglon.productoNombre}</div>
-                <div style='width: 20%; text-align: right;'>${renglon.totalRenglon}</div>
+                <div style='width: 60%;'>${renglon.nombre}</div>
+                <div style='width: 20%; text-align: right;'>${renglon.precioNeto}</div>
             </div>
             `
         })}

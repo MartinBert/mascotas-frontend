@@ -126,7 +126,7 @@ const calculateNetPrice = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlo
 const calculateGrossPrice = (line) => {
     const quantity = (line.fraccionar) ? line.cantidadUnidades / line.fraccionamiento : line.cantidadUnidades
     const grossPrice = quantity * line.precioUnitario
-    return grossPrice
+    return roundTwoDecimals(grossPrice)
 }
 
 const calculateSurchargeOnGrossPrice = (line, porcentajeRecargoGlobal, porcentajePlanDePago) => {
@@ -210,9 +210,9 @@ const updateValues1 = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal,
         line.cantidadUnidades = calculateQuantity(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
     } else {
         line.precioNeto = calculateNetPrice(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
-        line.recargo = calculateSurchargeOnGrossPrice(line, porcentajeRecargoGlobal, porcentajePlanDePago)
-        line.descuento = calculateDiscountOnGrossPrice(line, porcentajeDescuentoGlobal, porcentajePlanDePago)
     }
+    line.recargo = calculateSurchargeOnGrossPrice(line, porcentajeRecargoGlobal, porcentajePlanDePago)
+    line.descuento = calculateDiscountOnGrossPrice(line, porcentajeDescuentoGlobal, porcentajePlanDePago)
     line.precioBruto = calculateGrossPrice(line)
     spanQuantity(line)
 }
@@ -234,6 +234,8 @@ const updateValues2 = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePag
         line.cantidadUnidades = calculateBaseQuantity(line)
         line.precioNeto = calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
     }
+    line.recargo = calculateSurchargeOnGrossPrice(line, recargoGlobal, porcentajePlanDePago)
+    line.descuento = calculateDiscountOnGrossPrice(line, descuentoGlobal, porcentajePlanDePago)
     line.precioBruto = calculateGrossPrice(line)
     spanQuantity(line)
 }
