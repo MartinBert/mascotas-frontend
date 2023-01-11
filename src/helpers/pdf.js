@@ -11,8 +11,8 @@ const {simpleDateWithHours} = dateHelper;
 const {roundTwoDecimals} = mathHelper;
 const {AfipQR} = qr;
 
-const showSurchargesAndDiscounts = 
-    [/*${
+/*const showSurchargesAndDiscounts = 
+    [${
         (saleData.totalDescuento)
         ? `
         <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 10px;'>
@@ -39,7 +39,7 @@ const showSurchargesAndDiscounts =
             <div style='width: 10%; text-align: right;'>${saleData.totalRecargo}</div>
         </div> `
         :'' 
-    }*/]
+    }]*/
 
 const voucherTemplate = (saleData, qrImage) => {
     return `
@@ -178,27 +178,32 @@ const ticketTemplate = (saleData) => {
             <hr>
         </div>
         <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-bottom: 15px; font-weight: bold; font-size: 9px;'>
-            <div style='width: 20%;'>Cant.</div>
-            <div style='width: 60%;'>Producto</div>
-            <div style='width: 20%; text-align: right;'>Total</div>
+            <div style='width: 15%;'>Cant.</div>
+            <div style='width: 65%;'>Producto</div>
+            <div style='width: 20%; text-align: right;'>P. Bruto</div>
         </div>
         ${saleData.renglones.map(renglon => {
             return `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; font-size: 9px;'>
-                <div style='width: 20%;'>${renglon.cantidadUnidades}</div>
-                <div style='width: 60%;'>${renglon.nombre}</div>
-                <div style='width: 20%; text-align: right;'>${renglon.precioNeto}</div>
+                <div style='width: 15%;'>${
+                    renglon.fraccionar
+                        ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                        : roundTwoDecimals(renglon.cantidadUnidades)
+                }</div>
+                <div style='width: 65%;'>${renglon.nombre}</div>
+                <div style='width: 20%; text-align: right;'>${renglon.precioBruto}</div>
             </div>
             `
         })}
+        <div style='width: 100%; text-align: center; padding-top: 15px'>----------------</div>
         ${
             (saleData.totalDescuento) 
             ?
             `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 9px;'>
-                <div style='width: 20%;'>-</div>
-                <div style='width: 60%;'>DESCUENTO EFECTUADO</div>
-                <div style='width: 20%; text-align: right;'>${saleData.totalDescuento}</div>
+                <div style='width: 15%;'>-</div>
+                <div style='width: 65%;'>DESCUENTO APLICADO</div>
+                <div style='width: 20%; text-align: right;'>- ${saleData.totalDescuento}</div>
             </div>
             `
             :'' 
@@ -207,8 +212,8 @@ const ticketTemplate = (saleData) => {
             (saleData.totalRecargo) 
             ?`
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 9px;'>
-                <div style='width: 20%;'>-</div>
-                <div style='width: 60%;'>RECARGO EFECTUADO</div>
+                <div style='width: 15%;'>-</div>
+                <div style='width: 65%;'>RECARGO APLICADO</div>
                 <div style='width: 20%; text-align: right;'>${saleData.totalRecargo}</div>
             </div>
             `
@@ -218,14 +223,8 @@ const ticketTemplate = (saleData) => {
             <div style='width: 100%;'>
                 <hr>
             </div>
-            <div style='width: 100%; padding: 10px; display: flex; text-align: center;'>
-                <div style='width: 33%'>
-                    <p>Descuento: $${saleData.totalDescuento + saleData.totalDescuentoLineas}</p>
-                </div>
-                <div style='width: 33%'>
-                    <p>Recargo: $${saleData.totalRecargo + saleData.totalRecargoLineas}</p>
-                </div>
-                <div style='width: 33%'>
+            <div style='width: 100%; padding: 10px;'>
+                <div style='width: 100%; text-align: right; font-weight: bold; font-size: 12px;'>
                     <p>Total: $${saleData.total}</p>
                 </div>
             </div>

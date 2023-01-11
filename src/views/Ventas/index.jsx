@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import Header from './Header';
 import reducers from '../../reducers';
 import DiscountSurchargeModal from './DiscountSurchargeModal';
 import FinalizeSaleModal from './FinalizeSaleModal';
 import Lines from './Lines';
 import api from '../../services';
-import { Row, Col, Spin, Card } from 'antd';
+import { Row, Col, Spin } from 'antd';
 import { errorAlert } from '../../components/alerts';
 
 const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates();
 const { initialState, reducer, actions } = reducers.saleReducer;
 
 const Ventas = ({ userState }) => {
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const [minimumBillingAmount, setMinimumBillingAmount] = useState('')
+    const [state, dispatch] = useReducer(reducer, initialState)
     const [productState, productDispatch] = useReducer(
         productReducer,
         productInitialState
@@ -34,13 +33,6 @@ const Ventas = ({ userState }) => {
         []);
 
     useEffect(() => {
-
-        const loadMinimumBillingAmount = async () => {
-            const res = await api.afip.getMinimumBillingAmount()
-            setMinimumBillingAmount(res)
-        }
-        loadMinimumBillingAmount()
-
         if (state.fechaEmision) return;
         dispatch({ type: SET_DATES });
     },
@@ -98,17 +90,6 @@ const Ventas = ({ userState }) => {
                             >
                                 Finalizar venta
                             </button>
-                        </Col>
-                        <Col span={24}>
-                            <br /><br />
-                            <div className='site-card-border-less-wrapper' align='justify'>
-                                <Card
-                                    title='DISPOSICIÓN DE AFIP'
-                                    bordered={false}
-                                >
-                                    <h1>Cuando el importe de la operación sea igual o superior a <b>{minimumBillingAmount}</b>, se deberá detallar: apellido, nombre, tipo y número de documento de identidad del consumidor final.</h1>
-                                </Card>
-                            </div>
                         </Col>
                     </Row>
 
