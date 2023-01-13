@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Row, Col, Table } from 'antd'
 
-const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
+const ProductDetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
 
     const dataTable1 = [
         { label: 'Nombre', value: <h3 style={{margin: 0}}>{(detailsData && detailsData.nombre) ? detailsData.nombre : '-'}</h3>, key: 1 },
@@ -53,4 +53,4 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
     )
 }
 
-export default DetailsModal
+export default ProductDetailsModal

@@ -1,56 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import api from '../../services';
-import {Row, Col, Table} from 'antd';
-import Header from './Header';
-import icons from '../../components/icons';
-import DetailsModal from './DetailsModal';
-import {DeleteModal} from '../../components/generics';
-import helpers from '../../helpers';
+import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
+import api from '../../services'
+import { Row, Col, Table } from 'antd'
+import Header from './Header'
+import icons from '../../components/icons'
+import DetailsModal from './DetailsModal'
+import { DeleteModal } from '../../components/generics'
+import helpers from '../../helpers'
 
-const { Details, Edit, Delete } = icons;
-const { dateHelper } = helpers;
+const { Details, Edit, Delete } = icons
+const { dateHelper } = helpers
 
 const Entradas = () => {
-    const history = useHistory();
-    const [entradas, setEntradas] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [totalDocs, setTotalDocs] = useState(null);
-    const [limit, setLimit] = useState(10);
-    const [filters, setFilters] = useState(null);
-    const [detailsVisible, setDetailsVisible] = useState(false);
-    const [detailsData, setDetailsData] = useState(null);
-    const [deleteVisible, setDeleteVisible] = useState(false);
-    const [deleteEntityId, setDeleteEntityId] = useState(null);
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
+    const history = useHistory()
+    const [entradas, setEntradas] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [totalDocs, setTotalDocs] = useState(null)
+    const [limit, setLimit] = useState(10)
+    const [filters, setFilters] = useState(null)
+    const [detailsVisible, setDetailsVisible] = useState(false)
+    const [detailsData, setDetailsData] = useState(null)
+    const [deleteVisible, setDeleteVisible] = useState(false)
+    const [deleteEntityId, setDeleteEntityId] = useState(null)
+    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
     useEffect(() => {
       const fetchEntradas = async() => {
-        const response = await api.entradas.findAll({page, limit, filters: JSON.stringify(filters)});
-        setEntradas(response.data.docs);
-        setTotalDocs(response.data.totalDocs);
-        setLoading(false);
+        const response = await api.entradas.findAll({page, limit, filters: JSON.stringify(filters)})
+        setEntradas(response.data.docs)
+        setTotalDocs(response.data.totalDocs)
+        setLoading(false)
       }
-      fetchEntradas();
+      fetchEntradas()
     },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
     useEffect(() => {
-      if(deleteEntityId === null) return;
+      if(deleteEntityId === null) return
       const deleteEntrada = async() => {
-        setLoading(true);
+        setLoading(true)
         api.entradas.deleteById(deleteEntityId)
         .then(() => {
           setDeleteEntityId(null)
-          setLoading(false);
+          setLoading(false)
         })
       }
-      deleteEntrada();
+      deleteEntrada()
     }, [deleteEntityId])
 
     const editEntrada = (id) => {
-      console.log('test');
-      history.push(`/entradas/${id}`);
+      console.log('test')
+      history.push(`/entradas/${id}`)
     }
 
     const columnsForTable = [
@@ -68,7 +68,7 @@ const Entradas = () => {
         title: 'Productos que entraron',
         render: data => (
           <div onClick={() => {
-            setDetailsData(data.productos);
+            setDetailsData(data.productos)
             setDetailsVisible(true)
           }}>
             <Details/>
@@ -92,8 +92,8 @@ const Entradas = () => {
               <Edit/>
             </div>
             <div onClick={() => {
-              setDeleteEntityIdConfirmation(entrada._id);
-              setDeleteVisible(true);
+              setDeleteEntityIdConfirmation(entrada._id)
+              setDeleteVisible(true)
             }}>
               <Delete/>
             </div>
@@ -143,4 +143,4 @@ const Entradas = () => {
     )
 }
 
-export default Entradas;
+export default Entradas

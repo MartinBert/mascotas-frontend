@@ -1,7 +1,20 @@
-import React from 'react';
-import { Modal, Table } from 'antd';
+import React, { useState } from 'react'
+import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
+import { Modal, Table } from 'antd'
+import icons from '../../components/icons'
+
+const { Details } = icons
 
 const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
+
+    const [productDetailsVisible, setProductDetailsVisible] = useState(false)
+    const [productDetails, setProductDetails] = useState(null)
+
+    const seeDetails = (data) => {
+        setProductDetails(data)
+        setProductDetailsVisible(true)
+    }
+
     const columns = [
         {
             title: 'Producto',
@@ -16,6 +29,10 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
             dataIndex: 'precioUnitario',
         },
         {
+            title: 'Iva',
+            dataIndex: 'iva',
+        },
+        {
             title: 'Porcentaje de Ganancia',
             dataIndex: 'margenGanancia',
         },
@@ -28,10 +45,6 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
             dataIndex: 'gananciaNeta',
         },
         {
-            title: 'Iva',
-            dataIndex: 'iva',
-        },
-        {
             title: 'Cantidad entrante',
             dataIndex: 'cantidadesEntrantes',
         },
@@ -41,14 +54,23 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
                 <p>{product.cantidadesEntrantes * product.precioUnitario}</p>
             ),
         },
+        {
+            title: 'Detalles',
+            render: (product) => (
+                <div onClick={() => { seeDetails(product) }}>
+                    <Details title='Ver detalle' />
+                </div>
+            )
+        },
     ]
+
     return (
         <Modal
             title='Detalle de producto'
             open={detailsVisible}
             onCancel={() => { setDetailsVisible(false) }}
             footer={false}
-            width={800}
+            width={1000}
         >
             <Table
                 dataSource={detailsData}
@@ -56,8 +78,14 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
                 pagination={false}
                 rowKey='_id'
             />
+
+            <ProductDetailsModal
+                detailsVisible={productDetailsVisible}
+                setDetailsVisible={setProductDetailsVisible}
+                detailsData={productDetails}
+            />
         </Modal>
     )
 }
 
-export default DetailsModal;
+export default DetailsModal

@@ -1,7 +1,22 @@
-import React from 'react';
-import { Modal, Table } from 'antd';
+import React, { useState } from 'react'
+import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
+import { Modal, Table } from 'antd'
+import icons from '../../components/icons'
+import mathHelpers from '../../helpers/mathHelper'
 
-const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
+const { Details } = icons
+const { roundTwoDecimals } = mathHelpers
+
+const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
+
+    const [productDetailsVisible, setProductDetailsVisible] = useState(false)
+    const [productDetails, setProductDetails] = useState(null)
+
+    const seeDetails = (data) => {
+        setProductDetails(data)
+        setProductDetailsVisible(true)
+    }
+
     const columns = [
         {
             title: 'Producto',
@@ -16,6 +31,10 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             dataIndex: 'precioUnitario',
         },
         {
+            title: 'Iva',
+            dataIndex: 'iva',
+        },
+        {
             title: 'Porcentaje de Ganancia',
             dataIndex: 'margenGanancia',
         },
@@ -28,36 +47,46 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             dataIndex: 'gananciaNeta',
         },
         {
-            title: 'Iva',
-            dataIndex: 'iva',
-        },
-        {
             title: 'Cantidad saliente',
             dataIndex: 'cantidadesSalientes',
         },
         {
             title: 'Ganancia neta total',
             render: (product) => (
-                <p>{product.cantidadesSalientes * product.gananciaNeta}</p>
+                <p>{roundTwoDecimals(product.cantidadesSalientes * product.gananciaNeta)}</p>
             ),
+        },
+        {
+            title: 'Detalles',
+            render: (product) => (
+                <div onClick={() => { seeDetails(product) }}>
+                    <Details title='Ver detalle' />
+                </div>
+            )
         },
     ]
     return (
-    <Modal 
-        title='Detalle de producto' 
-        open={detailsVisible}
-        onCancel={() => {setDetailsVisible(false)}}
-        footer={false}
-        width={800}
-    >
-        <Table 
-            dataSource={detailsData} 
-            columns={columns}
-            pagination={false}
-            rowKey='_id'
-        />
-    </Modal>
-  )
+        <Modal
+            title='Detalle de producto'
+            open={detailsVisible}
+            onCancel={() => { setDetailsVisible(false) }}
+            footer={false}
+            width={1000}
+        >
+            <Table
+                dataSource={detailsData}
+                columns={columns}
+                pagination={false}
+                rowKey='_id'
+            />
+
+            <ProductDetailsModal
+                detailsVisible={productDetailsVisible}
+                setDetailsVisible={setProductDetailsVisible}
+                detailsData={productDetails}
+            />
+        </Modal>
+    )
 }
 
-export default DetailsModal;
+export default DetailsModal

@@ -1,55 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import api from '../../services';
-import {Row, Col, Table} from 'antd';
-import Header from './Header';
-import icons from '../../components/icons';
-import DetailsModal from './DetailsModal';
-import {DeleteModal} from '../../components/generics';
-import helpers from '../../helpers';
+import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
+import api from '../../services'
+import {Row, Col, Table} from 'antd'
+import Header from './Header'
+import icons from '../../components/icons'
+import DetailsModal from './DetailsModal'
+import {DeleteModal} from '../../components/generics'
+import helpers from '../../helpers'
 
-const { Details, Edit, Delete } = icons;
-const { dateHelper } = helpers;
+const { Details, Edit, Delete } = icons
+const { dateHelper, mathHelper } = helpers
+const { roundTwoDecimals } = mathHelper
 
 const Salidas = () => {
-    const history = useHistory();
-    const [salidas, setSalidas] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [totalDocs, setTotalDocs] = useState(null);
-    const [limit, setLimit] = useState(10);
-    const [filters, setFilters] = useState(null);
-    const [detailsVisible, setDetailsVisible] = useState(false);
-    const [detailsData, setDetailsData] = useState(null);
-    const [deleteVisible, setDeleteVisible] = useState(false);
-    const [deleteEntityId, setDeleteEntityId] = useState(null);
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
+    const history = useHistory()
+    const [salidas, setSalidas] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [totalDocs, setTotalDocs] = useState(null)
+    const [limit, setLimit] = useState(10)
+    const [filters, setFilters] = useState(null)
+    const [detailsVisible, setDetailsVisible] = useState(false)
+    const [detailsData, setDetailsData] = useState(null)
+    const [deleteVisible, setDeleteVisible] = useState(false)
+    const [deleteEntityId, setDeleteEntityId] = useState(null)
+    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
     useEffect(() => {
       const fetchSalidas = async() => {
-        const response = await api.salidas.findAll({page, limit, filters: JSON.stringify(filters)});
-        setSalidas(response.data.docs);
-        setTotalDocs(response.data.totalDocs);
-        setLoading(false);
+        const response = await api.salidas.findAll({page, limit, filters: JSON.stringify(filters)})
+        response.data.docs.map((item) => item.gananciaNeta = roundTwoDecimals(item.gananciaNeta))
+        setSalidas(response.data.docs)
+        setTotalDocs(response.data.totalDocs)
+        setLoading(false)
       }
-      fetchSalidas();
+      fetchSalidas()
     },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
     useEffect(() => {
-      if(deleteEntityId === null) return;
+      if(deleteEntityId === null) return
       const deleteSalida = async() => {
-        setLoading(true);
+        setLoading(true)
         api.salidas.deleteById(deleteEntityId)
         .then(() => {
           setDeleteEntityId(null)
-          setLoading(false);
+          setLoading(false)
         })
       }
-      deleteSalida();
+      deleteSalida()
     }, [deleteEntityId])
 
     const editSalida = (id) => {
-      history.push(`/salidas/${id}`);
+      history.push(`/salidas/${id}`)
     }
 
     const columnsForTable = [
@@ -67,7 +69,7 @@ const Salidas = () => {
         title: 'Productos que salieron',
         render: data => (
           <div onClick={() => {
-            setDetailsData(data.productos);
+            setDetailsData(data.productos)
             setDetailsVisible(true)
           }}>
             <Details/>
@@ -91,8 +93,8 @@ const Salidas = () => {
               <Edit/>
             </div>
             <div onClick={() => {
-              setDeleteEntityIdConfirmation(salida._id);
-              setDeleteVisible(true);
+              setDeleteEntityIdConfirmation(salida._id)
+              setDeleteVisible(true)
             }}>
               <Delete/>
             </div>
@@ -142,4 +144,4 @@ const Salidas = () => {
     )
 }
 
-export default Salidas;
+export default Salidas

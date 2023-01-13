@@ -1,60 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services';
-import {Row, Col, Table} from 'antd';
-import Header from './Header';
-import DetailsModal from './DetailsModal';
-import icons from '../../components/icons';
-import {OpenImage} from '../../components/generics';
-import {useHistory} from 'react-router-dom';
-import {DeleteModal} from '../../components/generics';
+import React, { useState, useEffect } from 'react'
+import api from '../../services'
+import { Row, Col, Table } from 'antd'
+import Header from './Header'
+import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
+import icons from '../../components/icons'
+import { OpenImage } from '../../components/generics'
+import { useHistory } from 'react-router-dom'
+import { DeleteModal } from '../../components/generics'
 
-const { Details, Edit, Delete } = icons;
+const { Details, Edit, Delete } = icons
 const Productos = ({userState}) => {
-  const [products, setProducts] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalDocs, setTotalDocs] = useState(null);
-  const [limit, setLimit] = useState(6);
-  const [filters, setFilters] = useState(null);
-  const [detailsVisible, setDetailsVisible] = useState(false);
-  const [detailsData, setDetailsData] = useState(null);
-  const [deleteVisible, setDeleteVisible] = useState(false);
-  const [deleteEntityId, setDeleteEntityId] = useState(null);
-  const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-  const history = useHistory();
+  const [products, setProducts] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [totalDocs, setTotalDocs] = useState(null)
+  const [limit, setLimit] = useState(6)
+  const [filters, setFilters] = useState(null)
+  const [detailsVisible, setDetailsVisible] = useState(false)
+  const [detailsData, setDetailsData] = useState(null)
+  const [deleteVisible, setDeleteVisible] = useState(false)
+  const [deleteEntityId, setDeleteEntityId] = useState(null)
+  const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
+  const history = useHistory()
 
 
   useEffect(() => {
     const fetchProducts = async() => {
       const stringFilters = JSON.stringify(filters)
-      const data = await api.productos.findAll({page, limit, filters: stringFilters});
-      setProducts(data.docs);
-      setTotalDocs(data.totalDocs);
-      setLoading(false);
+      const data = await api.productos.findAll({page, limit, filters: stringFilters})
+      setProducts(data.docs)
+      setTotalDocs(data.totalDocs)
+      setLoading(false)
     }
-    fetchProducts();
+    fetchProducts()
   },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
   useEffect(() => {
-    if(deleteEntityId === null) return;
+    if(deleteEntityId === null) return
     const deleteProduct = async() => {
-      setLoading(true);
+      setLoading(true)
       api.productos.deleteById(deleteEntityId)
       .then(() => {
         setDeleteEntityId(null)
-        setLoading(false);
+        setLoading(false)
       })
     }
-    deleteProduct();
+    deleteProduct()
   }, [deleteEntityId])
 
   const seeDetails = (data) => {
-    setDetailsData(data);
-    setDetailsVisible(true);
+    setDetailsData(data)
+    setDetailsVisible(true)
   }
 
   const editProduct = (id) => {
-    history.push(`/productos/${id}`);
+    history.push(`/productos/${id}`)
   }
 
   const columnsForTable = [
@@ -109,8 +109,8 @@ const Productos = ({userState}) => {
               <Edit/>
             </div>
             <div onClick={() => {
-              setDeleteEntityIdConfirmation(product._id);
-              setDeleteVisible(true);
+              setDeleteEntityIdConfirmation(product._id)
+              setDeleteVisible(true)
             }}>
               <Delete/>
             </div>
@@ -147,7 +147,7 @@ const Productos = ({userState}) => {
               size='small'
           />
         </Col>
-        <DetailsModal 
+        <ProductDetailsModal 
           detailsVisible={detailsVisible}
           setDetailsVisible={setDetailsVisible}
           detailsData={detailsData}
@@ -165,4 +165,4 @@ const Productos = ({userState}) => {
   )
 }
 
-export default Productos;
+export default Productos
