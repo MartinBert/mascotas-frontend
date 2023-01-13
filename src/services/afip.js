@@ -19,7 +19,6 @@ const findLastVoucherNumber = async (cuit, salePointNumber, voucherCode) => {
 const generateVoucher = async (cuit, voucher) => {
     try {
         const response = await axios.post(`${process.env.REACT_APP_API_REST_AFIP}/generarComprobante/${cuit}`, voucher);
-        console.log(response.data)
         return response.data;
     } catch (err) {
         checkStorageStatus(err);

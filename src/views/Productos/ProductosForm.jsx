@@ -19,9 +19,9 @@ const ProductosForm = () => {
     const [product, setProduct] = useState({
         nombre: '',
         codigoProducto: '',
-        codigoBarras: '',   
-        marca: null,   
-        rubro: null,   
+        codigoBarras: '',
+        marca: null,
+        rubro: null,
         unidadMedida: null,
         cantidadStock: 0,
         cantidadFraccionadaStock: 1,
@@ -134,7 +134,6 @@ const ProductosForm = () => {
             cantidadFraccionadaStock: response.fraccionamiento
         })
     }
-    console.log(product)
     const saveProduct = () => {
         product.imagenes = uploadedImages;
         const saveProduct = async() => {

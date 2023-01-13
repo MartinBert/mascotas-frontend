@@ -344,7 +344,6 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    console.log(state)
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     if (line._id === action.payload._id) {
                         line.cantidadUnidades = action.payload.cantidadUnidades

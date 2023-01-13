@@ -1,4 +1,4 @@
-import {jsPDF} from 'jspdf';
+import { jsPDF } from 'jspdf';
 import stringHelper from './stringHelper.js';
 import dateHelper from './dateHelper.js';
 import mathHelper from './mathHelper.js';
@@ -6,10 +6,10 @@ import qr from './qr.js';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode';
 
-const {completeLengthWithZero} = stringHelper;
-const {simpleDateWithHours} = dateHelper;
-const {roundTwoDecimals} = mathHelper;
-const {AfipQR} = qr;
+const { completeLengthWithZero } = stringHelper;
+const { simpleDateWithHours } = dateHelper;
+const { roundTwoDecimals } = mathHelper;
+const { AfipQR } = qr;
 
 /*const showSurchargesAndDiscounts = 
     [${
@@ -39,6 +39,7 @@ const {AfipQR} = qr;
             <div style='width: 10%; text-align: right;'>${saleData.totalRecargo}</div>
         </div> `
         :'' 
+        width: 793px; height: 1122px
     }]*/
 
 const voucherTemplate = (saleData, qrImage) => {
@@ -102,13 +103,12 @@ const voucherTemplate = (saleData, qrImage) => {
             <div style='width: 10%; text-align: right;'>P. Neto</div>
         </div>
         ${saleData.renglones.map(renglon => {
-            return `
+        return `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; font-size: 10px;'>
-                <div style='width: 12%;'>${
-                    renglon.fraccionar
-                        ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                        : roundTwoDecimals(renglon.cantidadUnidades)
-                }</div>
+                <div style='width: 12%;'>${renglon.fraccionar
+                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                : roundTwoDecimals(renglon.cantidadUnidades)
+            }</div>
                 <div style='width: 34%;'>${renglon.nombre}</div>
                 <div style='width: 10%;'>${renglon.precioUnitario}</div>
                 <div style='width: 10%;'>${renglon.precioBruto}</div>
@@ -117,7 +117,7 @@ const voucherTemplate = (saleData, qrImage) => {
                 <div style='width: 10%; text-align: right;'>${renglon.precioNeto}</div>
             </div>
             `
-        })}
+    })}
 
         <!-- ------------ OPTIONAL, INSERT const showSurchargesAndDiscounts ------------ -->
         
@@ -183,21 +183,19 @@ const ticketTemplate = (saleData) => {
             <div style='width: 20%; text-align: right;'>P. Bruto</div>
         </div>
         ${saleData.renglones.map(renglon => {
-            return `
+        return `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; font-size: 9px;'>
-                <div style='width: 15%;'>${
-                    renglon.fraccionar
-                        ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                        : roundTwoDecimals(renglon.cantidadUnidades)
-                }</div>
+                <div style='width: 15%;'>${renglon.fraccionar
+                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                : roundTwoDecimals(renglon.cantidadUnidades)
+            }</div>
                 <div style='width: 65%;'>${renglon.nombre}</div>
                 <div style='width: 20%; text-align: right;'>${renglon.precioBruto}</div>
             </div>
             `
-        })}
+    })}
         <div style='width: 100%; text-align: center; padding-top: 15px'>----------------</div>
-        ${
-            (saleData.totalDescuento) 
+        ${(saleData.totalDescuento)
             ?
             `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 9px;'>
@@ -206,18 +204,17 @@ const ticketTemplate = (saleData) => {
                 <div style='width: 20%; text-align: right;'>- ${saleData.totalDescuento}</div>
             </div>
             `
-            :'' 
+            : ''
         }
-        ${
-            (saleData.totalRecargo) 
-            ?`
+        ${(saleData.totalRecargo)
+            ? `
             <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 9px;'>
                 <div style='width: 15%;'>-</div>
                 <div style='width: 65%;'>RECARGO APLICADO</div>
                 <div style='width: 20%; text-align: right;'>${saleData.totalRecargo}</div>
             </div>
             `
-            :'' 
+            : ''
         }
         <div style='width: 100%; position: absolute; bottom: 0; font-size: 9px;'>
             <div style='width: 100%;'>
@@ -233,47 +230,46 @@ const ticketTemplate = (saleData) => {
     `
 }
 
-const processCanvas = async(frameToCanvas, htmlObject, docName, size) => {
+const processCanvas = async (frameToCanvas, htmlObject, docName, size) => {
     const canvasResult = new Promise(resolve => {
-        try{
-            frameToCanvas.appendChild(htmlObject);
-            html2canvas(htmlObject, {allowTaint: true, useCORS: true}).then(function (canvas) {
-                const img = canvas.toDataURL('image/png');
-                const doc = new jsPDF('p', 'mm', size);
-                doc.addImage(img, 'JPEG', 0, 0);
-                doc.save(docName);
-                document.getElementById('voucher').innerHTML = '';
-                resolve({isProcesseed: true})
-            });
-        }catch(err){
+        try {
+            const doc = new jsPDF('p', 'mm', size)
+            frameToCanvas.appendChild(htmlObject)
+            html2canvas(htmlObject, { allowTaint: true, useCORS: true, scale: 1 }).then(function (canvas) {
+                const img = canvas.toDataURL('image/png')
+                doc.addImage(img, 'JPEG', 0, 0)
+                doc.save(docName)
+                document.getElementById('voucher').innerHTML = ''
+                resolve({ isProcesseed: true })
+            })
+        } catch (err) {
             console.error(err)
-            resolve({isProcesseed: false})
+            resolve({ isProcesseed: false })
         }
     })
-
-    return await canvasResult;
+    return await canvasResult
 }
 
-const createVoucherPdf = async(saleData) => {
-    const qrToVoucher = new AfipQR(saleData);
-    const qrImage = await QRCode.toDataURL(qrToVoucher.url);
+const createVoucherPdf = async (saleData) => {
+    const qrToVoucher = new AfipQR(saleData)
+    const qrImage = await QRCode.toDataURL(qrToVoucher.url)
     const frameToCanvas = document.getElementById('voucher')
-    const htmlObject = document.createElement('div');
-    const docName = saleData.numeroCompletoFactura;
+    const htmlObject = document.createElement('div')
+    const docName = saleData.numeroCompletoFactura
     const size = [297, 210]; //Expresed in mm
     htmlObject.innerHTML = voucherTemplate(saleData, qrImage)
-    const doc = await processCanvas(frameToCanvas, htmlObject, docName, size);
-    return {isCreated: doc.isProcesseed}
+    const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
+    return { isCreated: doc.isProcesseed }
 }
 
-const createTicketPdf = async(saleData) => {
+const createTicketPdf = async (saleData) => {
     const frameToCanvas = document.getElementById('ticket')
     const htmlObject = document.createElement('div');
     const docName = saleData.numeroCompletoFactura;
     const size = [297, 80]; //Expresed in mm
     htmlObject.innerHTML = ticketTemplate(saleData)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size);
-    return {isCreated: doc.isProcesseed}
+    return { isCreated: doc.isProcesseed }
 }
 
 const pdf = {

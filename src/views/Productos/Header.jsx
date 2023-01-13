@@ -46,15 +46,17 @@ const Header = ({setFilters, filters, setLoading}) => {
         const nameOfSheet = 'Hoja de productos';
         const nameOfDocument = 'Lista de productos';
         const columnHeaders = [
-            'Producto' , 
-            'Marca', 
-            'Rubro', 
-            'Precio unitario', 
-            'IVA', 
-            'Precio de venta', 
-            'Margen de ganancia', 
-            'Ganancia por venta', 
-            'Stock'
+            'Producto',
+            'Marca',
+            'Rubro',
+            'Precio de lista',
+            'IVA',
+            'Margen de ganancia',
+            'Ganancia por venta',
+            'Precio de venta',
+            'Stock',
+            'Cód. producto',
+            'Cód. barras'
         ];
         const lines = await processExcelLines(response.docs);
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument);
@@ -65,14 +67,16 @@ const Header = ({setFilters, filters, setLoading}) => {
         for await (let product of products){
             processedLines.push([
                 product.nombre,
-                (product.marca) ? product.marca.nombre : 'Sin Marca',
-                (product.rubro) ? product.rubro.nombre : 'Sin Rubro',
+                (product.marca) ? product.marca.nombre : '-',
+                (product.rubro) ? product.rubro.nombre : '-',
                 '$'+product.precioUnitario,
-                '$'+product.iva,
-                '$'+product.precioVenta,
+                '$'+product.ivaVenta,
                 '%'+product.margenGanancia,
                 '$'+product.gananciaNeta,
-                product.cantidadStock
+                '$'+product.precioVenta,
+                product.cantidadStock,
+                (product.codigoProducto) ? product.codigoProducto : '-',
+                (product.codigoBarras) ? product.codigoBarras : '-'
             ])
         }
         return processedLines;
