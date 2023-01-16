@@ -79,7 +79,7 @@ const Lines = ({
                                 : null
                         }
                     </Row>
-                    <Row align='middle'>
+                    <Row align='middle' hidden={product.unidadMedida === 'kilogramos' ? false : true}>
                         <span>{product.cantidadKg} kg  {round(product.cantidadg)} g</span>
                     </Row>
                 </>

@@ -32,7 +32,7 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
         },
         {
             title: 'Iva',
-            dataIndex: 'iva',
+            dataIndex: 'ivaVenta',
         },
         {
             title: 'Porcentaje de Ganancia',
@@ -52,9 +52,7 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
         },
         {
             title: 'Ganancia neta total',
-            render: (product) => (
-                <p>{roundTwoDecimals(product.cantidadesSalientes * product.gananciaNeta)}</p>
-            ),
+            render: product => roundTwoDecimals(product.cantidadesSalientes * product.gananciaNeta)
         },
         {
             title: 'Detalles',

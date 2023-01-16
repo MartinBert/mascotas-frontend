@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
 import { Modal, Table } from 'antd'
 import icons from '../../components/icons'
+import mathHelper from '../../helpers/mathHelper'
 
 const { Details } = icons
+const { roundTwoDecimals } = mathHelper
 
 const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
 
@@ -30,7 +32,7 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
         },
         {
             title: 'Iva',
-            dataIndex: 'iva',
+            dataIndex: 'ivaVenta',
         },
         {
             title: 'Porcentaje de Ganancia',
@@ -50,9 +52,7 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
         },
         {
             title: 'Costo total',
-            render: (product) => (
-                <p>{product.cantidadesEntrantes * product.precioUnitario}</p>
-            ),
+            render: product => roundTwoDecimals(product.cantidadesEntrantes * product.precioUnitario)
         },
         {
             title: 'Detalles',

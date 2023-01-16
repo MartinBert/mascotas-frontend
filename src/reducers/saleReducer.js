@@ -419,29 +419,31 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: action.payload.map((product) => {
+                    const productUnitOfMeasure = action.payload.find(item => item._id === product._id).unidadMedida.nombre
                     const linePresent = state.renglones.find(renglon => renglon._id === product._id)
                     if (linePresent) return linePresent
                     return {
                         _id: product._id,
                         nombre: product.nombre,
                         codigoBarras: product.codigoBarras,
+                        unidadMedida: productUnitOfMeasure,
                         precioUnitario: product.precioVenta,
                         porcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
                         importeIva: (product.ivaVenta) ? product.ivaVenta : 0,
                         fraccionamiento: (product.unidadMedida) ? product.unidadMedida.fraccionamiento : 1,
                         fraccionar: false,
-                        cantidadUnidades: 0,
+                        cantidadUnidades: 1,
                         cantidadQuitadaPorRecargo_enKg: 0,
                         cantidadAgregadaPorDescuento_enKg: 0,
-                        cantidadKg: 0,
+                        cantidadKg: 1,
                         cantidadg: 0,
                         porcentajeRecargoRenglon: 0,
                         porcentajeDescuentoRenglon: 0,
                         recargo: 0,
                         descuento: 0,
-                        precioNeto: 0,
+                        precioNeto: product.precioVenta,
                         precioNetoFijo: false,
-                        precioBruto: 0
+                        precioBruto: product.precioVenta
                     }
                 }),
             }

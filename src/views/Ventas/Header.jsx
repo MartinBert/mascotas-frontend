@@ -107,6 +107,7 @@ const Header = ({
                 <Row gutter={8}>
                     <Col xl={6} lg={6} md={12}>
                         <GenericAutocomplete
+                            id='cliente'
                             label='Cliente'
                             modelToFind='cliente'
                             keyToCompare='razonSocial'
@@ -119,6 +120,7 @@ const Header = ({
                     </Col>
                     <Col xl={6} lg={6} md={12}>
                         <GenericAutocomplete
+                            id='documento'
                             label='Documento'
                             modelToFind='documento'
                             keyToCompare='nombre'
@@ -139,6 +141,7 @@ const Header = ({
                     </Col>
                     <Col xl={6} lg={8} md={8}>
                         <GenericAutocomplete
+                            id='medioDePago'
                             label='Medio de pago'
                             modelToFind='mediopago'
                             keyToCompare='nombre'
