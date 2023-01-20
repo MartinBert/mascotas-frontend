@@ -7,8 +7,6 @@ import {
 import api from '../../services'
 import { errorAlert } from '../../components/alerts'
 
-const { Option } = Select
-
 const Header = ({
     productState,
     productDispatch,
@@ -17,6 +15,9 @@ const Header = ({
     dispatch,
     state,
 }) => {
+
+    const { Option } = Select
+
     const { SHOW_MODAL } = productActions
     const {
         LOADING_DOCUMENT_INDEX,
@@ -30,6 +31,7 @@ const Header = ({
     } = actions
 
     useEffect(() => {
+
         if (!state.documento) return
         dispatch({ type: LOADING_DOCUMENT_INDEX })
         let attemps = 0
@@ -107,7 +109,6 @@ const Header = ({
                 <Row gutter={8}>
                     <Col xl={6} lg={6} md={12}>
                         <GenericAutocomplete
-                            id='cliente'
                             label='Cliente'
                             modelToFind='cliente'
                             keyToCompare='razonSocial'
@@ -120,7 +121,6 @@ const Header = ({
                     </Col>
                     <Col xl={6} lg={6} md={12}>
                         <GenericAutocomplete
-                            id='documento'
                             label='Documento'
                             modelToFind='documento'
                             keyToCompare='nombre'
@@ -141,7 +141,6 @@ const Header = ({
                     </Col>
                     <Col xl={6} lg={8} md={8}>
                         <GenericAutocomplete
-                            id='medioDePago'
                             label='Medio de pago'
                             modelToFind='mediopago'
                             keyToCompare='nombre'

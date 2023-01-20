@@ -1,43 +1,43 @@
-import React, { useEffect, useReducer } from 'react';
-import Header from './Header';
-import reducers from '../../reducers';
-import DiscountSurchargeModal from './DiscountSurchargeModal';
-import FinalizeSaleModal from './FinalizeSaleModal';
-import Lines from './Lines';
-import api from '../../services';
-import { Row, Col, Spin } from 'antd';
-import { errorAlert } from '../../components/alerts';
+import React, { useEffect, useReducer } from 'react'
+import Header from './Header'
+import reducers from '../../reducers'
+import DiscountSurchargeModal from './DiscountSurchargeModal'
+import FinalizeSaleModal from './FinalizeSaleModal'
+import Lines from './Lines'
+import api from '../../services'
+import { Row, Col, Spin } from 'antd'
+import { errorAlert } from '../../components/alerts'
 
-const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates();
-const { initialState, reducer, actions } = reducers.saleReducer;
+const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates()
+const { initialState, reducer, actions } = reducers.saleReducer
 
 const Ventas = ({ userState }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
     const [productState, productDispatch] = useReducer(
         productReducer,
         productInitialState
-    );
-    const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL, SET_INDEX, SET_USER } = actions;
+    )
+    const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL, SET_INDEX, SET_USER } = actions
 
     useEffect(() => {
-        dispatch({ type: SET_COMPANY, payload: userState.user.empresa });
-        dispatch({ type: SET_SALE_POINT, payload: userState.user.puntoVenta });
+        dispatch({ type: SET_COMPANY, payload: userState.user.empresa })
+        dispatch({ type: SET_SALE_POINT, payload: userState.user.puntoVenta })
         dispatch({ type: SET_USER, payload: userState.user })
         const fetchLastVoucherIndex = async () => {
-            const lastIndex = await api.ventas.findLastIndex();
+            const lastIndex = await api.ventas.findLastIndex()
             dispatch({ type: SET_INDEX, payload: lastIndex + 1 })
         }
-        fetchLastVoucherIndex();
+        fetchLastVoucherIndex()
     },
         //eslint-disable-next-line
-        []);
+        [])
 
     useEffect(() => {
-        if (state.fechaEmision) return;
-        dispatch({ type: SET_DATES });
+        if (state.fechaEmision) return
+        dispatch({ type: SET_DATES })
     },
         //eslint-disable-next-line
-        []);
+        [])
 
     const checkState = async () => {
         const result = new Promise(resolve => {
@@ -48,7 +48,7 @@ const Ventas = ({ userState }) => {
             if (!state.planesPago || state.planesPago.length < 1) resolve('Debe seleccionar al menos un plan de pago para realizar la venta.')
             resolve('OK')
         })
-        return await result;
+        return await result
     }
 
     return (
@@ -84,7 +84,7 @@ const Ventas = ({ userState }) => {
                                     checkState()
                                         .then(result => {
                                             if (result === 'OK') return dispatch({ type: SHOW_FINALIZE_SALE_MODAL })
-                                            return errorAlert(result);
+                                            return errorAlert(result)
                                         })
                                 }}
                             >
@@ -109,7 +109,7 @@ const Ventas = ({ userState }) => {
             <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
             <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
         </>
-    );
-};
+    )
+}
 
-export default Ventas;
+export default Ventas

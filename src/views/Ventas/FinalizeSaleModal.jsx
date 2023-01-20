@@ -1,27 +1,27 @@
-import React, { useEffect } from 'react';
-import {Modal, Row, Col} from 'antd';
-import helpers from '../../helpers';
-import api from '../../services';
-import { errorAlert, successAlert } from '../../components/alerts';
+import React, { useEffect } from 'react'
+import {Modal, Row, Col} from 'antd'
+import helpers from '../../helpers'
+import api from '../../services'
+import { errorAlert, successAlert } from '../../components/alerts'
 
-const {formatBody} = helpers.afipHelper;
-const {createVoucherPdf, createTicketPdf} = helpers.pdf;
+const { formatBody } = helpers.afipHelper
+const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
-  const { HIDE_FINALIZE_SALE_MODAL, CLOSE_FISCAL_OPERATION, LOADING_VIEW, CLOSE_NO_FISCAL_OPERATION } = actions;
+  const { HIDE_FINALIZE_SALE_MODAL, CLOSE_FISCAL_OPERATION, LOADING_VIEW, CLOSE_NO_FISCAL_OPERATION } = actions
 
   const reload = () => {
     return window.location.reload()
   }
 
   const closeFiscalOperation = async() => {
-    const bodyToAfip = formatBody(state);
-    const responseOfAfip = await api.afip.generateVoucher(userState.user.empresa.cuit, bodyToAfip);
-    dispatch({type: CLOSE_FISCAL_OPERATION, payload: responseOfAfip});
+    const bodyToAfip = formatBody(state)
+    const responseOfAfip = await api.afip.generateVoucher(userState.user.empresa.cuit, bodyToAfip)
+    dispatch({type: CLOSE_FISCAL_OPERATION, payload: responseOfAfip})
   }
 
   const startCloseSale = async() => {
-    dispatch({type: HIDE_FINALIZE_SALE_MODAL});
+    dispatch({type: HIDE_FINALIZE_SALE_MODAL})
     dispatch({type: LOADING_VIEW})
     state.documentoFiscal ? closeFiscalOperation() : dispatch({type: CLOSE_NO_FISCAL_OPERATION})
   }
@@ -30,7 +30,7 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
     const processStock = async() => {
       try{
         for(const product of state.productos){
-          const lineOfProduct = state.renglones.find(item => item._id === product._id);
+          const lineOfProduct = state.renglones.find(item => item._id === product._id)
           await api.productos.modifyStock(
             {
               product,
@@ -38,49 +38,50 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
             }
           )
         }
-        return true;
+        return true
       }catch(err){
-        console.error(err);
-        return false;
+        console.error(err)
+        return false
       }
     }
-    return {isModified: await processStock()};
+    return {isModified: await processStock()}
   }
 
   const saveSaleData = async() => {
     try {
       state.renglones = state.renglones.map(renglon => {
-        delete renglon._id;
-        return renglon;
+        delete renglon._id
+        return renglon
       })
-      const result = await api.ventas.save(state);
-      return {isSaved: (result.code === 200)};
+      const result = await api.ventas.save(state)
+      return {isSaved: (result.code === 200)}
     }catch(err){
       console.error(err)
-      return {isSaved: false};
+      return {isSaved: false}
     }
   }
 
   const save = async() => {
     //Modify stock of products
-    const stock = await applyStockModification();
-    if(!stock.isModified) return errorAlert('Error al modificar stock.').then(() => reload());
+    const stock = await applyStockModification()
+    if(!stock.isModified) return errorAlert('Error al modificar stock.').then(() => reload())
 
     //Save sale data
-    const saleData = await saveSaleData();
-    if(!saleData.isSaved) return errorAlert('No se pudo guardar la venta.').then(() => reload());
+    const saleData = await saveSaleData()
+    if(!saleData.isSaved) return errorAlert('No se pudo guardar la venta.').then(() => reload())
 
-    //Create voucher
-    const voucherOrTicket = (state.documentoFiscal) ? await createVoucherPdf(state) : await createTicketPdf(state);
-    if(!voucherOrTicket.isCreated) return errorAlert('No se pudo generar el comprobante de la operación.').then(() => reload());
+    //Create document
+    if (state.documento.nombre === 'TIQUE') await createTicketPdf(state)
+    else if (state.documento.nombre !== 'TIQUE') await createVoucherPdf(state)
+    else return errorAlert('No se pudo generar el comprobante de la operación.').then(() => reload())
 
-    return successAlert('Venta realizada').then(() => reload());
+    return successAlert('Venta realizada').then(() => reload())
   }
 
   useEffect(() => {
-    if(!state.closedSale) return;
-    save();
-  }, 
+    if(!state.closedSale) return
+    save()
+  },
   //eslint-disable-next-line
   [state.closedSale])
 
@@ -118,7 +119,7 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
         </Col>
       </Row>
     </Modal>
-  );
-};
+  )
+}
 
-export default FinalizeSaleModal;
+export default FinalizeSaleModal
