@@ -62,20 +62,22 @@ const voucherTemplate = (saleData, qrImage) => {
         </div>
         <div style='width: 100%; height: 582px; padding: 10px'>
             ${saleData.renglones.map(renglon => {
-                return (`<div style='width: 100%; display: flex; font-size: 16px;'>
-                    <div style='width: 12%;'>
-                        ${renglon.fraccionar
-                            ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                            : roundTwoDecimals(renglon.cantidadUnidades)
-                        }
-                    </div>
-                    <div style='width: 34%;'>${renglon.nombre}</div>
-                    <div style='width: 10%;'>${renglon.precioUnitario}</div>
-                    <div style='width: 10%;'>${renglon.precioBruto}</div>
-                    <div style='width: 12%;'>${renglon.descuento}</div>
-                    <div style='width: 12%;'>${renglon.recargo}</div>
-                    <div style='width: 10%; text-align: right;'>${renglon.precioNeto}</div>
-                </div>`)
+                return (
+                    `<div style='width: 100%; display: flex; font-size: 16px;'>
+                        <div style='width: 12%;'>
+                            ${renglon.fraccionar
+                                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                                : roundTwoDecimals(renglon.cantidadUnidades)
+                            }
+                        </div>
+                        <div style='width: 34%;'>${renglon.nombre}</div>
+                        <div style='width: 10%;'>${renglon.precioUnitario}</div>
+                        <div style='width: 10%;'>${roundTwoDecimals(renglon.precioBruto)}</div>
+                        <div style='width: 12%;'>${roundTwoDecimals(renglon.descuento)}</div>
+                        <div style='width: 12%;'>${roundTwoDecimals(renglon.recargo)}</div>
+                        <div style='width: 10%; text-align: right;'>${roundTwoDecimals(renglon.precioNeto)}</div>
+                    </div>`
+                )
             }).join('<br />')}
         </div>
         <div style='width: 100%; height: 215px; bottom: 0px; display: inline-block;'>
@@ -151,44 +153,45 @@ const ticketTemplate = (saleData) => {
         <div style='width: 100%; height: 39px; display: flex; padding-bottom: 15px;'>
             <div style='width: 20%; text-align: left; padding-left: 5px;'><i>Cant.</i></div>
             <div style='width: 60%; text-align: left;'><i>Producto</i></div>
-            <div style='width: 20%; text-align: right; padding-right: 5px;'><i>P. Bruto</i></div>
+            <div style='width: 20%; text-align: right; padding-right: 5px;'><i>P. Neto</i></div>
         </div>
-        <div style='width: 100%; height: 733px;'>
-            ${ saleData.renglones.map(renglon => {
+        <div style='width: 100%; height: 733px; display: inline-block;'>
+            <div>
+                ${ saleData.renglones.map(renglon => {
                     return `<div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
                         <div style='width: 20%;'>${renglon.fraccionar
                             ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
                             : roundTwoDecimals(renglon.cantidadUnidades)}
                         </div>
                         <div style='width: 60%;'>${renglon.nombre}</div>
-                        <div style='width: 20%; text-align: right; padding-right: 5px;'>${renglon.precioBruto}</div>
+                        <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
                     </div>`
                 }).join('<br />')}
-            ${(saleData.totalDescuento)
-                ? `<div style='width: 100%; text-align: center; padding-top: 15px'>----------------</div>`
-                : ''
-            }
-            ${(saleData.totalDescuento)
-                ?
-                `
-                <div style='width: 100%; display: flex; text-align: left; font-size: 12px;'>
-                    <div style='width: 20%;'>-</div>
-                    <div style='width: 60%;'>DESCUENTO APLICADO</div>
-                    <div style='width: 20%; text-align: right;'>- ${saleData.totalDescuento}</div>
-                </div>
-                `
-                : ''
-            }
-            ${(saleData.totalRecargo)
-                ? `
-                <div style='width: 100%; display: flex; padding-left: 15px; padding-right: 15px; padding-top: 15px; font-size: 12px;'>
-                    <div style='width: 20%;'>-</div>
-                    <div style='width: 60%;'>RECARGO APLICADO</div>
-                    <div style='width: 20%; text-align: right;'>${saleData.totalRecargo}</div>
-                </div>
-                `
-                : ''
-            }
+            </div>
+            <div style='width: 100%; display: inline-block;'>
+                <br />
+                ${ (saleData.totalRecargo)
+                    ? `
+                        <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                            <div style='width: 20%;'></div>
+                            <div style='width: 60%;'>Recargo aplicado</div>
+                            <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalRecargo)}</div>
+                        </div>
+                    `
+                    : ''
+                }
+                <br />
+                ${ (saleData.totalDescuento)
+                    ? `
+                        <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                            <div style='width: 20%;'></div>
+                            <div style='width: 60%;'>Descuento aplicado</div>
+                            <div style='width: 20%; text-align: right; padding-right: 5px;'>- ${roundTwoDecimals(saleData.totalDescuento)}</div>
+                        </div>
+                    `
+                    : ''
+                }
+            </div>
         </div>
         <div style='width: 100%; height: 110px; bottom: 0; font-size: 9px;'>
             <div style='width: 100%; color: #C2BDBC;'>

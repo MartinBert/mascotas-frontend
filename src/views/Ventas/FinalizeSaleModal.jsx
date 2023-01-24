@@ -5,6 +5,7 @@ import api from '../../services'
 import { errorAlert, successAlert } from '../../components/alerts'
 
 const { formatBody } = helpers.afipHelper
+const { roundTwoDecimals } = helpers.mathHelper
 const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
@@ -30,6 +31,8 @@ const FinalizeSaleModal = ({state, dispatch, actions, userState}) => {
     const processStock = async() => {
       try{
         for(const product of state.productos){
+            product.cantidadUnidades = roundTwoDecimals(product.cantidadStock)
+            product.cantidadStock = roundTwoDecimals(product.cantidadStock)
           const lineOfProduct = state.renglones.find(item => item._id === product._id)
           await api.productos.modifyStock(
             {

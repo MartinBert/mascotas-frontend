@@ -103,54 +103,75 @@ const actions = {
     SET_TOTAL: 'SET_TOTAL',
 }
 
-const quantity = (line) => {
-    let quantity = 0
-    if (line.precioNetoFijo) quantity = line.precioNeto / line.precioUnitario
-    if (line.fraccionar) quantity = line.cantidadUnidades / line.fraccionamiento
-    else quantity = line.cantidadUnidades
-    return quantity
-}
-
-const calculateNetPrice = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
-    const totalWithoutModifications = line.precioUnitario * quantity(line)
-    const totalWithModifications = totalWithoutModifications * (1
-        + decimalPercent(line.porcentajeRecargoRenglon)
-        + decimalPercent(porcentajeRecargoGlobal)
-        - decimalPercent(line.porcentajeDescuentoRenglon)
-        - decimalPercent(porcentajeDescuentoGlobal)
-        + porcentajePlanDePago
-    )
-    return roundTwoDecimals(totalWithModifications)
-}
-
 const calculateGrossPrice = (line) => {
-    const quantity = (line.fraccionar) ? line.cantidadUnidades / line.fraccionamiento : line.cantidadUnidades
+    const quantity = (line.fraccionar)
+        ? line.cantidadUnidades / line.fraccionamiento
+        : line.cantidadUnidades
     const grossPrice = quantity * line.precioUnitario
-    return roundTwoDecimals(grossPrice)
+    return grossPrice
 }
 
-const calculateSurchargeOnGrossPrice = (line, porcentajeRecargoGlobal, porcentajePlanDePago) => {
-    const porcPlanPago = (porcentajePlanDePago > 0) ? porcentajePlanDePago : 0
-    const totalWithoutModifications = line.precioUnitario * quantity(line)
-    const totalWithModifications = totalWithoutModifications * (1
-        + decimalPercent(line.porcentajeRecargoRenglon)
-        + decimalPercent(porcentajeRecargoGlobal)
-        + porcPlanPago
-    )
-    const lineSurcharge = totalWithModifications - totalWithoutModifications
+const calculateLineSurcharge = (line, recargoGlobal, porcentajePlanDePago) => {
+    const percentagePaymentPlan = (porcentajePlanDePago > 0) ? porcentajePlanDePago : 0
+    const grossPrice = calculateGrossPrice(line)
+    let lineSurcharge = 0
+    if (line.precioNetoFijo) lineSurcharge = (line.precioNeto > grossPrice) ? line.precioNeto - grossPrice : 0
+    else {
+        const netPrice = grossPrice * (1
+            + decimalPercent(line.porcentajeRecargoRenglon)
+            + decimalPercent(recargoGlobal)
+            + percentagePaymentPlan
+        )
+        lineSurcharge = netPrice - grossPrice
+    }
     return roundTwoDecimals(lineSurcharge)
 }
 
-const calculateDiscountOnGrossPrice = (line, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
-    const porcPlanPago = (porcentajePlanDePago < 0) ? porcentajePlanDePago : 0
-    const totalWithoutModifications = line.precioUnitario * quantity(line)
-    const totalWithModifications = totalWithoutModifications * (1
-        - decimalPercent(line.porcentajeDescuentoRenglon)
-        - decimalPercent(porcentajeDescuentoGlobal)
-        + porcPlanPago
-    )
-    const lineDiscount = totalWithoutModifications - totalWithModifications
+const calculateLineDiscount = (line, descuentoGlobal, porcentajePlanDePago) => {
+    const percentagePaymentPlan = (porcentajePlanDePago < 0) ? porcentajePlanDePago : 0
+    const grossPrice = calculateGrossPrice(line)
+    let lineDiscount = 0
+    if (line.precioNetoFijo) lineDiscount = (grossPrice > line.precioNeto) ? grossPrice - line.precioNeto : 0
+    else {
+        const netPrice = grossPrice * (1
+            - decimalPercent(line.porcentajeDescuentoRenglon)
+            - decimalPercent(descuentoGlobal)
+            + percentagePaymentPlan
+        )
+        lineDiscount = grossPrice - netPrice
+    }
     return roundTwoDecimals(lineDiscount)
+}
+
+const calculateNetPrice = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago) => {
+    const grossPrice = calculateGrossPrice(line)
+    const netPrice = grossPrice
+        + calculateLineSurcharge(line, recargoGlobal, porcentajePlanDePago)
+        - calculateLineDiscount(line, descuentoGlobal, porcentajePlanDePago)
+    return roundTwoDecimals(netPrice)
+}
+
+const calculateQuantity = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago) => {
+    const initialQuantity = (line.fraccionar)
+        ? (line.precioNeto / line.precioUnitario) * line.fraccionamiento
+        : line.precioNeto / line.precioUnitario
+    const quantity = initialQuantity * (1
+        - decimalPercent(line.porcentajeRecargoRenglon)
+        - decimalPercent(recargoGlobal)
+        + decimalPercent(line.porcentajeDescuentoRenglon)
+        + decimalPercent(descuentoGlobal)
+        + porcentajePlanDePago
+    )
+
+    const removedQuantity = (line.porcentajeRecargoRenglon > 0 || recargoGlobal > 0 || porcentajePlanDePago > 0)
+        ? initialQuantity - quantity : 0
+    line.cantidadQuitadaPorRecargo_enKg = (line.fraccionar) ? removedQuantity / line.fraccionamiento : removedQuantity
+
+    const addedQuantity = (line.porcentajeDescuentoRenglon > 0 || descuentoGlobal > 0 || porcentajePlanDePago < 0)
+        ? quantity - initialQuantity : 0
+    line.cantidadAgregadaPorDescuento_enKg = (line.fraccionar) ? addedQuantity / line.fraccionamiento : addedQuantity
+
+    return quantity
 }
 
 const spanQuantity = (line) => {
@@ -165,78 +186,18 @@ const spanQuantity = (line) => {
     }
 }
 
-const calculateQuantity = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
-    const quantityWithoutModifications = (line.fraccionar)
-        ? (line.precioNeto / line.precioUnitario) * line.fraccionamiento
-        : line.precioNeto / line.precioUnitario
-    let quantityWithModifications = 0
-    if (line.porcentajeRecargoRenglon > 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) - porcentajePlanDePago)
-    } else if (line.porcentajeRecargoRenglon > 0 && porcentajeRecargoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) - decimalPercent(porcentajeRecargoGlobal) - porcentajePlanDePago)
-    } else if (line.porcentajeRecargoRenglon > 0 && porcentajeDescuentoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(line.porcentajeRecargoRenglon) + decimalPercent(porcentajeDescuentoGlobal) - porcentajePlanDePago)
-    } else if (line.porcentajeDescuentoRenglon > 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) - porcentajePlanDePago)
-    } else if (line.porcentajeDescuentoRenglon > 0 && porcentajeRecargoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) - decimalPercent(porcentajeRecargoGlobal) - porcentajePlanDePago)
-    } else if (line.porcentajeDescuentoRenglon > 0 && porcentajeDescuentoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(line.porcentajeDescuentoRenglon) + decimalPercent(porcentajeDescuentoGlobal) - porcentajePlanDePago)
-    } else if (line.porcentajeRecargoRenglon === 0 && porcentajeRecargoGlobal > 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - decimalPercent(porcentajeRecargoGlobal) - porcentajePlanDePago)
-    } else if (line.porcentajeRecargoRenglon === 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal > 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 + decimalPercent(porcentajeDescuentoGlobal) - porcentajePlanDePago)
-    } else if (line.porcentajeRecargoRenglon === 0 && line.porcentajeDescuentoRenglon === 0 && porcentajeRecargoGlobal === 0 && porcentajeDescuentoGlobal === 0) {
-        quantityWithModifications = quantityWithoutModifications * (1 - porcentajePlanDePago)
-    }
-
-    const removedQuantity = (line.porcentajeRecargoRenglon > 0 || porcentajeRecargoGlobal > 0 || porcentajePlanDePago > 0)
-        ? quantityWithoutModifications - quantityWithModifications
-        : 0
-    const addedQuantity = (line.porcentajeDescuentoRenglon > 0 || porcentajeDescuentoGlobal > 0 || porcentajePlanDePago < 0)
-        ? quantityWithModifications - quantityWithoutModifications
-        : 0
-    line.cantidadQuitadaPorRecargo_enKg = (line.fraccionar) ? removedQuantity / line.fraccionamiento : removedQuantity
-    line.cantidadAgregadaPorDescuento_enKg = (line.fraccionar) ? addedQuantity / line.fraccionamiento : addedQuantity
-    return quantityWithModifications
-}
-
-const calculateBaseQuantity = (line) => {
-    return line.precioNeto / line.precioUnitario
-}
-
-const updateValues1 = (line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago) => {
+const updateValues = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice) => {
     if (line.precioNetoFijo) {
-        line.cantidadUnidades = calculateQuantity(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
+        line.precioUnitario = (line.fraccionar) ? productFractionedPrice : productUnfractionedPrice
+        line.cantidadUnidades = calculateQuantity(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
+        line.precioBruto = calculateGrossPrice(line)
     } else {
-        line.precioNeto = calculateNetPrice(line, porcentajeRecargoGlobal, porcentajeDescuentoGlobal, porcentajePlanDePago)
-    }
-    line.recargo = calculateSurchargeOnGrossPrice(line, porcentajeRecargoGlobal, porcentajePlanDePago)
-    line.descuento = calculateDiscountOnGrossPrice(line, porcentajeDescuentoGlobal, porcentajePlanDePago)
-    line.precioBruto = calculateGrossPrice(line)
-    spanQuantity(line)
-}
-
-const updateValues2 = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice) => {
-    const fixed = line.precioNetoFijo
-    const fractioned = line.fraccionar
-    if (fixed && fractioned) {
-        line.precioUnitario = productFractionedPrice
-        line.cantidadUnidades = calculateQuantity(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
-    } else if (!fixed && fractioned) {
-        line.precioUnitario = productFractionedPrice
-        line.precioNeto = calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
-    } else if (fixed && !fractioned) {
-        line.precioUnitario = productUnfractionedPrice
-        line.cantidadUnidades = calculateQuantity(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
-    } else if (!fixed && !fractioned) {
-        line.precioUnitario = productUnfractionedPrice
-        line.cantidadUnidades = calculateBaseQuantity(line)
+        line.precioUnitario = (line.fraccionar) ? productFractionedPrice : productUnfractionedPrice
+        line.precioBruto = calculateGrossPrice(line)
         line.precioNeto = calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
     }
-    line.recargo = calculateSurchargeOnGrossPrice(line, recargoGlobal, porcentajePlanDePago)
-    line.descuento = calculateDiscountOnGrossPrice(line, descuentoGlobal, porcentajePlanDePago)
-    line.precioBruto = calculateGrossPrice(line)
+    line.recargo = calculateLineSurcharge(line, recargoGlobal, porcentajePlanDePago)
+    line.descuento = calculateLineDiscount(line, descuentoGlobal, porcentajePlanDePago)
     spanQuantity(line)
 }
 
@@ -259,7 +220,7 @@ const reducer = (state = initialState, action) => {
                 state.porcentajeRecargoGlobal = 0
                 const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                 state.renglones.map((line) => {
-                    updateValues1(line, 0, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
+                    updateValues(line, 0, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
                     return line
                 })
             }
@@ -268,7 +229,7 @@ const reducer = (state = initialState, action) => {
                 state.porcentajeDescuentoGlobal = 0
                 const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                 state.renglones.map((line) => {
-                    updateValues1(line, state.porcentajeRecargoGlobal, 0, porcentajePlanDePago)
+                    updateValues(line, state.porcentajeRecargoGlobal, 0, porcentajePlanDePago)
                     return line
                 })
             }
@@ -326,7 +287,9 @@ const reducer = (state = initialState, action) => {
                 porcentajeDescuentoGlobal: action.payload,
                 renglones: state.renglones.map((line) => {
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
-                    updateValues1(line, 0, action.payload, porcentajePlanDePago)
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                    updateValues(line, 0, action.payload, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     return line
                 }),
             }
@@ -336,7 +299,9 @@ const reducer = (state = initialState, action) => {
                 porcentajeRecargoGlobal: action.payload,
                 renglones: state.renglones.map((line) => {
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
-                    updateValues1(line, action.payload, 0, porcentajePlanDePago)
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                    updateValues(line, action.payload, 0, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     return line
                 }),
             }
@@ -345,13 +310,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 renglones: state.renglones.map((line) => {
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         line.cantidadUnidades = action.payload.cantidadUnidades
-                        if (!line.precioNetoFijo) {
-                            line.precioNeto = calculateNetPrice(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
-                            line.precioBruto = calculateGrossPrice(line)
-                        }
-                        spanQuantity(line)
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
                 }),
@@ -364,13 +327,11 @@ const reducer = (state = initialState, action) => {
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
-                        (line.fraccionar)
-                            ? line.precioUnitario = productFractionedPrice
-                            : line.precioUnitario = productUnfractionedPrice
                         line.precioNeto = action.payload.precioNeto
+                        line.precioUnitario = (line.fraccionar) ? productFractionedPrice : productUnfractionedPrice
                         line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
-                        spanQuantity(line)
                         line.precioBruto = calculateGrossPrice(line)
+                        spanQuantity(line)
                     }
                     return line
                 }),
@@ -379,14 +340,12 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    const recargoGlobal = state.porcentajeRecargoGlobal
-                    const descuentoGlobal = state.porcentajeDescuentoGlobal
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         line.precioNetoFijo = action.payload.precioNetoFijo
-                        updateValues2(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
                 }),
@@ -396,9 +355,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 renglones: state.renglones.map((line) => {
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         line.porcentajeDescuentoRenglon = action.payload.porcentajeDescuentoRenglon
-                        updateValues1(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
                 }),
@@ -408,9 +369,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 renglones: state.renglones.map((line) => {
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         line.porcentajeRecargoRenglon = action.payload.porcentajeRecargoRenglon
-                        updateValues1(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
                 }),
@@ -451,14 +414,12 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map(line => {
-                    const recargoGlobal = state.porcentajeRecargoGlobal
-                    const descuentoGlobal = state.porcentajeDescuentoGlobal
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         line = action.payload
-                        updateValues2(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
                 })
@@ -553,19 +514,32 @@ const reducer = (state = initialState, action) => {
                 planesPagoNombres: planNames
             }
         case actions.SET_TOTAL:
-            if (state.renglones.length === 0) return state
+            if (state.renglones.length === 0) {
+                state.totalDescuento = 0
+                state.totalRecargo = 0
+                state.baseImponible21 = 0
+                state.baseImponible10 = 0
+                state.baseImponible27 = 0
+                state.iva21 = 0
+                state.iva10 = 0
+                state.iva27 = 0
+                state.importeIva = 0
+                state.subTotal = 0
+                state.total = 0
+                return state
+            }
 
             // ---------------- Cálculos correspondientes a ítems de precio VARIABLE ---------------- //
             const variableAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo === false)
-            const variableLinesSumBasePrice = variableAmountLines.reduce((acc, el) => acc + el.precioBruto, 0)
+            const variableLinesSumBasePrice = variableAmountLines.reduce((acc, el) => acc + el.precioNeto, 0)
             const totalDescuentoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.descuento, 0))
             const totalRecargoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, el) => acc + el.recargo, 0))
 
             // ---------------- Cálculos correspondientes a ítems de precio FIJADO ---------------- //
             const fixedAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo === true)
             const fixedLinesSumBasePrice = fixedAmountLines.reduce((acc, el) => acc + el.precioNeto, 0)
-            const totalDescuentoFijo = 0    // Cero porque el cliente abona un monto fijo.
-            const totalRecargoFijo = 0      // Cero porque el cliente abona un monto fijo.
+            const totalDescuentoFijo = roundTwoDecimals(fixedAmountLines.reduce((acc, el) => acc + el.descuento, 0))
+            const totalRecargoFijo = roundTwoDecimals(fixedAmountLines.reduce((acc, el) => acc + el.recargo, 0))
 
             // ---------------- TOTALES (ítems de precio VARIABLE + ítems de precio FIJADO) ---------------- //
             const totalLinesSum = variableLinesSumBasePrice + fixedLinesSumBasePrice
@@ -598,7 +572,7 @@ const reducer = (state = initialState, action) => {
             const iva10 = roundTwoDecimals(iva10Total - baseImponible10)
             const iva27 = roundTwoDecimals(iva27Total - baseImponible27)
             const importeIva = roundTwoDecimals(iva21 + iva10 + iva27)
-            const total = roundTwoDecimals(totalLinesSum + totalRecargo - totalDescuento)
+            const total = roundTwoDecimals(totalLinesSum)
             const subTotal = roundTwoDecimals(total - importeIva)
 
             return {
