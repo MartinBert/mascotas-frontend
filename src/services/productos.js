@@ -1,4 +1,7 @@
 import axios from 'axios'
+import mathHelper from '../helpers/mathHelper'
+
+const { roundTwoDecimals } = mathHelper
 const token = localStorage.getItem('token')
 const headers = {headers: {Authorization: token}}
 const checkStorageStatus = (err) => {
@@ -79,8 +82,16 @@ const edit = async(producto) => {
 }
 
 const modifyStock = async(body) => {
+    const productWithRoundedStock = {
+        ...body,
+        product: {
+            ...body.product,
+            cantidadStock: roundTwoDecimals(body.product.cantidadStock),
+            cantidadFraccionadaStock: roundTwoDecimals(body.product.cantidadFraccionadaStock)
+        }
+    }
     try{
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos/modifyStock`, body, headers)
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos/modifyStock`, productWithRoundedStock, headers)
         return response.data
     }catch(err){
         checkStorageStatus(err)
