@@ -10,7 +10,7 @@ import helpers from '../../helpers'
 const { Spinner } = graphics
 const { formHelper } = helpers
 
-const ClientesForm = () => {
+const ClientesForm = ({userState}) => {
 
     const { id } = useParams()
     const history = useHistory()
@@ -21,8 +21,8 @@ const ClientesForm = () => {
         email: '',
         telefono: '',
         direccion: '',
-        ciudad: 'Reconquista',
-        provincia: 'Santa Fe',
+        ciudad: '',
+        provincia: '',
         documentoReceptor: 0,
         _id: null
     })
@@ -116,19 +116,63 @@ const ClientesForm = () => {
                         />
                     </Form.Item>
 
-                    {formProps.map(formItem => {
-                        return (
-                            <Form.Item
-                                label={formItem.label}
-                                name={formItem.name}
-                                onChange={e => loadClienteData(e)}
-                                rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
-                                key={formItem.name}
-                            >
-                                <Input name={formItem.name} value={formItem.value} />
-                            </Form.Item>
-                        )
-                    })}
+                    {formProps.map(formItem => (
+                        (formItem.name !== 'cuit')
+                        ?
+                        <Form.Item
+                            label={formItem.label}
+                            name={formItem.name}
+                            onChange={e => loadClienteData(e)}
+                            rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
+                            key={formItem.name}
+                        >
+                            <Input name={formItem.name} value={formItem.value} />
+                        </Form.Item>
+                        :
+                        <Row key={formItem.name}>
+                            <Col span={16}>
+                                <Form.Item
+                                    label={formItem.label}
+                                    name={formItem.name}
+                                    onChange={e => loadClienteData(e)}
+                                    rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
+                                >
+                                    <Input name={formItem.name} value={formItem.value} />
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <Button 
+                                    className='btn-primary' 
+                                    type='button'
+                                    onClick={async(e)=> {
+                                        e.preventDefault();
+                                        setLoading(true)
+                                        if(!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.');
+                                
+                                        const userCuit = userState.user.empresa.cuit;
+                                        const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit);
+                                        
+                                        if(!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
+                                
+                                        setCliente({
+                                            ...cliente,
+                                            razonSocial: taxpayerData.razonSocial,
+                                            condicionFiscal: null,
+                                            email: (taxpayerData.email) ? taxpayerData.email[0].direccion : '',
+                                            telefono: (taxpayerData.telefono) ? taxpayerData.telefono[0].numero : '',
+                                            direccion: (taxpayerData.domicilio[0].direccion) ? taxpayerData.domicilio[0].direccion : '',
+                                            ciudad: (taxpayerData.domicilio[0].localidad) ? taxpayerData.domicilio[0].localidad : '',
+                                            provincia: (taxpayerData.domicilio[0].descripcionProvincia) ? taxpayerData.domicilio[0].descripcionProvincia : '',
+                                            documentoReceptor: 80
+                                        })
+                                    }
+                                    }
+                                >
+                                    Buscar datos
+                                </Button>
+                            </Col>
+                        </Row>
+                    ))}
                 </Col>
                 <Row justify='center' gutter={24}>
                     <Col>

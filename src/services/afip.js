@@ -26,9 +26,20 @@ const generateVoucher = async (cuit, voucher) => {
     }
 }
 
+const findTaxpayerData = async (userCuit, taxpayerCuit) => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/buscarDatosContribuyente/${userCuit}/${taxpayerCuit}`);
+        return response.data;
+    } catch (err) {
+        checkStorageStatus(err);
+        console.error(err);
+    }
+}
+
 const marcas = {
     findLastVoucherNumber,
-    generateVoucher
+    generateVoucher,
+    findTaxpayerData
 }
 
 export default marcas;
