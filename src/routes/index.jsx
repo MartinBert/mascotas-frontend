@@ -1,38 +1,38 @@
-import React, { useReducer } from 'react';
-import reducers from '../reducers';
-import PublicRouter from './PublicRouter';
-import PrivateRouter from './PrivateRouter';
-import {BrowserRouter as Router, Switch} from 'react-router-dom';
-import Login from '../views/Login';
-import Home from '../views/Home';
-import Productos from '../views/Productos';
-import ProductosForm from '../views/Productos/ProductosForm';
-import Salidas from '../views/Salidas';
-import SalidasForm from '../views/Salidas/SalidasForm';
-import Entradas from '../views/Entradas';
-import EntradasForm from '../views/Entradas/EntradasForm';
-import Marcas from '../views/Marcas';
-import MarcasForm from '../views/Marcas/MarcasForm';
-import Clientes from '../views/Clientes';
-import ClientesForm from '../views/Clientes/ClientesForm';
-import Documentos from '../views/Documentos';
-import DocumentosForm from '../views/Documentos/DocumentosForm';
-import MediosPago from '../views/MediosPago';
-import MediosPagoForm from '../views/MediosPago/MediosPagoForm';
-import Rubros from '../views/Rubros';
-import RubrosForm from '../views/Rubros/RubrosForm';
-import Usuarios from '../views/Usuarios';
-import UsuariosForm from '../views/Usuarios/UsuariosForm';
-import Empresas from '../views/Empresas';
-import EmpresasForm from '../views/Empresas/EmpresasForm';
-import PuntosVenta from '../views/PuntosVenta';
-import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm';
-import UnidadesMedida from '../views/UnidadesMedida';
-import UnidadesMedidaForm from '../views/UnidadesMedida/UnidadesMedidaForm';
-import CondicionesFiscales from '../views/CondicionesFiscales';
-import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm';
-import Ventas from '../views/Ventas';
-import VentasList from '../views/Ventas/VentasList';
+import React, { useReducer } from 'react'
+import reducers from '../reducers'
+import PublicRouter from './PublicRouter'
+import PrivateRouter from './PrivateRouter'
+import {BrowserRouter as Router, Switch} from 'react-router-dom'
+import Login from '../views/Login'
+import Home from '../views/Home'
+import Productos from '../views/Productos'
+import ProductosForm from '../views/Productos/ProductosForm'
+import Salidas from '../views/Salidas'
+import SalidasForm from '../views/Salidas/SalidasForm'
+import Entradas from '../views/Entradas'
+import EntradasForm from '../views/Entradas/EntradasForm'
+import Marcas from '../views/Marcas'
+import MarcasForm from '../views/Marcas/MarcasForm'
+import Clientes from '../views/Clientes'
+import ClientesForm from '../views/Clientes/ClientesForm'
+import Documentos from '../views/Documentos'
+import DocumentosForm from '../views/Documentos/DocumentosForm'
+import MediosPago from '../views/MediosPago'
+import MediosPagoForm from '../views/MediosPago/MediosPagoForm'
+import Rubros from '../views/Rubros'
+import RubrosForm from '../views/Rubros/RubrosForm'
+import Usuarios from '../views/Usuarios'
+import UsuariosForm from '../views/Usuarios/UsuariosForm'
+import Empresas from '../views/Empresas'
+import EmpresasForm from '../views/Empresas/EmpresasForm'
+import PuntosVenta from '../views/PuntosVenta'
+import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm'
+import UnidadesMedida from '../views/UnidadesMedida'
+import UnidadesMedidaForm from '../views/UnidadesMedida/UnidadesMedidaForm'
+import CondicionesFiscales from '../views/CondicionesFiscales'
+import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm'
+import Ventas from '../views/Ventas'
+import VentasList from '../views/Ventas/VentasList'
 
 const routes = [
     {id: 1, activeKey: null, path: '/login', private: false, component: Login},
@@ -67,10 +67,10 @@ const routes = [
     {id: 30, activeKey: null, path: '/', private: true, component: Home},
 ]
 
-const {reducer, initialState} = reducers.privateRouteReducer;
+const {reducer, initialState} = reducers.privateRouteReducer
 
 const AppRouter  = ({userState, userDispatch, userActions}) => {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = useReducer(reducer, initialState)
     return (
         <Router>
             <Switch>
@@ -95,4 +95,4 @@ const AppRouter  = ({userState, userDispatch, userActions}) => {
     )
 }
 
-export default AppRouter;
+export default AppRouter

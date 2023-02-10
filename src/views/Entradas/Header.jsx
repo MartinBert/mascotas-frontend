@@ -1,77 +1,123 @@
-import React from 'react';
-import { Row, Col, Input } from 'antd';
-import { Link } from 'react-router-dom';
-import api from '../../services';
-import helpers from '../../helpers';
+import React, { useState, useEffect } from 'react'
+import { Row, Col, Input, DatePicker } from 'antd'
+import { Link } from 'react-router-dom'
+import api from '../../services'
+import helpers from '../../helpers'
 
-const {exportSimpleExcel} = helpers.excel;
-const {simpleDateWithHours} = helpers.dateHelper;
+const { RangePicker } = DatePicker
+const { addDays } = helpers.dateHelper
+const { exportSimpleExcel } = helpers.excel
+const { simpleDateWithHours } = helpers.dateHelper
 
-const Header = ({ filters, setFilters }) => {
-    const exportExcel = async() => {
-        const response = await api.entradas.findAll({page: 0, limit: 1000000, filters: null});
-        const nameOfSheet = 'Hoja de entradas';
-        const nameOfDocument = 'Lista de entradas';
-        const columnHeaders = [
-            'Fecha',
-            'Descripción' , 
-            'Productos',
-            'Costo total', 
-            'Usuario',
-        ];
-        const lines = await processExcelLines(response.data.docs);
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument);
+const Header = ({ setFilters, setPage, entradas_paginadas, entradas_totales }) => {
+    const [fecha, setFecha] = useState(null)
+    const [descripcion, setDescripcion] = useState(null)
+    const [entradasToReport, setEntradasToReport] = useState(null)
+    useEffect(() => { setEntradasToReport(entradas_paginadas) }, [entradas_paginadas])
+
+    const fetchEntradasByDates = async (value) => {
+        if (value === null) setEntradasToReport(entradas_paginadas)
+        else {
+            const initialDate = (addDays(value[0]._d, + 0)).toISOString()
+            const finalDate = (addDays(value[1]._d, + 1)).toISOString()
+            const response = await api.entradas.findByDates({ initialDate, finalDate })
+            setEntradasToReport(response)
+        }
     }
 
-    const processExcelLines = async(entradas) => {
-        const processedLines = [];
-        for await (let entrada of entradas){
+    const processExcelLines = async (entradasToReport) => {
+        const processedLines = []
+        for await (let entrada of entradasToReport) {
             processedLines.push([
+                (entrada.usuario) ? entrada.usuario.nombre : 'Usuario inexistente',
                 simpleDateWithHours(entrada.fecha),
                 entrada.descripcion,
-                entrada.productos.reduce((acc, item) => { 
+                entrada.productos.reduce((acc, item) => {
                     acc = acc + item.nombre + ' (' + item.cantidadesEntrantes + '),'
-                    return acc;
+                    return acc
                 }, ''),
-                entrada.costoTotal,
-                (entrada.usuario) ? entrada.usuario.nombre : 'Usuario inexistente'
+                entrada.costoTotal
             ])
         }
-        return processedLines;
+        return processedLines
+    }
+
+    const exportExcel = async () => {
+        const nameOfSheet = 'Hoja de entradas'
+        const nameOfDocument = 'Lista de entradas'
+        const columnHeaders = [
+            'Usuario',
+            'Fecha',
+            'Descripción',
+            'Productos',
+            'Costo total'
+        ]
+        const lines = await processExcelLines(entradasToReport)
+        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+    }
+
+    const clearInputs = () => {
+        setFecha(null)
+        setDescripcion(null)
+    }
+
+    const onChangeFecha = (value) => {
+        clearInputs()
+        setFecha(value)
+        const fechaForFilters = entradas_totales.map(entry => {
+            const fechaToCompare = simpleDateWithHours(new Date(entry.fecha))
+            if (fechaToCompare.includes(value)) return entry.fecha
+            else return null
+        })
+        setFilters(JSON.stringify({ fecha: fechaForFilters }))
+        if (value.length < 1) setFilters(null)
+        setPage(1)
+    }
+
+    const onChangeDescripcion = (value) => {
+        clearInputs()
+        setDescripcion(value)
+        setFilters(JSON.stringify({ descripcion: value }))
+        if (value.length < 1) setFilters(null)
+        setPage(1)
     }
 
     return (
         <Row gutter={8}>
             <Col span={4}>
                 <Link to='/entradas/nuevo'>
-                    <button 
-                        className='btn-primary'
-                    >
-                        Nueva entrada
-                    </button>
+                    <button className='btn-primary'>Nueva entrada</button>
                 </Link>
             </Col>
             <Col span={4}>
                 <button
                     className='btn-primary'
-                    onClick={() => {exportExcel()}}
+                    onClick={() => exportExcel()}
                 >
                     Exportar Excel
                 </button>
             </Col>
-            <Col span={16} align='right'>
-                <Input 
-                    color='primary' 
-                    style={{ width: 200, marginBottom: '10px' }}
+            <Col span={8}>
+                <RangePicker
+                    format='DD-MM-YYYY'
+                    onChange={value => fetchEntradasByDates(value)}
+                />
+            </Col>
+            <Col span={4} align='right'>
+                <Input
+                    type='primary'
+                    placeholder='Buscar por fecha'
+                    onChange={e => onChangeFecha(e.target.value)}
+                    value={fecha}
+                />
+            </Col>
+            <Col span={4} align='right'>
+                <Input
+                    type='primary'
                     placeholder='Buscar por descripción'
-                    onChange={(e) => { setFilters(
-                        {
-                            ...filters,
-                            descripcion: e.target.value
-                        }
-                    )}}
-                    value={(filters) ? filters.descripcion : null}
-                /> 
+                    onChange={e => onChangeDescripcion(e.target.value)}
+                    value={descripcion}
+                />
             </Col>
         </Row>
     )

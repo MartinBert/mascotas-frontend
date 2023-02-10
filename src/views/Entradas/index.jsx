@@ -13,7 +13,8 @@ const { dateHelper } = helpers
 
 const Entradas = () => {
     const history = useHistory()
-    const [entradas, setEntradas] = useState(null)
+    const [entradas_paginadas, setEntradas_paginadas] = useState(null)
+    const [entradas_totales, setEntradas_totales] = useState(null)
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
@@ -26,91 +27,104 @@ const Entradas = () => {
     const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
     useEffect(() => {
-      const fetchEntradas = async() => {
-        const response = await api.entradas.findAll({page, limit, filters: JSON.stringify(filters)})
-        setEntradas(response.data.docs)
-        setTotalDocs(response.data.totalDocs)
-        setLoading(false)
-      }
-      fetchEntradas()
-    },[page, limit, filters, loading, deleteEntityIdConfirmation])
+        const fetchEntradas_paginadas = async () => {
+            const response = await api.entradas.findAll({ page, limit, filters })
+            setEntradas_paginadas(response.data.docs)
+            setTotalDocs(response.data.totalDocs)
+            setLoading(false)
+        }
+        fetchEntradas_paginadas()
+    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
 
     useEffect(() => {
-      if(deleteEntityId === null) return
-      const deleteEntrada = async() => {
-        setLoading(true)
-        api.entradas.deleteById(deleteEntityId)
-        .then(() => {
-          setDeleteEntityId(null)
-          setLoading(false)
-        })
-      }
-      deleteEntrada()
+        const fetchEntradas_totales = async () => {
+            const data = await api.entradas.findAll(null)
+            setEntradas_totales(data)
+        }
+        fetchEntradas_totales()
+    }, [])
+
+    useEffect(() => {
+        if (deleteEntityId === null) return
+        const deleteEntrada = async () => {
+            setLoading(true)
+            api.entradas.deleteById(deleteEntityId)
+                .then(() => {
+                    setDeleteEntityId(null)
+                    setLoading(false)
+                })
+        }
+        deleteEntrada()
     }, [deleteEntityId])
 
     const editEntrada = (id) => {
-      console.log('test')
-      history.push(`/entradas/${id}`)
+        console.log('test')
+        history.push(`/entradas/${id}`)
     }
 
     const columnsForTable = [
-      {
-        title: 'Descripción',
-        dataIndex: 'descripcion',
-      },
-      {
-        title: 'Fecha',
-        render: (data) => (
-          <p>{dateHelper.simpleDateWithHours(data.fecha)+' hs'}</p>
-        ),
-      },
-      {
-        title: 'Productos que entraron',
-        render: data => (
-          <div onClick={() => {
-            setDetailsData(data.productos)
-            setDetailsVisible(true)
-          }}>
-            <Details/>
-          </div>
-        )
-      },
-      {
-        title: 'Costo',
-        dataIndex: 'costoTotal',
-      },
-      {
-        title: 'Usuario',
-        dataIndex: 'usuario',
-        render: usuario => (usuario) ? usuario.nombre : 'Usuario inexistente'
-      },
-      {
-        title: 'Acciones',
-        render: (entrada) => (
-          <Row style={{display: 'inline-flex'}}>
-            <div onClick={() => {editEntrada(entrada._id)}}>
-              <Edit/>
-            </div>
-            <div onClick={() => {
-              setDeleteEntityIdConfirmation(entrada._id)
-              setDeleteVisible(true)
-            }}>
-              <Delete/>
-            </div>
-          </Row>
-        )
-      },
+        {
+            title: 'Usuario',
+            dataIndex: 'usuario',
+            render: usuario => (usuario) ? usuario.nombre : 'Usuario inexistente'
+        },
+        {
+            title: 'Productos que entraron',
+            render: data => (
+                <div onClick={() => {
+                    setDetailsData(data.productos)
+                    setDetailsVisible(true)
+                }}>
+                    <Details />
+                </div>
+            )
+        },
+        {
+            title: 'Fecha',
+            render: (data) => (
+                <p>{dateHelper.simpleDateWithHours(data.fecha) + ' hs'}</p>
+            ),
+        },
+        {
+            title: 'Descripción',
+            dataIndex: 'descripcion',
+        },
+        {
+            title: 'Costo',
+            dataIndex: 'costoTotal',
+        },
+        {
+            title: 'Acciones',
+            render: (entrada) => (
+                <Row style={{ display: 'inline-flex' }}>
+                    <div onClick={() => { editEntrada(entrada._id) }}>
+                        <Edit />
+                    </div>
+                    <div onClick={() => {
+                        setDeleteEntityIdConfirmation(entrada._id)
+                        setDeleteVisible(true)
+                    }}>
+                        <Delete />
+                    </div>
+                </Row>
+            )
+        },
     ]
 
     return (
         <Row>
             <Col span={24}>
-              <Header setFilters={setFilters} filters={filters}/>
+                <Header
+                    setFilters={setFilters}
+                    setPage={setPage}
+                    entradas_paginadas={entradas_paginadas}
+                    entradas_totales={entradas_totales}
+                />
             </Col>
             <Col span={24}>
-                <Table 
+                <Table
                     width={'100%'}
-                    dataSource={entradas}
+                    dataSource={entradas_paginadas}
                     columns={columnsForTable}
                     pagination={{
                         defaultCurrent: page,
@@ -126,18 +140,18 @@ const Entradas = () => {
                     size='small'
                 />
             </Col>
-            <DetailsModal 
-              detailsVisible={detailsVisible}
-              setDetailsVisible={setDetailsVisible}
-              detailsData={detailsData}
+            <DetailsModal
+                detailsVisible={detailsVisible}
+                setDetailsVisible={setDetailsVisible}
+                detailsData={detailsData}
             />
             <DeleteModal
-              title='Eliminar entrada'
-              deleteVisible={deleteVisible}
-              setLoading={setLoading}
-              setDeleteVisible={setDeleteVisible}
-              setDeleteEntityId={setDeleteEntityId}
-              deleteEntityIdConfirmation={deleteEntityIdConfirmation}
+                title='Eliminar entrada'
+                deleteVisible={deleteVisible}
+                setLoading={setLoading}
+                setDeleteVisible={setDeleteVisible}
+                setDeleteEntityId={setDeleteEntityId}
+                deleteEntityIdConfirmation={deleteEntityIdConfirmation}
             />
         </Row>
     )
