@@ -1,203 +1,207 @@
-import React, {useEffect, useState} from 'react';
-import { GenericAutocomplete } from '../../components/generics';
-import { Row, Col, Button, Input } from 'antd';
-import { Link } from 'react-router-dom';
-import PriceModificatorModal from './PriceModificatorModal';
+import React, { useEffect, useState } from 'react'
+import { GenericAutocomplete } from '../../components/generics'
+import { Row, Col, Button, Input } from 'antd'
+import { Link } from 'react-router-dom'
+import PriceModificatorModal from './PriceModificatorModal'
 import api from '../../services'
-import helpers from '../../helpers';
+import helpers from '../../helpers'
 
-const {exportSimpleExcel} = helpers.excel;
+const { exportSimpleExcel } = helpers.excel
 
-const Header = ({setFilters, filters, setLoading}) => {
-    const [selectedBrand, setSelectedBrand] = useState(null);
-    const [selectedHeading, setSelectedHeading] = useState(null);
-    const [priceModalVisible, setPriceModalVisible] = useState(false);
-
+const Header = ({ setFilters, filters, setLoading, detailsData }) => {
+    const [productosToReport, setProductosToReport] = useState(null)
+    const [selectedBrand, setSelectedBrand] = useState(null)
+    const [selectedHeading, setSelectedHeading] = useState(null)
+    const [priceModalVisible, setPriceModalVisible] = useState(false)
+    useEffect(() => { if (selectedBrand) { setFilters({ ...filters, marca: selectedBrand }) } }, [selectedBrand, filters, setFilters])
+    useEffect(() => { if (selectedHeading) { setFilters({ ...filters, rubro: selectedHeading }) } }, [selectedHeading, filters, setFilters])
     useEffect(() => {
-        if(selectedBrand){
-            setFilters({
-                ...filters,
-                marca: selectedBrand
-            })
+        const findProductos = async () => {
+            const response = await api.productos.findAll({ page: 0, limit: 1000000, filters: null })
+            setProductosToReport(response.docs)
         }
-    }, 
-    //eslint-disable-next-line
-    [selectedBrand])
-
-    useEffect(() => {
-        if(selectedHeading){
-            setFilters({
-                ...filters,
-                rubro: selectedHeading
-            })
-        }
-    }, 
-    //eslint-disable-next-line
-    [selectedHeading]);
+        findProductos()
+    }, [selectedHeading])
 
     const cleanFilters = () => {
-        setSelectedBrand(null);
-        setSelectedHeading(null);
-        setFilters(null);
+        setSelectedBrand(null)
+        setSelectedHeading(null)
+        setFilters(null)
     }
 
-    const exportExcel = async() => {
-        const response = await api.productos.findAll({page: 0, limit: 1000000, filters: null});
-        const nameOfSheet = 'Hoja de productos';
-        const nameOfDocument = 'Lista de productos';
+    const calculateSalePricePerUnit = (product) => {
+        const precioVentaFraccionado = product.precioVentaFraccionado
+        const fraccionamiento = product.unidadMedida.fraccionamiento
+        const salePricePerUnit = (fraccionamiento < 1000)
+            ? precioVentaFraccionado / fraccionamiento
+            : precioVentaFraccionado * 1000 / fraccionamiento
+        return salePricePerUnit
+    }
+
+    const exportExcel = async () => {
+        const nameOfSheet = 'Hoja de productos'
+        const nameOfDocument = 'Lista de productos'
         const columnHeaders = [
-            'Producto',
-            'Marca',
             'Rubro',
-            'Precio de lista',
-            'IVA',
-            'Margen de ganancia',
-            'Ganancia por venta',
-            'Precio de venta',
+            'Marca',
+            'Producto',
+            'Precio de lista ($)',
+            'IVA ($)',
+            'Margen de ganancia (%)',
+            'Ganancia por venta ($)',
+            'Precio de venta ($)',
+            'Precio de venta por unidad ($)',
             'Stock',
             'Cód. producto',
             'Cód. barras'
-        ];
-        const lines = await processExcelLines(response.docs);
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument);
+        ]
+        const lines = await processExcelLines(productosToReport)
+        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
     }
 
-    const processExcelLines = async(products) => {
-        const processedLines = [];
-        for await (let product of products){
+    const processExcelLines = async (productosToReport) => {
+        const processedLines = []
+        for await (let product of productosToReport) {
             processedLines.push([
-                product.nombre,
-                (product.marca) ? product.marca.nombre : '-',
                 (product.rubro) ? product.rubro.nombre : '-',
-                '$'+product.precioUnitario,
-                '$'+product.ivaVenta,
-                '%'+product.margenGanancia,
-                '$'+product.gananciaNeta,
-                '$'+product.precioVenta,
+                (product.marca) ? product.marca.nombre : '-',
+                product.nombre,
+                product.precioUnitario,
+                product.ivaVenta,
+                product.margenGanancia,
+                product.gananciaNeta,
+                product.precioVenta,
+                calculateSalePricePerUnit(product),
                 product.cantidadStock,
                 (product.codigoProducto) ? product.codigoProducto : '-',
                 (product.codigoBarras) ? product.codigoBarras : '-'
             ])
         }
-        return processedLines;
+        return processedLines
     }
 
-    return(
+    return (
         <>
-        <Row>            
-            <Col span={24}>
-                <Row gutter={8}>
-                    <Col>
-                        <button
-                            className='btn-primary'
-                        > 
-                            <Link to='/productos/nuevo'>
-                                Nuevo    
-                            </Link>
-                        </button>
-                    </Col>
-                    <Col>                       
-                        <button
-                            className='btn-primary'
-                            onClick={() => {setPriceModalVisible(true)}}
-                        >
-                                Modificar precios    
-                        </button>
-                    </Col>
-                    <Col>                       
-                        <button
-                            className='btn-primary'
-                            onClick={() => {exportExcel()}}
-                        >
-                            Exportar Excel
-                        </button>
-                    </Col>
-                </Row>
-                <Row justify='space between' gutter={16}>
-                <Col span={6}>
-                        <Input 
-                            color='primary' 
-                            style={{ width: 200, marginBottom: '10px' }}
-                            placeholder='Buscar por nombre'
-                            onChange={(e) => { setFilters(
-                                {
-                                    ...filters,
-                                    nombre: e.target.value
-                                }
-                            )}}
-                            value={(filters) ? filters.nombre : null}
-                        /> 
-                    </Col>
-                    <Col span={6}>
-                        <Input 
-                            color='primary' 
-                            style={{ width: 200, marginBottom: '10px' }}
-                            placeholder='Buscar por codigo de barras'
-                            onChange={(e) => { setFilters(
-                                {
-                                    ...filters,
-                                    codigoBarras: e.target.value
-                                }
-                            )}}
-                            value={(filters) ? filters.codigoBarras : null}
-                        /> 
-                    </Col>
-                    <Col span={6}>
-                        <Input 
-                            color='primary' 
-                            style={{ width: 200, marginBottom: '10px' }}
-                            placeholder='Buscar por codigo de producto'
-                            onChange={(e) => { setFilters(
-                                {
-                                    ...filters,
-                                    codigoProducto: e.target.value
-                                }
-                            )}}
-                            value={(filters) ? filters.codigoProducto : null}
-                        /> 
-                    </Col>
-                    <Col span={6}>
-                        <Button 
-                            type='danger' 
-                            onClick={() => {cleanFilters()}}
-                        > 
-                            Limpiar filtros
-                        </Button>
-                    </Col>
-                    <Col span={8}>
-                        <GenericAutocomplete
-                            label='Filtrar por marcas'
-                            modelToFind='marca'
-                            keyToCompare='nombre'
-                            controller='marcas'
-                            setResultSearch={setSelectedBrand}
-                            selectedSearch={selectedBrand}
-                            returnCompleteModel={true}
-                            styles={{backgroundColor: '#fff'}}
-                        />
-                    </Col>
-                    <Col span={8}>
-                        <GenericAutocomplete
-                            label='Filtrar por rubros'
-                            modelToFind='rubro'
-                            keyToCompare='nombre'
-                            controller='rubros'
-                            setResultSearch={setSelectedHeading}
-                            selectedSearch={selectedHeading}
-                            returnCompleteModel={true}
-                            styles={{backgroundColor: '#fff'}}
-                        />
-                    </Col>
-                </Row>
-            </Col>
-        </Row>
-        <PriceModificatorModal 
-            priceModalVisible={priceModalVisible} 
-            setPriceModalVisible={setPriceModalVisible}
-            setLoading={setLoading}
-        />
+            <Row>
+                <Col span={24}>
+                    <Row gutter={8}>
+                        <Col>
+                            <button
+                                className='btn-primary'
+                            >
+                                <Link to='/productos/nuevo'>
+                                    Nuevo
+                                </Link>
+                            </button>
+                        </Col>
+                        <Col>
+                            <button
+                                className='btn-primary'
+                                onClick={() => { setPriceModalVisible(true) }}
+                            >
+                                Modificar precios
+                            </button>
+                        </Col>
+                        <Col>
+                            <button
+                                className='btn-primary'
+                                onClick={() => { exportExcel() }}
+                            >
+                                Exportar Excel
+                            </button>
+                        </Col>
+                    </Row>
+                    <Row justify='space between' gutter={16}>
+                        <Col span={6}>
+                            <Input
+                                color='primary'
+                                style={{ width: 200, marginBottom: '10px' }}
+                                placeholder='Buscar por nombre'
+                                onChange={(e) => {
+                                    setFilters(
+                                        {
+                                            ...filters,
+                                            nombre: e.target.value
+                                        }
+                                    )
+                                }}
+                                value={(filters) ? filters.nombre : null}
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <Input
+                                color='primary'
+                                style={{ width: 200, marginBottom: '10px' }}
+                                placeholder='Buscar por codigo de barras'
+                                onChange={(e) => {
+                                    setFilters(
+                                        {
+                                            ...filters,
+                                            codigoBarras: e.target.value
+                                        }
+                                    )
+                                }}
+                                value={(filters) ? filters.codigoBarras : null}
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <Input
+                                color='primary'
+                                style={{ width: 200, marginBottom: '10px' }}
+                                placeholder='Buscar por codigo de producto'
+                                onChange={(e) => {
+                                    setFilters(
+                                        {
+                                            ...filters,
+                                            codigoProducto: e.target.value
+                                        }
+                                    )
+                                }}
+                                value={(filters) ? filters.codigoProducto : null}
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <Button
+                                type='danger'
+                                onClick={() => { cleanFilters() }}
+                            >
+                                Limpiar filtros
+                            </Button>
+                        </Col>
+                        <Col span={8}>
+                            <GenericAutocomplete
+                                label='Filtrar por marcas'
+                                modelToFind='marca'
+                                keyToCompare='nombre'
+                                controller='marcas'
+                                setResultSearch={setSelectedBrand}
+                                selectedSearch={selectedBrand}
+                                returnCompleteModel={true}
+                                styles={{ backgroundColor: '#fff' }}
+                            />
+                        </Col>
+                        <Col span={8}>
+                            <GenericAutocomplete
+                                label='Filtrar por rubros'
+                                modelToFind='rubro'
+                                keyToCompare='nombre'
+                                controller='rubros'
+                                setResultSearch={setSelectedHeading}
+                                selectedSearch={selectedHeading}
+                                returnCompleteModel={true}
+                                styles={{ backgroundColor: '#fff' }}
+                            />
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+            <PriceModificatorModal
+                priceModalVisible={priceModalVisible}
+                setPriceModalVisible={setPriceModalVisible}
+                setLoading={setLoading}
+            />
         </>
-    ) 
+    )
 }
 
 export default Header

@@ -124,7 +124,12 @@ const Productos = ({ userState }) => {
         <>
             <Row>
                 <Col span={24} style={{ marginBottom: '10px' }}>
-                    <Header setFilters={setFilters} filters={filters} setLoading={setLoading} />
+                    <Header
+                        setFilters={setFilters}
+                        filters={filters}
+                        setLoading={setLoading}
+                        detailsData={detailsData}
+                    />
                 </Col>
                 <Col span={24}>
                     <Table
