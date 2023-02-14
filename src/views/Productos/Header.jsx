@@ -38,22 +38,37 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
         return salePricePerUnit
     }
 
+    const calculateSaleProfitPerUnit = (product) => {
+        const saleProfitPerUnit = product.gananciaNetaFraccionado / product.unidadMedida.fraccionamiento
+        return saleProfitPerUnit
+    }
+
     const exportExcel = async () => {
         const nameOfSheet = 'Hoja de productos'
         const nameOfDocument = 'Lista de productos'
         const columnHeaders = [
+            'Producto',
             'Rubro',
             'Marca',
-            'Producto',
-            'Precio de lista ($)',
-            'IVA ($)',
-            'Margen de ganancia (%)',
-            'Ganancia por venta ($)',
-            'Precio de venta ($)',
-            'Precio de venta por unidad ($)',
-            'Stock',
             'Cód. producto',
-            'Cód. barras'
+            'Cód. barras',
+            '% IVA compra',
+            'IVA compra ($)',
+            'Precio de lista ($)',
+            '% IVA venta',
+            'IVA venta ($)',
+            'Porcentaje ganancia',
+            'Precio de venta ($)',
+            'Ganancia venta ($)',
+            'Porcentaje ganancia fraccionada',
+            'Precio de venta fraccionada ($)',
+            'Ganancia venta fraccionada ($)',
+            'Precio de venta por unidad fraccionada ($)',
+            'Ganancia venta por unidad fraccionada ($)',
+            'Stock',
+            'Stock fraccionado',
+            'Unidad de medida',
+            'Fraccionamiento',
         ]
         const lines = await processExcelLines(productosToReport)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
@@ -63,18 +78,28 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
         const processedLines = []
         for await (let product of productosToReport) {
             processedLines.push([
+                (product.nombre) ? product.nombre : '-',
                 (product.rubro) ? product.rubro.nombre : '-',
                 (product.marca) ? product.marca.nombre : '-',
-                product.nombre,
-                product.precioUnitario,
-                product.ivaVenta,
-                product.margenGanancia,
-                product.gananciaNeta,
-                product.precioVenta,
-                calculateSalePricePerUnit(product),
-                product.cantidadStock,
                 (product.codigoProducto) ? product.codigoProducto : '-',
-                (product.codigoBarras) ? product.codigoBarras : '-'
+                (product.codigoBarras) ? product.codigoBarras : '-',
+                (product.porcentajeIvaCompra) ? '% ' + product.porcentajeIvaCompra : '-',
+                (product.ivaCompra) ? product.ivaCompra : '-',
+                (product.precioUnitario) ? product.precioUnitario : '-',
+                (product.porcentajeIvaVenta) ? '% ' + product.porcentajeIvaVenta : '-',
+                (product.ivaVenta) ? product.ivaVenta : '-',
+                (product.margenGanancia) ? '% ' + product.margenGanancia : '-',
+                (product.precioVenta) ? product.precioVenta : '-',
+                (product.gananciaNeta) ? product.gananciaNeta : '-',
+                (product.margenGananciaFraccionado) ? '% ' + product.margenGananciaFraccionado : '-',
+                (product.precioVentaFraccionado) ? product.precioVentaFraccionado : '-',
+                (product.gananciaNetaFraccionado) ? product.gananciaNetaFraccionado : '-',
+                (product.precioVentaFraccionado && product.unidadMedida.fraccionamiento) ? calculateSalePricePerUnit(product) : '--error--',
+                (product.gananciaNetaFraccionado && product.unidadMedida.fraccionamiento) ? calculateSaleProfitPerUnit(product) : '--error--',
+                (product.cantidadStock) ? product.cantidadStock : '-',
+                (product.cantidadFraccionadaStock) ? product.cantidadFraccionadaStock : '-',
+                (product.unidadMedida) ? product.unidadMedida.nombre : '-',
+                (product.unidadMedida) ? product.unidadMedida.fraccionamiento : '-',
             ])
         }
         return processedLines

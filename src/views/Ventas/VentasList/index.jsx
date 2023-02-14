@@ -12,6 +12,8 @@ const VentasList = () => {
     const [ventas, setVentas] = useState(null)
     const [documentos, setDocumentos] = useState(null)
     const [documentosNombres, setDocumentosNombres] = useState(null)
+    const [mediosPago, setMediosPago] = useState(null)
+    const [mediosPagoNombres, setMediosPagoNombres] = useState(null)
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
@@ -31,11 +33,21 @@ const VentasList = () => {
     useEffect(() => {
         const fetchDocumentos = async () => {
             const data = await api.documentos.findAll(null)
-            const todosLosDocumentos = data.map(doc => {return { value: doc.nombre, label: doc.nombre }})
+            const todosLosDocumentos = data.map(doc => { return { value: doc.nombre, label: doc.nombre } })
             setDocumentos(data)
             setDocumentosNombres(todosLosDocumentos)
         }
         fetchDocumentos()
+    }, [])
+
+    useEffect(() => {
+        const fetchMediosPago = async () => {
+            const data = await api.mediospago.findAll(null)
+            const todosLosMediosDePago = data.map(mp => { return { value: mp.nombre, label: mp.nombre } })
+            setMediosPago(data)
+            setMediosPagoNombres(todosLosMediosDePago)
+        }
+        fetchMediosPago()
     }, [])
 
     const columnsForTable = [
@@ -61,6 +73,15 @@ const VentasList = () => {
             title: 'Comprobante',
             render: (venta) => (
                 <p>{venta.documento.nombre}</p>
+            ),
+        },
+        {
+            title: 'Medio de pago',
+            render: (venta) => (
+                <div style={{ lineHeight: 0 }}>
+                    <p>{venta.mediosPagoNombres}</p>
+                    <small>{venta.planesPagoNombres}</small>
+                </div>
             ),
         },
         {
@@ -91,6 +112,8 @@ const VentasList = () => {
                     ventas={ventas}
                     documentos={documentos}
                     documentosNombres={documentosNombres}
+                    mediosPago={mediosPago}
+                    mediosPagoNombres={mediosPagoNombres}
                 />
             </Col>
             <Col span={24}>

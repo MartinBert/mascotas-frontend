@@ -7,10 +7,11 @@ const { RangePicker } = DatePicker
 const { exportSimpleExcel } = helpers.excel
 const { addDays } = helpers.dateHelper
 
-const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) => {
+const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, mediosPago, mediosPagoNombres }) => {
     const [fecha, setFecha] = useState(null)
     const [cliente, setCliente] = useState(null)
     const [documentosSeleccionados, setDocumentosSeleccionados] = useState([])
+    const [mediosPagoSeleccionados, setMediosPagoSeleccionados] = useState([])
     const [ventasToReport, setVentasToReport] = useState(null)
     useEffect(() => { setVentasToReport(ventas) }, [ventas])
 
@@ -28,10 +29,11 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
         const processedLines = []
         ventasToReport.forEach(venta => {
             processedLines.push([
-                venta.fechaEmisionString,
                 (venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente',
+                venta.fechaEmisionString,
                 venta.clienteRazonSocial,
                 venta.documento.nombre,
+                venta.mediosPagoNombres,
                 venta.total
             ])
         })
@@ -42,10 +44,11 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
         const nameOfSheet = 'Hoja de ventas'
         const nameOfDocument = 'Lista de ventas'
         const columnHeaders = [
-            'Fecha',
             'Usuario',
+            'Fecha',
             'Cliente',
             'Comprobante',
+            'Medio de pago',
             'Total de venta',
         ]
         const lines = processLines(ventasToReport)
@@ -56,6 +59,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
         setFecha(null)
         setCliente(null)
         setDocumentosSeleccionados([])
+        setMediosPagoSeleccionados([])
     }
 
     const onChangeFecha = (value) => {
@@ -80,8 +84,20 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
         const documentosForFilters = documentos.map(doc => {
             if (value.includes(doc.nombre)) return doc
             else return null
-        })
+        }).filter(doc => doc !== null)
         setFilters(JSON.stringify({ documento: documentosForFilters }))
+        if (value.length < 1) setFilters(null)
+        setPage(1)
+    }
+
+    const onChangeMediosPago = (value) => {
+        clearInputs()
+        setMediosPagoSeleccionados(value)
+        const mediosDePagoForFilters = mediosPago.map(mp => {
+            if (value.includes(mp.nombre)) return mp._id
+            else return null
+        }).filter(mp => mp !== null)
+        setFilters(JSON.stringify({ mediosPago: mediosDePagoForFilters }))
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
@@ -104,7 +120,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
                             onChange={value => fetchVentasByDates(value)}
                         />
                     </Col>
-                    <Col span={4}>
+                    <Col span={3}>
                         <Input
                             type='primary'
                             placeholder='Buscar por fecha'
@@ -112,7 +128,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
                             value={fecha}
                         />
                     </Col>
-                    <Col span={4}>
+                    <Col span={3}>
                         <Input
                             type='primary'
                             placeholder='Buscar por cliente'
@@ -120,14 +136,23 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres }) 
                             value={cliente}
                         />
                     </Col>
-                    <Col span={4} align='right'>
+                    <Col span={3}>
                         <Select
-                            style={{ width: '100%', textAlign: 'left' }}
+                            style={{ width: '100%' }}
                             mode='multiple'
                             options={documentosNombres}
                             value={documentosSeleccionados}
-                            placeholder='Buscar por comprobante'
+                            placeholder='Comprobante'
                             onChange={value => onChangeDocumentos(value)}
+                        />
+                    </Col>
+                    <Col span={3}>
+                        <Select
+                            style={{ width: '100%' }}
+                            options={mediosPagoNombres}
+                            value={mediosPagoSeleccionados}
+                            placeholder='Medio de pago'
+                            onChange={value => onChangeMediosPago(value)}
                         />
                     </Col>
                 </Row>
