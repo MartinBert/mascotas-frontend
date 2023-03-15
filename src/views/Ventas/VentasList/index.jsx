@@ -52,15 +52,15 @@ const VentasList = () => {
 
     const columnsForTable = [
         {
-            title: 'Fecha',
-            render: (venta) => (
-                <p>{venta.fechaEmisionString}</p>
-            ),
-        },
-        {
             title: 'Usuario',
             render: (venta) => (
                 <p>{(venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente'}</p>
+            ),
+        },
+        {
+            title: 'Fecha',
+            render: (venta) => (
+                <p>{venta.fechaEmisionString}</p>
             ),
         },
         {

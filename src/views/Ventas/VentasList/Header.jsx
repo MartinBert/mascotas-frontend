@@ -32,9 +32,9 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
                 (venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente',
                 venta.fechaEmisionString,
                 venta.clienteRazonSocial,
+                venta.total,
                 venta.documento.nombre,
                 venta.mediosPagoNombres,
-                venta.total
             ])
         })
         return processedLines
@@ -47,9 +47,9 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
             'Usuario',
             'Fecha',
             'Cliente',
+            'Importe',
             'Comprobante',
-            'Medio de pago',
-            'Total de venta',
+            'Medio de pago'
         ]
         const lines = processLines(ventasToReport)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
