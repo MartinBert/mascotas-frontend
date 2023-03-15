@@ -70,6 +70,12 @@ const VentasList = () => {
             ),
         },
         {
+            title: 'Importe',
+            render: (venta) => (
+                <p>{venta.total}</p>
+            ),
+        },
+        {
             title: 'Comprobante',
             render: (venta) => (
                 <p>{venta.documento.nombre}</p>
