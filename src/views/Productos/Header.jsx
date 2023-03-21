@@ -77,6 +77,7 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
     const processExcelLines = async (productosToReport) => {
         const processedLines = []
         for await (let product of productosToReport) {
+            console.log(product)
             processedLines.push([
                 (product.nombre) ? product.nombre : '-',
                 (product.rubro) ? product.rubro.nombre : '-',
@@ -91,15 +92,15 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
                 (product.margenGanancia) ? '% ' + product.margenGanancia : '-',
                 (product.precioVenta) ? product.precioVenta : '-',
                 (product.gananciaNeta) ? product.gananciaNeta : '-',
-                (product.margenGananciaFraccionado) ? '% ' + product.margenGananciaFraccionado : '-',
-                (product.precioVentaFraccionado) ? product.precioVentaFraccionado : '-',
-                (product.gananciaNetaFraccionado) ? product.gananciaNetaFraccionado : '-',
-                (product.precioVentaFraccionado && product.unidadMedida.fraccionamiento) ? calculateSalePricePerUnit(product) : '--error--',
-                (product.gananciaNetaFraccionado && product.unidadMedida.fraccionamiento) ? calculateSaleProfitPerUnit(product) : '--error--',
+                (product.margenGananciaFraccionado) ? '% ' + product.margenGananciaFraccionado : '-- Sin fraccionar --',
+                (product.precioVentaFraccionado) ? product.precioVentaFraccionado : '-- Sin fraccionar --',
+                (product.gananciaNetaFraccionado) ? product.gananciaNetaFraccionado : '-- Sin fraccionar --',
+                (product.precioVentaFraccionado && product.unidadMedida) ? calculateSalePricePerUnit(product) : '-- Sin fraccionar --',
+                (product.gananciaNetaFraccionado && product.unidadMedida) ? calculateSaleProfitPerUnit(product) : '-- Sin fraccionar --',
                 (product.cantidadStock) ? product.cantidadStock : '-',
-                (product.cantidadFraccionadaStock) ? product.cantidadFraccionadaStock : '-',
-                (product.unidadMedida) ? product.unidadMedida.nombre : '-',
-                (product.unidadMedida) ? product.unidadMedida.fraccionamiento : '-',
+                (product.cantidadFraccionadaStock) ? product.cantidadFraccionadaStock : '-- Sin fraccionar --',
+                (product.unidadMedida) ? product.unidadMedida.nombre : '-- Sin fraccionar --',
+                (product.unidadMedida) ? product.unidadMedida.fraccionamiento : '-- Sin fraccionar --',
             ])
         }
         return processedLines
