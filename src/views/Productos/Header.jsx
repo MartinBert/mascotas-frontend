@@ -77,7 +77,6 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
     const processExcelLines = async (productosToReport) => {
         const processedLines = []
         for await (let product of productosToReport) {
-            console.log(product)
             processedLines.push([
                 (product.nombre) ? product.nombre : '-',
                 (product.rubro) ? product.rubro.nombre : '-',
