@@ -4,7 +4,7 @@ import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
 import {DeleteModal} from '../../components/generics';
-import {useHistory} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const { Edit, Delete } = icons;
 
@@ -18,7 +18,7 @@ const CondicionesFiscales = () => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteEntityId, setDeleteEntityId] = useState(null);
   const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCondicionesFiscales = async() => {
@@ -44,7 +44,7 @@ const CondicionesFiscales = () => {
   }, [deleteEntityId])
 
   const editBrand = (id) => {
-    history.push(`/condicionesfiscales/${id}`);
+    navigate(`/condicionesfiscales/${id}`);
   }
 
   const columnsForTable = [

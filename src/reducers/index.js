@@ -1,7 +1,7 @@
-import privateRouteReducer from './privateRouteReducer';
-import productSelectionModalReducer from './productSelectionModalReducer';
-import saleReducer from './saleReducer';
-import loggedUserReducer from './loggedUserReducer';
+import privateRouteReducer from './privateRouteReducer'
+import productSelectionModalReducer from './productSelectionModalReducer'
+import saleReducer from './saleReducer'
+import loggedUserReducer from './loggedUserReducer'
 
 const reducers = {
     privateRouteReducer,
@@ -10,4 +10,4 @@ const reducers = {
     loggedUserReducer
 }
 
-export default reducers;
+export default reducers

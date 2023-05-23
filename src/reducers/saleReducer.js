@@ -621,8 +621,8 @@ const reducer = (state = initialState, action) => {
 
 const saleReducer = {
     initialState,
-    reducer,
     actions,
+    reducer
 }
 
 export default saleReducer

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Row, Col, Form, Input, Checkbox} from 'antd';
 import api from '../../services';
 import graphics from '../../components/graphics';
@@ -13,7 +13,7 @@ const { mathHelper } = helpers;
 
 const MediosPagoForm = () => {
     const { id } = useParams();
-    const history = useHistory();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [mediopago, setMedioPago] = useState({
         nombre: '',
@@ -77,7 +77,7 @@ const MediosPagoForm = () => {
     }
 
     const redirectToMediosPago = () => {
-        history.push('/mediospago');
+        navigate('/mediospago');
     }
 
     return (

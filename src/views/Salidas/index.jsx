@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import api from '../../services'
 import { Row, Col, Table } from 'antd'
 import Header from './Header'
@@ -13,7 +13,7 @@ const { dateHelper, mathHelper } = helpers
 const { roundTwoDecimals } = mathHelper
 
 const Salidas = () => {
-    const history = useHistory()
+    const navigate = useNavigate()
     const [salidas_paginadas, setSalidas_paginadas] = useState(null)
     const [salidas_totales, setSalidas_totales] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -63,7 +63,7 @@ const Salidas = () => {
     }, [deleteEntityId])
 
     const editSalida = (id) => {
-        history.push(`/salidas/${id}`)
+        navigate(`/salidas/${id}`)
     }
 
     const columnsForTable = [

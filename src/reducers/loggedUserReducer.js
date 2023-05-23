@@ -1,6 +1,6 @@
 const initialState = {
     user: null,
-    loading: true,
+    loading: true
 }
 
 const actions = {
@@ -18,26 +18,16 @@ const reducer = (state = initialState, action) => {
         case actions.SET_LOADING:
             return {
                 ...state,
-                loading: !state.loading
+                loading: action.payload
             }
         default:
-            return state;
-    }
-}
-
-const getNamedStates = () => {
-    return {
-        userInitialState: initialState,
-        userReducer: reducer,
-        userActions: actions
+            return state
     }
 }
 
 const loggedUserReducer = {
     initialState,
-    actions,
     reducer,
-    getNamedStates
 }
 
-export default loggedUserReducer;
+export default loggedUserReducer

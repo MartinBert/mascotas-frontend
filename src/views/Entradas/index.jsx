@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import api from '../../services'
 import { Row, Col, Table } from 'antd'
 import Header from './Header'
@@ -12,7 +12,7 @@ const { Details, Edit, Delete } = icons
 const { dateHelper } = helpers
 
 const Entradas = () => {
-    const history = useHistory()
+    const navigate = useNavigate()
     const [entradas_paginadas, setEntradas_paginadas] = useState(null)
     const [entradas_totales, setEntradas_totales] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -59,7 +59,7 @@ const Entradas = () => {
 
     const editEntrada = (id) => {
         console.log('test')
-        history.push(`/entradas/${id}`)
+        navigate(`/entradas/${id}`)
     }
 
     const columnsForTable = [

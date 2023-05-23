@@ -1,20 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Row, Col, Input, Button, Table, Checkbox } from 'antd';
-import { GenericAutocomplete } from '../';
-import api from '../../../services';
+// React Components and Hooks
+import React, { useState, useEffect } from 'react'
 
-const ProductSelectionModal = ({state, dispatch, actions}) => {
-    const {SET_PRODUCT, DELETE_PRODUCT, HIDE_MODAL, CLEAN_PRODUCT_LIST} = actions;
+// Custom Components
+import { GenericAutocomplete } from '../'
+
+// Custom Context Providers
+import contextProviders from '../../../contextProviders'
+
+// Services
+import api from '../../../services'
+
+// Design Components
+import { Modal, Row, Col, Input, Button, Table, Checkbox } from 'antd'
+
+// Imports Destructurings
+const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+
+
+const ProductSelectionModal = () => {
+
+    const productSelectionModalContext = useProductSelectionModalContext()
+    const [product_state, product_dispatch] = productSelectionModalContext
 
     //--------------------------- State declarations ---------------------------//
-    const [products, setProducts] = useState(null);
-    const [limit, setLimit] = useState(10);
-    const [page, setPage] = useState(1);
-    const [totalDocs, setTotalDocs] = useState(0);
-    const [selectedBrand, setSelectedBrand] = useState(null);
-    const [selectedHeading, setSelectedHeading] = useState(null);
-    const [filters, setFilters] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [products, setProducts] = useState(null)
+    const [limit, setLimit] = useState(10)
+    const [page, setPage] = useState(1)
+    const [totalDocs, setTotalDocs] = useState(0)
+    const [selectedBrand, setSelectedBrand] = useState(null)
+    const [selectedHeading, setSelectedHeading] = useState(null)
+    const [filters, setFilters] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     const columnsForTable = [
         {
@@ -35,9 +51,9 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
                 <Checkbox 
                     checked={product.selected}
                     onChange={(e) => {
-                        if(state.selectionLimit <= 1) dispatch({type: CLEAN_PRODUCT_LIST});
-                        product.selected = e.target.checked;
-                        dispatch({type: (e.target.checked) ? SET_PRODUCT : DELETE_PRODUCT, payload: product});
+                        if(product_state.selectionLimit <= 1) product_dispatch({type: 'CLEAN_PRODUCT_LIST'})
+                        product.selected = e.target.checked
+                        product_dispatch({type: (e.target.checked) ? 'SET_PRODUCT' : 'DELETE_PRODUCT', payload: product})
                     }}
                 />
             )
@@ -51,27 +67,26 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
     useEffect(() => {
         const fetchProducts = async() => {
           const stringFilters = JSON.stringify(filters)
-          const data = await api.productos.findAll({page, limit, filters: stringFilters});
+          const data = await api.productos.findAll({page, limit, filters: stringFilters})
           data.docs.forEach(product => {
-              state.selectedProducts.forEach(selectedProduct => {
+              product_state.selectedProducts.forEach(selectedProduct => {
                 if(product._id === selectedProduct._id){
-                    product.selected = true;
+                    product.selected = true
                 }
               })
           })
-          setProducts(data.docs);
-          setTotalDocs(data.totalDocs);
-          setLoading(false);
+          setProducts(data.docs)
+          setTotalDocs(data.totalDocs)
+          setLoading(false)
         }
-        fetchProducts();
-    },[page, limit, filters, state.selectedProducts])
-    //
+        fetchProducts()
+    },[page, limit, filters, product_state.selectedProducts])
 
     //------------------------- State changes detection -------------------------//
     const cleanFilters = () => {
-        setSelectedBrand(null);
-        setSelectedHeading(null);
-        setFilters(null);
+        setSelectedBrand(null)
+        setSelectedHeading(null)
+        setFilters(null)
     }
 
     useEffect(() => {
@@ -94,16 +109,16 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
         }
     }, 
     //eslint-disable-next-line
-    [selectedHeading]);
+    [selectedHeading])
     //--------------------------------------------------------------------------//
 
     return (
     <Modal 
-        title={'Seleccionar producto' + ((state.selectionLimit > 1) ? 's' : '')}
-        open={state.open}
+        title={'Seleccionar producto' + ((product_state.selectionLimit > 1) ? 's' : '')}
+        open={product_state.open}
         cancelButtonProps={{ style: { display: 'none' } }}
         closable={false}
-        onOk={() => {dispatch({type: HIDE_MODAL})}}
+        onOk={() => {product_dispatch({type: 'HIDE_MODAL'})}}
         width={1200}
     >
         <Row>
@@ -209,4 +224,4 @@ const ProductSelectionModal = ({state, dispatch, actions}) => {
   )
 }
 
-export default ProductSelectionModal;
+export default ProductSelectionModal

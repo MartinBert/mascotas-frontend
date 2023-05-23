@@ -3,7 +3,7 @@ import api from '../../services'
 import { Row, Col, Table } from 'antd'
 import icons from '../../components/icons'
 import Header from './Header'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { DeleteModal } from '../../components/generics'
 
 const { Edit, Delete } = icons
@@ -18,7 +18,7 @@ const Clientes = () => {
     const [deleteVisible, setDeleteVisible] = useState(false)
     const [deleteEntityId, setDeleteEntityId] = useState(null)
     const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
-    const history = useHistory()
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchClientes = async () => {
@@ -44,7 +44,7 @@ const Clientes = () => {
     }, [deleteEntityId])
 
     const editClient = (id) => {
-        history.push(`/clientes/${id}`)
+        navigate(`/clientes/${id}`)
     }
 
     const columnsForTable = [

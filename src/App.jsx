@@ -1,31 +1,39 @@
-import {useReducer, useEffect} from 'react';
-import 'antd/dist/antd.css';
-import AppRouter from './routes';
-import reducers from './reducers';
-import api from './services';
+// React Components
+import { BrowserRouter as Router } from 'react-router-dom'
 
-const { initialState, reducer, actions } = reducers.loggedUserReducer;
-const {LOAD_USER, SET_LOADING} = actions;
+// Custom Routers
+import AppRouter from './routes'
+
+// Custom Context Providers
+import contextProviders from './contextProviders'
+
+// Design Frameworks
+// import 'antd/dist/antd.css'
+
+// Imports Destructurings
+const { LoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { PrivateRouteContext } = contextProviders.PrivateRouteContextProvider
+const { ProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { SaleContext } = contextProviders.SaleContextProvider
+
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    const fetchLoggedUser = async() => {
-      const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'));
-      dispatch({type: LOAD_USER, payload: loggedUser});
-      setTimeout(() => {
-        dispatch({type: SET_LOADING})
-      }, 50)
-    }
-    fetchLoggedUser();
-  }, [])
-  
-  return (
-    <div style={{height: '100%'}}>
-      <AppRouter userState={state} userDispatch={dispatch} userActions={actions}/>
-    </div>
-  );
+    return (
+        <div style={{ height: '100%' }}>
+            <LoggedUserContext>
+                <PrivateRouteContext>
+                    <ProductSelectionModalContext>
+                        <SaleContext>
+                            <Router>
+                                <AppRouter />
+                            </Router>
+                        </SaleContext>
+                    </ProductSelectionModalContext>
+                </PrivateRouteContext>
+            </LoggedUserContext>
+        </div>
+    )
 }
 
-export default App;
+export default App

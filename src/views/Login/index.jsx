@@ -1,7 +1,7 @@
-import React from 'react';
-import { Row } from 'antd';
-import LoginForm from './LoginForm';
-import './login.scss';
+import React from 'react'
+import { Row } from 'antd'
+import LoginForm from './LoginForm'
+import './login.scss'
 
 const Login = () => {
     return(
@@ -67,4 +67,4 @@ const Login = () => {
     )
 }
 
-export default Login;
+export default Login

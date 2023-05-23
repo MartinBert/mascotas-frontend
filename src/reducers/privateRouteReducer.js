@@ -3,14 +3,19 @@ const initialState = {
     openKey: []
 }
 
-const reducer = (state, action) => {
+const actions = {
+    SET_OPEN_SUBMENU_KEY: 'SET_OPEN_SUBMENU_KEY',
+    SET_OPEN_KEY: 'SET_OPEN_KEY'
+}
+
+const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'SET_OPEN_SUBMENU_KEY':
+        case actions.SET_OPEN_SUBMENU_KEY:
             return {
                 ...state,
                 openSubmenuKey: action.payload 
             }
-        case 'SET_OPEN_KEY':
+        case actions.SET_OPEN_KEY:
             return {
                 ...state,
                 openKey: action.payload 
@@ -22,7 +27,8 @@ const reducer = (state, action) => {
 
 const privateRouteReducer = {
     initialState,
+    actions,
     reducer
 }
 
-export default privateRouteReducer;
+export default privateRouteReducer

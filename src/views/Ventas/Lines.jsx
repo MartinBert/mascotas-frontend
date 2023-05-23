@@ -1,32 +1,32 @@
+// React Components and Hooks
 import React, { useEffect } from 'react'
-import { Table, Input, Checkbox, Row, Col } from 'antd'
+
+// Custom Components
 import icons from '../../components/icons'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
+// Helpers
 import helpers from '../../helpers'
 
-const { round, roundTwoDecimals } = helpers.mathHelper
+// Design Components
+import { Table, Input, Checkbox, Row, Col } from 'antd'
+
+// Imports Destructurings
 const { Delete } = icons
+const { useSaleContext } = contextProviders.SaleContextProvider
+const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { round, roundTwoDecimals } = helpers.mathHelper
 
-const Lines = ({
-    productState,
-    productDispatch,
-    productActions,
-    state,
-    dispatch,
-    actions,
-}) => {
 
-    const { DELETE_PRODUCT } = productActions
-    const {
-        SET_FRACTIONED,
-        SET_LINES,
-        SET_LINE_DISCOUNT_PERCENT,
-        SET_LINE_SURCHARGE_PERCENT,
-        SET_LINE_QUANTITY,
-        SET_NET_PRICE,
-        SET_NET_PRICE_FIXED,
-        SET_PRODUCTS,
-        SET_TOTAL,
-    } = actions
+const Lines = () => {
+
+    const saleContext = useSaleContext()
+    const [sale_state, sale_dispatch] = saleContext
+    const productContext = useProductSelectionModalContext()
+    const [product_state, product_dispatch] = productContext
+
 
     const columnsForTable = [
         {
@@ -36,8 +36,8 @@ const Lines = ({
                     checked={product.fraccionar === true ? true : false}
                     onChange={(e) => {
                         product.fraccionar = e.target.checked
-                        dispatch({ type: SET_FRACTIONED, payload: product })
-                        dispatch({ type: SET_TOTAL })
+                        sale_dispatch({ type: 'SET_FRACTIONED', payload: product })
+                        sale_dispatch({ type: 'SET_TOTAL' })
                     }} />
             ),
         },
@@ -59,14 +59,14 @@ const Lines = ({
                                 disabled={product.precioNetoFijo === true ? true : false}
                                 value={product.fraccionar === true ? round(product.cantidadUnidades) : roundTwoDecimals(product.cantidadUnidades)}
                                 onChange={(e) => {
-                                    dispatch({
-                                        type: SET_LINE_QUANTITY,
+                                    sale_dispatch({
+                                        type: 'SET_LINE_QUANTITY',
                                         payload: {
                                             _id: product._id,
                                             cantidadUnidades: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
                                         },
                                     })
-                                    dispatch({ type: SET_TOTAL })
+                                    sale_dispatch({ type: 'SET_TOTAL' })
                                 }}
                             />
                         </Col>
@@ -110,14 +110,14 @@ const Lines = ({
                     value={product.porcentajeDescuentoRenglon}
                     disabled={product.porcentajeRecargoRenglon > 0}
                     onChange={(e) => {
-                        dispatch({
-                            type: SET_LINE_DISCOUNT_PERCENT,
+                        sale_dispatch({
+                            type: 'SET_LINE_DISCOUNT_PERCENT',
                             payload: {
                                 _id: product._id,
                                 porcentajeDescuentoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
                             },
                         })
-                        dispatch({ type: SET_TOTAL })
+                        sale_dispatch({ type: 'SET_TOTAL' })
                     }}
                 />
             ),
@@ -132,14 +132,14 @@ const Lines = ({
                     value={product.porcentajeRecargoRenglon}
                     disabled={product.porcentajeDescuentoRenglon > 0}
                     onChange={(e) => {
-                        dispatch({
-                            type: SET_LINE_SURCHARGE_PERCENT,
+                        sale_dispatch({
+                            type: 'SET_LINE_SURCHARGE_PERCENT',
                             payload: {
                                 _id: product._id,
                                 porcentajeRecargoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
                             },
                         })
-                        dispatch({ type: SET_TOTAL })
+                        sale_dispatch({ type: 'SET_TOTAL' })
                     }}
                 />
             ),
@@ -163,8 +163,8 @@ const Lines = ({
                     <Col span={3}>
                         <Checkbox onChange={(e) => {
                             product.precioNetoFijo = e.target.checked
-                            dispatch({ type: SET_NET_PRICE_FIXED, payload: product })
-                            dispatch({ type: SET_TOTAL })
+                            sale_dispatch({ type: 'SET_NET_PRICE_FIXED', payload: product })
+                            sale_dispatch({ type: 'SET_TOTAL' })
                         }} />
                     </Col>
                     <Col span={21}>
@@ -175,14 +175,14 @@ const Lines = ({
                             disabled={product.precioNetoFijo === true ? true : false}
                             value={product.precioNeto}
                             onChange={(e) => {
-                                dispatch({
-                                    type: SET_NET_PRICE,
+                                sale_dispatch({
+                                    type: 'SET_NET_PRICE',
                                     payload: {
                                         _id: product._id,
                                         precioNeto: e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
                                     },
                                 })
-                                dispatch({ type: SET_TOTAL })
+                                sale_dispatch({ type: 'SET_TOTAL' })
                             }} />
                     </Col>
                 </Row>
@@ -193,7 +193,7 @@ const Lines = ({
             render: (product) => (
                 <Col align='middle'
                     onClick={() => {
-                        productDispatch({ type: DELETE_PRODUCT, payload: product })
+                        product_dispatch({ type: 'DELETE_PRODUCT', payload: product })
                     }}
                 >
                     <Delete />
@@ -203,24 +203,24 @@ const Lines = ({
     ]
 
     useEffect(() => {
-        dispatch({ type: SET_LINES, payload: productState.selectedProducts })
-        dispatch({ type: SET_PRODUCTS, payload: productState.selectedProducts })
-        dispatch({ type: SET_TOTAL })
+        sale_dispatch({ type: 'SET_LINES', payload: product_state.selectedProducts })
+        sale_dispatch({ type: 'SET_PRODUCTS', payload: product_state.selectedProducts })
+        sale_dispatch({ type: 'SET_TOTAL' })
     },
         //eslint-disable-next-line
         [
-            productState.selectedProducts,
-            dispatch,
-            SET_LINES,
-            SET_PRODUCTS,
-            SET_TOTAL,
+            product_state.selectedProducts,
+            sale_dispatch,
+            'SET_LINES',
+            'SET_PRODUCTS',
+            'SET_TOTAL',
         ])
 
     return (
         <Table
             style={{ marginTop: '20px' }}
             width={'100%'}
-            dataSource={state.renglones}
+            dataSource={sale_state.renglones}
             columns={columnsForTable}
             pagination={false}
             rowKey='_id'

@@ -5,7 +5,7 @@ import icons from '../../components/icons';
 import {OpenImage} from '../../components/generics';
 import Header from './Header';
 import {DeleteModal} from '../../components/generics';
-import {useHistory} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const { Edit, Delete } = icons;
 
@@ -19,7 +19,7 @@ const Empresas = () => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteEntityId, setDeleteEntityId] = useState(null);
   const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmpresas = async() => {
@@ -45,7 +45,7 @@ const Empresas = () => {
   }, [deleteEntityId])
 
   const editBrand = (id) => {
-    history.push(`/empresas/${id}`);
+    navigate(`/empresas/${id}`);
   }
 
   const columnsForTable = [

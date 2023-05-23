@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import api from '../../services';
 import { Row, Col, Form, Input, Checkbox } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -10,7 +10,7 @@ const { Error } = messages;
 const { Spinner } = graphics;
 
 const CondicionesFiscalesForm = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const {id} = useParams(); 
   const [condicionFiscal, setCondicionFiscal] = useState({
     nombre: '',
@@ -61,7 +61,7 @@ const CondicionesFiscalesForm = () => {
   };
 
   const redirectToCondicionesFiscales = () => {
-    history.push('/condicionesfiscales')
+    navigate('/condicionesfiscales')
   }
 
   const success = () => {

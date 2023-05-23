@@ -1,37 +1,37 @@
-import React, {useState} from 'react';
-import {Select} from 'antd';
-import api from '../../../services';
+import React, {useState} from 'react'
+import {Select} from 'antd'
+import api from '../../../services'
 
-const {Option} = Select;
+const {Option} = Select
 
 const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controller, selectedSearch, label, setResultSearch, dispatch, action, returnCompleteModel}) => {
-    const [loading, setLoading] = useState(false);
-    const [options, setOptions] = useState([]);
+    const [loading, setLoading] = useState(false)
+    const [options, setOptions] = useState([])
 
     const handleSearch = (searchText) => {
-        if(!searchText || searchText.length < 3) return;
+        if(!searchText || searchText.length < 3) return
         const fetchOptions = async() => {
-            setLoading(true);
-            const response = await api.genericos.filterAutocompleteOptions(modelToFind, searchText, keyToCompare);
-            setOptions(response.data.docs);
+            setLoading(true)
+            const response = await api.genericos.filterAutocompleteOptions(modelToFind, searchText, keyToCompare)
+            setOptions(response.data.docs)
             setLoading(false)
         }
-        fetchOptions();
+        fetchOptions()
     } 
 
     const returnResults = async(items) => {
         const singleObject = async() => {
-            return await api[controller].findById(items.value);
+            return await api[controller].findById(items.value)
         }
         const collectionObject = async() => {
-            return await api[controller].findMultipleIds(items.map(item => item.value));
+            return await api[controller].findMultipleIds(items.map(item => item.value))
         }
         if(returnCompleteModel){
-            if(setResultSearch)return setResultSearch((multiple) ? await collectionObject() : await singleObject());
-            return dispatch({type: action, payload: (multiple) ? await collectionObject() : await singleObject()});
+            if(setResultSearch)return setResultSearch((multiple) ? await collectionObject() : await singleObject())
+            return dispatch({type: action, payload: (multiple) ? await collectionObject() : await singleObject()})
         }else{
-            if(setResultSearch)return setResultSearch(items);
-            return dispatch({type: action, payload: items});
+            if(setResultSearch)return setResultSearch(items)
+            return dispatch({type: action, payload: items})
         }
     }
 
@@ -64,4 +64,4 @@ const GenericAutocomplete = ({multiple, modelToFind, keyToCompare, controller, s
     )
 }
 
-export default GenericAutocomplete;
+export default GenericAutocomplete

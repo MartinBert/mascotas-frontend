@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from '../../services'
 import helpers from '../../helpers'
 import { Row, Col, Form, Input, Checkbox, Button, Popover } from 'antd'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
@@ -12,7 +12,7 @@ const { formHelper } = helpers
 const DocumentosForm = () => {
 
     const { id } = useParams()
-    const history = useHistory()
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(true)
     const [documento, setDocumento] = useState({
         nombre: '',
@@ -62,7 +62,7 @@ const DocumentosForm = () => {
     }
 
     const redirectToDocumentos = () => {
-        history.push('/documentos')
+        navigate('/documentos')
     }
 
     const inputsProps = [

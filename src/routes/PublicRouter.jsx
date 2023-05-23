@@ -1,10 +1,31 @@
-import React from 'react';
-import { Route } from 'react-router-dom';
+// React Components
+import React from 'react'
 
-const PublicRouter = ({ path, component: Component }) => (
-    <Route exact path={path}>
-        <Component/>
-    </Route>
-)
+// Views
+import Login from '../views/Login'
 
-export default PublicRouter;
+const publicRoutesPreData = [
+    {
+        path: '/login',
+        element: <Login />,
+        activeKey: null,
+        private: false
+    }
+]
+
+const publicRoutesData = publicRoutesPreData.map((route, i) => {
+    const prefixKey = 'public_route_'
+    return ({
+        path: route.path,
+        element: route.element,
+        key: prefixKey + i,
+        activeKey: route.activeKey,
+        private: route.private
+    })
+})
+
+const PublicRouter = {
+    publicRoutesData
+}
+
+export default PublicRouter

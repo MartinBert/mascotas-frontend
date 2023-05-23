@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 import api from '../../services'
 import { Row, Col, Form, Input, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import graphics from '../../components/graphics'
 import { GenericAutocomplete } from '../../components/generics'
 import { errorAlert, successAlert } from '../../components/alerts'
 const { Spinner } = graphics
 
 const EmpresasForm = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { id } = useParams()
   const [empresa, setEmpresa] = useState({
     razonSocial: '',
@@ -114,7 +114,7 @@ const EmpresasForm = () => {
   }
 
   const redirectToEmpresas = () => {
-    history.push('/empresas')
+    navigate('/empresas')
   }
 
   const success = () => {

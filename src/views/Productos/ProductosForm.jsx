@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Row, Col, Form, Input, Upload } from 'antd';
 import { GenericAutocomplete } from '../../components/generics';
 import { UploadOutlined } from '@ant-design/icons';
@@ -15,7 +15,7 @@ const decimalPercent = helper.mathHelper.decimalPercent;
 
 const ProductosForm = () => {
     const { id } = useParams();
-    const history = useHistory();
+    const navigate = useNavigate();
     const [product, setProduct] = useState({
         nombre: '',
         codigoProducto: '',
@@ -166,7 +166,7 @@ const ProductosForm = () => {
     }
 
     const redirectToProducts = () => {
-        history.push('/productos');
+        navigate('/productos');
     }
 
     const uploaderProps = {

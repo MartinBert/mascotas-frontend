@@ -5,7 +5,7 @@ import Header from './Header'
 import GiselaDetailsModal from '../../components/generics/productDetailsModal/GiselaDetailsModal'
 import icons from '../../components/icons'
 import { OpenImage } from '../../components/generics'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { DeleteModal } from '../../components/generics'
 
 const { Details, Edit, Delete } = icons
@@ -21,7 +21,7 @@ const Productos = ({ userState }) => {
     const [deleteVisible, setDeleteVisible] = useState(false)
     const [deleteEntityId, setDeleteEntityId] = useState(null)
     const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
-    const history = useHistory()
+    const navigate = useNavigate()
 
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const Productos = ({ userState }) => {
     }
 
     const editProduct = (id) => {
-        history.push(`/productos/${id}`)
+        navigate(`/productos/${id}`)
     }
 
     const columnsForTable = [

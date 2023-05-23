@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services';
 import { Row, Col, Form, Input } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
 import { errorAlert, successAlert } from '../../components/alerts';
@@ -10,7 +10,7 @@ const { Error } = messages;
 const { Spinner } = graphics;
 
 const RubrosForm = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { id } = useParams();
   const [rubro, setRubro] = useState({
     nombre: '',
@@ -61,7 +61,7 @@ const RubrosForm = () => {
   };
 
   const redirectToRubros = () => {
-    history.push('/rubros');
+    navigate('/rubros');
   };
 
   const success = () => {

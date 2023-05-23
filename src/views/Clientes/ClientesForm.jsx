@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import api from '../../services'
 import { Row, Col, Form, Input, Button } from 'antd'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import graphics from '../../components/graphics'
 import { GenericAutocomplete } from '../../components/generics'
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -9,11 +9,13 @@ import helpers from '../../helpers'
 
 const { Spinner } = graphics
 const { formHelper } = helpers
-
+// import contextProviders from '../contextProviders'
+// const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+// const loggedUserContext = useLoggedUserContext()
 const ClientesForm = ({userState}) => {
 
     const { id } = useParams()
-    const history = useHistory()
+    const navigate = useNavigate()
     const [cliente, setCliente] = useState({
         razonSocial: '',
         cuit: '',
@@ -63,7 +65,7 @@ const ClientesForm = ({userState}) => {
     }
     
     const redirectToClientes = () => {
-        history.push('/clientes')
+        navigate('/clientes')
     }
 
     const save = async () => {

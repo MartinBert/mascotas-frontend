@@ -1,28 +1,53 @@
+// React Components and Hooks
 import React, { useEffect, useReducer } from 'react'
+
+// Custom Components
+import { errorAlert } from '../../components/alerts'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
+// Services
+import api from '../../services'
+
+// Views
 import Header from './Header'
 import reducers from '../../reducers'
 import DiscountSurchargeModal from './DiscountSurchargeModal'
 import FinalizeSaleModal from './FinalizeSaleModal'
 import Lines from './Lines'
-import api from '../../services'
-import { Row, Col, Spin } from 'antd'
-import { errorAlert } from '../../components/alerts'
 
+// Design Components
+import { Row, Col, Spin } from 'antd'
+
+// Imports Destructurings
+const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
 const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates()
 const { initialState, reducer, actions } = reducers.saleReducer
+const {
+    SET_COMPANY,
+    SET_SALE_POINT,
+    SET_DATES,
+    SHOW_FINALIZE_SALE_MODAL,
+    SET_INDEX,
+    SET_USER
+} = actions
 
-const Ventas = ({ userState }) => {
+
+const Ventas = () => {
+
+    const loggedUserContext = useLoggedUserContext()
+    const [ loggedUser_state ] = loggedUserContext
     const [state, dispatch] = useReducer(reducer, initialState)
     const [productState, productDispatch] = useReducer(
         productReducer,
         productInitialState
     )
-    const { SET_COMPANY, SET_SALE_POINT, SET_DATES, SHOW_FINALIZE_SALE_MODAL, SET_INDEX, SET_USER } = actions
 
     useEffect(() => {
-        dispatch({ type: SET_COMPANY, payload: userState.user.empresa })
-        dispatch({ type: SET_SALE_POINT, payload: userState.user.puntoVenta })
-        dispatch({ type: SET_USER, payload: userState.user })
+        dispatch({ type: SET_COMPANY, payload: loggedUser_state.user.empresa })
+        dispatch({ type: SET_SALE_POINT, payload: loggedUser_state.user.puntoVenta })
+        dispatch({ type: SET_USER, payload: loggedUser_state.user })
         const fetchLastVoucherIndex = async () => {
             const lastIndex = await api.ventas.findLastIndex()
             dispatch({ type: SET_INDEX, payload: lastIndex + 1 })
@@ -62,9 +87,6 @@ const Ventas = ({ userState }) => {
                                 productState={productState}
                                 productDispatch={productDispatch}
                                 productActions={productActions}
-                                actions={actions}
-                                dispatch={dispatch}
-                                state={state}
                             />
                         </Col>
                         <Col span={24}>
@@ -95,17 +117,8 @@ const Ventas = ({ userState }) => {
 
                     : <Spin />
             }
-            <DiscountSurchargeModal
-                state={state}
-                dispatch={dispatch}
-                actions={actions}
-            />
-            <FinalizeSaleModal
-                state={state}
-                dispatch={dispatch}
-                actions={actions}
-                userState={userState}
-            />
+            <DiscountSurchargeModal />
+            <FinalizeSaleModal />
             <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
             <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
         </>

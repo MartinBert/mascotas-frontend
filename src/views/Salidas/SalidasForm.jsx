@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useReducer } from 'react';
 import reducers from '../../reducers';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
 import api from '../../services';
 import icons from '../../components/icons';
@@ -15,7 +15,7 @@ const SalidasForm = ({userState}) => {
 
     //------------------------------------------------------ State declarations ------------------------------------------------------/
     const { id } = useParams();
-    const history = useHistory();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [salida, setSalida] = useState({
         descripcion: '',
@@ -142,7 +142,7 @@ const SalidasForm = ({userState}) => {
     }
     
     const redirectToSalidas = () => {
-        history.push('/salidas');
+        navigate('/salidas');
     }
     //------------------------------------------------------------------------------------------------------------------------------/
 

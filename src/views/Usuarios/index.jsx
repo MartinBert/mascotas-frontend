@@ -1,50 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services';
-import {Row, Col, Table} from 'antd';
-import Header from './Header';
-import {useHistory} from 'react-router-dom';
-import {DeleteModal} from '../../components/generics';
-import icons from '../../components/icons';
+import React, { useState, useEffect } from 'react'
+import api from '../../services'
+import {Row, Col, Table} from 'antd'
+import Header from './Header'
+import {useNavigate} from 'react-router-dom'
+import {DeleteModal} from '../../components/generics'
+import icons from '../../components/icons'
 
-const { Edit, Delete } = icons;
+const { Edit, Delete } = icons
 
 const Usuarios = () => {
-    const [usuarios, setUsuarios] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [totalDocs, setTotalDocs] = useState(null);
-    const [limit, setLimit] = useState(10);
-    const [filters, setFilters] = useState(null);
-    const [deleteVisible, setDeleteVisible] = useState(false);
-    const [deleteEntityId, setDeleteEntityId] = useState(null);
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-    const history = useHistory();
+    const [usuarios, setUsuarios] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [totalDocs, setTotalDocs] = useState(null)
+    const [limit, setLimit] = useState(10)
+    const [filters, setFilters] = useState(null)
+    const [deleteVisible, setDeleteVisible] = useState(false)
+    const [deleteEntityId, setDeleteEntityId] = useState(null)
+    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
       const fetchUsuarios = async() => {
-        const data = await api.usuarios.findAll({page, limit, filters});
-        setUsuarios(data.docs);
-        setTotalDocs(data.totalDocs);
-        setLoading(false);
+        const data = await api.usuarios.findAll({page, limit, filters})
+        setUsuarios(data.docs)
+        setTotalDocs(data.totalDocs)
+        setLoading(false)
       }
-      fetchUsuarios();
+      fetchUsuarios()
     },[page, limit, filters, loading, deleteEntityIdConfirmation])
 
     useEffect(() => {
-      if(deleteEntityId === null) return;
+      if(deleteEntityId === null) return
       const deleteUser = async() => {
-        setLoading(true);
+        setLoading(true)
         api.usuarios.deleteUsuario(deleteEntityId)
         .then(() => {
           setDeleteEntityId(null)
-          setLoading(false);
+          setLoading(false)
         })
       }
-      deleteUser();
+      deleteUser()
     }, [deleteEntityId])
 
     const editUser = (id) => {
-      history.push(`/usuarios/${id}`);
+      navigate(`/usuarios/${id}`)
     }
 
     const columnsForTable = [
@@ -68,8 +68,8 @@ const Usuarios = () => {
               <Edit/>
             </div>
             <div onClick={() => {
-              setDeleteEntityIdConfirmation(_id);
-              setDeleteVisible(true);
+              setDeleteEntityIdConfirmation(_id)
+              setDeleteVisible(true)
             }}>
               <Delete/>
             </div>
@@ -114,4 +114,4 @@ const Usuarios = () => {
     )
 }
 
-export default Usuarios;
+export default Usuarios

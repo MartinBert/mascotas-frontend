@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import api from '../../services';
 import { Row, Col, Form, Input, Button, Select } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import messages from '../../components/messages';
 import graphics from '../../components/graphics';
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -11,7 +11,7 @@ const { Spinner } = graphics;
 const { Option } = Select;
 
 const CuentasCorrientesForm = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const {id} = useParams(); 
   const [cuentaCorriente, setCuentaCorriente] = useState({
     mediosPago: [],
@@ -63,7 +63,7 @@ const CuentasCorrientesForm = () => {
   };
 
   const redirectToCuentasCorrientes = () => {
-    history.push('/cuentasCorrientes')
+    navigate('/cuentasCorrientes')
   }
 
   const success = () => {

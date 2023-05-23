@@ -76,4 +76,4 @@ const productSelectionModalReducer = {
     getNamedStates
 }
 
-export default productSelectionModalReducer;
+export default productSelectionModalReducer

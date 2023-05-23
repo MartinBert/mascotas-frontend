@@ -4,7 +4,7 @@ import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
 import {DeleteModal} from '../../components/generics';
-import {useHistory} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import DetailsModal from './DetailsModal';
 
 const { Edit, Delete, Details } = icons;
@@ -21,7 +21,7 @@ const MediosPago = () => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteEntityId, setDeleteEntityId] = useState(null);
   const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMediosPago = async() => {
@@ -47,7 +47,7 @@ const MediosPago = () => {
   }, [deleteEntityId])
 
   const editMedioPago = (id) => {
-    history.push(`/mediospago/${id}`);
+    navigate(`/mediospago/${id}`);
   }
 
   const seeDetails = (data) => {

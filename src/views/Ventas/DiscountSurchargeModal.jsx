@@ -1,25 +1,30 @@
+// React Components and Hooks
 import React from 'react'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
+// Design Components
 import { Modal, Row, Col, Input, Select } from 'antd'
 
+// Imports Destructurings
+const { useSaleContext } = contextProviders.SaleContextProvider
 const { Option } = Select
 
-const ProductSelectionModal = ({ state, dispatch, actions }) => {
-    const {
-        HIDE_DISCOUNT_SURCHARGE_MODAL,
-        SET_GLOBAL_DISCOUNT_PERCENT,
-        SET_GLOBAL_SURCHARGE_PERCENT,
-        SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION,
-        SET_TOTAL,
-    } = actions
+
+const ProductSelectionModal = () => {
+
+    const saleContext = useSaleContext()
+    const [sale_state, sale_dispatch] = saleContext
 
     return (
         <Modal
             title='Agregar descuento o recargo a la factura'
-            open={state.discountSurchargeModalVisible}
+            open={sale_state.discountSurchargeModalVisible}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             onOk={() => {
-                dispatch({ type: HIDE_DISCOUNT_SURCHARGE_MODAL })
+                sale_dispatch({ type: 'HIDE_DISCOUNT_SURCHARGE_MODAL' })
             }}
             width={1200}
         >
@@ -28,14 +33,14 @@ const ProductSelectionModal = ({ state, dispatch, actions }) => {
                     <Select
                         style={{ width: '100%' }}
                         onChange={(e) => {
-                            dispatch({ type: SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION, payload: e })
-                            // dispatch({
-                            //     type: (state.discountSurchargeModalOperation === 'discount') ? SET_GLOBAL_DISCOUNT_PERCENT : SET_GLOBAL_SURCHARGE_PERCENT,
+                            sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION', payload: e })
+                            // sale_dispatch({
+                            //     type: (sale_state.discountSurchargeModalOperation === 'discount') ? 'SET_GLOBAL_DISCOUNT_PERCENT' : 'SET_GLOBAL_SURCHARGE_PERCENT',
                             //     payload: (!e.target.value) ? 0 : parseFloat(e.target.value)
                             // })
-                            dispatch({ type: SET_TOTAL })
+                            sale_dispatch({ type: 'SET_TOTAL' })
                         }}
-                        value={state.discountSurchargeModalOperation}
+                        value={sale_state.discountSurchargeModalOperation}
                     >
                         <Option value='discount'>Descuento</Option>
                         <Option value='surcharge'>Recargo</Option>
@@ -47,15 +52,15 @@ const ProductSelectionModal = ({ state, dispatch, actions }) => {
                         type='number'
                         placeholder='Ingrese el porcentaje de modificación'
                         onChange={(e) => {
-                            dispatch({
-                                type: (state.discountSurchargeModalOperation === 'discount') ? SET_GLOBAL_DISCOUNT_PERCENT : SET_GLOBAL_SURCHARGE_PERCENT,
+                            sale_dispatch({
+                                type: (sale_state.discountSurchargeModalOperation === 'discount') ? 'SET_GLOBAL_DISCOUNT_PERCENT' : 'SET_GLOBAL_SURCHARGE_PERCENT',
                                 payload: (!e.target.value) ? 0 : parseFloat(e.target.value)
                             })
-                            // dispatch({
-                            //     type: (state.discountSurchargeModalOperation === 'discount') ? SET_GLOBAL_SURCHARGE_PERCENT : SET_GLOBAL_DISCOUNT_PERCENT,
+                            // sale_dispatch({
+                            //     type: (sale_state.discountSurchargeModalOperation === 'discount') ? 'SET_GLOBAL_SURCHARGE_PERCENT' : 'SET_GLOBAL_DISCOUNT_PERCENT',
                             //     payload: 0
                             // })
-                            dispatch({ type: SET_TOTAL })
+                            sale_dispatch({ type: 'SET_TOTAL' })
                         }}
                     />
                 </Col>

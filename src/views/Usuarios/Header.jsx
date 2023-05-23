@@ -1,7 +1,7 @@
 
-import React from 'react';
-import { Row, Col, Button, Input} from 'antd';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Row, Col, Button, Input} from 'antd'
+import { Link } from 'react-router-dom'
 
 const Header = ({setFilters}) => {
     return(

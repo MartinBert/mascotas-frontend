@@ -3,7 +3,7 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import DeleteModal from './DeleteModal';
 
 const { Edit, Delete } = icons;
@@ -18,7 +18,7 @@ const CuentasCorrientes = () => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteEntityId, setDeleteEntityId] = useState(null);
   const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCuentasCorrientes = async() => {
@@ -44,7 +44,7 @@ const CuentasCorrientes = () => {
   }, [deleteEntityId])
 
   const editCurrentAccount = (id) => {
-    history.push(`/cuentasCorrientes/${id}`);
+    navigate(`/cuentasCorrientes/${id}`);
   }
 
   const columnsForTable = [

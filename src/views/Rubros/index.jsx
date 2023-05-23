@@ -3,7 +3,7 @@ import api from '../../services';
 import {Row, Col, Table} from 'antd';
 import icons from '../../components/icons';
 import Header from './Header';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {DeleteModal} from '../../components/generics';
 
 const { Edit, Delete } = icons;
@@ -18,7 +18,7 @@ const Rubros = () => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteEntityId, setDeleteEntityId] = useState(null);
   const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRubros = async() => {
@@ -44,7 +44,7 @@ const Rubros = () => {
   }, [deleteEntityId])
 
   const editHeading = (id) => {
-    history.push(`/rubros/${id}`);
+    navigate(`/rubros/${id}`);
   }
 
   const columnsForTable = [
