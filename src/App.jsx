@@ -1,4 +1,4 @@
-// React Components
+// React Components and Hooks
 import { BrowserRouter as Router } from 'react-router-dom'
 
 // Custom Routers
@@ -8,7 +8,7 @@ import AppRouter from './routes'
 import contextProviders from './contextProviders'
 
 // Design Frameworks
-// import 'antd/dist/antd.css'
+import 'antd/dist/reset.css'
 
 // Imports Destructurings
 const { LoggedUserContext } = contextProviders.LoggedUserContextProvider

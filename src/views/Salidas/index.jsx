@@ -1,16 +1,29 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../../services'
-import { Row, Col, Table } from 'antd'
-import Header from './Header'
-import icons from '../../components/icons'
-import DetailsModal from './DetailsModal'
+
+// Custom Components
 import { DeleteModal } from '../../components/generics'
+import icons from '../../components/icons'
+
+// Design Components
+import { Row, Col, Table } from 'antd'
+
+// Helpers
 import helpers from '../../helpers'
 
+// Services
+import api from '../../services'
+
+// Views
+import DetailsModal from './DetailsModal'
+import Header from './Header'
+
+// Imports Destructuring
 const { Details, Edit, Delete } = icons
 const { dateHelper, mathHelper } = helpers
 const { roundTwoDecimals } = mathHelper
+
 
 const Salidas = () => {
     const navigate = useNavigate()

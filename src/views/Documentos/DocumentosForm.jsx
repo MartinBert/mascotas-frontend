@@ -1,18 +1,28 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import api from '../../services'
-import helpers from '../../helpers'
-import { Row, Col, Form, Input, Checkbox, Button, Popover } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
+
+// Custom Components
 import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
+// Design Components
+import { Row, Col, Form, Input, Checkbox, Button, Popover } from 'antd'
+
+// Helpers
+import helpers from '../../helpers'
+
+// Services
+import api from '../../services'
+
+// Imports Destructuring
 const { Spinner } = graphics
 const { formHelper } = helpers
 
-const DocumentosForm = () => {
 
-    const { id } = useParams()
+const DocumentosForm = () => {
     const navigate = useNavigate()
+    const { id } = useParams()
     const [loading, setLoading] = useState(true)
     const [documento, setDocumento] = useState({
         nombre: '',
@@ -39,9 +49,7 @@ const DocumentosForm = () => {
         })
     }
 
-    //eslint-disable-next-line
     useEffect(() => {
-
         const fetchDocumento = async (id) => {
             const searchedItem = await api.documentos.findById(id)
             setDocumento(searchedItem)
@@ -114,7 +122,7 @@ const DocumentosForm = () => {
                                             title={input.popover.title}
                                             content={input.popover.content}
                                             trigger={input.popover.trigger}
-                                            
+
                                             key={input.popover.id}
                                         >
                                             <Button shape='circle'>?</Button>

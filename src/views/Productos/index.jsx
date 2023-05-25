@@ -1,15 +1,33 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import api from '../../services'
-import { Row, Col, Table } from 'antd'
-import Header from './Header'
+import { useNavigate } from 'react-router-dom'
+
+// Custom Components
+import { DeleteModal, OpenImage } from '../../components/generics'
 import GiselaDetailsModal from '../../components/generics/productDetailsModal/GiselaDetailsModal'
 import icons from '../../components/icons'
-import { OpenImage } from '../../components/generics'
-import { useNavigate } from 'react-router-dom'
-import { DeleteModal } from '../../components/generics'
 
+// Design Components
+import { Row, Col, Table } from 'antd'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
+// Services
+import api from '../../services'
+
+// Views
+import Header from './Header'
+
+// Imports Destructuring
 const { Details, Edit, Delete } = icons
-const Productos = ({ userState }) => {
+const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+
+
+const Productos = () => {
+    const navigate = useNavigate()
+    const loggedUserContext = useLoggedUserContext()
+    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
     const [products, setProducts] = useState(null)
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
@@ -21,8 +39,15 @@ const Productos = ({ userState }) => {
     const [deleteVisible, setDeleteVisible] = useState(false)
     const [deleteEntityId, setDeleteEntityId] = useState(null)
     const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
-    const navigate = useNavigate()
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            const userId = localStorage.getItem('userId')
+            const loggedUser = await api.usuarios.findById(userId)
+            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+        }
+        fetchUser()
+    }, [loggedUser_dispatch])
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -85,7 +110,7 @@ const Productos = ({ userState }) => {
                     <Details title='Ver detalle' />
                 </div>
             ),
-            open: userState.user.perfil
+            open: loggedUser_state.perfil
         },
         {
             title: 'Imagen',

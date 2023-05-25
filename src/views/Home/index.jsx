@@ -1,4 +1,6 @@
+// React Components and Hooks
 import React from 'react'
+
 
 const Home = () => {
     return (

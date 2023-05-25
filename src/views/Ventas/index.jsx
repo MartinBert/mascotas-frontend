@@ -1,8 +1,11 @@
 // React Components and Hooks
-import React, { useEffect, useReducer } from 'react'
+import React, { useEffect } from 'react'
 
 // Custom Components
 import { errorAlert } from '../../components/alerts'
+
+// Design Components
+import { Row, Col, Spin } from 'antd'
 
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
@@ -12,65 +15,52 @@ import api from '../../services'
 
 // Views
 import Header from './Header'
-import reducers from '../../reducers'
 import DiscountSurchargeModal from './DiscountSurchargeModal'
 import FinalizeSaleModal from './FinalizeSaleModal'
 import Lines from './Lines'
 
-// Design Components
-import { Row, Col, Spin } from 'antd'
-
 // Imports Destructurings
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { productInitialState, productReducer, productActions } = reducers.productSelectionModalReducer.getNamedStates()
-const { initialState, reducer, actions } = reducers.saleReducer
-const {
-    SET_COMPANY,
-    SET_SALE_POINT,
-    SET_DATES,
-    SHOW_FINALIZE_SALE_MODAL,
-    SET_INDEX,
-    SET_USER
-} = actions
+const { useSaleContext } = contextProviders.SaleContextProvider
 
 
 const Ventas = () => {
-
-    const loggedUserContext = useLoggedUserContext()
-    const [ loggedUser_state ] = loggedUserContext
-    const [state, dispatch] = useReducer(reducer, initialState)
-    const [productState, productDispatch] = useReducer(
-        productReducer,
-        productInitialState
-    )
+    const saleContext = useSaleContext()
+    const [sale_state, sale_dispatch] = saleContext
 
     useEffect(() => {
-        dispatch({ type: SET_COMPANY, payload: loggedUser_state.user.empresa })
-        dispatch({ type: SET_SALE_POINT, payload: loggedUser_state.user.puntoVenta })
-        dispatch({ type: SET_USER, payload: loggedUser_state.user })
+        const fetchUser = async () => {
+            const userId = localStorage.getItem('userId')
+            const loggedUser = await api.usuarios.findById(userId)
+            sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.empresa })
+            sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.puntoVenta })
+            sale_dispatch({ type: 'SET_USER', payload: loggedUser })
+        }
+
         const fetchLastVoucherIndex = async () => {
             const lastIndex = await api.ventas.findLastIndex()
-            dispatch({ type: SET_INDEX, payload: lastIndex + 1 })
+            sale_dispatch({ type: 'SET_INDEX', payload: lastIndex + 1 })
         }
+
+        fetchUser()
         fetchLastVoucherIndex()
     },
         //eslint-disable-next-line
         [])
 
     useEffect(() => {
-        if (state.fechaEmision) return
-        dispatch({ type: SET_DATES })
+        if (sale_state.fechaEmision) return
+        sale_dispatch({ type: 'SET_DATES' })
     },
         //eslint-disable-next-line
         [])
 
     const checkState = async () => {
         const result = new Promise(resolve => {
-            if (!state.renglones || state.renglones.length < 1) resolve('Debe seleccionar al menos un producto para realizar la venta.')
-            if (!state.cliente) resolve('Debe seleccionar un cliente para realizar la venta.')
-            if (!state.documento) resolve('Debe indicar el documento/comprobante de la operación.')
-            if (!state.mediosPago || state.mediosPago.length < 1) resolve('Debe seleccionar al menos un medio de pago para realizar la venta.')
-            if (!state.planesPago || state.planesPago.length < 1) resolve('Debe seleccionar al menos un plan de pago para realizar la venta.')
+            if (!sale_state.renglones || sale_state.renglones.length < 1) resolve('Debe seleccionar al menos un producto para realizar la venta.')
+            if (!sale_state.cliente) resolve('Debe seleccionar un cliente para realizar la venta.')
+            if (!sale_state.documento) resolve('Debe indicar el documento/comprobante de la operación.')
+            if (!sale_state.mediosPago || sale_state.mediosPago.length < 1) resolve('Debe seleccionar al menos un medio de pago para realizar la venta.')
+            if (!sale_state.planesPago || sale_state.planesPago.length < 1) resolve('Debe seleccionar al menos un plan de pago para realizar la venta.')
             resolve('OK')
         })
         return await result
@@ -79,25 +69,14 @@ const Ventas = () => {
     return (
         <>
             {
-                (!state.loadingView)
+                (!sale_state.loadingView)
                     ?
                     <Row>
                         <Col span={24}>
-                            <Header
-                                productState={productState}
-                                productDispatch={productDispatch}
-                                productActions={productActions}
-                            />
+                            <Header />
                         </Col>
                         <Col span={24}>
-                            <Lines
-                                productState={productState}
-                                productDispatch={productDispatch}
-                                productActions={productActions}
-                                state={state}
-                                dispatch={dispatch}
-                                actions={actions}
-                            />
+                            <Lines />
                         </Col>
                         <Col span={6} style={{ marginTop: '25px' }}>
                             <button
@@ -105,7 +84,7 @@ const Ventas = () => {
                                 onClick={() => {
                                     checkState()
                                         .then(result => {
-                                            if (result === 'OK') return dispatch({ type: SHOW_FINALIZE_SALE_MODAL })
+                                            if (result === 'OK') return sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
                                             return errorAlert(result)
                                         })
                                 }}

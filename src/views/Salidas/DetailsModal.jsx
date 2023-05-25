@@ -1,14 +1,22 @@
+// React Components and Hooks
 import React, { useState } from 'react'
+
+// Custom Components
 import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
-import { Modal, Table } from 'antd'
 import icons from '../../components/icons'
+
+// Design Components
+import { Modal, Table } from 'antd'
+
+// Helpers
 import mathHelpers from '../../helpers/mathHelper'
 
+// Imports Destructuring
 const { Details } = icons
 const { roundTwoDecimals } = mathHelpers
 
-const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
 
+const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
     const [productDetailsVisible, setProductDetailsVisible] = useState(false)
     const [productDetails, setProductDetails] = useState(null)
 

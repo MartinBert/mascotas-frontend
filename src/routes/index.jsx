@@ -9,9 +9,6 @@ import PrivateRouter from './PrivateRouter'
 // Custom Context Providers
 import contextProviders from '../contextProviders'
 
-// Services
-import api from '../services'
-
 // Design Components
 import { Spin } from 'antd'
 
@@ -38,16 +35,14 @@ const AppRouter = () => {
         const accessToPrivateRoutes = async () => {
             const token = localStorage.getItem('token')
             const userId = localStorage.getItem('userId')
-            if (!token || !userId || token === undefined || userId === undefined) redirectToLogin()
-
-            const loggedUser = await api.usuarios.findById(localStorage.getItem('userId'))
-            if (!loggedUser) redirectToLogin()
-
-            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            if (!token || !userId || token === undefined || userId === undefined) {
+                loggedUser_dispatch({ type: 'SET_LOADING', payload: true })
+                return redirectToLogin()
+            }
             loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
-            if (privateRoute_state.openKey.length === 0) {
+            if (privateRoute_state.openKey.length === 0)
                 privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
-            } else redirectToLogin()
+            else redirectToLogin()
         }
         accessToPrivateRoutes()
     }, [

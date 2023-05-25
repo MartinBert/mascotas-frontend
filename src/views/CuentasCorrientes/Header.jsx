@@ -1,13 +1,18 @@
 
-import React from 'react';
-import { Row, Col, Button, Input} from 'antd';
-import { Link } from 'react-router-dom';
-import '../../index.css';
+// React Components and Hooks
+import React from 'react'
+import { Link } from 'react-router-dom'
+
+// Styles
+import '../../index.css'
+
+// Design Components
+import { Row, Col, Button, Input} from 'antd'
+
 
 const Header = ({setFilters}) => {
     return(
         <Row>
-            
             <Col span={24}>
                 <Row align='end'>
                     <Col span={20}>

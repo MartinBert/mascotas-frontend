@@ -1,68 +1,77 @@
+// React Components and Hooks
 import React from 'react'
-import { Row } from 'antd'
-import LoginForm from './LoginForm'
+
+// Styles
 import './login.scss'
 
+// Design Components
+import { Row } from 'antd'
+
+// Views
+import LoginForm from './LoginForm'
+
+
 const Login = () => {
-    return(
+
+    return (
         <Row className='login'>
-                <div className='bubbles'>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div style={{width: '100%', marginTop: '10%', justifyContent: 'center', display: 'flex'}}>
-                        <div style={{width: '300px', height: '200px'}}>
-                            <LoginForm/>
-                        </div>
+            <div className='bubbles'>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div style={{ width: '100%', marginTop: '10%', justifyContent: 'center', display: 'flex' }}>
+                    <div style={{ width: '300px', height: '200px' }}>
+                        <LoginForm />
                     </div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
-                    <div className='bubble'></div>
                 </div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+                <div className='bubble'></div>
+            </div>
         </Row>
     )
 }

@@ -4,17 +4,17 @@ import React, { useEffect } from 'react'
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
 
+// Design Components
+import { Modal, Row, Col } from 'antd'
+
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
-
-// Services
-import api from '../../services'
 
 // Helpers
 import helpers from '../../helpers'
 
-// Design Components
-import { Modal, Row, Col } from 'antd'
+// Services
+import api from '../../services'
 
 // Imports Destructurings
 const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
@@ -25,7 +25,7 @@ const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 const FinalizeSaleModal = () => {
     const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
+    const [loggedUser_state] = loggedUserContext
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
 

@@ -1,13 +1,22 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Input, DatePicker } from 'antd'
 import { Link } from 'react-router-dom'
-import api from '../../services'
+
+// Design Components
+import { Row, Col, Input, DatePicker } from 'antd'
+
+// Helpers
 import helpers from '../../helpers'
 
+// Services
+import api from '../../services'
+
+// Imports Destructuring
 const { RangePicker } = DatePicker
 const { addDays } = helpers.dateHelper
 const { exportSimpleExcel } = helpers.excel
 const { simpleDateWithHours } = helpers.dateHelper
+
 
 const Header = ({ setFilters, setPage, entradas_paginadas, entradas_totales }) => {
     const [fecha, setFecha] = useState(null)

@@ -1,11 +1,20 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
+
+// Design Components
 import { Row, Col, Input, Select, DatePicker } from 'antd'
+
+// Helpers
 import helpers from '../../../helpers'
+
+// Services
 import api from '../../../services'
 
+// Imports Destructuring
 const { RangePicker } = DatePicker
 const { exportSimpleExcel } = helpers.excel
 const { addDays } = helpers.dateHelper
+
 
 const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, mediosPago, mediosPagoNombres }) => {
     const [fecha, setFecha] = useState(null)

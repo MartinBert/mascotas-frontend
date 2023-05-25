@@ -1,11 +1,11 @@
 // React Components and Hooks
 import React from 'react'
 
-// Custom Context Providers
-import contextProviders from '../../contextProviders'
-
 // Design Components
 import { Modal, Row, Col, Input, Select } from 'antd'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
 
 // Imports Destructurings
 const { useSaleContext } = contextProviders.SaleContextProvider
@@ -13,7 +13,6 @@ const { Option } = Select
 
 
 const ProductSelectionModal = () => {
-
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
 

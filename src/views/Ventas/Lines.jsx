@@ -4,14 +4,14 @@ import React, { useEffect } from 'react'
 // Custom Components
 import icons from '../../components/icons'
 
+// Design Components
+import { Table, Input, Checkbox, Row, Col } from 'antd'
+
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
 
 // Helpers
 import helpers from '../../helpers'
-
-// Design Components
-import { Table, Input, Checkbox, Row, Col } from 'antd'
 
 // Imports Destructurings
 const { Delete } = icons
@@ -21,12 +21,10 @@ const { round, roundTwoDecimals } = helpers.mathHelper
 
 
 const Lines = () => {
-
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
-    const productContext = useProductSelectionModalContext()
-    const [product_state, product_dispatch] = productContext
-
+    const productSelectionModalContext = useProductSelectionModalContext()
+    const [productSelectionModal_state, productSelectionModal_dispatch] = productSelectionModalContext
 
     const columnsForTable = [
         {
@@ -38,7 +36,8 @@ const Lines = () => {
                         product.fraccionar = e.target.checked
                         sale_dispatch({ type: 'SET_FRACTIONED', payload: product })
                         sale_dispatch({ type: 'SET_TOTAL' })
-                    }} />
+                    }}
+                />
             ),
         },
         {
@@ -193,7 +192,7 @@ const Lines = () => {
             render: (product) => (
                 <Col align='middle'
                     onClick={() => {
-                        product_dispatch({ type: 'DELETE_PRODUCT', payload: product })
+                        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: product })
                     }}
                 >
                     <Delete />
@@ -203,19 +202,13 @@ const Lines = () => {
     ]
 
     useEffect(() => {
-        sale_dispatch({ type: 'SET_LINES', payload: product_state.selectedProducts })
-        sale_dispatch({ type: 'SET_PRODUCTS', payload: product_state.selectedProducts })
+        sale_dispatch({ type: 'SET_LINES', payload: productSelectionModal_state.selectedProducts })
+        sale_dispatch({ type: 'SET_PRODUCTS', payload: productSelectionModal_state.selectedProducts })
         sale_dispatch({ type: 'SET_TOTAL' })
     },
         //eslint-disable-next-line
-        [
-            product_state.selectedProducts,
-            sale_dispatch,
-            'SET_LINES',
-            'SET_PRODUCTS',
-            'SET_TOTAL',
-        ])
-
+        [productSelectionModal_state.selectedProducts, sale_dispatch])
+    console.log(productSelectionModal_state)
     return (
         <Table
             style={{ marginTop: '20px' }}

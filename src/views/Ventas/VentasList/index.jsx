@@ -1,12 +1,25 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import api from '../../../services'
-import { Row, Col, Table } from 'antd'
+
+// Custom Components
 import icons from '../../../components/icons'
-import Header from './Header'
+
+// Design Components
+import { Row, Col, Table } from 'antd'
+
+// Helpers
 import helpers from '../../../helpers'
 
+// Services
+import api from '../../../services'
+
+// Views
+import Header from './Header'
+
+// Imports Destructuring
 const { PrintPdf } = icons
 const { createVoucherPdf, createTicketPdf } = helpers.pdf
+
 
 const VentasList = () => {
     const [ventas, setVentas] = useState(null)

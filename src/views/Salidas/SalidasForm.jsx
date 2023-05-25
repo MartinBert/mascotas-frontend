@@ -1,22 +1,39 @@
-import React, { useEffect, useState, useReducer } from 'react';
-import reducers from '../../reducers';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Row, Col, Form, Input, Spin, DatePicker } from 'antd';
-import api from '../../services';
-import icons from '../../components/icons';
-import { errorAlert, successAlert } from '../../components/alerts';
-import { ProductSelectionModal } from '../../components/generics';
+// React Components and Hooks
+import React, { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 
-const { Add, Delete } = icons;
-const {reducer, initialState, actions} = reducers.productSelectionModalReducer;
-const {DELETE_PRODUCT} = actions;
+// Custom Components
+import { ProductSelectionModal } from '../../components/generics'
+import { errorAlert, successAlert } from '../../components/alerts'
+import icons from '../../components/icons'
 
-const SalidasForm = ({userState}) => {
+// Design Components
+import { Row, Col, Form, Input, Spin, DatePicker } from 'antd'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
+// Services
+import api from '../../services'
+
+// Imports Destructuring
+const { Add, Delete } = icons
+const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+
+
+const SalidasForm = () => {
 
     //------------------------------------------------------ State declarations ------------------------------------------------------/
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate()
+    const { id } = useParams()
+    const loggedUserContext = useLoggedUserContext()
+    const [loggedUser_state] = loggedUserContext
+    const productSelectionModalContext = useProductSelectionModalContext()
+    const [productSelectionModal_state, productSelectionModal_dispatch] = productSelectionModalContext
+    const [salidaIsReady, setSalidaIsReady] = useState(false)
+    const [total, setTotal] = useState(0)
+    const [loading, setLoading] = useState(true)
     const [salida, setSalida] = useState({
         descripcion: '',
         fecha: new Date(),
@@ -24,37 +41,34 @@ const SalidasForm = ({userState}) => {
         gananciaNeta: 0,
         productos: [],
         usuario: null,
-    });
-    const [salidaIsReady, setSalidaIsReady] = useState(false);
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const [total, setTotal] = useState(0);
+    })
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
     //--------------------------------------------------------- First load ---------------------------------------------------------/
-    //eslint-disable-next-line
+
     useEffect(() => {
-        if (!loading) return;
+        if (!loading) return
         if (id === 'nuevo') {
-            setSalidaIsReady(true);
+            setSalidaIsReady(true)
         } else {
-            fetchSalida();
+            const fetchSalida = async () => {
+                const response = await api.salidas.findById(id)
+                setSalida(response.data)
+                setSalidaIsReady(true)
+            }
+            fetchSalida()
         }
-    })
+    }, [loading, id])
 
     useEffect(() => {
-        if (!salidaIsReady) return;
-        if (!salida.usuario) setSalida({...salida,usuario: userState.user})
-        setLoading(false);
+        if (!salidaIsReady) return
+        if (!salida.usuario) setSalida({ ...salida, usuario: loggedUser_state.user })
+        setLoading(false)
     },
-    //eslint-disable-next-line
-    [salidaIsReady])
+        //eslint-disable-next-line
+        [salidaIsReady])
 
-    const fetchSalida = async () => {
-        const response = await api.salidas.findById(id);
-        setSalida(response.data);
-        setSalidaIsReady(true);
-    }
     //------------------------------------------------------------------------------------------------------------------------------/
 
 
@@ -62,11 +76,11 @@ const SalidasForm = ({userState}) => {
     useEffect(() => {
         setSalida({
             ...salida,
-            productos: state.selectedProducts
+            productos: productSelectionModal_state.selectedProducts
         })
     },
-    //eslint-disable-next-line
-    [state.selectedProducts])
+        //eslint-disable-next-line
+        [productSelectionModal_state.selectedProducts])
 
     useEffect(() => {
         setTotal(
@@ -78,20 +92,20 @@ const SalidasForm = ({userState}) => {
 
 
     //----------------------------------------------- Submit form action -----------------------------------------------------------/
-    const handleSubmit = async() => {
-        try{
-            if(id !== 'nuevo'){
-                for(let product of salida.productos){
-                    const firstSalidaRequest = await api.salidas.findById(id);
-                    const firstSalidaInstance = firstSalidaRequest.data;
-                    const originalProductInstance = firstSalidaInstance.productos.find(el => el._id === product._id);
-                    if(originalProductInstance && originalProductInstance.cantidadesSalientes !== product.cantidadesSalientes){
-                        const productToModifyRequest = await api.productos.findById(product._id);
-                        const productToModify = productToModifyRequest.data;
-                        productToModify.cantidadStock += originalProductInstance.cantidadesSalientes;
-                        productToModify.cantidadStock -= parseFloat(product.cantidadesSalientes);
-                        await api.productos.edit(productToModify);
-                    }else{
+    const handleSubmit = async () => {
+        try {
+            if (id !== 'nuevo') {
+                for (let product of salida.productos) {
+                    const firstSalidaRequest = await api.salidas.findById(id)
+                    const firstSalidaInstance = firstSalidaRequest.data
+                    const originalProductInstance = firstSalidaInstance.productos.find(el => el._id === product._id)
+                    if (originalProductInstance && originalProductInstance.cantidadesSalientes !== product.cantidadesSalientes) {
+                        const productToModifyRequest = await api.productos.findById(product._id)
+                        const productToModify = productToModifyRequest.data
+                        productToModify.cantidadStock += originalProductInstance.cantidadesSalientes
+                        productToModify.cantidadStock -= parseFloat(product.cantidadesSalientes)
+                        await api.productos.edit(productToModify)
+                    } else {
                         await api.productos.modifyStock({
                             product,
                             isIncrement: false,
@@ -99,27 +113,27 @@ const SalidasForm = ({userState}) => {
                         })
                     }
                 }
-                salida.fecha = new Date();
-                salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0);
+                salida.fecha = new Date()
+                salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0)
                 await api.salidas.edit(salida)
-                .then((response) => {
-                    if(response.code === 200){
-                        successAlert('El registro se editó correctamente');
-                        redirectToSalidas();
-                    }else{
-                        errorAlert('Fallo al editar el registro');
-                    }
-                })
-            }else{
-                if(!salida.descripcion){
-                    salida.descripcion = '-- Sin descripción --';
+                    .then((response) => {
+                        if (response.code === 200) {
+                            successAlert('El registro se editó correctamente')
+                            redirectToSalidas()
+                        } else {
+                            errorAlert('Fallo al editar el registro')
+                        }
+                    })
+            } else {
+                if (!salida.descripcion) {
+                    salida.descripcion = '-- Sin descripción --'
                 }
-                if(!salida.fecha){
+                if (!salida.fecha) {
                     salida.fecha = new Date()
-                };
-                salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0);
-                salida.gananciaNeta = total;
-                for(const product of salida.productos){
+                }
+                salida.cantidad = salida.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0)
+                salida.gananciaNeta = total
+                for (const product of salida.productos) {
                     await api.productos.modifyStock({
                         product,
                         isIncrement: false,
@@ -127,22 +141,22 @@ const SalidasForm = ({userState}) => {
                     })
                 }
                 await api.salidas.save(salida)
-                .then((response) => {
-                    if(response.code === 200){
-                        successAlert('El registro se guardó correctamente');
-                        redirectToSalidas();
-                    }else{
-                        errorAlert('Fallo al guardar el registro');
-                    }
-                })
+                    .then((response) => {
+                        if (response.code === 200) {
+                            successAlert('El registro se guardó correctamente')
+                            redirectToSalidas()
+                        } else {
+                            errorAlert('Fallo al guardar el registro')
+                        }
+                    })
             }
-        }catch(err){
-            console.error(err);
+        } catch (err) {
+            console.error(err)
         }
     }
-    
+
     const redirectToSalidas = () => {
-        navigate('/salidas');
+        navigate('/salidas')
     }
     //------------------------------------------------------------------------------------------------------------------------------/
 
@@ -205,7 +219,7 @@ const SalidasForm = ({userState}) => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => { dispatch({type: 'SHOW_MODAL'}) }}>
+                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_MODAL' }) }}>
                                     <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>
@@ -229,7 +243,7 @@ const SalidasForm = ({userState}) => {
                                                                     if (el._id === item._id) {
                                                                         el.nombre = e.target.value
                                                                     }
-                                                                    return el;
+                                                                    return el
                                                                 })
                                                             })
                                                         }}
@@ -252,7 +266,7 @@ const SalidasForm = ({userState}) => {
                                                                     if (el._id === item._id) {
                                                                         el.codigoBarras = e.target.value
                                                                     }
-                                                                    return el;
+                                                                    return el
                                                                 })
                                                             })
                                                         }}
@@ -274,9 +288,9 @@ const SalidasForm = ({userState}) => {
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
                                                                     if (el._id === item._id) {
-                                                                        el.cantidadesSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
+                                                                        el.cantidadesSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value)
                                                                     }
-                                                                    return el;
+                                                                    return el
                                                                 })
                                                             })
                                                         }}
@@ -298,9 +312,9 @@ const SalidasForm = ({userState}) => {
                                                                 ...salida,
                                                                 productos: salida.productos.map(el => {
                                                                     if (el._id === item._id) {
-                                                                        el.cantidadesFraccionadasSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value);
+                                                                        el.cantidadesFraccionadasSalientes = (!e.target.value) ? 0 : parseFloat(e.target.value)
                                                                     }
-                                                                    return el;
+                                                                    return el
                                                                 })
                                                             })
                                                         }}
@@ -310,7 +324,7 @@ const SalidasForm = ({userState}) => {
                                             <Col span={4}>
                                                 <div onClick={
                                                     () => {
-                                                        dispatch({type: DELETE_PRODUCT, payload: state.selectedProducts.find(product => product._id === item._id)})
+                                                        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: productSelectionModal_state.selectedProducts.find(product => product._id === item._id) })
                                                     }
                                                 }>
                                                     <Delete />
@@ -344,13 +358,9 @@ const SalidasForm = ({userState}) => {
                     </Form>
                 }
             </Col>
-            <ProductSelectionModal 
-                state={state}
-                actions={actions}
-                dispatch={dispatch}
-            />
+            <ProductSelectionModal />
         </Row>
     )
 }
 
-export default SalidasForm;
+export default SalidasForm

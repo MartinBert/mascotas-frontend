@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom'
 // Custom Components
 import messages from '../../components/messages'
 
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
 // Services
 import api from '../../services'
 
@@ -13,16 +16,17 @@ import { Form, Input, Button } from 'antd'
 
 // Imports Destructurings
 const { Error } = messages
-
+const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
 
 const LoginForm = () => {
-
+    const navigate = useNavigate()
+    const [error, setError] = useState(false)
     const [credentials, setCredentials] = useState({
         email: '',
         password: '',
     })
-    const [error, setError] = useState(false)
-    const navigate = useNavigate()
+    const loggedUserContext = useLoggedUserContext()
+    const [, loggedUser_dispatch] = loggedUserContext
 
     const loadCredentials = (e) => {
         setCredentials({
@@ -31,25 +35,30 @@ const LoginForm = () => {
         })
     }
 
-    const login = async () => {
-        const response = await api.auth.login(credentials)
-        if (response) {
-            const { token, data } = response
-            if (!token) {
-                setError(true)
-                return
-            }
-            localStorage.setItem('token', token)
-            localStorage.setItem('userId', data)
-            return redirectToHome()
-        } else {
-            setError(true)
-            return
-        }
-    }
-
     const redirectToHome = () => {
         navigate('/')
+    }
+
+    const redirectToLogin = () => {
+        localStorage.clear()
+        navigate('/login')
+    }
+
+    const login = async () => {
+        const response = await api.auth.login(credentials)
+        if (!response) {
+            setError(true)
+            return redirectToLogin()
+        }
+        const { token, data } = response
+        if (!token) {
+            setError(true)
+            return redirectToLogin()
+        }
+        localStorage.setItem('token', token)
+        localStorage.setItem('userId', data)
+        loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
+        return redirectToHome()
     }
 
     return (

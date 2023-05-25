@@ -1,7 +1,11 @@
-import React from 'react';
-import { Modal, Table } from 'antd';
+// React Components and Hooks
+import React from 'react'
 
-const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
+// Design Components
+import { Modal, Table } from 'antd'
+
+
+const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
     const columns = [
         {
             title: 'Nombre',
@@ -16,22 +20,23 @@ const DetailsModal = ({detailsVisible, setDetailsVisible, detailsData}) => {
             dataIndex: 'porcentaje',
         },
     ]
+
     return (
-    <Modal 
-        title='Detalle de planes' 
-        open={detailsVisible}
-        onCancel={() => {setDetailsVisible(false)}}
-        footer={false}
-        width={800}
-    >
-        <Table 
-            dataSource={detailsData} 
-            columns={columns}
-            pagination={false}
-            rowKey='_id'
-        />
-    </Modal>
-  )
+        <Modal
+            title='Detalle de planes'
+            open={detailsVisible}
+            onCancel={() => { setDetailsVisible(false) }}
+            footer={false}
+            width={800}
+        >
+            <Table
+                dataSource={detailsData}
+                columns={columns}
+                pagination={false}
+                rowKey='_id'
+            />
+        </Modal>
+    )
 }
 
-export default DetailsModal;
+export default DetailsModal

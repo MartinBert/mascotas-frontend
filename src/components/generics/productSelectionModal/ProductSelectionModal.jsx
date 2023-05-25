@@ -19,10 +19,9 @@ const { useProductSelectionModalContext } = contextProviders.ProductSelectionMod
 
 const ProductSelectionModal = () => {
 
-    const productSelectionModalContext = useProductSelectionModalContext()
-    const [product_state, product_dispatch] = productSelectionModalContext
-
     //--------------------------- State declarations ---------------------------//
+    const productSelectionModalContext = useProductSelectionModalContext()
+    const [productSelectionModal_state, productSelectionModal_dispatch] = productSelectionModalContext
     const [products, setProducts] = useState(null)
     const [limit, setLimit] = useState(10)
     const [page, setPage] = useState(1)
@@ -51,9 +50,9 @@ const ProductSelectionModal = () => {
                 <Checkbox 
                     checked={product.selected}
                     onChange={(e) => {
-                        if(product_state.selectionLimit <= 1) product_dispatch({type: 'CLEAN_PRODUCT_LIST'})
+                        if(productSelectionModal_state.selectionLimit <= 1) productSelectionModal_dispatch({type: 'CLEAN_PRODUCT_LIST'})
                         product.selected = e.target.checked
-                        product_dispatch({type: (e.target.checked) ? 'SET_PRODUCT' : 'DELETE_PRODUCT', payload: product})
+                        productSelectionModal_dispatch({type: (e.target.checked) ? 'SET_PRODUCT' : 'DELETE_PRODUCT', payload: product})
                     }}
                 />
             )
@@ -69,7 +68,7 @@ const ProductSelectionModal = () => {
           const stringFilters = JSON.stringify(filters)
           const data = await api.productos.findAll({page, limit, filters: stringFilters})
           data.docs.forEach(product => {
-              product_state.selectedProducts.forEach(selectedProduct => {
+              productSelectionModal_state.selectedProducts.forEach(selectedProduct => {
                 if(product._id === selectedProduct._id){
                     product.selected = true
                 }
@@ -80,7 +79,7 @@ const ProductSelectionModal = () => {
           setLoading(false)
         }
         fetchProducts()
-    },[page, limit, filters, product_state.selectedProducts])
+    },[page, limit, filters, productSelectionModal_state.selectedProducts])
 
     //------------------------- State changes detection -------------------------//
     const cleanFilters = () => {
@@ -114,11 +113,11 @@ const ProductSelectionModal = () => {
 
     return (
     <Modal 
-        title={'Seleccionar producto' + ((product_state.selectionLimit > 1) ? 's' : '')}
-        open={product_state.open}
+        title={'Seleccionar producto' + ((productSelectionModal_state.selectionLimit > 1) ? 's' : '')}
+        open={productSelectionModal_state.open}
         cancelButtonProps={{ style: { display: 'none' } }}
         closable={false}
-        onOk={() => {product_dispatch({type: 'HIDE_MODAL'})}}
+        onOk={() => {productSelectionModal_dispatch({type: 'HIDE_MODAL'})}}
         width={1200}
     >
         <Row>

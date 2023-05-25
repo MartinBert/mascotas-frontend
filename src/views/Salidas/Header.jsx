@@ -1,13 +1,22 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Input, DatePicker } from 'antd'
 import { Link } from 'react-router-dom'
-import api from '../../services'
+
+// Design Components
+import { Row, Col, Input, DatePicker } from 'antd'
+
+// Helpers
 import helpers from '../../helpers'
 
+// Services
+import api from '../../services'
+
+// Imports Destructuring
 const { RangePicker } = DatePicker
 const { addDays } = helpers.dateHelper
-const {exportSimpleExcel} = helpers.excel
-const {simpleDateWithHours} = helpers.dateHelper
+const { exportSimpleExcel } = helpers.excel
+const { simpleDateWithHours } = helpers.dateHelper
+
 
 const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => {
     const [fecha, setFecha] = useState(null)
@@ -25,25 +34,25 @@ const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => 
         }
     }
 
-    const processExcelLines = async(salidasToReport) => {
+    const processExcelLines = async (salidasToReport) => {
         const processedLines = []
-        for await (let salida of salidasToReport){
+        for await (let salida of salidasToReport) {
             processedLines.push([
                 (salida.usuario) ? salida.usuario.nombre : 'Usuario inexistente',
                 salida.descripcion,
                 simpleDateWithHours(salida.fecha),
-                salida.productos.reduce((acc, item) => { 
+                salida.productos.reduce((acc, item) => {
                     acc = acc + item.nombre + ' (' + item.cantidadesSalientes + '),'
                     return acc
                 }, ''),
                 salida.gananciaNetaTotal,
-                
+
             ])
         }
         return processedLines
     }
 
-    const exportExcel = async() => {
+    const exportExcel = async () => {
         const nameOfSheet = 'Hoja de salidas'
         const nameOfDocument = 'Lista de salidas'
         const columnHeaders = [

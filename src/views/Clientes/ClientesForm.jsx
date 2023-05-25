@@ -1,21 +1,37 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import api from '../../services'
-import { Row, Col, Form, Input, Button } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
-import graphics from '../../components/graphics'
+
+// Custom Components
 import { GenericAutocomplete } from '../../components/generics'
+import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
+
+// Design Components
+import { Row, Col, Form, Input, Button } from 'antd'
+
+// Custom Context Providers
+import contextProviders from '../../contextProviders'
+
+// Helpers
 import helpers from '../../helpers'
 
+// Services
+import api from '../../services'
+
+// Imports Destructuring
 const { Spinner } = graphics
 const { formHelper } = helpers
-// import contextProviders from '../contextProviders'
-// const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-// const loggedUserContext = useLoggedUserContext()
-const ClientesForm = ({userState}) => {
+const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
 
-    const { id } = useParams()
+
+const ClientesForm = () => {
+
     const navigate = useNavigate()
+    const loggedUserContext = useLoggedUserContext()
+    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
+    const { id } = useParams()
+    const [loading, setLoading] = useState(true)
     const [cliente, setCliente] = useState({
         razonSocial: '',
         cuit: '',
@@ -28,7 +44,10 @@ const ClientesForm = ({userState}) => {
         documentoReceptor: 0,
         _id: null
     })
-    const [loading, setLoading] = useState(true)
+
+    const redirectToClientes = () => {
+        navigate('/clientes')
+    }
 
     const loadClienteData = (e) => {
         setCliente({
@@ -37,7 +56,15 @@ const ClientesForm = ({userState}) => {
         })
     }
 
-    //eslint-disable-next-line
+    useEffect(() => {
+        const fetchUser = async () => {
+            const userId = localStorage.getItem('userId')
+            const loggedUser = await api.usuarios.findById(userId)
+            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+        }
+        fetchUser()
+    }, [loggedUser_dispatch])
+
     useEffect(() => {
         const fetchCliente = async (id) => {
             const searchedItem = await api.clientes.findById(id)
@@ -63,10 +90,8 @@ const ClientesForm = ({userState}) => {
             })
         }
     }
-    
-    const redirectToClientes = () => {
-        navigate('/clientes')
-    }
+
+
 
     const save = async () => {
         if (id && formHelper.noEmptyKeys(cliente) === true) {
@@ -120,60 +145,60 @@ const ClientesForm = ({userState}) => {
 
                     {formProps.map(formItem => (
                         (formItem.name !== 'cuit')
-                        ?
-                        <Form.Item
-                            label={formItem.label}
-                            name={formItem.name}
-                            onChange={e => loadClienteData(e)}
-                            rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
-                            key={formItem.name}
-                        >
-                            <Input name={formItem.name} value={formItem.value} />
-                        </Form.Item>
-                        :
-                        <Row key={formItem.name}>
-                            <Col span={16}>
-                                <Form.Item
-                                    label={formItem.label}
-                                    name={formItem.name}
-                                    onChange={e => loadClienteData(e)}
-                                    rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
-                                >
-                                    <Input name={formItem.name} value={formItem.value} />
-                                </Form.Item>
-                            </Col>
-                            <Col span={8}>
-                                <Button 
-                                    className='btn-primary' 
-                                    type='button'
-                                    onClick={async(e)=> {
-                                        e.preventDefault();
-                                        setLoading(true)
-                                        if(!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.');
-                                
-                                        const userCuit = userState.user.empresa.cuit;
-                                        const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit);
-                                        
-                                        if(!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
-                                
-                                        setCliente({
-                                            ...cliente,
-                                            razonSocial: taxpayerData.razonSocial,
-                                            condicionFiscal: null,
-                                            email: (taxpayerData.email) ? taxpayerData.email[0].direccion : '',
-                                            telefono: (taxpayerData.telefono) ? taxpayerData.telefono[0].numero : '',
-                                            direccion: (taxpayerData.domicilio[0].direccion) ? taxpayerData.domicilio[0].direccion : '',
-                                            ciudad: (taxpayerData.domicilio[0].localidad) ? taxpayerData.domicilio[0].localidad : '',
-                                            provincia: (taxpayerData.domicilio[0].descripcionProvincia) ? taxpayerData.domicilio[0].descripcionProvincia : '',
-                                            documentoReceptor: 80
-                                        })
-                                    }
-                                    }
-                                >
-                                    Buscar datos
-                                </Button>
-                            </Col>
-                        </Row>
+                            ?
+                            <Form.Item
+                                label={formItem.label}
+                                name={formItem.name}
+                                onChange={e => loadClienteData(e)}
+                                rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
+                                key={formItem.name}
+                            >
+                                <Input name={formItem.name} value={formItem.value} />
+                            </Form.Item>
+                            :
+                            <Row key={formItem.name}>
+                                <Col span={16}>
+                                    <Form.Item
+                                        label={formItem.label}
+                                        name={formItem.name}
+                                        onChange={e => loadClienteData(e)}
+                                        rules={[{ required: formItem.required, message: `¡Ingrese ${formItem.label.toUpperCase()} de su cliente!` }]}
+                                    >
+                                        <Input name={formItem.name} value={formItem.value} />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={8}>
+                                    <Button
+                                        className='btn-primary'
+                                        type='button'
+                                        onClick={async (e) => {
+                                            e.preventDefault()
+                                            setLoading(true)
+                                            if (!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.')
+
+                                            const userCuit = loggedUser_state.user.empresa.cuit
+                                            const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit)
+
+                                            if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
+
+                                            setCliente({
+                                                ...cliente,
+                                                razonSocial: taxpayerData.razonSocial,
+                                                condicionFiscal: null,
+                                                email: (taxpayerData.email) ? taxpayerData.email[0].direccion : '',
+                                                telefono: (taxpayerData.telefono) ? taxpayerData.telefono[0].numero : '',
+                                                direccion: (taxpayerData.domicilio[0].direccion) ? taxpayerData.domicilio[0].direccion : '',
+                                                ciudad: (taxpayerData.domicilio[0].localidad) ? taxpayerData.domicilio[0].localidad : '',
+                                                provincia: (taxpayerData.domicilio[0].descripcionProvincia) ? taxpayerData.domicilio[0].descripcionProvincia : '',
+                                                documentoReceptor: 80
+                                            })
+                                        }
+                                        }
+                                    >
+                                        Buscar datos
+                                    </Button>
+                                </Col>
+                            </Row>
                     ))}
                 </Col>
                 <Row justify='center' gutter={24}>

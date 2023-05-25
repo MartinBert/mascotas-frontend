@@ -5,14 +5,14 @@ import React, { useEffect } from 'react'
 import { ProductSelectionModal, GenericAutocomplete } from '../../components/generics'
 import { errorAlert } from '../../components/alerts'
 
+// Design Components
+import { Row, Col, Select, Spin } from 'antd'
+
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
 
 // Services
 import api from '../../services'
-
-// Design Components
-import { Row, Col, Select, Spin } from 'antd'
 
 // Imports Destructurings
 const { useSaleContext } = contextProviders.SaleContextProvider
@@ -21,14 +21,12 @@ const { Option } = Select
 
 
 const Header = () => {
-
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
     const productContext = useProductSelectionModalContext()
-    const [product_dispatch] = productContext
+    const [, product_dispatch] = productContext
 
     useEffect(() => {
-
         if (!sale_state.documento) return
         sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
         let attemps = 0

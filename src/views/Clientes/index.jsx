@@ -1,12 +1,23 @@
+// React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import api from '../../services'
-import { Row, Col, Table } from 'antd'
-import icons from '../../components/icons'
-import Header from './Header'
 import { useNavigate } from 'react-router-dom'
-import { DeleteModal } from '../../components/generics'
 
+// Custom Components
+import { DeleteModal } from '../../components/generics'
+import icons from '../../components/icons'
+
+// Design Components
+import { Row, Col, Table } from 'antd'
+
+// Services
+import api from '../../services'
+
+// Views
+import Header from './Header'
+
+// Imports Destructuring
 const { Edit, Delete } = icons
+
 
 const Clientes = () => {
     const [clientes, setClientes] = useState(null)

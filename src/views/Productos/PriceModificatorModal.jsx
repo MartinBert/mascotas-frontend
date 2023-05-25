@@ -1,89 +1,100 @@
-import React, { useState, useEffect } from 'react';
-import { GenericAutocomplete } from '../../components/generics';
-import { Modal, Row, Col, Select, Input, Table, Checkbox } from 'antd';
-import { errorAlert, successAlert } from '../../components/alerts';
-import helper from '../../helpers';
-import api from '../../services';
-import icons from '../../components/icons';
+// React Components and Hooks
+import React, { useState, useEffect } from 'react'
 
-const { Option } = Select;
-const { Delete } = icons;
-const { decimalPercent, roundTwoDecimals } = helper.mathHelper;
+// Custom Components
+import { GenericAutocomplete } from '../../components/generics'
+import { errorAlert, successAlert } from '../../components/alerts'
+import icons from '../../components/icons'
+
+// Design Components
+import { Modal, Row, Col, Select, Input, Table, Checkbox } from 'antd'
+
+// Helpers
+import helper from '../../helpers'
+
+// Services
+import api from '../../services'
+
+// Imports Destructuring
+const { Option } = Select
+const { Delete } = icons
+const { decimalPercent, roundTwoDecimals } = helper.mathHelper
+
 
 const PriceModificatorModal = ({
     priceModalVisible,
     setPriceModalVisible,
     setLoading,
 }) => {
-    const [brands, setBrands] = useState(null);
-    const [headings, setHeadings] = useState(null);
-    const [selectedBrand, setSelectedBrand] = useState(null);
-    const [selectedHeading, setSelectedHeading] = useState(null);
-    const [productNameSearch, setProductNameSearch] = useState('');
-    const [products, setProducts] = useState(null);
-    const [productsLoading, setProductsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [limitPerPage, setLimitPerPage] = useState(5);
-    const [totalDocsInPage, setTotalDocsInPage] = useState(0);
-    const [addedProducts, setAddedProducts] = useState([]);
-    const [modificationValue, setModificationValue] = useState(0);
+    const [brands, setBrands] = useState(null)
+    const [headings, setHeadings] = useState(null)
+    const [selectedBrand, setSelectedBrand] = useState(null)
+    const [selectedHeading, setSelectedHeading] = useState(null)
+    const [productNameSearch, setProductNameSearch] = useState('')
+    const [products, setProducts] = useState(null)
+    const [productsLoading, setProductsLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [limitPerPage, setLimitPerPage] = useState(5)
+    const [totalDocsInPage, setTotalDocsInPage] = useState(0)
+    const [addedProducts, setAddedProducts] = useState([])
+    const [modificationValue, setModificationValue] = useState(0)
     const [selectedModificationType, setSelectedModificationType] =
-        useState(null);
+        useState(null)
     const modificationTypes = [
         { key: 1, value: 'Porcentual' },
         { key: 2, value: 'Monto fijo' },
-    ];
+    ]
 
     useEffect(() => {
-        if (brands) return;
+        if (brands) return
         const fetchBrands = async () => {
             const response = await api.marcas.findAll({
                 page: 0,
                 limit: 100000,
                 filters: null,
-            });
-            setBrands(response.docs);
-        };
-        fetchBrands();
-    });
+            })
+            setBrands(response.docs)
+        }
+        fetchBrands()
+    })
 
     useEffect(() => {
-        if (headings) return;
+        if (headings) return
         const fetchHeadings = async () => {
             const response = await api.rubros.findAll({
                 page: 0,
                 limit: 100000,
                 filters: null,
-            });
-            setHeadings(response.docs);
-        };
-        fetchHeadings();
-    });
+            })
+            setHeadings(response.docs)
+        }
+        fetchHeadings()
+    })
 
     useEffect(
         () => {
-            setProductsLoading(true);
+            setProductsLoading(true)
             const fetchProducts = async () => {
                 const filtersToParams = {
                     nombre: productNameSearch,
-                };
+                }
                 if (selectedHeading) {
-                    filtersToParams.rubro = selectedHeading;
+                    filtersToParams.rubro = selectedHeading
                 }
                 if (selectedBrand) {
-                    filtersToParams.marca = selectedBrand;
+                    filtersToParams.marca = selectedBrand
                 }
                 const params = {
                     page: currentPage,
                     limit: limitPerPage,
                     filters: JSON.stringify(filtersToParams),
-                };
-                const response = await api.productos.findAll(params);
-                setProducts(response.docs);
-                setTotalDocsInPage(response.totalDocs);
-                setProductsLoading(false);
-            };
-            fetchProducts();
+                }
+                const response = await api.productos.findAll(params)
+                setProducts(response.docs)
+                setTotalDocsInPage(response.totalDocs)
+                setProductsLoading(false)
+            }
+            fetchProducts()
         },
         //eslint-disable-next-line
         [
@@ -93,74 +104,74 @@ const PriceModificatorModal = ({
             currentPage,
             limitPerPage,
         ]
-    );
+    )
 
     const handleOk = () => {
-        setLoading(true);
+        setLoading(true)
         if (!selectedModificationType)
             return errorAlert(
                 'Debe seleccionar el tipo de modificación a aplicar en el precio de los productos...'
-            );
+            )
         if (modificationValue === 0)
-            return errorAlert('El valor de la modificación no puede ser 0...');
+            return errorAlert('El valor de la modificación no puede ser 0...')
         if (addedProducts.length < 1)
             return errorAlert(
                 'Debe seleccionar al menos 1 producto para modificar su precio...'
-            );
+            )
         for (let product of addedProducts) {
             product.precioUnitario =
                 selectedModificationType === '1'
                     ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
-                    : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue));
-            product.ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))));
-            product.ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta));
-            product.gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia));
-            product.gananciaNetaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGananciaFraccionado));
-            product.precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNeta);
-            product.precioVentaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNetaFraccionado);
-            api.productos.edit(product);
+                    : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue))
+            product.ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))))
+            product.ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta))
+            product.gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia))
+            product.gananciaNetaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGananciaFraccionado))
+            product.precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNeta)
+            product.precioVentaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNetaFraccionado)
+            api.productos.edit(product)
         }
-        setPriceModalVisible(false);
-        cleanModificator();
+        setPriceModalVisible(false)
+        cleanModificator()
         successAlert('Los precios fueron modificados!').then(() => {
-            window.location.reload();
-        });
-    };
+            window.location.reload()
+        })
+    }
 
     const addProductToModification = (product) => {
-        const duplicated = addedProducts.find((item) => item._id === product._id);
+        const duplicated = addedProducts.find((item) => item._id === product._id)
         if (duplicated) {
             const stateWithoutThisElement = addedProducts.filter(
                 (item) => item._id !== product._id
-            );
-            setAddedProducts(stateWithoutThisElement);
+            )
+            setAddedProducts(stateWithoutThisElement)
         } else {
-            setAddedProducts([...addedProducts, product]);
+            setAddedProducts([...addedProducts, product])
         }
-    };
+    }
 
     const cleanFilters = () => {
-        setSelectedBrand(null);
-        setSelectedHeading(null);
-        setProductNameSearch('');
-    };
+        setSelectedBrand(null)
+        setSelectedHeading(null)
+        setProductNameSearch('')
+    }
 
     const cleanModificator = () => {
-        setSelectedBrand(null);
-        setSelectedHeading(null);
-        setProductNameSearch('');
-        setAddedProducts([]);
-        setModificationValue(0);
-        setSelectedModificationType(null);
-    };
+        setSelectedBrand(null)
+        setSelectedHeading(null)
+        setProductNameSearch('')
+        setAddedProducts([])
+        setModificationValue(0)
+        setSelectedModificationType(null)
+    }
 
     const checkPage = () => {
-        setAddedProducts(products);
-    };
+        setAddedProducts(products)
+    }
 
     const uncheckPage = () => {
-        setAddedProducts([]);
-    };
+        setAddedProducts([])
+    }
 
     const columnsForTable = [
         {
@@ -177,14 +188,14 @@ const PriceModificatorModal = ({
                 <Row style={{ display: 'inline-flex' }}>
                     <Checkbox
                         onChange={() => {
-                            addProductToModification(product);
+                            addProductToModification(product)
                         }}
                         checked={addedProducts.find((item) => item._id === product._id)}
                     />
                 </Row>
             ),
         },
-    ];
+    ]
 
     const columnsInAddedProductsTable = [
         {
@@ -202,20 +213,20 @@ const PriceModificatorModal = ({
                     onClick={() => {
                         products.forEach((el) => {
                             if (el._id === product._id) {
-                                el.selected = false;
+                                el.selected = false
                             }
-                        });
+                        })
                         const sliceElement = addedProducts.filter(
                             (item) => item._id !== product._id
-                        );
-                        setAddedProducts(sliceElement);
+                        )
+                        setAddedProducts(sliceElement)
                     }}
                 >
                     <Delete />
                 </div>
             ),
         },
-    ];
+    ]
 
     return (
         <Modal
@@ -260,7 +271,7 @@ const PriceModificatorModal = ({
                                 color='primary'
                                 placeholder='Nombre'
                                 onChange={(e) => {
-                                    setProductNameSearch(e.target.value);
+                                    setProductNameSearch(e.target.value)
                                 }}
                                 value={productNameSearch}
                             />
@@ -269,7 +280,7 @@ const PriceModificatorModal = ({
                             <button
                                 className='btn-secondary'
                                 onClick={() => {
-                                    cleanFilters();
+                                    cleanFilters()
                                 }}
                             >
                                 Limpiar filtros
@@ -281,7 +292,7 @@ const PriceModificatorModal = ({
                             <Select
                                 placeholder='Tipo de modificación'
                                 onChange={(e) => {
-                                    setSelectedModificationType(e);
+                                    setSelectedModificationType(e)
                                 }}
                                 value={selectedModificationType}
                             >
@@ -298,7 +309,7 @@ const PriceModificatorModal = ({
                                 type='number'
                                 placeholder='Porcentaje o monto fijo de modificación'
                                 onChange={(e) => {
-                                    setModificationValue(e.target.value);
+                                    setModificationValue(e.target.value)
                                 }}
                                 value={modificationValue}
                             />
@@ -307,7 +318,7 @@ const PriceModificatorModal = ({
                             <button
                                 className='btn-primary'
                                 onClick={() => {
-                                    checkPage();
+                                    checkPage()
                                 }}
                             >
                                 Marcar página
@@ -317,7 +328,7 @@ const PriceModificatorModal = ({
                             <button
                                 className='btn-secondary'
                                 onClick={() => {
-                                    uncheckPage();
+                                    uncheckPage()
                                 }}
                             >
                                 Desmarcar todo
@@ -341,10 +352,10 @@ const PriceModificatorModal = ({
                             total: totalDocsInPage,
                             showSizeChanger: false,
                             onChange: (e) => {
-                                setCurrentPage(e);
+                                setCurrentPage(e)
                             },
                             onShowSizeChange: (e, val) => {
-                                setLimitPerPage(val);
+                                setLimitPerPage(val)
                             },
                         }}
                         loading={productsLoading}
@@ -374,7 +385,7 @@ const PriceModificatorModal = ({
                     <button
                         className='btn-secondary'
                         onClick={() => {
-                            setPriceModalVisible(false);
+                            setPriceModalVisible(false)
                         }}
                     >
                         Cancelar
@@ -384,7 +395,7 @@ const PriceModificatorModal = ({
                     <button
                         className='btn-primary'
                         onClick={() => {
-                            handleOk();
+                            handleOk()
                         }}
                     >
                         Aplicar
@@ -392,7 +403,7 @@ const PriceModificatorModal = ({
                 </Col>
             </Row>
         </Modal>
-    );
-};
+    )
+}
 
-export default PriceModificatorModal;
+export default PriceModificatorModal

@@ -1,12 +1,25 @@
+// React Components and Hooks
 import React, { useEffect, useState } from 'react'
-import { GenericAutocomplete } from '../../components/generics'
-import { Row, Col, Button, Input } from 'antd'
 import { Link } from 'react-router-dom'
-import PriceModificatorModal from './PriceModificatorModal'
-import api from '../../services'
+
+// Custom Components
+import { GenericAutocomplete } from '../../components/generics'
+
+// Design Components
+import { Row, Col, Button, Input } from 'antd'
+
+// Helpers
 import helpers from '../../helpers'
 
+// Services
+import api from '../../services'
+
+// Views
+import PriceModificatorModal from './PriceModificatorModal'
+
+// Imports Destructuring
 const { exportSimpleExcel } = helpers.excel
+
 
 const Header = ({ setFilters, filters, setLoading, detailsData }) => {
     const [productosToReport, setProductosToReport] = useState(null)
