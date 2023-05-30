@@ -1,13 +1,14 @@
 import axios from 'axios'
-const token = localStorage.getItem('token')
-const headers = {headers: {Authorization: token}}
+
 const checkStorageStatus = (err) => {
     if(err.status === 401 || err.status === 403){
         localStorage.clear()
     }
 }
 
+
 const findAll = async(params) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     if (!params) {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago`, headers)
@@ -29,6 +30,7 @@ const findAll = async(params) => {
 }
 
 const findById = async(id) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers)
         return response
@@ -39,6 +41,7 @@ const findById = async(id) => {
 }
 
 const findMultipleIds = async(ids) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
         return response.data
@@ -49,6 +52,7 @@ const findMultipleIds = async(ids) => {
 }
 
 const findByName = async(name) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/name/${name}`, headers)
         return response.data
@@ -59,6 +63,7 @@ const findByName = async(name) => {
 }
 
 const save = async(mediopago) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/mediospago`, mediopago, headers)
         return response.data
@@ -69,6 +74,7 @@ const save = async(mediopago) => {
 }
 
 const edit = async(mediopago) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_REST}/mediospago/${mediopago._id}`, mediopago, headers)
         return response.data
@@ -79,6 +85,7 @@ const edit = async(mediopago) => {
 }
 
 const deleteMedioPago = async(id) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
         const response = await axios.delete(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers)
         return response.data

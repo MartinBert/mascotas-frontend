@@ -25,7 +25,7 @@ const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 const FinalizeSaleModal = () => {
     const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state] = loggedUserContext
+    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
 
@@ -33,8 +33,18 @@ const FinalizeSaleModal = () => {
         return window.location.reload()
     }
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            const userId = localStorage.getItem('userId')
+            const loggedUser = await api.usuarios.findById(userId)
+            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+        }
+        fetchUser()
+    }, [loggedUser_dispatch])
+
     const closeFiscalOperation = async () => {
         const bodyToAfip = formatBody(sale_state)
+        console.log(loggedUser_state)
         const responseOfAfip = await api.afip.generateVoucher(loggedUser_state.user.empresa.cuit, bodyToAfip)
         sale_dispatch({ type: 'CLOSE_FISCAL_OPERATION', payload: responseOfAfip })
     }

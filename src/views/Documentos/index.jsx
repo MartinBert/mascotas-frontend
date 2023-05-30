@@ -34,8 +34,8 @@ const Documentos = () => {
     useEffect(() => {
         const fetchDocumentos = async () => {
             const data = await api.documentos.findAll({ page, limit, filters })
-            setDocumentos(data.docs)
-            setTotalDocs(data.totalDocs)
+            setDocumentos(data)
+            setTotalDocs(data.length)
             setLoading(false)
         }
         fetchDocumentos()

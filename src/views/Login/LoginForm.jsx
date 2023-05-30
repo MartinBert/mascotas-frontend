@@ -35,8 +35,8 @@ const LoginForm = () => {
         })
     }
 
-    const redirectToHome = () => {
-        navigate('/')
+    const redirectToVentas = () => {
+        navigate('/venta')
     }
 
     const redirectToLogin = () => {
@@ -58,7 +58,7 @@ const LoginForm = () => {
         localStorage.setItem('token', token)
         localStorage.setItem('userId', data)
         loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
-        return redirectToHome()
+        return redirectToVentas()
     }
 
     return (

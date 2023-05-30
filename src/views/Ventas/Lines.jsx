@@ -80,7 +80,16 @@ const Lines = () => {
                     </Row>
                     <Row
                         align='middle'
-                        hidden={((product.unidadMedida).toLowerCase()).includes('kilo') || ((product.unidadMedida).toLowerCase()).includes('gramo') ? false : true}
+                        hidden={
+                            (!product.unidadMedida)
+                                ? true
+                                : (
+                                    ((product.unidadMedida).toLowerCase()).includes('kilo')
+                                    || ((product.unidadMedida).toLowerCase()).includes('gramo')
+                                )
+                                    ? false
+                                    : true
+                        }
                     >
                         <span>{product.cantidadKg} kg {round(product.cantidadg)} g</span>
                     </Row>
@@ -208,7 +217,7 @@ const Lines = () => {
     },
         //eslint-disable-next-line
         [productSelectionModal_state.selectedProducts, sale_dispatch])
-    console.log(productSelectionModal_state)
+
     return (
         <Table
             style={{ marginTop: '20px' }}

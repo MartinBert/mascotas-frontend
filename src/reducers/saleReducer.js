@@ -175,7 +175,14 @@ const calculateQuantity = (line, recargoGlobal, descuentoGlobal, porcentajePlanD
 }
 
 const spanQuantity = (line) => {
-    const unitMeasure_gramsToGrams = !(((line.unidadMedida).toLowerCase()).includes('kilo')) && ((line.unidadMedida).toLowerCase()).includes(' gramo')
+    const unitMeasure_gramsToGrams = (!line.unidadMedida)
+        ? false
+        : (
+            !(((line.unidadMedida).toLowerCase()).includes('kilo'))
+            && ((line.unidadMedida).toLowerCase()).includes(' gramo')
+        )
+            ? true
+            : false
 
     if (line.fraccionar) {
         if (line.fraccionamiento < 1000) {
@@ -405,9 +412,18 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: action.payload.map((product) => {
-                    const unitMeasure_gramsToGrams = !(((product.unidadMedida.nombre).toLowerCase()).includes('kilo')) && ((product.unidadMedida.nombre).toLowerCase()).includes(' gramo')
-                    const fractionament = product.unidadMedida.fraccionamiento
-                    const productUnitOfMeasure = action.payload.find(item => item._id === product._id).unidadMedida.nombre
+                    const unitMeasure_gramsToGrams = (!product.unidadMedida)
+                        ? false
+                        : (!(((product.unidadMedida.nombre).toLowerCase()).includes('kilo'))
+                            && ((product.unidadMedida.nombre).toLowerCase()).includes(' gramo'))
+                            ? true
+                            : false
+                    const fractionament = (!product.unidadMedida)
+                        ? 1
+                        : product.unidadMedida.fraccionamiento
+                    const productUnitOfMeasure = (!product.unidadMedida)
+                        ? null
+                        : action.payload.find(item => item._id === product._id).unidadMedida.nombre
                     const linePresent = state.renglones.find(renglon => renglon._id === product._id)
                     if (linePresent) return linePresent
                     return {
@@ -418,7 +434,7 @@ const reducer = (state = initialState, action) => {
                         precioUnitario: product.precioVenta,
                         porcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
                         importeIva: (product.ivaVenta) ? product.ivaVenta : 0,
-                        fraccionamiento: (product.unidadMedida) ? fractionament : 1,
+                        fraccionamiento: fractionament,
                         fraccionar: false,
                         cantidadUnidades: 1,
                         cantidadQuitadaPorRecargo_enKg: 0,

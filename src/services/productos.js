@@ -2,15 +2,15 @@ import axios from 'axios'
 import mathHelper from '../helpers/mathHelper'
 
 const { roundTwoDecimals } = mathHelper
-const token = localStorage.getItem('token')
-const headers = {headers: {Authorization: token}}
 const checkStorageStatus = (err) => {
     if(err.status === 401 || err.status === 403){
         localStorage.clear()
     }
 }
 
+
 const findAll = async(params) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     const {page, limit, filters} = params
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos?page=${page}&limit=${limit}&filters=${filters}`, headers)
@@ -22,6 +22,7 @@ const findAll = async(params) => {
 }
 
 const findById = async(id) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/${id}`, headers)
         return response.data
@@ -32,6 +33,7 @@ const findById = async(id) => {
 }
 
 const findMultipleIds = async(ids) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
         return response.data
@@ -42,6 +44,7 @@ const findMultipleIds = async(ids) => {
 }
 
 const getByBarcode = async(barcode) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/barcode/${barcode}`, headers)
         return response.data
@@ -52,6 +55,7 @@ const getByBarcode = async(barcode) => {
 }
 
 const deleteById = async(id) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.delete(`${process.env.REACT_APP_API_REST}/productos/${id}`, headers)
         return response
@@ -62,6 +66,7 @@ const deleteById = async(id) => {
 }
 
 const save = async(producto) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/productos`, producto, headers)
         return response.data
@@ -72,6 +77,7 @@ const save = async(producto) => {
 }
 
 const edit = async(producto) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos`, producto, headers)
         return response.data
@@ -82,6 +88,7 @@ const edit = async(producto) => {
 }
 
 const modifyStock = async(body) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     const productWithRoundedStock = {
         ...body,
         product: {

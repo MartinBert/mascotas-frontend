@@ -12,6 +12,9 @@ import contextProviders from '../contextProviders'
 // Design Components
 import { Spin } from 'antd'
 
+// Services
+import api from '../services'
+
 // Imports Destructurings
 const { publicRoutesData } = PublicRouter
 const { privateRoutesData } = PrivateRouter
@@ -39,6 +42,8 @@ const AppRouter = () => {
                 loggedUser_dispatch({ type: 'SET_LOADING', payload: true })
                 return redirectToLogin()
             }
+            const loggedUser = await api.usuarios.findById(userId)
+            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
             loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
             if (privateRoute_state.openKey.length === 0)
                 privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
@@ -52,17 +57,6 @@ const AppRouter = () => {
         redirectToLogin
     ])
 
-    const privateRoutes = privateRoutesData.map(route => (
-        <Route
-            exact
-            path={route.path}
-            element={(loggedUser_state.loading === false) ? route.element : <Spin />}
-            key={route.key}
-            activeKey={route.activeKey}
-            private={route.private}
-        />
-    ))
-
     const publicRoutes = publicRoutesData.map(route => (
         <Route
             exact
@@ -74,10 +68,27 @@ const AppRouter = () => {
         />
     ))
 
+    const privateRoutes = privateRoutesData.map(route => (
+        <Route
+            exact
+            path={route.path}
+            element={
+                (loggedUser_state.loading || !loggedUser_state.user)
+                ? <Spin />
+                : (loggedUser_state.user.perfil === false && route.onlySuperadmin === true)
+                    ? <Spin />
+                    : route.element
+            }
+            key={route.key}
+            activeKey={route.activeKey}
+            private={route.private}
+        />
+    ))
+
     return (
         <Routes>
-            {privateRoutes}
             {publicRoutes}
+            {privateRoutes}
         </Routes>
     )
 }

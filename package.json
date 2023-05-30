@@ -18,6 +18,7 @@
         "@testing-library/user-event": "^14.4.3",
         "antd": "^5.4.7",
         "axios": "^1.4.0",
+        "buffer": "^6.0.3",
         "file-saver": "^2.0.5",
         "form-data": "^4.0.0",
         "html2canvas": "^1.4.1",
@@ -34,7 +35,7 @@
         "sass": "^1.62.1",
         "shortid": "^2.2.16",
         "soap": "^1.0.0",
-        "sweetalert2": "^11.7.5",
+        "sweetalert2": "^11.4.8",
         "web-vitals": "^3.3.1",
         "xlsx": "^0.18.5"
     },

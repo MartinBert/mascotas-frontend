@@ -37,8 +37,8 @@ const MediosPago = () => {
     useEffect(() => {
         const fetchMediosPago = async () => {
             const data = await api.mediospago.findAll({ page, limit, filters })
-            setMediosPago(data.docs)
-            setTotalDocs(data.totalDocs)
+            setMediosPago(data)
+            setTotalDocs(data.length)
             setLoading(false)
         }
         fetchMediosPago()

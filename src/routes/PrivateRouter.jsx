@@ -30,180 +30,210 @@ import UsuariosForm from '../views/Usuarios/UsuariosForm'
 import Ventas from '../views/Ventas'
 import VentasList from '../views/Ventas/VentasList'
 
+
 const privateRoutesPreData = [
     {
         path: '/venta',
         element: <Ventas />,
         activeKey: '1',
-        private: true
+        private: true,
+        onlySuperadmin: false
     },
     {
         path: '/listaVentas',
         element: <VentasList />,
         activeKey: '2',
-        private: true
+        private: true,
+        onlySuperadmin: false
     },
     {
         path: '/documentos/:id',
         element: <DocumentosForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/documentos',
         element: <Documentos />,
         activeKey: '3',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/clientes/:id',
         element: <ClientesForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/clientes',
         element: <Clientes />,
         activeKey: '4',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/mediospago/:id',
         element: <MediosPagoForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/mediospago',
         element: <MediosPago />,
         activeKey: '5',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/productos/:id',
         element: <ProductosForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/productos',
         element: <Productos />,
         activeKey: '6',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/salidas/:id',
         element: <SalidasForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/salidas',
         element: <Salidas />,
         activeKey: '7',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/entradas/:id',
         element: <EntradasForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/entradas',
         element: <Entradas />,
         activeKey: '8',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/marcas/:id',
         element: <MarcasForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/marcas',
         element: <Marcas />,
         activeKey: '9',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/rubros/:id',
         element: <RubrosForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/rubros',
         element: <Rubros />,
         activeKey: '10',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/unidadesmedida/:id',
         element: <UnidadesMedidaForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/unidadesmedida',
         element: <UnidadesMedida />,
         activeKey: '11',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/usuarios/:id',
         element: <UsuariosForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/usuarios',
         element: <Usuarios />,
         activeKey: '12',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/empresas/:id',
         element: <EmpresasForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/empresas',
         element: <Empresas />,
         activeKey: '13',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/puntosventa/:id',
         element: <PuntosVentaForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/puntosventa',
         element: <PuntosVenta />,
         activeKey: '14',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/condicionesfiscales/:id',
         element: <CondicionesFiscalesForm />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/condicionesfiscales',
         element: <CondicionesFiscales />,
         activeKey: '15',
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
     {
         path: '/',
         element: <Home />,
         activeKey: null,
-        private: true
+        private: true,
+        onlySuperadmin: true
     },
 ]
 
@@ -214,7 +244,8 @@ const privateRoutesData = privateRoutesPreData.map((route, i) => {
         element: <FormatPrivateComponent children={route.element} activeKey={route.activeKey} />,
         key: prefixKey + i,
         activeKey: route.activeKey,
-        private: route.private
+        private: route.private,
+        onlySuperadmin: route.onlySuperadmin
     })
 })
 
