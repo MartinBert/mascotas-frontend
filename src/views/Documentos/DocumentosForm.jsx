@@ -99,7 +99,6 @@ const DocumentosForm = () => {
         ? <Spinner />
         : (
             <Form
-                onFinish={() => save()}
                 initialValues={documento}
                 autoComplete='off'
             >
@@ -149,7 +148,10 @@ const DocumentosForm = () => {
                 </Col>
                 <Row justify='center' gutter={24}>
                     <Col>
-                        <Button className='btn-primary' type='submit'>
+                        <Button
+                            className='btn-primary'
+                            onClick={() => save()}
+                        >
                             Guardar
                         </Button>
                     </Col>

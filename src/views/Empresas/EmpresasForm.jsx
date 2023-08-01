@@ -1,7 +1,6 @@
 // React Components and Hooks
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { FaBusinessTime } from 'react-icons/fa'
 
 // Custom Components
 import { GenericAutocomplete } from '../../components/generics'
@@ -188,9 +187,6 @@ const EmpresasForm = () => {
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             initialValues={{ remember: true }}
-            onFinish={() => {
-                save()
-            }}
             autoComplete='off'
             style={{ marginTop: '10px' }}
         >
@@ -317,7 +313,10 @@ const EmpresasForm = () => {
                     </Upload>
                 </Col>
                 <Col span={6} style={{ display: 'flex' }}>
-                    <button className='btn-primary' type='submit'>
+                    <button
+                        className='btn-primary'
+                        onClick={() => save()}
+                    >
                         Guardar
                     </button>
                     <button

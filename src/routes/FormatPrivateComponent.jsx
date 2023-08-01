@@ -30,15 +30,12 @@ import { Layout, Menu } from 'antd'
 // Custom Context Providers
 import contextProviders from '../contextProviders'
 
-
 // Imports Destructurings
 const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { useSaleContext } = contextProviders.SaleContextProvider
 
 
 const FormatPrivateComponent = ({ children, activeKey }) => {
-    const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
-    const [sale_state, sale_dispatch] = useSaleContext()
+    const [loggedUser_state] = useLoggedUserContext()
     const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false)
     const { Header, Sider, Content } = Layout

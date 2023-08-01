@@ -170,7 +170,6 @@ const SalidasForm = () => {
                     :
                     <Form
                         autoComplete='off'
-                        onFinish={() => { handleSubmit() }}
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
@@ -339,8 +338,8 @@ const SalidasForm = () => {
                                 <Row>
                                     <Col span={12} style={{ display: 'flex' }}>
                                         <button
-                                            type='submit'
                                             className='btn-primary'
+                                            onClick={() => handleSubmit()}
                                             style={{ marginRight: '15px' }}
                                         >
                                             Guardar

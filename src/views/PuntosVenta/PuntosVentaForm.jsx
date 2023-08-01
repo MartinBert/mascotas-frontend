@@ -90,7 +90,6 @@ const PuntosVentaForm = () => {
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
                 initialValues={{ remember: true }}
-                onFinish={() => { save() }}
                 autoComplete='off'
                 style={{ marginTop: '10px' }}
             >
@@ -122,7 +121,10 @@ const PuntosVentaForm = () => {
                         </Form.Item>
                     </Col>
                     <Col span={8} style={{ display: 'flex' }}>
-                        <button className='btn-primary' type='submit'>
+                        <button
+                            className='btn-primary'
+                            onClick={() => save()}
+                        >
                             Guardar
                         </button>
                         <button className='btn-secondary' type='button' onClick={() => { redirectToPuntosVenta() }} style={{ marginLeft: '10px' }}>

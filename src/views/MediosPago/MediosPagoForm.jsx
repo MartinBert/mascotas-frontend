@@ -99,7 +99,6 @@ const MediosPagoForm = () => {
                     :
                     <Form
                         autoComplete='off'
-                        onFinish={() => { handleSubmit() }}
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
@@ -261,8 +260,8 @@ const MediosPagoForm = () => {
                             <Col span={24} align='start' style={{ display: 'flex' }}>
                                 <Form.Item style={{ marginRight: '15px' }}>
                                     <button
-                                        type='submit'
                                         className='btn-primary'
+                                        onClick={() => handleSubmit()}
                                     >
                                         Guardar
                                     </button>

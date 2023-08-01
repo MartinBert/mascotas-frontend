@@ -220,7 +220,6 @@ const ProductosForm = () => {
                     ? <Spinner />
                     :
                     <Form
-                        onFinish={() => { saveProduct() }}
                         autoComplete='off'
                     >
                         <Row gutter={8}>
@@ -553,8 +552,8 @@ const ProductosForm = () => {
                             <Col span={24} align='start' style={{ display: 'flex' }}>
                                 <Form.Item style={{ marginRight: '15px' }}>
                                     <button
-                                        type='submit'
                                         className='btn-primary'
+                                        onClick={() => saveProduct()}
                                     >
                                         Guardar
                                     </button>

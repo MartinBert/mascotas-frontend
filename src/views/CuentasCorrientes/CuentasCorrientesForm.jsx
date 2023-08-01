@@ -89,7 +89,6 @@ const CuentasCorrientesForm = () => {
             :
             <Form
                 initialValues={{ remember: true }}
-                onFinish={() => { save() }}
                 autoComplete='off'
                 style={{ marginTop: '10px' }}
             >
@@ -196,14 +195,16 @@ const CuentasCorrientesForm = () => {
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Button type='primary' type='submit'
+                        <Button
+                            type='primary'
+                            onClick={() => save()}
                             style={{
                                 background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)',
                                 color: '#fff'
                             }}>
                             Guardar
                         </Button>
-                        <Button type='secondary' type='button' onClick={() => { redirectToCuentasCorrientes() }} style={{ marginLeft: '10px' }}>
+                        <Button type='secondary' onClick={() => { redirectToCuentasCorrientes() }} style={{ marginLeft: '10px' }}>
                             Cancelar
                         </Button>
                     </Col>

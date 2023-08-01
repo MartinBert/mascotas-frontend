@@ -118,9 +118,6 @@ const UsuariosForm = () => {
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
                         initialValues={{ remember: true }}
-                        onFinish={() => {
-                            save()
-                        }}
                         autoComplete='off'
                         style={{ marginTop: '10px' }}
                     >
@@ -198,7 +195,10 @@ const UsuariosForm = () => {
                         </Form.Item>
                         <Row>
                             <Col span={8} style={{ display: 'flex' }}>
-                                <button type='submit' className='btn-primary'>
+                                <button
+                                    className='btn-primary'
+                                    onClick={() => save()}
+                                >
                                     Guardar
                                 </button>
                                 <button

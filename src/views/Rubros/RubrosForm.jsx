@@ -97,9 +97,6 @@ const RubrosForm = () => {
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
                         initialValues={{ remember: true }}
-                        onFinish={() => {
-                            save()
-                        }}
                         autoComplete='off'
                         style={{ marginTop: '10px' }}
                     >
@@ -117,7 +114,10 @@ const RubrosForm = () => {
                                 />
                             </Col>
                             <Col span={6} style={{ display: 'flex' }}>
-                                <button type='submit' className='btn-primary'>
+                                <button
+                                    className='btn-primary'
+                                    onClick={() => save()}
+                                >
                                     Guardar
                                 </button>
                                 <button

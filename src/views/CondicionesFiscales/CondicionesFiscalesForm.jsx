@@ -90,7 +90,6 @@ const CondicionesFiscalesForm = () => {
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
                 initialValues={{ remember: true }}
-                onFinish={() => { save() }}
                 autoComplete='off'
                 style={{ marginTop: '10px' }}
             >
@@ -121,7 +120,10 @@ const CondicionesFiscalesForm = () => {
                     </Col>
                     <Col span={6}></Col>
                     <Col span={6} style={{ display: 'flex', marginTop: '15px' }}>
-                        <button className='btn-primary' type='submit'>
+                        <button
+                            className='btn-primary'
+                            onClick={() => save()}
+                        >
                             Guardar
                         </button>
                         <button className='btn-secondary' type='button' onClick={() => { redirectToCondicionesFiscales() }} style={{ marginLeft: '10px' }}>
