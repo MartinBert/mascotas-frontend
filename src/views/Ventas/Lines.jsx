@@ -23,8 +23,7 @@ const { round, roundTwoDecimals } = helpers.mathHelper
 const Lines = () => {
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
-    const productSelectionModalContext = useProductSelectionModalContext()
-    const [productSelectionModal_state, productSelectionModal_dispatch] = productSelectionModalContext
+    const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
     const columnsForTable = [
         {

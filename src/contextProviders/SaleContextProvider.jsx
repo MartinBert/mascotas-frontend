@@ -11,9 +11,9 @@ const useSaleContext = () => {
 
 const SaleContext = ({ children }) => {
     const [sale_state, sale_dispatch] = useReducer(reducer, initialState)
-    useEffect(() => {
+    // useEffect(() => {
         // console.log(sale_state)
-    }, [sale_state])
+    // }, [sale_state])
 
     return (
         <createSaleContext.Provider value={[sale_state, sale_dispatch]}>

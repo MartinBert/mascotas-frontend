@@ -30,38 +30,18 @@ import { Layout, Menu } from 'antd'
 // Custom Context Providers
 import contextProviders from '../contextProviders'
 
+
 // Imports Destructurings
 const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useSaleContext } = contextProviders.SaleContextProvider
 
 
 const FormatPrivateComponent = ({ children, activeKey }) => {
     const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
+    const [sale_state, sale_dispatch] = useSaleContext()
     const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false)
     const { Header, Sider, Content } = Layout
-
-    // useEffect(() => {
-    //     const accessToPrivateRoutes = async () => {
-    //         const token = localStorage.getItem('token')
-    //         const userId = localStorage.getItem('userId')
-    //         if (!token || !userId || token === undefined || userId === undefined) {
-    //             loggedUser_dispatch({ type: 'SET_LOADING', payload: true })
-    //             return redirectToLogin()
-    //         }
-    //         const loggedUser = await api.usuarios.findById(userId)
-    //         loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
-    //         loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
-    //         if (privateRoute_state.openKey.length === 0)
-    //             privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
-    //         else redirectToLogin()
-    //     }
-    //     accessToPrivateRoutes()
-    // }, [
-    //     privateRoute_state.openKey.length,
-    //     privateRoute_dispatch,
-    //     loggedUser_dispatch,
-    //     redirectToLogin
-    // ])
 
     const redirectToPath = (e) => {
         navigate(e.item.props.routepath)
@@ -82,11 +62,11 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     }
 
     const saleMenu = [
-        getItem('1','Ventas',<FaShoppingCart />,'/venta'),
-        getItem('2','Lista de ventas',<FaList />,'/listaVentas'),
-        loggedUser_state.user.perfil ? getItem('3','Documentos',<FaFile />,'/documentos') : null,
-        loggedUser_state.user.perfil ? getItem('4','Clientes',<FaUsers />,'/clientes') : null,
-        loggedUser_state.user.perfil ? getItem('5','Medios de pago',<FaMoneyBillWave />,'/mediospago') : null,
+        getItem('1', 'Ventas', <FaShoppingCart />, '/venta'),
+        getItem('2', 'Lista de ventas', <FaList />, '/listaVentas'),
+        loggedUser_state.user.perfil ? getItem('3', 'Documentos', <FaFile />, '/documentos') : null,
+        loggedUser_state.user.perfil ? getItem('4', 'Clientes', <FaUsers />, '/clientes') : null,
+        loggedUser_state.user.perfil ? getItem('5', 'Medios de pago', <FaMoneyBillWave />, '/mediospago') : null,
     ]
 
     const productAndStockMenu = [

@@ -26,6 +26,13 @@ const Header = () => {
     const productContext = useProductSelectionModalContext()
     const [, product_dispatch] = productContext
 
+    // useEffect(() => {
+    //     sale_dispatch({ type: 'SET_CLIENT', payload: null })
+    //     sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
+    //     sale_dispatch({ type: 'SET_PAYMENT_METHODS', payload: { data: null } })
+    //     sale_dispatch({ type: 'SET_PAYMENT_PLANS', payload: [] })
+    // }, [])
+
     useEffect(() => {
         if (!sale_state.documento) return
         sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })

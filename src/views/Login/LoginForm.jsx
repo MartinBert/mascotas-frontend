@@ -66,7 +66,6 @@ const LoginForm = () => {
             initialValues={{
                 remember: true,
             }}
-            onSubmitCapture={e => login(e)}
         >
             {(error) ? <Error message='Credenciales invalidas' /> : null}
             <Form.Item>
@@ -97,8 +96,8 @@ const LoginForm = () => {
                 }}
             >
                 <Button
+                    onClick={e => login(e)}
                     type='primary'
-                    type='submit'
                 >
                     Login
                 </Button>
