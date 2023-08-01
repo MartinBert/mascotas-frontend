@@ -1,5 +1,7 @@
 import axios from 'axios'
-import FormData from 'form-data'
+// import FormData from 'form-data'
+var FormData = require('form-data')
+
 
 const checkStorageStatus = (err) => {
     if(err.status === 401 || err.status === 403){
@@ -9,7 +11,7 @@ const checkStorageStatus = (err) => {
 
 
 const uploadImage = async(data) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token'), 'Content-Type':'application/json'}}
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
     const bodyMultiPart = new FormData()
     bodyMultiPart.append('file', data)
     try{

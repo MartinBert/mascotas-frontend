@@ -149,7 +149,7 @@ const DocumentosForm = () => {
                 </Col>
                 <Row justify='center' gutter={24}>
                     <Col>
-                        <Button className='btn-primary' htmlType='submit'>
+                        <Button className='btn-primary' type='submit'>
                             Guardar
                         </Button>
                     </Col>

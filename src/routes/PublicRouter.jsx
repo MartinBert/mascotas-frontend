@@ -1,8 +1,6 @@
-// React Components
-import React from 'react'
-
 // Views
 import Login from '../views/Login'
+
 
 const publicRoutesPreData = [
     {

@@ -203,12 +203,12 @@ const ClientesForm = () => {
                 </Col>
                 <Row justify='center' gutter={24}>
                     <Col>
-                        <Button className='btn-primary' htmlType='submit'>
+                        <Button className='btn-primary' type='submit'>
                             Guardar
                         </Button>
                     </Col>
                     <Col>
-                        <Button onClick={() => redirectToClientes()} className='btn-secondary' htmlType='button'>
+                        <Button onClick={() => redirectToClientes()} className='btn-secondary' type='button'>
                             Cancelar
                         </Button>
                     </Col>

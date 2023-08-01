@@ -71,6 +71,7 @@ const findLastIndex = async () => {
 
 const findLastVoucherNumber = async (code) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    console.log(headers)
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/last/voucher/number/${code}`, headers)
         return response.data

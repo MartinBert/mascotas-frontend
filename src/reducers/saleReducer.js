@@ -495,11 +495,11 @@ const reducer = (state = initialState, action) => {
                 empresa: action.payload,
                 empresaRazonSocial: action.payload.razonSocial,
                 empresaDireccion: action.payload.direccion,
-                empresaCondicionIva: action.payload.condicionFiscal.nombre,
+                empresaCondicionIva: action.payload.condicionFiscal ? action.payload.condicionFiscal.nombre : null,
                 empresaCuit: action.payload.cuit,
                 empresaIngresosBrutos: action.payload.ingresosBrutos,
                 empresaInicioActividad: action.payload.fechaInicioActividad,
-                empresaLogo: action.payload.logo.url
+                empresaLogo: action.payload.logo ? action.payload.logo.url : null
             }
         case actions.SET_SALE_POINT:
             return {

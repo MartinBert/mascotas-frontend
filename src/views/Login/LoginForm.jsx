@@ -98,7 +98,7 @@ const LoginForm = () => {
             >
                 <Button
                     type='primary'
-                    htmlType='submit'
+                    type='submit'
                 >
                     Login
                 </Button>

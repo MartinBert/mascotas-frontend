@@ -1,6 +1,6 @@
 // React Components and Hooks
 import React, { useCallback, useEffect } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 
 // Custom Routers
 import PublicRouter from './PublicRouter'
@@ -76,7 +76,7 @@ const AppRouter = () => {
                 (loggedUser_state.loading || !loggedUser_state.user)
                 ? <Spin />
                 : (loggedUser_state.user.perfil === false && route.onlySuperadmin === true)
-                    ? <Spin />
+                    ? <Navigate to={'/ventas'} />
                     : route.element
             }
             key={route.key}

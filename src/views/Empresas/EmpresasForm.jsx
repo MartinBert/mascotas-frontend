@@ -1,6 +1,7 @@
 // React Components and Hooks
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { FaBusinessTime } from 'react-icons/fa'
 
 // Custom Components
 import { GenericAutocomplete } from '../../components/generics'
@@ -154,7 +155,7 @@ const EmpresasForm = () => {
 
     const uploaderProps = {
         name: 'file',
-        accept: '.jpg,.png',
+        accept: '.jpg,.jpeg,.png',
         multiple: false,
         onChange: (info) => {
             uploadImageToServer(info.file)

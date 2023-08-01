@@ -44,7 +44,6 @@ const FinalizeSaleModal = () => {
 
     const closeFiscalOperation = async () => {
         const bodyToAfip = formatBody(sale_state)
-        console.log(loggedUser_state)
         const responseOfAfip = await api.afip.generateVoucher(loggedUser_state.user.empresa.cuit, bodyToAfip)
         sale_dispatch({ type: 'CLOSE_FISCAL_OPERATION', payload: responseOfAfip })
     }
@@ -77,6 +76,7 @@ const FinalizeSaleModal = () => {
     }
 
     const saveSaleData = async () => {
+        console.log(sale_state)
         try {
             sale_state.renglones = sale_state.renglones.map(renglon => {
                 delete renglon._id

@@ -117,7 +117,7 @@ const RubrosForm = () => {
                                 />
                             </Col>
                             <Col span={6} style={{ display: 'flex' }}>
-                                <button htmlType='submit' className='btn-primary'>
+                                <button type='submit' className='btn-primary'>
                                     Guardar
                                 </button>
                                 <button

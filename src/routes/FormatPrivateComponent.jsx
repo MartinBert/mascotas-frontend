@@ -27,12 +27,41 @@ import {
 // Design Components
 import { Layout, Menu } from 'antd'
 
+// Custom Context Providers
+import contextProviders from '../contextProviders'
+
+// Imports Destructurings
+const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+
 
 const FormatPrivateComponent = ({ children, activeKey }) => {
-    
+    const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
     const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false)
     const { Header, Sider, Content } = Layout
+
+    // useEffect(() => {
+    //     const accessToPrivateRoutes = async () => {
+    //         const token = localStorage.getItem('token')
+    //         const userId = localStorage.getItem('userId')
+    //         if (!token || !userId || token === undefined || userId === undefined) {
+    //             loggedUser_dispatch({ type: 'SET_LOADING', payload: true })
+    //             return redirectToLogin()
+    //         }
+    //         const loggedUser = await api.usuarios.findById(userId)
+    //         loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+    //         loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
+    //         if (privateRoute_state.openKey.length === 0)
+    //             privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
+    //         else redirectToLogin()
+    //     }
+    //     accessToPrivateRoutes()
+    // }, [
+    //     privateRoute_state.openKey.length,
+    //     privateRoute_dispatch,
+    //     loggedUser_dispatch,
+    //     redirectToLogin
+    // ])
 
     const redirectToPath = (e) => {
         navigate(e.item.props.routepath)
@@ -55,31 +84,31 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const saleMenu = [
         getItem('1','Ventas',<FaShoppingCart />,'/venta'),
         getItem('2','Lista de ventas',<FaList />,'/listaVentas'),
-        getItem('3','Documentos',<FaFile />,'/documentos'),
-        getItem('4','Clientes',<FaUsers />,'/clientes'),
-        getItem('5','Medios de pago',<FaMoneyBillWave />,'/mediospago'),
+        loggedUser_state.user.perfil ? getItem('3','Documentos',<FaFile />,'/documentos') : null,
+        loggedUser_state.user.perfil ? getItem('4','Clientes',<FaUsers />,'/clientes') : null,
+        loggedUser_state.user.perfil ? getItem('5','Medios de pago',<FaMoneyBillWave />,'/mediospago') : null,
     ]
 
     const productAndStockMenu = [
-        getItem('6', 'Productos', <FaBookmark />, '/productos'),
-        getItem('7', 'Salidas', <FaCheck />, '/salidas'),
-        getItem('8', 'Entradas', <FaInbox />, '/entradas'),
-        getItem('9', 'Marcas', <FaTag />, '/marcas'),
-        getItem('10', 'Rubros', <FaTags />, '/rubros'),
-        getItem('11', 'Unid. medida', <FaWeightHanging />, '/unidadesmedida'),
+        loggedUser_state.user.perfil ? getItem('6', 'Productos', <FaBookmark />, '/productos') : null,
+        loggedUser_state.user.perfil ? getItem('7', 'Salidas', <FaCheck />, '/salidas') : null,
+        loggedUser_state.user.perfil ? getItem('8', 'Entradas', <FaInbox />, '/entradas') : null,
+        loggedUser_state.user.perfil ? getItem('9', 'Marcas', <FaTag />, '/marcas') : null,
+        loggedUser_state.user.perfil ? getItem('10', 'Rubros', <FaTags />, '/rubros') : null,
+        loggedUser_state.user.perfil ? getItem('11', 'Unid. medida', <FaWeightHanging />, '/unidadesmedida') : null,
     ]
 
     const configurationMenu = [
-        getItem('12', 'Usuarios', <FaUser />, '/usuarios'),
-        getItem('13', 'Empresas', <FaBusinessTime />, '/empresas'),
-        getItem('14', 'Puntos de venta', <FaCodeBranch />, '/puntosventa'),
-        getItem('15', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales'),
+        loggedUser_state.user.perfil ? getItem('12', 'Usuarios', <FaUser />, '/usuarios') : null,
+        loggedUser_state.user.perfil ? getItem('13', 'Empresas', <FaBusinessTime />, '/empresas') : null,
+        loggedUser_state.user.perfil ? getItem('14', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
+        loggedUser_state.user.perfil ? getItem('15', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
     ]
 
     const subMenusToSidebar = [
         getItem('sub1', 'Ventas', <FaChartLine />, null, saleMenu),
-        getItem('sub2', 'Productos y Stock', <FaCubes />, null, productAndStockMenu),
-        getItem('sub3', 'Configuraciones', <FaCogs />, null, configurationMenu),
+        loggedUser_state.user.perfil ? getItem('sub2', 'Productos y Stock', <FaCubes />, null, productAndStockMenu) : null,
+        loggedUser_state.user.perfil ? getItem('sub3', 'Configuraciones', <FaCogs />, null, configurationMenu) : null,
     ]
 
     const toolbarMenu = [
