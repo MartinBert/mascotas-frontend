@@ -10,6 +10,7 @@ const checkStorageStatus = (err) => {
 const findLastVoucherNumber = async (cuit, salePointNumber, voucherCode) => {
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/obtenerUltimoNumeroAutorizado/${cuit}/${salePointNumber}/${voucherCode}`)
+        console.log(response)
         return response.data.responseOfAfip
     } catch (err) {
         checkStorageStatus(err)
