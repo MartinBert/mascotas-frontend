@@ -53,7 +53,7 @@ const reducer = (state = initialState, action) => {
         case actions.CLEAN_STATE:
             return {
                 open: false,
-                selectionLimit: null,
+                selectionLimit: 100000000,
                 selectedProducts: []
             }
         default:

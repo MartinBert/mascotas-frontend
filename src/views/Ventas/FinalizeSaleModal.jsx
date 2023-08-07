@@ -1,5 +1,6 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -24,6 +25,7 @@ const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 
 const FinalizeSaleModal = () => {
+    const navigate = useNavigate()
     const loggedUserContext = useLoggedUserContext()
     const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
     const saleContext = useSaleContext()
@@ -45,7 +47,16 @@ const FinalizeSaleModal = () => {
     const closeFiscalOperation = async () => {
         const bodyToAfip = formatBody(sale_state)
         const responseOfAfip = await api.afip.generateVoucher(loggedUser_state.user.empresa.cuit, bodyToAfip)
-        sale_dispatch({ type: 'CLOSE_FISCAL_OPERATION', payload: responseOfAfip })
+        if (!responseOfAfip) {
+            return (
+                errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')
+                .then(() => {
+                    sale_dispatch({ type: 'SET_DATES', payload: new Date() })
+                    sale_dispatch({ type: 'LOADING_VIEW' })
+                })
+            )
+        }
+        else sale_dispatch({ type: 'CLOSE_FISCAL_OPERATION', payload: responseOfAfip })
     }
 
     const startCloseSale = async () => {
@@ -76,7 +87,6 @@ const FinalizeSaleModal = () => {
     }
 
     const saveSaleData = async () => {
-        console.log(sale_state)
         try {
             sale_state.renglones = sale_state.renglones.map(renglon => {
                 delete renglon._id

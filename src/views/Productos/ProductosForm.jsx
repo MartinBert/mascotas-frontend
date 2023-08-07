@@ -362,9 +362,7 @@ const ProductosForm = () => {
                                         placeholder='Precio unitario'
                                         type='number'
                                         value={product.precioUnitario}
-                                        onChange={e => {
-                                            setFormDataToProduct(e)
-                                        }}
+                                        onChange={e => setFormDataToProduct(e)}
                                     />
                                 </Form.Item>
                             </Col>

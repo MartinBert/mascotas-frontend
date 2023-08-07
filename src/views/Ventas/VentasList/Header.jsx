@@ -27,8 +27,8 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
     const fetchVentasByDates = async (value) => {
         if (value === null) setVentasToReport(ventas)
         else {
-            const initialDate = (addDays(value[0]._d, + 0)).toISOString()
-            const finalDate = (addDays(value[1]._d, + 1)).toISOString()
+            const initialDate = (addDays(value[0].$d, 0)).toISOString()
+            const finalDate = (addDays(value[1].$d, 1)).toISOString()
             const response = await api.ventas.findByDates({ initialDate, finalDate })
             setVentasToReport(response)
         }

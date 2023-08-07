@@ -16,6 +16,42 @@ const ProductSelectionModal = () => {
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
 
+    const changePercentage = (e) => {
+        sale_dispatch({
+            type: (sale_state.discountSurchargeModalOperation === 'surcharge')
+                ? 'SET_GLOBAL_SURCHARGE_PERCENT'
+                : 'SET_GLOBAL_DISCOUNT_PERCENT',
+            payload: (!e)
+                ? 0
+                : parseFloat(e.target.value)
+        })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const selectTypePercentage = (e) => {
+        if (e === 'surcharge') {
+            sale_dispatch({
+                type: 'SET_GLOBAL_SURCHARGE_PERCENT',
+                payload: sale_state.porcentajeDescuentoGlobal
+            })
+            sale_dispatch({
+                type: 'SET_GLOBAL_DISCOUNT_PERCENT',
+                payload: 0
+            })
+        } else {
+            sale_dispatch({
+                type: 'SET_GLOBAL_DISCOUNT_PERCENT',
+                payload: sale_state.porcentajeRecargoGlobal
+            })
+            sale_dispatch({
+                type: 'SET_GLOBAL_SURCHARGE_PERCENT',
+                payload: 0
+            })
+        }
+        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION', payload: e })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+    
     return (
         <Modal
             title='Agregar descuento o recargo a la factura'
@@ -30,15 +66,8 @@ const ProductSelectionModal = () => {
             <Row justify='space between' gutter={16}>
                 <Col span={6}>
                     <Select
+                        onChange={(e) => selectTypePercentage(e)}
                         style={{ width: '100%' }}
-                        onChange={(e) => {
-                            sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION', payload: e })
-                            // sale_dispatch({
-                            //     type: (sale_state.discountSurchargeModalOperation === 'discount') ? 'SET_GLOBAL_DISCOUNT_PERCENT' : 'SET_GLOBAL_SURCHARGE_PERCENT',
-                            //     payload: (!e.target.value) ? 0 : parseFloat(e.target.value)
-                            // })
-                            sale_dispatch({ type: 'SET_TOTAL' })
-                        }}
                         value={sale_state.discountSurchargeModalOperation}
                     >
                         <Option value='discount'>Descuento</Option>
@@ -50,17 +79,12 @@ const ProductSelectionModal = () => {
                         color='primary'
                         type='number'
                         placeholder='Ingrese el porcentaje de modificación'
-                        onChange={(e) => {
-                            sale_dispatch({
-                                type: (sale_state.discountSurchargeModalOperation === 'discount') ? 'SET_GLOBAL_DISCOUNT_PERCENT' : 'SET_GLOBAL_SURCHARGE_PERCENT',
-                                payload: (!e.target.value) ? 0 : parseFloat(e.target.value)
-                            })
-                            // sale_dispatch({
-                            //     type: (sale_state.discountSurchargeModalOperation === 'discount') ? 'SET_GLOBAL_SURCHARGE_PERCENT' : 'SET_GLOBAL_DISCOUNT_PERCENT',
-                            //     payload: 0
-                            // })
-                            sale_dispatch({ type: 'SET_TOTAL' })
-                        }}
+                        onChange={(e) => changePercentage(e)}
+                        value={
+                            sale_state.porcentajeRecargoGlobal > 0
+                                ? sale_state.porcentajeRecargoGlobal
+                                : sale_state.porcentajeDescuentoGlobal
+                        }
                     />
                 </Col>
             </Row>

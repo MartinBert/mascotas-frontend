@@ -44,9 +44,9 @@ const voucherTemplate = (saleData, qrImage) => {
         </div>
         <div style='width: 100%; height: 70px; background-color: #C2BDBC; padding: 10px; margin-top: 10px; border: solid 2px; border-radius: 5px; border-color: #C2BDBC'>
             <div style='width: 100%; display: flex'>
-                <div style='width: 33.3%;'><i>Razón social:</i> ${saleData.clienteRazonSocial}</div>
-                <div style='width: 33.3%; padding-left: 15px; padding-right: 15px'><i>Cuit:</i> ${saleData.clienteIdentificador}</div>
-                <div style='width: 33.3%;'><i>Cond. IVA:</i> ${saleData.clienteCondicionIva}</div>
+                <div style='width: 40%;'><i>Razón social:</i> ${saleData.clienteRazonSocial}</div>
+                <div style='width: 25%; text-align: center;'><i>Cuit:</i> ${saleData.clienteIdentificador}</div>
+                <div style='width: 35%; text-align: right;'><i>Cond. IVA:</i> ${saleData.clienteCondicionIva}</div>
             </div>
             <div style='width: 100%; margin-top: 2px;'><i>Dirección:</i> ${saleData.clienteDireccion}</div>
             <div style='width: 100%; margin-top: 2px;'><i>Cond. venta:</i> ${saleData.condicionVenta}</div>

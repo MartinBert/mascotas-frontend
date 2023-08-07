@@ -47,13 +47,6 @@ const Ventas = () => {
         //eslint-disable-next-line
         [])
 
-    useEffect(() => {
-        if (sale_state.fechaEmision) return
-        sale_dispatch({ type: 'SET_DATES' })
-    },
-        //eslint-disable-next-line
-        [])
-
     const checkState = async () => {
         const result = new Promise(resolve => {
             if (!sale_state.renglones || sale_state.renglones.length < 1) resolve('Debe seleccionar al menos un producto para realizar la venta.')
@@ -69,7 +62,7 @@ const Ventas = () => {
     return (
         <>
             {
-                (!sale_state.loadingView)
+                !sale_state.loadingView
                     ?
                     <Row>
                         <Col span={24}>

@@ -46,8 +46,8 @@ const initialState = {
     planesPagoToSelect: [],
     planesPago: [],
     planesPagoNombres: [],
-    fechaEmision: null,
-    fechaEmisionString: null,
+    fechaEmision: new Date(),
+    fechaEmisionString: simpleDateWithHours(new Date()),
     cae: null,
     vencimientoCae: null,
     porcentajeRecargoGlobal: 0,
@@ -164,12 +164,18 @@ const calculateQuantity = (line, recargoGlobal, descuentoGlobal, porcentajePlanD
     )
 
     const removedQuantity = (line.porcentajeRecargoRenglon > 0 || recargoGlobal > 0 || porcentajePlanDePago > 0)
-        ? initialQuantity - quantity : 0
-    line.cantidadQuitadaPorRecargo_enKg = (line.fraccionar) ? removedQuantity / line.fraccionamiento : removedQuantity
+        ? initialQuantity - quantity
+        : 0
+    line.cantidadQuitadaPorRecargo_enKg = (line.fraccionar)
+        ? removedQuantity / line.fraccionamiento
+        : removedQuantity
 
     const addedQuantity = (line.porcentajeDescuentoRenglon > 0 || descuentoGlobal > 0 || porcentajePlanDePago < 0)
-        ? quantity - initialQuantity : 0
-    line.cantidadAgregadaPorDescuento_enKg = (line.fraccionar) ? addedQuantity / line.fraccionamiento : addedQuantity
+        ? quantity - initialQuantity
+        : 0
+    line.cantidadAgregadaPorDescuento_enKg = (line.fraccionar)
+        ? addedQuantity / line.fraccionamiento
+        : addedQuantity
 
     return quantity
 }
@@ -229,6 +235,7 @@ const updateValues = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago
     line.recargo = calculateLineSurcharge(line, recargoGlobal, porcentajePlanDePago)
     line.descuento = calculateLineDiscount(line, descuentoGlobal, porcentajePlanDePago)
     spanQuantity(line)
+    return line
 }
 
 const reducer = (state = initialState, action) => {
@@ -245,26 +252,29 @@ const reducer = (state = initialState, action) => {
                 discountSurchargeModalVisible: false,
             }
         case actions.SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION:
-            if (action.payload === 'discount') {
-                state.porcentajeDescuentoGlobal = state.porcentajeRecargoGlobal
-                state.porcentajeRecargoGlobal = 0
-                const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
-                state.renglones.map((line) => {
-                    updateValues(line, 0, state.porcentajeDescuentoGlobal, porcentajePlanDePago)
-                    return line
-                })
-            }
-            if (action.payload === 'surcharge') {
-                state.porcentajeRecargoGlobal = state.porcentajeDescuentoGlobal
-                state.porcentajeDescuentoGlobal = 0
-                const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
-                state.renglones.map((line) => {
-                    updateValues(line, state.porcentajeRecargoGlobal, 0, porcentajePlanDePago)
-                    return line
-                })
+            const refreshLinesValues = (percentageType, productos) => {
+                const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
+                let lines = []
+                if (percentageType === 'surcharge') {
+                    lines = state.renglones.map((line) => {
+                        const productUnfractionedPrice = productos.find(product => product._id === line._id).precioVenta
+                        const productFractionedPrice = productos.find(product => product._id === line._id).precioVentaFraccionado
+                        updateValues(line, state.porcentajeRecargoGlobal, 0, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                        return line
+                    })
+                } else {
+                    lines = state.renglones.map((line) => {
+                        const productUnfractionedPrice = productos.find(product => product._id === line._id).precioVenta
+                        const productFractionedPrice = productos.find(product => product._id === line._id).precioVentaFraccionado
+                        updateValues(line, 0, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                        return line
+                    })
+                }
+                return lines
             }
             return {
                 ...state,
+                renglones: refreshLinesValues(action.payload, state.productos),
                 discountSurchargeModalOperation: action.payload,
             }
         case actions.SHOW_FINALIZE_SALE_MODAL:
@@ -316,11 +326,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 porcentajeDescuentoGlobal: action.payload,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                    updateValues(line, 0, action.payload, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
-                    return line
+                    const newLine = updateValues(line, 0, action.payload, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                    return newLine
                 }),
             }
         case actions.SET_GLOBAL_SURCHARGE_PERCENT:
@@ -328,7 +338,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 porcentajeRecargoGlobal: action.payload,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     updateValues(line, action.payload, 0, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
@@ -339,7 +349,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
@@ -353,7 +363,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
@@ -370,7 +380,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
@@ -378,13 +388,13 @@ const reducer = (state = initialState, action) => {
                         updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
-                }),
+                })
             }
         case actions.SET_LINE_DISCOUNT_PERCENT:
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
@@ -398,7 +408,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
@@ -424,9 +434,11 @@ const reducer = (state = initialState, action) => {
                     const productUnitOfMeasure = (!product.unidadMedida)
                         ? null
                         : action.payload.find(item => item._id === product._id).unidadMedida.nombre
+
                     const linePresent = state.renglones.find(renglon => renglon._id === product._id)
                     if (linePresent) return linePresent
-                    return {
+
+                    const formatProduct = {
                         _id: product._id,
                         nombre: product.nombre,
                         codigoBarras: product.codigoBarras,
@@ -449,17 +461,25 @@ const reducer = (state = initialState, action) => {
                         precioNetoFijo: false,
                         precioBruto: product.precioVenta
                     }
-                }),
+
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
+                    const productUnfractionedPrice = formatProduct.precioUnitario
+                    const productFractionedPrice = formatProduct.precioUnitario
+                    updateValues(formatProduct, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+
+                    return formatProduct
+                })
             }
         case actions.SET_FRACTIONED:
             return {
                 ...state,
                 renglones: state.renglones.map(line => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(state.planesPago[0].porcentaje) : 0
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
                     if (line._id === action.payload._id) {
                         line.fraccionar = action.payload.fraccionar
+                        if (line.fraccionar === false) line.cantidadUnidades = 1
                         updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     }
                     return line
@@ -471,23 +491,46 @@ const reducer = (state = initialState, action) => {
                 productos: action.payload,
             }
         case actions.SET_CLIENT:
-            return {
-                ...state,
-                cliente: action.payload,
-                clienteRazonSocial: action.payload.razonSocial,
-                clienteDireccion: action.payload.direccion,
-                clienteIdentificador: action.payload.cuit,
-                clienteCondicionIva: action.payload.condicionFiscal.nombre,
-                clienteDocumentoReceptor: action.payload.documentoReceptor
+            if (!action.payload) {
+                return {
+                    ...state,
+                    cliente: null,
+                    clienteRazonSocial: null,
+                    clienteDireccion: null,
+                    clienteIdentificador: null,
+                    clienteCondicionIva: null,
+                    clienteDocumentoReceptor: null
+                }
+            } else {
+                return {
+                    ...state,
+                    cliente: action.payload,
+                    clienteRazonSocial: action.payload.razonSocial,
+                    clienteDireccion: action.payload.direccion,
+                    clienteIdentificador: action.payload.cuit,
+                    clienteCondicionIva: action.payload.condicionFiscal.nombre,
+                    clienteDocumentoReceptor: action.payload.documentoReceptor
+                }
             }
         case actions.SET_DOCUMENT:
-            return {
-                ...state,
-                documento: action.payload,
-                documentoLetra: action.payload.letra,
-                documentoFiscal: action.payload.fiscal,
-                documentoCodigo: action.payload.codigoUnico,
-                documentoDocumentoReceptor: action.payload.documentoReceptor
+            if (!action.payload) {
+                return {
+                    ...state,
+                    documento: null,
+                    documentoLetra: null,
+                    documentoFiscal: null,
+                    documentoCodigo: null,
+                    documentoDocumentoReceptor: null
+                }
+            } else {
+                return {
+                    ...state,
+                    documento: action.payload,
+                    documentoLetra: action.payload.letra,
+                    documentoFiscal: action.payload.fiscal,
+                    documentoCodigo: action.payload.codigoUnico,
+                    documentoDocumentoReceptor: action.payload.documentoReceptor
+                }
             }
         case actions.SET_COMPANY:
             return {
@@ -511,8 +554,8 @@ const reducer = (state = initialState, action) => {
         case actions.SET_DATES:
             return {
                 ...state,
-                fechaEmision: new Date(),
-                fechaEmisionString: simpleDateWithHours(new Date())
+                fechaEmision: action.payload,
+                fechaEmisionString: simpleDateWithHours(action.payload)
             }
         case actions.SET_VOUCHER_NUMBERS:
             return {
@@ -524,35 +567,57 @@ const reducer = (state = initialState, action) => {
                     completeLengthWithZero(action.payload, 8),
             }
         case actions.SET_PAYMENT_METHODS:
-            const paymentMethodNames = [action.payload.data].map(paymentMethod => paymentMethod.nombre)
-            const paymentPlansMapping = [action.payload.data].map(paymentMethod => paymentMethod.planes)
-            const paymentPlans = []
-            paymentPlansMapping.forEach(paymentPlanMapping => {
-                paymentPlanMapping.forEach(plan => {
-                    paymentPlans.push(plan)
+            if (!action.payload) {
+                return {
+                    ...state,
+                    mediosPago: [],
+                    mediosPagoNombres: [],
+                    planesPagoToSelect: [],
+                }
+            } else {
+                const paymentMethodNames = [action.payload.data].map(paymentMethod => paymentMethod.nombre)
+                const paymentPlansMapping = [action.payload.data].map(paymentMethod => paymentMethod.planes)
+                const paymentPlans = []
+                paymentPlansMapping.forEach(paymentPlanMapping => {
+                    paymentPlanMapping.forEach(plan => {
+                        paymentPlans.push(plan)
+                    })
                 })
-            })
-            return {
-                ...state,
-                mediosPago: [action.payload.data],
-                mediosPagoNombres: paymentMethodNames,
-                planesPagoToSelect: paymentPlans,
+                return {
+                    ...state,
+                    mediosPago: [action.payload.data],
+                    mediosPagoNombres: paymentMethodNames,
+                    planesPagoToSelect: paymentPlans,
+                }
             }
         case actions.SET_PAYMENT_PLANS:
-            const plans = action.payload.map(item => JSON.parse(item))
-            const planNames = plans.map(item => item.nombre)
-            const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent((JSON.parse(action.payload[0])).porcentaje) : 0
-            state.renglones.map((line) => {
-                (line.precioNetoFijo)
-                    ? line.cantidadUnidades = calculateQuantity(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado)
-                    : line.precioNeto = calculateNetPrice(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado)
-                spanQuantity(line)
-                return line
-            })
-            return {
-                ...state,
-                planesPago: plans,
-                planesPagoNombres: planNames
+            if (!action.payload) {
+                return {
+                    ...state,
+                    planesPago: [],
+                    planesPagoNombres: [],
+                    renglones: state.renglones.map(line => {
+                        const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                        const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, 0, productUnfractionedPrice, productFractionedPrice)
+                        return line
+                    })
+                }
+            } else {
+                const plans = action.payload.map(item => JSON.parse(item))
+                const planNames = plans.map(item => item.nombre)
+                const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent((JSON.parse(action.payload[0])).porcentaje) : 0
+                return {
+                    ...state,
+                    planesPago: plans,
+                    planesPagoNombres: planNames,
+                    renglones: state.renglones.map(line => {
+                        const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                        const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado, productUnfractionedPrice, productFractionedPrice)
+                        return line
+                    })
+                }
             }
         case actions.SET_TOTAL:
             if (state.renglones.length === 0) {

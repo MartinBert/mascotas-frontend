@@ -27,8 +27,8 @@ const Header = ({ setFilters, setPage, entradas_paginadas, entradas_totales }) =
     const fetchEntradasByDates = async (value) => {
         if (value === null) setEntradasToReport(entradas_paginadas)
         else {
-            const initialDate = (addDays(value[0]._d, + 0)).toISOString()
-            const finalDate = (addDays(value[1]._d, + 1)).toISOString()
+            const initialDate = (addDays(value[0].$d, 0)).toISOString()
+            const finalDate = (addDays(value[1].$d, 1)).toISOString()
             const response = await api.entradas.findByDates({ initialDate, finalDate })
             setEntradasToReport(response)
         }
