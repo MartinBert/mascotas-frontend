@@ -6,17 +6,25 @@ const { completeLengthWithZero } = helpers.stringHelper
 
 const initialState = {
     //----------------------------------------------- Generics state of view -----------------------------------------------------------/
-    discountSurchargeModalVisible: false,
     discountSurchargeModalOperation: 'discount',
+    discountSurchargeModalVisible: false,
     finalizeSaleModalIsVisible: false,
-    loadingView: false,
     loadingDocumentIndex: false,
+    loadingView: false,
 
     //------------------------------------------------- State of sale data -------------------------------------------------------------/
-    indice: null,
-    usuario: null,
-    productos: [],
-    renglones: [],
+    baseImponible10: 0,
+    baseImponible21: 0,
+    baseImponible27: 0,
+    cae: null,
+    cliente: null,
+    clienteCondicionIva: null,
+    clienteDireccion: null,
+    clienteIdentificador: null,
+    clienteDocumentoReceptor: null,
+    clienteRazonSocial: null,
+    closedSale: false,
+    condicionVenta: 'Contado',
     documento: null,
     documentoLetra: null,
     documentoFiscal: null,
@@ -29,78 +37,72 @@ const initialState = {
     empresaIngresosBrutos: null,
     empresaInicioActividad: null,
     empresaLogo: null,
-    puntoVenta: null,
-    puntoVentaNumero: null,
-    puntoVentaNombre: null,
-    numeroFactura: null,
-    numeroCompletoFactura: null,
-    condicionVenta: 'Contado',
-    cliente: null,
-    clienteRazonSocial: null,
-    clienteDireccion: null,
-    clienteIdentificador: null,
-    clienteCondicionIva: null,
-    clienteDocumentoReceptor: null,
-    mediosPago: [],
-    mediosPagoNombres: [],
-    planesPagoToSelect: [],
-    planesPago: [],
-    planesPagoNombres: [],
     fechaEmision: new Date(),
     fechaEmisionString: simpleDateWithHours(new Date()),
-    cae: null,
-    vencimientoCae: null,
-    porcentajeRecargoGlobal: 0,
-    porcentajeDescuentoGlobal: 0,
-    totalDescuento: 0,
-    totalRecargo: 0,
+    importeIva: 0,
+    indice: null,
     iva21: 0,
     iva10: 0,
     iva27: 0,
-    baseImponible21: 0,
-    baseImponible10: 0,
-    baseImponible27: 0,
-    importeIva: 0,
+    mediosPago: [],
+    mediosPagoNombres: [],
+    numeroFactura: null,
+    numeroCompletoFactura: null,
+    planesPago: [],
+    planesPagoNombres: [],
+    planesPagoToSelect: [],
+    porcentajeRecargoGlobal: 0,
+    porcentajeDescuentoGlobal: 0,
+    productos: [],
+    puntoVenta: null,
+    puntoVentaNumero: null,
+    puntoVentaNombre: null,
+    renglones: [],
+    renglonesPersonalizados: [],
     subTotal: 0,
     total: 0,
-    closedSale: false
+    totalDescuento: 0,
+    totalRecargo: 0,
+    usuario: null,
+    vencimientoCae: null,
 }
 
 const actions = {
     //---------------------------------------------- Generics actions of view ----------------------------------------------------------/
-    SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
-    HIDE_DISCOUNT_SURCHARGE_MODAL: 'HIDE_DISCOUNT_SURCHARGE_MODAL',
-    SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION',
-    SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
-    HIDE_FINALIZE_SALE_MODAL: 'HIDE_FINALIZE_SALE_MODAL',
     CLOSE_FISCAL_OPERATION: 'CLOSE_FISCAL_OPERATION',
     CLOSE_NO_FISCAL_OPERATION: 'CLOSE_NO_FISCAL_OPERATION',
+    HIDE_DISCOUNT_SURCHARGE_MODAL: 'HIDE_DISCOUNT_SURCHARGE_MODAL',
+    HIDE_FINALIZE_SALE_MODAL: 'HIDE_FINALIZE_SALE_MODAL',
     LOADING_DOCUMENT_INDEX: 'LOADING_DOCUMENT_INDEX',
     LOADING_VIEW: 'LOADING_VIEW',
     RESET_STATE: 'RESET_STATE',
+    SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION',
+    SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
+    SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
 
     //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
-    SET_INDEX: 'SET_INDEX',
-    SET_USER: 'SET_USER',
+    SET_CLIENT: 'SET_CLIENT',
+    SET_COMPANY: 'SET_COMPANY',
+    SET_DATES: 'SET_DATES',
+    SET_DOCUMENT: 'SET_DOCUMENT',
+    SET_FRACTIONED: 'SET_FRACTIONED',
     SET_GLOBAL_DISCOUNT_PERCENT: 'SET_GLOBAL_DISCOUNT_PERCENT',
     SET_GLOBAL_SURCHARGE_PERCENT: 'SET_GLOBAL_SURCHARGE_PERCENT',
-    SET_PRODUCTS: 'SET_PRODUCTS',
-    SET_LINES: 'SET_LINES',
-    SET_FRACTIONED: 'SET_FRACTIONED',
+    SET_INDEX: 'SET_INDEX',
+    SET_LINE_DISCOUNT_PERCENT: 'SET_LINE_DISCOUNT_PERCENT',
+    SET_LINE_NOTE: 'SET_LINE_NOTE',
+    SET_LINE_SURCHARGE_PERCENT: 'SET_LINE_SURCHARGE_PERCENT',
     SET_LINE_QUANTITY: 'SET_LINE_QUANTITY',
+    SET_LINES: 'SET_LINES',
     SET_NET_PRICE: 'SET_NET_PRICE',
     SET_NET_PRICE_FIXED: 'SET_NET_PRICE_FIXED',
-    SET_LINE_DISCOUNT_PERCENT: 'SET_LINE_DISCOUNT_PERCENT',
-    SET_LINE_SURCHARGE_PERCENT: 'SET_LINE_SURCHARGE_PERCENT',
-    SET_CLIENT: 'SET_CLIENT',
-    SET_DOCUMENT: 'SET_DOCUMENT',
     SET_PAYMENT_METHODS: 'SET_PAYMENT_METHODS',
     SET_PAYMENT_PLANS: 'SET_PAYMENT_PLANS',
-    SET_COMPANY: 'SET_COMPANY',
+    SET_PRODUCTS: 'SET_PRODUCTS',
     SET_SALE_POINT: 'SET_SALE_POINT',
-    SET_DATES: 'SET_DATES',
-    SET_VOUCHER_NUMBERS: 'SET_VOUCHER_NUMBERS',
     SET_TOTAL: 'SET_TOTAL',
+    SET_USER: 'SET_USER',
+    SET_VOUCHER_NUMBERS: 'SET_VOUCHER_NUMBERS'
 }
 
 const calculateGrossPrice = (line) => {
@@ -418,56 +420,69 @@ const reducer = (state = initialState, action) => {
                     return line
                 }),
             }
+        case actions.SET_LINE_NOTE:
+            return {
+                ...state,
+                renglones: state.renglones.map((line) => {
+                    if (line._id === action.payload.lineID)
+                        line.nota = action.payload.note
+                    return line
+                })
+            }
         case actions.SET_LINES:
             return {
                 ...state,
-                renglones: action.payload.map((product) => {
-                    const unitMeasure_gramsToGrams = (!product.unidadMedida)
+                renglones: action.payload.map(line => {
+                    const unitMeasure_gramsToGrams = (!line.unidadMedida)
                         ? false
-                        : (!(((product.unidadMedida.nombre).toLowerCase()).includes('kilo'))
-                            && ((product.unidadMedida.nombre).toLowerCase()).includes(' gramo'))
+                        : (!(((line.unidadMedida.nombre).toLowerCase()).includes('kilo'))
+                            && ((line.unidadMedida.nombre).toLowerCase()).includes(' gramo'))
                             ? true
                             : false
-                    const fractionament = (!product.unidadMedida)
+                    const fractionament = (!line.unidadMedida)
                         ? 1
-                        : product.unidadMedida.fraccionamiento
-                    const productUnitOfMeasure = (!product.unidadMedida)
+                        : line.unidadMedida.fraccionamiento
+                    const productUnitOfMeasure = (!line.unidadMedida)
                         ? null
-                        : action.payload.find(item => item._id === product._id).unidadMedida.nombre
+                        : action.payload.find(item => item._id === line._id).unidadMedida.nombre
 
-                    const linePresent = state.renglones.find(renglon => renglon._id === product._id)
+                    const linePresent = state.renglones
+                        .filter(renglon => !(renglon._id.startsWith('customProduct_')))
+                        .find(renglon => renglon._id === line._id)
                     if (linePresent) return linePresent
 
-                    const formatProduct = {
-                        _id: product._id,
-                        nombre: product.nombre,
-                        codigoBarras: product.codigoBarras,
-                        unidadMedida: productUnitOfMeasure,
-                        precioUnitario: product.precioVenta,
-                        porcentajeIva: (product.porcentajeIvaVenta) ? product.porcentajeIvaVenta : 0,
-                        importeIva: (product.ivaVenta) ? product.ivaVenta : 0,
+                    const formattedLine = {
+                        _id: line._id,
+                        cantidadAgregadaPorDescuento_enKg: 0,
+                        cantidadg: unitMeasure_gramsToGrams ? fractionament : 0,
+                        cantidadKg: unitMeasure_gramsToGrams ? 0 : (fractionament < 1000) ? fractionament : 1,
+                        cantidadQuitadaPorRecargo_enKg: 0,
+                        cantidadUnidades: 1,
+                        codigoBarras: line.codigoBarras,
+                        descuento: 0,
                         fraccionamiento: fractionament,
                         fraccionar: false,
-                        cantidadUnidades: 1,
-                        cantidadQuitadaPorRecargo_enKg: 0,
-                        cantidadAgregadaPorDescuento_enKg: 0,
-                        cantidadKg: unitMeasure_gramsToGrams ? 0 : (fractionament < 1000) ? fractionament : 1,
-                        cantidadg: unitMeasure_gramsToGrams ? fractionament : 0,
-                        porcentajeRecargoRenglon: 0,
+                        importeIva: (line.ivaVenta) ? line.ivaVenta : 0,
+                        key: line._id,
+                        nombre: line.nombre,
+                        nota: '',
                         porcentajeDescuentoRenglon: 0,
-                        recargo: 0,
-                        descuento: 0,
-                        precioNeto: product.precioVenta,
+                        porcentajeIva: (line.porcentajeIvaVenta) ? line.porcentajeIvaVenta : 0,
+                        porcentajeRecargoRenglon: 0,
+                        precioBruto: line.precioVenta,
+                        precioNeto: line.precioVenta,
                         precioNetoFijo: false,
-                        precioBruto: product.precioVenta
+                        precioUnitario: line.precioVenta,
+                        recargo: 0,
+                        unidadMedida: productUnitOfMeasure,
                     }
 
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-                    const productUnfractionedPrice = formatProduct.precioUnitario
-                    const productFractionedPrice = formatProduct.precioUnitario
-                    updateValues(formatProduct, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                    const productUnfractionedPrice = formattedLine.precioUnitario
+                    const productFractionedPrice = formattedLine.precioUnitario
+                    updateValues(formattedLine, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
 
-                    return formatProduct
+                    return formattedLine
                 })
             }
         case actions.SET_FRACTIONED:
@@ -604,9 +619,9 @@ const reducer = (state = initialState, action) => {
                     })
                 }
             } else {
-                const plans = action.payload.map(item => JSON.parse(item))
+                const plans = action.payload.map(item => item)
                 const planNames = plans.map(item => item.nombre)
-                const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent((JSON.parse(action.payload[0])).porcentaje) : 0
+                const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent((action.payload[0]).porcentaje) : 0
                 return {
                     ...state,
                     planesPago: plans,

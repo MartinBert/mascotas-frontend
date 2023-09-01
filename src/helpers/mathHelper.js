@@ -10,6 +10,15 @@ const decimalPercent = (value) => {
     return Number(value) / 100;
 }
 
+const roundToMultiple = (value, multipleOf) => {
+    const rest = value % multipleOf
+    const roundingParameter = multipleOf / 2
+    const roundedValue = (rest >= roundingParameter)
+        ? value + multipleOf - rest
+        : value - rest
+    return roundedValue
+}
+
 const previousInteger = (value) => {
     return Math.floor(value)
 }
@@ -25,6 +34,7 @@ const nextIntegerMultipleOf_10 = (value) => {
 
 const mathHelper = {
     round,
+    roundToMultiple,
     roundTwoDecimals,
     decimalPercent,
     previousInteger,

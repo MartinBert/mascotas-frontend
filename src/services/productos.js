@@ -89,6 +89,8 @@ const edit = async(producto) => {
 
 const modifyStock = async(body) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    if (!body) return
+    
     const productWithRoundedStock = {
         ...body,
         product: {

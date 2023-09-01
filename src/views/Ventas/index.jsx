@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 
 // Custom Components
 import { errorAlert } from '../../components/alerts'
+import { ProductSelectionModal } from '../../components/generics'
 
 // Design Components
 import { Row, Col, Spin } from 'antd'
@@ -14,10 +15,12 @@ import contextProviders from '../../contextProviders'
 import api from '../../services'
 
 // Views
+import CustomLineModal from './CustomLineModal'
 import Header from './Header'
 import DiscountSurchargeModal from './DiscountSurchargeModal'
 import FinalizeSaleModal from './FinalizeSaleModal'
 import Lines from './Lines'
+import ListCustomLinesModal from './ListCustomLinesModal'
 
 // Imports Destructurings
 const { useSaleContext } = contextProviders.SaleContextProvider
@@ -62,35 +65,42 @@ const Ventas = () => {
     return (
         <>
             {
-                !sale_state.loadingView
-                    ?
-                    <Row>
-                        <Col span={24}>
-                            <Header />
-                        </Col>
-                        <Col span={24}>
-                            <Lines />
-                        </Col>
-                        <Col span={6} style={{ marginTop: '25px' }}>
-                            <button
-                                className='btn-primary'
-                                onClick={() => {
-                                    checkState()
-                                        .then(result => {
-                                            if (result === 'OK') return sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
-                                            return errorAlert(result)
-                                        })
-                                }}
-                            >
-                                Finalizar venta
-                            </button>
-                        </Col>
-                    </Row>
-
-                    : <Spin />
+                sale_state.loadingView
+                    ? <Spin />
+                    : (
+                        <Row>
+                            <Col span={24}>
+                                <Header />
+                            </Col>
+                            <Col span={24}>
+                                <Lines />
+                            </Col>
+                            <Col span={24} style={{ marginTop: '1%' }}>
+                                <Row>
+                                    <Col span={6}>
+                                        <button
+                                            className='btn-primary'
+                                            onClick={() => {
+                                                checkState()
+                                                    .then(result => {
+                                                        if (result === 'OK') return sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
+                                                        return errorAlert(result)
+                                                    })
+                                            }}
+                                        >
+                                            Finalizar venta
+                                        </button>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                    )
             }
+            <CustomLineModal />
             <DiscountSurchargeModal />
             <FinalizeSaleModal />
+            <ListCustomLinesModal />
+            <ProductSelectionModal />
             <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
             <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
         </>

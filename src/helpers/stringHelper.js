@@ -7,8 +7,14 @@ const completeLengthWithZero = (value, length) => {
     return value;
 }
 
+const replaceFor = (string, segment, newSegment) => {
+    const newString = string.replaceAll(segment, newSegment)
+    return newString
+}
+
 const stringHelper = {
-    completeLengthWithZero
+    completeLengthWithZero,
+    replaceFor
 }
 
 export default stringHelper;

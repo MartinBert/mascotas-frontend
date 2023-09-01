@@ -134,10 +134,10 @@ const EntradasForm = () => {
                         }
                     })
             } else {
-                if (!entrada.descripcion) {
+                if (!entrada.descripcion || entrada.descripcion === '') {
                     entrada.descripcion = '-- Sin descripción --'
                 }
-                if (!entrada.fecha) {
+                if (!entrada.fecha || entrada.fecha === null) {
                     entrada.fecha = new Date()
                 }
                 entrada.cantidad = entrada.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0)
@@ -207,7 +207,7 @@ const EntradasForm = () => {
                                         onChange={(e) => {
                                             setEntrada({
                                                 ...entrada,
-                                                fecha: new Date(e._d)
+                                                fecha: new Date(e.$d)
                                             })
                                         }}
                                     />
@@ -226,7 +226,7 @@ const EntradasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_MODAL' }) }}>
+                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' }) }}>
                                     <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>

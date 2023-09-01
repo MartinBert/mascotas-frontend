@@ -63,20 +63,29 @@ const voucherTemplate = (saleData, qrImage) => {
         <div style='width: 100%; height: 582px; padding: 10px'>
             ${saleData.renglones.map(renglon => {
                 return (
-                    `<div style='width: 100%; display: flex; font-size: 16px;'>
-                        <div style='width: 12%;'>
-                            ${renglon.fraccionar
-                                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                                : roundTwoDecimals(renglon.cantidadUnidades)
-                            }
+                    `
+                        <div>
+                            <div style='width: 100%; display: flex; font-size: 16px;'>
+                                <div style='width: 12%;'>
+                                    ${renglon.fraccionar
+                                        ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                                        : roundTwoDecimals(renglon.cantidadUnidades)
+                                    }
+                                </div>
+                                <div style='width: 34%;'>${renglon.nombre}</div>
+                                <div style='width: 10%;'>${renglon.precioUnitario}</div>
+                                <div style='width: 10%;'>${roundTwoDecimals(renglon.precioBruto)}</div>
+                                <div style='width: 12%;'>${roundTwoDecimals(renglon.descuento)}</div>
+                                <div style='width: 12%;'>${roundTwoDecimals(renglon.recargo)}</div>
+                                <div style='width: 10%; text-align: right;'>${roundTwoDecimals(renglon.precioNeto)}</div>
+                            </div>
+                            <div style='margin-top: 5px; width: 100%; font-size: 14px;'>
+                                <div style='margin-left: 12%; width: 88%;'>
+                                    <i>${renglon.nota}</i>
+                                </div>
+                            </div>
                         </div>
-                        <div style='width: 34%;'>${renglon.nombre}</div>
-                        <div style='width: 10%;'>${renglon.precioUnitario}</div>
-                        <div style='width: 10%;'>${roundTwoDecimals(renglon.precioBruto)}</div>
-                        <div style='width: 12%;'>${roundTwoDecimals(renglon.descuento)}</div>
-                        <div style='width: 12%;'>${roundTwoDecimals(renglon.recargo)}</div>
-                        <div style='width: 10%; text-align: right;'>${roundTwoDecimals(renglon.precioNeto)}</div>
-                    </div>`
+                    `
                 )
             }).join('<br />')}
         </div>

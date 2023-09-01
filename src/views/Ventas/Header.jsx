@@ -2,34 +2,26 @@
 import React, { useEffect } from 'react'
 
 // Custom Components
-import { ProductSelectionModal, GenericAutocomplete } from '../../components/generics'
 import { errorAlert } from '../../components/alerts'
-
-// Design Components
-import { DatePicker, Row, Col, Select, Spin } from 'antd'
-import dayjs from 'dayjs'
 
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
 
+// Design Components
+import { Row, Col } from 'antd'
+
+// Views
+import HeaderElements from './HeaderElements'
+
 // Services
 import api from '../../services'
 
-// Helpers
-import helpers from '../../helpers'
-
 // Imports Destructurings
 const { useSaleContext } = contextProviders.SaleContextProvider
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
-const { isItLater, localFormat } = helpers.dateHelper
-const { Option } = Select
 
 
 const Header = () => {
-    const saleContext = useSaleContext()
-    const [sale_state, sale_dispatch] = saleContext
-    const productContext = useProductSelectionModalContext()
-    const [, product_dispatch] = productContext
+    const [sale_state, sale_dispatch] = useSaleContext()
 
     useEffect(() => {
         if (!sale_state.documento) return
@@ -71,167 +63,187 @@ const Header = () => {
         [sale_state.documento]
     )
 
-    const changeDate = (e) => {
-        if (!e) sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-        else {
-            if (isItLater(new Date(), e.$d)) {
-                errorAlert('No es conveniente facturar con fecha posterior a hoy.')
-                sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-            }
-            else sale_dispatch({ type: 'SET_DATES', payload: e.$d })
-        }
-    }
+    const header = [
+        {
+            body: HeaderElements.BillingDate,
+            name: 'billingDate',
+            order_lg: 2,
+            order_md: 2,
+            order_sm: 4,
+            order_xl: 2,
+            order_xs: 4,
+            order_xxl: 2
+        },
+        {
+            body: HeaderElements.BillingClient,
+            name: 'billingClient',
+            order_lg: 3,
+            order_md: 4,
+            order_sm: 5,
+            order_xl: 3,
+            order_xs: 5,
+            order_xxl: 3
+        },
+        {
+            body: HeaderElements.BillingDocument,
+            name: 'billingDocument',
+            order_lg: 6,
+            order_md: 6,
+            order_sm: 6,
+            order_xl: 6,
+            order_xs: 6,
+            order_xxl: 6
+        },
+        {
+            body: HeaderElements.BillingLoadingDocument,
+            name: 'billingLoadingDocument',
+            order_lg: 7,
+            order_md: 8,
+            order_sm: 7,
+            order_xl: 7,
+            order_xs: 7,
+            order_xxl: 7
+        },
+        {
+            body: HeaderElements.BillingPaymentMethods,
+            name: 'billingPaymentMethods',
+            order_lg: 10,
+            order_md: 10,
+            order_sm: 8,
+            order_xl: 10,
+            order_xs: 8,
+            order_xxl: 10
+        },
+        {
+            body: HeaderElements.BillingPaymentPlans,
+            name: 'billingPaymentPlans',
+            order_lg: 11,
+            order_md: 12,
+            order_sm: 9,
+            order_xl: 11,
+            order_xs: 9,
+            order_xxl: 11
+        },
+        {
+            body: HeaderElements.CleanFieldsButton,
+            name: 'cleanFieldsButton',
+            order_lg: 4,
+            order_md: 7,
+            order_sm: 10,
+            order_xl: 4,
+            order_xs: 10,
+            order_xxl: 4
+        },
+        {
+            body: HeaderElements.CleanGlobalPercentageButton,
+            name: 'cleanGlobalPercentageButton',
+            order_lg: 12,
+            order_md: 11,
+            order_sm: 12,
+            order_xl: 12,
+            order_xs: 12,
+            order_xxl: 12
+        },
+        {
+            body: HeaderElements.CleanProductsButton,
+            name: 'cleanProductsButton',
+            order_lg: 8,
+            order_md: 9,
+            order_sm: 11,
+            order_xl: 8,
+            order_xs: 11,
+            order_xxl: 8
+        },
+        {
+            body: HeaderElements.CustomProductListButton,
+            name: 'customProductListButton',
+            order_lg: 5,
+            order_md: 3,
+            order_sm: 2,
+            order_xl: 5,
+            order_xs: 2,
+            order_xxl: 5
+        },
+        {
+            body: HeaderElements.GlobalPercentageButton,
+            name: 'globalPercentageButton',
+            order_lg: 9,
+            order_md: 5,
+            order_sm: 3,
+            order_xl: 9,
+            order_xs: 3,
+            order_xxl: 9
+        },
+        {
+            body: HeaderElements.ProductListButton,
+            name: 'productListButton',
+            order_lg: 1,
+            order_md: 1,
+            order_sm: 1,
+            order_xl: 1,
+            order_xs: 1,
+            order_xxl: 1
+        },
+    ]
 
-    const cleanFields = () => {
-        sale_dispatch({ type: 'SET_CLIENT', payload: null })
-        sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-        sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
-        sale_dispatch({ type: 'SET_PAYMENT_METHODS', payload: null })
-        sale_dispatch({ type: 'SET_PAYMENT_PLANS', payload: null })
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    const cleanGlobalPercentage = () => {
-        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_PERCENT', payload: 0 })
-        sale_dispatch({ type: 'SET_GLOBAL_SURCHARGE_PERCENT', payload: 0 })
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    const cleanProducts = () => {
-        product_dispatch({ type: 'CLEAN_STATE' })
+    const responsiveGrid = {
+        col_span_lg: 6,
+        col_span_md: 12,
+        col_span_sm: 24,
+        col_span_xl: 6,
+        col_span_xs: 24,
+        col_span_xxl: 6,
+        row_gutter_horizontal: 8,
+        row_gutter_vertical: 8,
     }
 
     return (
         <Col span={24}>
             <Row>
                 <Col span={24}>
-                    <Row gutter={8}>
-                        <Col span={12}>
-                            <Row gutter={8} justify='start'>
-                                <Col xl={8} lg={12} md={16} sm={24}>
-                                    <button
-                                        className='btn-primary'
-                                        onClick={() => product_dispatch({ type: 'SHOW_MODAL' })}
-                                    >
-                                        Productos
-                                    </button>
-                                </Col>
-                                <Col xl={8} lg={12} md={16} sm={24}>
-                                    <button
-                                        className='btn-primary'
-                                        onClick={() => sale_dispatch({ type: 'SHOW_DISCOUNT_SURCHARGE_MODAL' })}
-                                    >
-                                        Descuento/Recargo
-                                    </button>
-                                </Col>
-                            </Row>
-                        </Col>
-                        <Col span={12}>
-                            <Row gutter={8} justify='end'>
-                                <Col xl={8} lg={12} md={16} sm={24}>
-                                    <button
-                                        className='btn-primary'
-                                        onClick={() => cleanFields()}
-                                    >
-                                        Borrar campos
-                                    </button>
-                                </Col>
-                                <Col xl={8} lg={12} md={16} sm={24}>
-                                    <button
-                                        className='btn-primary'
-                                        onClick={() => cleanProducts()}
-                                    >
-                                        Borrar productos
-                                    </button>
-                                </Col>
-                                <Col xl={8} lg={12} md={16} sm={24}>
-                                    <button
-                                        className='btn-primary'
-                                        onClick={() => cleanGlobalPercentage()}
-                                    >
-                                        Borrar % global
-                                    </button>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
-                    <Row gutter={8}>
-                        <Col span={20}>
-                            <Row gutter={8}>
-                                <Col xl={6} lg={6} md={12}>
-                                    <DatePicker
-                                        format={['DD/MM/YYYY']}
-                                        onChange={e => changeDate(e)}
-                                        style={{ width: '100%' }}
-                                        value={dayjs(localFormat(sale_state.fechaEmision), ['DD/MM/YYYY'])}
-                                    />
-                                </Col>
-                                <Col xl={6} lg={6} md={12}>
-                                    <GenericAutocomplete
-                                        label='Cliente'
-                                        modelToFind='cliente'
-                                        keyToCompare='razonSocial'
-                                        controller='clientes'
-                                        selectedSearch={sale_state.cliente}
-                                        dispatch={sale_dispatch}
-                                        action={'SET_CLIENT'}
-                                        returnCompleteModel={true}
-                                    />
-                                </Col>
-                                <Col xl={6} lg={6} md={12}>
-                                    <GenericAutocomplete
-                                        label='Documento'
-                                        modelToFind='documento'
-                                        keyToCompare='nombre'
-                                        controller='documentos'
-                                        selectedSearch={sale_state.documento}
-                                        dispatch={sale_dispatch}
-                                        action={'SET_DOCUMENT'}
-                                        returnCompleteModel={true}
-                                    />
-                                </Col>
-                                <Col xl={6} lg={6} md={12}>
-                                    {
-                                        !sale_state.loadingDocumentIndex
-                                            ? null
-                                            : <span><Spin />Procesando...</span>
-                                    }
-                                </Col>
-                                <Col xl={6} lg={6} md={12}>
-                                    <GenericAutocomplete
-                                        label='Medio de pago'
-                                        modelToFind='mediopago'
-                                        keyToCompare='nombre'
-                                        controller='mediospago'
-                                        selectedSearch={sale_state.mediosPago[0]}
-                                        dispatch={sale_dispatch}
-                                        action={'SET_PAYMENT_METHODS'}
-                                        actionSecondary = {'SET_PAYMENT_PLANS'}
-                                        actionTertiary = {'SET_TOTAL'}
-                                        payloadSecondary={0}
-                                        returnCompleteModel={true}
-                                    />
-                                </Col>
-                                <Col xl={6} lg={6} md={12}>
-                                    <Select
-                                        onChange={e => {
-                                            sale_dispatch({ type: 'SET_PAYMENT_PLANS', payload: [e] })
-                                            sale_dispatch({ type: 'SET_TOTAL' })
+                    <Row
+                        gutter={[
+                            responsiveGrid.row_gutter_horizontal,
+                            responsiveGrid.row_gutter_vertical
+                        ]}
+                        justify='space-around'
+                    >
+                        {
+                            header.map(item => {
+                                return (
+                                    <Col
+                                        key={item.name}
+                                        lg={{
+                                            order: item.order_lg,
+                                            span: responsiveGrid.col_span_lg
                                         }}
-                                        style={{ width: '100%' }}
-                                        value={sale_state.planesPagoNombres[0]}
+                                        md={{
+                                            order: item.order_md,
+                                            span: responsiveGrid.col_span_md
+                                        }}
+                                        sm={{
+                                            order: item.order_sm,
+                                            span: responsiveGrid.col_span_sm
+                                        }}
+                                        xl={{
+                                            order: item.order_xl,
+                                            span: responsiveGrid.col_span_xl
+                                        }}
+                                        xs={{
+                                            order: item.order_xs,
+                                            span: responsiveGrid.col_span_xs
+                                        }}
+                                        xxl={{
+                                            order: item.order_xxl,
+                                            span: responsiveGrid.col_span_xxl
+                                        }}
                                     >
-                                        {
-                                            !sale_state.planesPagoToSelect
-                                                ? null
-                                                : sale_state.planesPagoToSelect.map(item => <Option key={item._id} value={JSON.stringify(item)}>{item.nombre}</Option>)
-                                        }
-                                    </Select>
-                                </Col>
-                            </Row>
-                        </Col>
+                                        {item.body}
+                                    </Col>
+                                )
+                            })
+                        }
                     </Row>
-                    <ProductSelectionModal />
                 </Col>
             </Row>
             <br />

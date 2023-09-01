@@ -5,7 +5,7 @@ import React, { useEffect } from 'react'
 import icons from '../../components/icons'
 
 // Design Components
-import { Table, Input, Checkbox, Row, Col } from 'antd'
+import { Button, Checkbox, Col, Input, Row, Space, Table } from 'antd'
 
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
@@ -25,13 +25,18 @@ const Lines = () => {
     const [sale_state, sale_dispatch] = saleContext
     const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
-    const columnsForTable = [
+    const deleteProduct = (productId) => {
+        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: productId })
+    }
+
+    const columns = [
         {
+            key: 'columna_fraccionar',
             title: 'Fracc.',
             render: (product) => (
                 <Checkbox
                     checked={product.fraccionar === true ? true : false}
-                    onChange={(e) => {
+                    onChange={e => {
                         product.fraccionar = e.target.checked
                         sale_dispatch({ type: 'SET_FRACTIONED', payload: product })
                         sale_dispatch({ type: 'SET_TOTAL' })
@@ -40,11 +45,13 @@ const Lines = () => {
             ),
         },
         {
+            key: 'columna_producto',
             title: 'Producto',
             dataIndex: 'nombre',
             width: 300
         },
         {
+            key: 'columna_cantidad',
             title: 'Cantidad',
             render: (product) => (
                 <>
@@ -96,6 +103,7 @@ const Lines = () => {
             ),
         },
         {
+            key: 'columna_preciounitario',
             title: 'Prec. U.',
             render: (product) => (
                 <Input
@@ -108,6 +116,7 @@ const Lines = () => {
             ),
         },
         {
+            key: 'columna_porcentajedescuento',
             title: '% Descuento',
             render: (product) => (
                 <Input
@@ -130,6 +139,7 @@ const Lines = () => {
             ),
         },
         {
+            key: 'columna_porcentajerecargo',
             title: '% Recargo',
             render: (product) => (
                 <Input
@@ -152,6 +162,7 @@ const Lines = () => {
             ),
         },
         {
+            key: 'columna_preciobruto',
             title: 'Precio bruto',
             render: (product) => (
                 <Input
@@ -164,6 +175,7 @@ const Lines = () => {
             ),
         },
         {
+            key: 'columna_precioneto',
             title: 'Precio neto',
             render: (product) => (
                 <Row align='middle'>
@@ -196,12 +208,11 @@ const Lines = () => {
             )
         },
         {
+            key: 'columna_quitar',
             title: 'Quitar',
             render: (product) => (
                 <Col align='middle'
-                    onClick={() => {
-                        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: product })
-                    }}
+                    onClick={() => deleteProduct(product._id)}
                 >
                     <Delete />
                 </Col>
@@ -215,18 +226,51 @@ const Lines = () => {
         sale_dispatch({ type: 'SET_TOTAL' })
     },
         //eslint-disable-next-line
-        [productSelectionModal_state.selectedProducts, sale_dispatch])
+        [
+            productSelectionModal_state.selectedProducts
+        ]
+    )
+
+    const setNote = (value, lineID) => {
+        sale_dispatch({
+            type: 'SET_LINE_NOTE',
+            payload: {
+                note: value,
+                lineID: lineID
+            }
+        })
+    }
 
     return (
         <Table
-            style={{ marginTop: '20px' }}
-            width={'100%'}
+            columns={columns}
             dataSource={sale_state.renglones}
-            columns={columnsForTable}
+            expandable={{
+                expandedRowRender: renglon => (
+                    <Space.Compact
+                        style={{ width: '100%' }}
+                    >
+                        <Input
+                            addonBefore='Nota'
+                            key={renglon._id}
+                            onChange={e => setNote(e.target.value, renglon._id)}
+                            value={renglon.nota}
+                        />
+                        <Button
+                            danger
+                            onClick={() => setNote('', renglon._id)}
+                            type='primary'
+                        >
+                            Borrar
+                        </Button>
+                    </Space.Compact>
+                ),
+            }}
             pagination={false}
-            rowKey='_id'
-            tableLayout='auto'
+            rowKey={renglon => renglon._id}
             size='small'
+            tableLayout='auto'
+            width={'100%'}
         />
     )
 }

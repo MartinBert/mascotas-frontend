@@ -196,10 +196,10 @@ const SalidasForm = () => {
                                     <DatePicker
                                         name='fecha'
                                         locale='es-es'
-                                        onChange={(e) => {
+                                        onChange={e => {
                                             setSalida({
                                                 ...salida,
-                                                fecha: new Date(e._d)
+                                                fecha: new Date(e.$d)
                                             })
                                         }}
                                     />
@@ -218,7 +218,7 @@ const SalidasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_MODAL' }) }}>
+                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' }) }}>
                                     <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>

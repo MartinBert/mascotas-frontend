@@ -50,7 +50,7 @@ const ProductSelectionModal = () => {
                 <Checkbox 
                     checked={product.selected}
                     onChange={(e) => {
-                        if(productSelectionModal_state.selectionLimit <= 1) productSelectionModal_dispatch({type: 'CLEAN_PRODUCT_LIST'})
+                        if(productSelectionModal_state.selectionLimit <= 1) productSelectionModal_dispatch({type: 'DELETE_ALL_PRODUCTS'})
                         product.selected = e.target.checked
                         productSelectionModal_dispatch({type: (e.target.checked) ? 'SET_PRODUCT' : 'DELETE_PRODUCT', payload: product})
                     }}
@@ -114,10 +114,10 @@ const ProductSelectionModal = () => {
     return (
     <Modal 
         title={'Seleccionar producto' + ((productSelectionModal_state.selectionLimit > 1) ? 's' : '')}
-        open={productSelectionModal_state.open}
+        open={productSelectionModal_state.productModalIsVisible}
         cancelButtonProps={{ style: { display: 'none' } }}
         closable={false}
-        onOk={() => {productSelectionModal_dispatch({type: 'HIDE_MODAL'})}}
+        onOk={() => {productSelectionModal_dispatch({type: 'HIDE_PRODUCT_MODAL'})}}
         width={1200}
     >
         <Row>

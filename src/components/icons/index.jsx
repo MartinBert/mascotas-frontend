@@ -1,17 +1,19 @@
-import Details from './Details';
-import Check from './Check';
 import Add from './Add';
-import Edit from './Edit';
+import Check from './Check';
+import Clear from './Clear';
 import Delete from './Delete';
+import Details from './Details';
+import Edit from './Edit';
 import PrintPdf from './PrintPdf';
 
 const icons = {
-    Details,
-    Check,
     Add,
-    Edit,
-    PrintPdf,
+    Check,
+    Clear,
     Delete,
+    Details,
+    Edit,
+    PrintPdf
 }
 
 export default icons;

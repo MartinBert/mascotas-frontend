@@ -1,6 +1,5 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -25,11 +24,8 @@ const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 
 const FinalizeSaleModal = () => {
-    const navigate = useNavigate()
-    const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
-    const saleContext = useSaleContext()
-    const [sale_state, sale_dispatch] = saleContext
+    const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
+    const [sale_state, sale_dispatch] = useSaleContext()
 
     const reload = () => {
         return window.location.reload()
@@ -50,10 +46,10 @@ const FinalizeSaleModal = () => {
         if (!responseOfAfip) {
             return (
                 errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')
-                .then(() => {
-                    sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-                    sale_dispatch({ type: 'LOADING_VIEW' })
-                })
+                    .then(() => {
+                        sale_dispatch({ type: 'SET_DATES', payload: new Date() })
+                        sale_dispatch({ type: 'LOADING_VIEW' })
+                    })
             )
         }
         else sale_dispatch({ type: 'CLOSE_FISCAL_OPERATION', payload: responseOfAfip })
@@ -69,13 +65,25 @@ const FinalizeSaleModal = () => {
         const processStock = async () => {
             try {
                 for (const product of sale_state.productos) {
-                    const lineOfProduct = sale_state.renglones.find(item => item._id === product._id)
-                    await api.productos.modifyStock(
-                        {
+                    const noCustomProduct = sale_state.renglones
+                        .filter(renglon => !(renglon._id.startsWith('customProduct_')))
+
+                    const lineOfProduct = (noCustomProduct.length === 0)
+                        ? null
+                        : noCustomProduct.find(renglon => renglon._id === product._id)
+
+                    const productToModifyInStock = (!lineOfProduct)
+                        ? null
+                        : {
                             product,
-                            [(lineOfProduct.fraccionar) ? 'fractionedQuantity' : 'quantity']: lineOfProduct.cantidadUnidades
+                            [
+                                lineOfProduct.fraccionar
+                                    ? 'fractionedQuantity'
+                                    : 'quantity'
+                            ]: lineOfProduct.cantidadUnidades
                         }
-                    )
+
+                    await api.productos.modifyStock(productToModifyInStock)
                 }
                 return true
             } catch (err) {

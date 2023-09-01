@@ -2,7 +2,7 @@
 import React from 'react'
 
 // Design Components
-import { Modal, Row, Col, Input, Select } from 'antd'
+import { Modal, Row, Col, InputNumber, Select } from 'antd'
 
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
@@ -23,7 +23,7 @@ const ProductSelectionModal = () => {
                 : 'SET_GLOBAL_DISCOUNT_PERCENT',
             payload: (!e)
                 ? 0
-                : parseFloat(e.target.value)
+                : e
         })
         sale_dispatch({ type: 'SET_TOTAL' })
     }
@@ -75,11 +75,12 @@ const ProductSelectionModal = () => {
                     </Select>
                 </Col>
                 <Col span={6}>
-                    <Input
+                    <InputNumber
                         color='primary'
-                        type='number'
+                        min={0}
+                        onChange={e => changePercentage(e)}
                         placeholder='Ingrese el porcentaje de modificación'
-                        onChange={(e) => changePercentage(e)}
+                        style={{width: '100%'}}
                         value={
                             sale_state.porcentajeRecargoGlobal > 0
                                 ? sale_state.porcentajeRecargoGlobal
