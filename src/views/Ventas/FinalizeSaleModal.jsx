@@ -100,6 +100,10 @@ const FinalizeSaleModal = () => {
                 delete renglon._id
                 return renglon
             })
+            
+            sale_state.productos = sale_state.productos
+                .filter(product => !(product._id.startsWith('customProduct_')))
+
             const result = await api.ventas.save(sale_state)
             return { isSaved: (result.code === 200) }
         } catch (err) {

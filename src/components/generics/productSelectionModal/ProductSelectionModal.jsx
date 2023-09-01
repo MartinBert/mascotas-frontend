@@ -52,7 +52,8 @@ const ProductSelectionModal = () => {
                     onChange={(e) => {
                         if(productSelectionModal_state.selectionLimit <= 1) productSelectionModal_dispatch({type: 'DELETE_ALL_PRODUCTS'})
                         product.selected = e.target.checked
-                        productSelectionModal_dispatch({type: (e.target.checked) ? 'SET_PRODUCT' : 'DELETE_PRODUCT', payload: product})
+                        if(e.target.checked) productSelectionModal_dispatch({ type: 'SET_PRODUCT', payload: product })
+                        else productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: product._id })
                     }}
                 />
             )

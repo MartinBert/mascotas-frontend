@@ -7,9 +7,6 @@ import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd'
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
 
-// Services
-import api from '../../services'
-
 // Imports Destructuring
 const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
 const { useSaleContext } = contextProviders.SaleContextProvider
@@ -27,14 +24,9 @@ const CustomLineModal = () => {
     const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
     const [sale_state] = useSaleContext()
     const [product, setProduct] = useState(initialLineState())
-    const [productProps, setProductProps] = useState(null)
 
     const addLine = () => {
-        const productToSet = {
-            ...product,
-            ...productProps
-        }
-        productSelectionModal_dispatch({ type: 'SET_CUSTOM_PRODUCT', payload: productToSet })
+        productSelectionModal_dispatch({ type: 'SET_CUSTOM_PRODUCT', payload: product })
         productSelectionModal_dispatch({ type: 'HIDE_CUSTOM_PRODUCT_MODAL' })
     }
 
@@ -83,24 +75,6 @@ const CustomLineModal = () => {
             setProduct(nextProduct)
         }
         updateProductId()
-    }, [
-        productSelectionModal_state.selectedCustomProducts.length,
-        sale_state.renglonesPersonalizados.length
-    ])
-
-    useEffect(() => {
-        const getProductProps = async () => {
-            const brand = await api.marcas.findById('64f149596afc353ad1054939')
-            const productLine = await api.rubros.findById('64f149636afc353ad1054960')
-            const unitOfMeasure = await api.unidadesmedida.findById('64f149716afc353ad1054987')
-            const props = {
-                brand,
-                productLine,
-                unitOfMeasure
-            }
-            setProductProps(props)
-        }
-        getProductProps()
     }, [
         productSelectionModal_state.selectedCustomProducts.length,
         sale_state.renglonesPersonalizados.length

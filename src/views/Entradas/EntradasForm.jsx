@@ -329,7 +329,7 @@ const EntradasForm = () => {
                                         </button>
                                         <button
                                             className='btn-secondary'
-                                            onClick={() => { redirectToEntradas() }}
+                                            onClick={() => redirectToEntradas()}
                                         >
                                             Cancelar
                                         </button>
