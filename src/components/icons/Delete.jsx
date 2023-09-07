@@ -1,14 +1,14 @@
-import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import React from 'react'
+import { FaTrash } from 'react-icons/fa'
 
 const Delete = () => {
     return (
         <FaTrash
-            title='Eliminar'
-            style={{cursor: 'pointer'}}
             color='#ff4d4f'
+            style={{ cursor: 'pointer', fontSize: '20px' }}
+            title='Eliminar'
         />
     )
 }
 
-export default Delete;
+export default Delete

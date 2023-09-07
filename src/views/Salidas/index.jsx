@@ -88,10 +88,13 @@ const Salidas = () => {
         {
             title: 'Productos que salieron',
             render: data => (
-                <div onClick={() => {
-                    setDetailsData(data.productos)
-                    setDetailsVisible(true)
-                }}>
+                <div
+                    onClick={() => {
+                        setDetailsData(data.productos)
+                        setDetailsVisible(true)
+                    }}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                >
                     <Details />
                 </div>
             )
@@ -113,14 +116,22 @@ const Salidas = () => {
         {
             title: 'Acciones',
             render: (salida) => (
-                <Row style={{ display: 'inline-flex' }}>
-                    <div onClick={() => { editSalida(salida._id) }}>
+                <Row
+                    style={{ display: 'flex', justifyContent: 'start' }}
+                >
+                    <div
+                        onClick={() => editSalida(salida._id)}
+                        style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
+                    >
                         <Edit />
                     </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(salida._id)
-                        setDeleteVisible(true)
-                    }}>
+                    <div
+                        onClick={() => {
+                            setDeleteEntityIdConfirmation(salida._id)
+                            setDeleteVisible(true)
+                        }}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
                         <Delete />
                     </div>
                 </Row>
@@ -148,8 +159,8 @@ const Salidas = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
-                        onShowSizeChange: (e, val) => { setLimit(val) }
+                        onChange: (e) => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
                     }}
                     loading={loading}
                     rowKey='_id'

@@ -79,15 +79,30 @@ const voucherTemplate = (saleData, qrImage) => {
                                 <div style='width: 12%;'>${roundTwoDecimals(renglon.recargo)}</div>
                                 <div style='width: 10%; text-align: right;'>${roundTwoDecimals(renglon.precioNeto)}</div>
                             </div>
-                            <div style='margin-top: 5px; width: 100%; font-size: 14px;'>
-                                <div style='margin-left: 12%; width: 88%;'>
-                                    <i>${renglon.nota}</i>
-                                </div>
-                            </div>
+                            ${ renglon.nota === (null || '')
+                                ? ''
+                                : (
+                                    `<div style='margin-top: 5px; width: 100%; font-size: 14px;'>
+                                        <div style='margin-left: 12%; width: 88%;'>
+                                            <i>${renglon.nota}</i>
+                                        </div>
+                                    </div>`
+                                )
+                            }
                         </div>
                     `
                 )
-            }).join('<br />')}
+            })
+            .concat( `<div style='width: 100%; display: flex; font-size: 16px;'>
+                <div style='width: 12%;'>1</div>
+                <div style='width: 34%;'>Redondeo a múltiplo de 10</div>
+                <div style='width: 10%;'>${saleData.totalDiferencia}</div>
+                <div style='width: 10%;'>${saleData.totalDiferencia}</div>
+                <div style='width: 12%;'>0</div>
+                <div style='width: 12%;'>0</div>
+                <div style='width: 10%; text-align: right;'>${saleData.totalDiferencia}</div>
+                </div>` )
+            .join('<br />')}
         </div>
         <div style='width: 100%; height: 215px; bottom: 0px; display: inline-block;'>
             <div style='width: 100%; color: #C2BDBC;'>
@@ -106,7 +121,7 @@ const voucherTemplate = (saleData, qrImage) => {
                 ${(saleData.iva21) ? `<p>Total IVA: $${saleData.importeIva}</p>` : ''}
                 </div>
                 <div style='width: 40%; text-align: right;'>
-                    <p><h2>Total: $${saleData.total}</h2></p>
+                    <p><h2>Total: $${saleData.totalRedondeado}</h2></p>
                 </div>
             </div>
             <div style='width: 100%; margin-top: 20px'>
@@ -167,14 +182,26 @@ const ticketTemplate = (saleData) => {
         <div style='width: 100%; height: 733px; display: inline-block;'>
             <div>
                 ${ saleData.renglones.map(renglon => {
-                    return `<div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                        <div style='width: 20%;'>${renglon.fraccionar
-                            ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                            : roundTwoDecimals(renglon.cantidadUnidades)}
+                    return `
+                        <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                            <div style='width: 20%;'>${renglon.fraccionar
+                                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                                : roundTwoDecimals(renglon.cantidadUnidades)}
+                            </div>
+                            <div style='width: 60%;'>${renglon.nombre}</div>
+                            <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
                         </div>
-                        <div style='width: 60%;'>${renglon.nombre}</div>
-                        <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
-                    </div>`
+                        ${ renglon.nota === (null || '')
+                                ? ''
+                                : (
+                                    `<div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                                        <div style='margin-left: 20%; width: 80%;'>
+                                            <i>${renglon.nota}</i>
+                                        </div>
+                                    </div>`
+                                )
+                            }
+                    `
                 }).join('<br />')}
             </div>
             <div style='width: 100%; display: inline-block;'>
@@ -182,7 +209,7 @@ const ticketTemplate = (saleData) => {
                 ${ (saleData.totalRecargo)
                     ? `
                         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                            <div style='width: 20%;'></div>
+                            <div style='width: 20%;'>1</div>
                             <div style='width: 60%;'>Recargo aplicado</div>
                             <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalRecargo)}</div>
                         </div>
@@ -193,9 +220,20 @@ const ticketTemplate = (saleData) => {
                 ${ (saleData.totalDescuento)
                     ? `
                         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                            <div style='width: 20%;'></div>
+                            <div style='width: 20%;'>1</div>
                             <div style='width: 60%;'>Descuento aplicado</div>
                             <div style='width: 20%; text-align: right; padding-right: 5px;'>- ${roundTwoDecimals(saleData.totalDescuento)}</div>
+                        </div>
+                    `
+                    : ''
+                }
+                <br />
+                ${ (saleData.totalDiferencia)
+                    ? `
+                        <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                            <div style='width: 20%;'>1</div>
+                            <div style='width: 60%;'>Redondeo</div>
+                            <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalDiferencia)}</div>
                         </div>
                     `
                     : ''
@@ -208,7 +246,7 @@ const ticketTemplate = (saleData) => {
             </div>
             <div style='width: 100%; padding: 10px;'>
                 <div style='width: 100%; text-align: right; font-size: 20px;'>
-                    <p>Total: $${saleData.total}</p>
+                    <p>Total: $${saleData.totalRedondeado}</p>
                 </div>
             </div>
         </div>

@@ -9,9 +9,13 @@ import icons from '../../components/icons'
 
 // Design Components
 import { Row, Col, Form, Input, Spin, DatePicker } from 'antd'
+import dayjs from 'dayjs'
 
 // Context Providers
 import contextProviders from '../../contextProviders'
+
+// Helpers
+import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
@@ -19,18 +23,19 @@ import api from '../../services'
 // Imports Destructuring
 const { Add, Delete } = icons
 const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useProductEntriesContext } = contextProviders.ProductEntries
 const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { localFormat } = helpers.dateHelper
 
 
 const EntradasForm = () => {
 
     //------------------------------------------------------ State declarations ------------------------------------------------------/
     const navigate = useNavigate()
-    const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
-    const productSelectionModalContext = useProductSelectionModalContext()
-    const [productSelectionModal_state, productSelectionModal_dispatch] = productSelectionModalContext
     const { id } = useParams()
+    const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
+    const [productEntries_state, productEntries_dispatch] = useProductEntriesContext()
+    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
     const [total, setTotal] = useState(0)
     const [loading, setLoading] = useState(true)
     const [entradaIsReady, setEntradaIsReady] = useState(false)
@@ -83,13 +88,10 @@ const EntradasForm = () => {
 
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
-        setEntrada({
-            ...entrada,
-            productos: productSelectionModal_state.selectedProducts
-        })
-    },
-        //eslint-disable-next-line
-        [productSelectionModal_state.selectedProducts])
+        setEntrada(entrada => ({
+            ...entrada, productos: productEntries_state.products
+        }))
+    }, [productEntries_state.products])
 
     useEffect(() => {
         setTotal(
@@ -153,6 +155,7 @@ const EntradasForm = () => {
                     .then((response) => {
                         if (response.code === 200) {
                             successAlert('El registro se guardó correctamente')
+                            productEntries_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
                             redirectToEntradas()
                         } else {
                             errorAlert('Fallo al guardar el registro')
@@ -163,11 +166,27 @@ const EntradasForm = () => {
             console.error(err)
         }
     }
+
     const redirectToEntradas = () => {
         navigate('/entradas')
     }
     //------------------------------------------------------------------------------------------------------------------------------/
 
+    const openModal = () => {
+        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
+    }
+
+    const deleteProductFromEntry = (productID) => {
+        productEntries_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
+    }
+
+    const changeDate = (e) => {
+        const newDate = (!e) ? new Date() : new Date(e.$d)
+        setEntrada({
+            ...entrada,
+            fecha: newDate
+        })
+    }
 
     return (
         <Row>
@@ -203,13 +222,9 @@ const EntradasForm = () => {
                                 >
                                     <DatePicker
                                         name='fecha'
-                                        locale='es-es'
-                                        onChange={(e) => {
-                                            setEntrada({
-                                                ...entrada,
-                                                fecha: new Date(e.$d)
-                                            })
-                                        }}
+                                        format={['DD/MM/YYYY']}
+                                        onChange={e => changeDate(e)}
+                                        value={dayjs(localFormat(entrada.fecha), ['DD/MM/YYYY'])}
                                     />
                                 </Form.Item>
                             </Col>
@@ -226,7 +241,7 @@ const EntradasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' }) }}>
+                                <div onClick={() => openModal()}>
                                     <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>
@@ -282,7 +297,12 @@ const EntradasForm = () => {
                                             </Col>
                                             <Col span={6}>
                                                 <Form.Item
-                                                    required
+                                                    rules={[
+                                                        {
+                                                            message: '¡Debes especificar la cantidad!',
+                                                            required: true
+                                                        }
+                                                    ]}
                                                 >
                                                     <Input
                                                         name='quantity'
@@ -304,11 +324,7 @@ const EntradasForm = () => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={4}>
-                                                <div onClick={
-                                                    () => {
-                                                        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: productSelectionModal_state.selectedProducts.find(product => product._id === item._id) })
-                                                    }
-                                                }>
+                                                <div onClick={() => deleteProductFromEntry(item._id)}>
                                                     <Delete />
                                                 </div>
                                             </Col>

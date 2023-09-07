@@ -84,10 +84,13 @@ const Entradas = () => {
         {
             title: 'Productos que entraron',
             render: data => (
-                <div onClick={() => {
-                    setDetailsData(data.productos)
-                    setDetailsVisible(true)
-                }}>
+                <div
+                    onClick={() => {
+                        setDetailsData(data.productos)
+                        setDetailsVisible(true)
+                    }}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                >
                     <Details />
                 </div>
             )
@@ -109,14 +112,22 @@ const Entradas = () => {
         {
             title: 'Acciones',
             render: (entrada) => (
-                <Row style={{ display: 'inline-flex' }}>
-                    <div onClick={() => { editEntrada(entrada._id) }}>
+                <Row
+                    style={{ display: 'flex', justifyContent: 'start' }}
+                >
+                    <div
+                        onClick={() => editEntrada(entrada._id)}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
                         <Edit />
                     </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(entrada._id)
-                        setDeleteVisible(true)
-                    }}>
+                    <div
+                        onClick={() => {
+                            setDeleteEntityIdConfirmation(entrada._id)
+                            setDeleteVisible(true)
+                        }}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
                         <Delete />
                     </div>
                 </Row>
@@ -144,8 +155,8 @@ const Entradas = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
-                        onShowSizeChange: (e, val) => { setLimit(val) }
+                        onChange: (e) => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
                     }}
                     loading={loading}
                     rowKey='_id'

@@ -95,7 +95,11 @@ const Header = ({ setFilters, setPage, entradas_paginadas, entradas_totales }) =
         <Row gutter={8}>
             <Col span={4}>
                 <Link to='/entradas/nuevo'>
-                    <button className='btn-primary'>Nueva entrada</button>
+                    <button
+                        className='btn-primary'
+                    >
+                        Nueva entrada
+                    </button>
                 </Link>
             </Col>
             <Col span={4}>

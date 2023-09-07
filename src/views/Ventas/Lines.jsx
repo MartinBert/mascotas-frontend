@@ -14,19 +14,18 @@ import contextProviders from '../../contextProviders'
 import helpers from '../../helpers'
 
 // Imports Destructurings
-const { Delete } = icons
 const { useSaleContext } = contextProviders.SaleContextProvider
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { useSaleProductsContext } = contextProviders.SaleProducts
 const { round, roundTwoDecimals } = helpers.mathHelper
+const { Delete } = icons
 
 
 const Lines = () => {
-    const saleContext = useSaleContext()
-    const [sale_state, sale_dispatch] = saleContext
-    const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
+    const [sale_state, sale_dispatch] = useSaleContext()
+    const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
 
-    const deleteProduct = (productId) => {
-        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: productId })
+    const deleteProduct = (productID) => {
+        saleProducts_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
     }
 
     const columns = [
@@ -36,6 +35,7 @@ const Lines = () => {
             render: (product) => (
                 <Checkbox
                     checked={product.fraccionar === true ? true : false}
+                    disabled={product._id.startsWith('customProduct_')}
                     onChange={e => {
                         product.fraccionar = e.target.checked
                         sale_dispatch({ type: 'SET_FRACTIONED', payload: product })
@@ -211,7 +211,8 @@ const Lines = () => {
             key: 'columna_quitar',
             title: 'Quitar',
             render: (product) => (
-                <Col align='middle'
+                <Col
+                    align='middle'
                     onClick={() => deleteProduct(product._id)}
                 >
                     <Delete />
@@ -221,15 +222,10 @@ const Lines = () => {
     ]
 
     useEffect(() => {
-        sale_dispatch({ type: 'SET_LINES', payload: productSelectionModal_state.selectedProducts })
-        sale_dispatch({ type: 'SET_PRODUCTS', payload: productSelectionModal_state.selectedProducts })
+        sale_dispatch({ type: 'SET_LINES', payload: saleProducts_state.products })
+        sale_dispatch({ type: 'SET_PRODUCTS', payload: saleProducts_state.products })
         sale_dispatch({ type: 'SET_TOTAL' })
-    },
-        //eslint-disable-next-line
-        [
-            productSelectionModal_state.selectedProducts
-        ]
-    )
+    }, [sale_dispatch, saleProducts_state.products])
 
     const setNote = (value, lineID) => {
         sale_dispatch({

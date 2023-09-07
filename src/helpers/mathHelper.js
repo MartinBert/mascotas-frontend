@@ -12,8 +12,8 @@ const decimalPercent = (value) => {
 
 const roundToMultiple = (value, multipleOf) => {
     const rest = value % multipleOf
-    const roundingParameter = multipleOf / 2
-    const roundedValue = (rest >= roundingParameter)
+    const roundingReference = multipleOf / 2
+    const roundedValue = (rest >= roundingReference)
         ? value + multipleOf - rest
         : value - rest
     return roundedValue

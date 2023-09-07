@@ -1,10 +1,12 @@
-import React from 'react';
-import { FaCheck } from 'react-icons/fa';
+import React from 'react'
+import { FaCheck } from 'react-icons/fa'
 
 const Check = () => {
     return (
-        <FaCheck/>
+        <FaCheck
+            style={{ fontSize: '20px' }}
+        />
     )
 }
 
-export default Check;
+export default Check

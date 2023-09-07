@@ -8,46 +8,40 @@ import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd'
 import contextProviders from '../../contextProviders'
 
 // Imports Destructuring
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
-const { useSaleContext } = contextProviders.SaleContextProvider
+const { useCustomProductsContext } = contextProviders.CustomProducts
+const { useSaleProductsContext } = contextProviders.SaleProducts
 
-const initialLineState = (index = 0) => {
-    return {
-        _id: 'customProduct_' + (1 + index),
-        concept: '',
-        percentageIVA: 21,
-        unitPrice: 0
-    }
+const initialProductState = {
+    _id: '',
+    concept: '',
+    percentageIVA: 21,
+    unitPrice: 0
 }
 
 const CustomLineModal = () => {
-    const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
-    const [sale_state] = useSaleContext()
-    const [product, setProduct] = useState(initialLineState())
+    const [customProducts_state, customProducts_dispatch] = useCustomProductsContext()
+    const [saleProducts_state] = useSaleProductsContext()
+    const [quantityOf_notSaved_customProducts, setNotSavedQuantity] = useState(0)
+    const [quantityOf_saved_customProducts, setSavedQuantity] = useState(0)
+    const [productID, setProductID] = useState(0)
+    const [product, setProduct] = useState(initialProductState)
 
     const addLine = () => {
-        productSelectionModal_dispatch({ type: 'SET_CUSTOM_PRODUCT', payload: product })
-        productSelectionModal_dispatch({ type: 'HIDE_CUSTOM_PRODUCT_MODAL' })
+        customProducts_dispatch({ type: 'SET_CUSTOM_PRODUCT', payload: product })
+        customProducts_dispatch({ type: 'HIDE_CUSTOM_PRODUCT_MODAL' })
     }
 
     const cancelAndCloseModal = () => {
-        setProduct(initialLineState())
-        productSelectionModal_dispatch({ type: 'HIDE_CUSTOM_PRODUCT_MODAL' })
+        customProducts_dispatch({ type: 'HIDE_CUSTOM_PRODUCT_MODAL' })
     }
 
     const clearLineState = () => {
-        setProduct(initialLineState(
-            productSelectionModal_state.selectedCustomProducts.length
-                + (sale_state.renglonesPersonalizados.length === 0)
-                ? 0
-                : sale_state.renglonesPersonalizados.length
-                + 1
-        ))
+        setProduct({...initialProductState, id: productID})
     }
 
     const setLineValue = async (e) => {
         const target = e.target.id
-        const value = (typeof initialLineState()[e.target.id] === 'number')
+        const value = (typeof initialProductState[e.target.id] === 'number')
             ? parseFloat(e.target.value)
             : e.target.value
 
@@ -58,34 +52,49 @@ const CustomLineModal = () => {
         setProduct(updatedLine)
     }
 
+    // Set quantity of custom products not saved
     useEffect(() => {
-        const updateProductId = () => {
-            const savedCustomProductsQuantity = productSelectionModal_state.selectedProducts.reduce(
+        const updateQuantityOf_notSaved_customProducts = () => {
+            setNotSavedQuantity(customProducts_state.customSaleProducts.length)
+        }
+        updateQuantityOf_notSaved_customProducts()
+    }, [customProducts_state.customSaleProducts.length])
+
+    // Set quantity of custom products saved
+    useEffect(() => {
+        const updateQuantityOf_saved_customProducts = () => {
+            const quantity = saleProducts_state.products.reduce(
                 (acc, el) => acc + ((el._id).startsWith('customProduct_') ? 1 : 0), 0
             )
-
-            const nextProduct = {
-                ...product,
-                _id: 'customProduct_' + (
-                    productSelectionModal_state.selectedCustomProducts.length
-                    + savedCustomProductsQuantity
-                    + 1
-                )
-            }
-            setProduct(nextProduct)
+            setSavedQuantity(quantity)
         }
-        updateProductId()
-    }, [
-        productSelectionModal_state.selectedCustomProducts.length,
-        sale_state.renglonesPersonalizados.length
-    ])
+        updateQuantityOf_saved_customProducts()
+    }, [saleProducts_state.products])
+
+    // Set index of following custom product
+    useEffect(() => {
+        setProductID(
+            'customProduct_' + (
+                quantityOf_notSaved_customProducts
+                + quantityOf_saved_customProducts
+                + 1
+            ))
+    }, [quantityOf_notSaved_customProducts, quantityOf_saved_customProducts])
+
+    // Set ID of following custom product
+    useEffect(() => {
+        setProduct(product => ({
+            ...product,
+            _id: productID
+        }))
+    }, [productID])
 
     return (
         <Modal
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={productSelectionModal_state.customProductModalIsVisible}
+            open={customProducts_state.customProductModalIsVisible}
             width={800}
         >
             <Form

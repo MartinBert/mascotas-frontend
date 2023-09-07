@@ -39,6 +39,14 @@ const VentasList = () => {
             setVentas(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)
+
+            const allVentas = await api.ventas.findAll()
+            for (let index = 0; index < allVentas.length; index++) {
+                const element = allVentas[index]
+                element.totalRedondeado = roundTwoDecimals(roundToMultiple(element.total, 10))
+                element.totalDiferencia = roundTwoDecimals(element.total - roundToMultiple(element.total, 10))
+                await api.ventas.edit(element)
+            }
         }
         fetchVentasList()
     }, [page, limit, filters, loading])
@@ -108,7 +116,7 @@ const VentasList = () => {
             render: (venta) => (
                 <Row>
                     <div onClick={() => {
-                        (venta.documentoFiscal)
+                        venta.documentoFiscal
                             ? createVoucherPdf(venta)
                             : createTicketPdf(venta)
                     }}

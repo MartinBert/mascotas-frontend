@@ -27,8 +27,7 @@ const { useSaleContext } = contextProviders.SaleContextProvider
 
 
 const Ventas = () => {
-    const saleContext = useSaleContext()
-    const [sale_state, sale_dispatch] = saleContext
+    const [sale_state, sale_dispatch] = useSaleContext()
 
     useEffect(() => {
         const fetchUser = async () => {

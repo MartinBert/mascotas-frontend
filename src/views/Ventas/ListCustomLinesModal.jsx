@@ -11,33 +11,38 @@ import { Button, Col, Modal, Row, Table } from 'antd'
 import contextProviders from '../../contextProviders'
 
 // Imports Destructurings
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { useCustomProductsContext } = contextProviders.CustomProducts
+const { useSaleProductsContext } = contextProviders.SaleProducts
 const { Delete } = icons
 
 
 const ListCustomLinesModal = () => {
-    const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
+    const [customProducts_state, customProducts_dispatch] = useCustomProductsContext()
+    const [, saleProducts_dispatch] = useSaleProductsContext()
 
     const cancelAndCloseModal = () => {
-        productSelectionModal_dispatch({ type: 'HIDE_LIST_OF_CUSTOM_PRODUCT_MODAL' })
+        customProducts_dispatch({ type: 'HIDE_LIST_OF_CUSTOM_PRODUCT_MODAL' })
     }
 
     const openCustomProductModal = () => {
-        productSelectionModal_dispatch({ type: 'SHOW_CUSTOM_PRODUCT_MODAL' })
+        customProducts_dispatch({ type: 'SHOW_CUSTOM_PRODUCT_MODAL' })
     }
 
     const removeAllCustomProducts = () => {
-        productSelectionModal_dispatch({ type: 'DELETE_ALL_CUSTOM_PRODUCTS' })
+        customProducts_dispatch({ type: 'DELETE_ALL_CUSTOM_PRODUCTS' })
     }
 
     const removeCustomProduct = (lineId) => {
-        productSelectionModal_dispatch({ type: 'DELETE_CUSTOM_PRODUCT', payload: lineId })
+        customProducts_dispatch({ type: 'DELETE_CUSTOM_PRODUCT', payload: lineId })
     }
 
     const saveProductsAndCloseModal = () => {
-        productSelectionModal_dispatch({ type: 'UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS' })
-        productSelectionModal_dispatch({ type: 'DELETE_ALL_CUSTOM_PRODUCTS' })
-        productSelectionModal_dispatch({ type: 'HIDE_LIST_OF_CUSTOM_PRODUCT_MODAL' })
+        saleProducts_dispatch({
+            type: 'UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS',
+            payload: customProducts_state.customSaleProducts
+        })
+        customProducts_dispatch({ type: 'DELETE_ALL_CUSTOM_PRODUCTS' })
+        customProducts_dispatch({ type: 'HIDE_LIST_OF_CUSTOM_PRODUCT_MODAL' })
     }
 
     const columns = [
@@ -55,7 +60,7 @@ const ListCustomLinesModal = () => {
             align: 'start',
             dataIndex: 'unitPrice',
             key: 'unitPrice',
-            render: (_, product) => product.precioUnitario,
+            render: (_, product) => product.precioVenta,
             title: 'Precio unitario'
         },
         {
@@ -85,7 +90,7 @@ const ListCustomLinesModal = () => {
 
     return (
         <Modal
-            open={productSelectionModal_state.listOfCustomProductModalIsVisible}
+            open={customProducts_state.listOfCustomProductModalIsVisible}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
@@ -93,7 +98,7 @@ const ListCustomLinesModal = () => {
         >
             <Table
                 columns={columns}
-                dataSource={productSelectionModal_state.selectedCustomProducts}
+                dataSource={customProducts_state.customSaleProducts}
             />
             <br />
             <Row justify='space-around'>

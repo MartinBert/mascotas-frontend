@@ -16,8 +16,10 @@ import contextProviders from '../../contextProviders'
 import helpers from '../../helpers'
 
 // Imports Destructurings
-const { useSaleContext } = contextProviders.SaleContextProvider
+const { useCustomProductsContext } = contextProviders.CustomProducts
 const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { useSaleContext } = contextProviders.SaleContextProvider
+const { useSaleProductsContext } = contextProviders.SaleProducts
 const { isItLater, localFormat } = helpers.dateHelper
 const { Option } = Select
 
@@ -113,12 +115,14 @@ const BillingPaymentMethods = () => {
 const BillingPaymentPlans = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
 
+    const setPaymentPlans = (e) => {
+        sale_dispatch({ type: 'SET_PAYMENT_PLANS', payload: [JSON.parse(e)] })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
     return (
         <Select
-            onChange={e => {
-                sale_dispatch({ type: 'SET_PAYMENT_PLANS', payload: [JSON.parse(e)] })
-                sale_dispatch({ type: 'SET_TOTAL' })
-            }}
+            onChange={e => setPaymentPlans(e)}
             style={{ width: '100%' }}
             placeholder='Plan de pago'
             value={sale_state.planesPagoNombres[0]}
@@ -142,7 +146,7 @@ const BillingPaymentPlans = () => {
 }
 
 const CleanFieldsButton = () => {
-    const [_, sale_dispatch] = useSaleContext()
+    const [, sale_dispatch] = useSaleContext()
 
     const cleanFields = () => {
         sale_dispatch({ type: 'SET_CLIENT', payload: null })
@@ -152,7 +156,7 @@ const CleanFieldsButton = () => {
         sale_dispatch({ type: 'SET_PAYMENT_PLANS', payload: null })
         sale_dispatch({ type: 'SET_TOTAL' })
     }
-    
+
     return (
         <button
             className='btn-primary'
@@ -164,14 +168,14 @@ const CleanFieldsButton = () => {
 }
 
 const CleanGlobalPercentageButton = () => {
-    const [_, sale_dispatch] = useSaleContext()
+    const [, sale_dispatch] = useSaleContext()
 
     const cleanGlobalPercentage = () => {
         sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_PERCENT', payload: 0 })
         sale_dispatch({ type: 'SET_GLOBAL_SURCHARGE_PERCENT', payload: 0 })
         sale_dispatch({ type: 'SET_TOTAL' })
     }
-    
+
     return (
         <button
             className='btn-primary'
@@ -183,10 +187,10 @@ const CleanGlobalPercentageButton = () => {
 }
 
 const CleanProductsButton = () => {
-    const [_, productSelectionModal_dispatch] = useProductSelectionModalContext()
+    const [, saleProducts_dispatch] = useSaleProductsContext()
 
     const cleanProducts = () => {
-        productSelectionModal_dispatch({ type: 'CLEAN_STATE' })
+        saleProducts_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
     }
 
     return (
@@ -200,10 +204,10 @@ const CleanProductsButton = () => {
 }
 
 const CustomProductListButton = () => {
-    const [_, productSelectionModal_dispatch] = useProductSelectionModalContext()
+    const [, customProducts_dispatch] = useCustomProductsContext()
 
     const openCustomProductList = () => {
-        productSelectionModal_dispatch({ type: 'SHOW_LIST_OF_CUSTOM_PRODUCT_MODAL' })
+        customProducts_dispatch({ type: 'SHOW_LIST_OF_CUSTOM_PRODUCT_MODAL' })
     }
 
     return (
@@ -217,11 +221,12 @@ const CustomProductListButton = () => {
 }
 
 const GlobalPercentageButton = () => {
-    const [_, sale_dispatch] = useSaleContext()
+    const [, sale_dispatch] = useSaleContext()
 
     const openGlobalPercentageModal = () => {
         sale_dispatch({ type: 'SHOW_DISCOUNT_SURCHARGE_MODAL' })
     }
+
     return (
         <button
             className='btn-primary'
@@ -233,7 +238,7 @@ const GlobalPercentageButton = () => {
 }
 
 const ProductListButton = () => {
-    const [_, productSelectionModal_dispatch] = useProductSelectionModalContext()
+    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
     const openProductList = () => {
         productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })

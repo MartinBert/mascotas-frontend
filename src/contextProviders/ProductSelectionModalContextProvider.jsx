@@ -1,24 +1,20 @@
-import { createContext, useReducer, useContext, useEffect } from 'react'
+import { createContext, useReducer, useContext } from 'react'
 import reducers from '../reducers'
-// import api from '../services'
 
-const createProductSelectionModalContext = createContext()
-const { initialState, reducer } = reducers.productSelectionModalReducer
+const CreateProductSelectionModalContext = createContext()
+const { initialState, reducer } = reducers.productSelectionModal
 
 const useProductSelectionModalContext = () => {
-    return useContext(createProductSelectionModalContext)
+    return useContext(CreateProductSelectionModalContext)
 }
 
 const ProductSelectionModalContext = ({ children }) => {
     const [product_state, product_dispatch] = useReducer(reducer, initialState)
-    useEffect(() => {
-        // console.log(product_state)
-    }, [product_state])
 
     return (
-        <createProductSelectionModalContext.Provider value={[product_state, product_dispatch]}>
+        <CreateProductSelectionModalContext.Provider value={[product_state, product_dispatch]}>
             {children}
-        </createProductSelectionModalContext.Provider>
+        </CreateProductSelectionModalContext.Provider>
     )
 }
 

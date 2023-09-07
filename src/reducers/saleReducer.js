@@ -1,6 +1,6 @@
 import helpers from '../helpers'
 
-const { decimalPercent, roundTwoDecimals, previousInteger } = helpers.mathHelper
+const { decimalPercent, previousInteger, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { simpleDateWithHours } = helpers.dateHelper
 const { completeLengthWithZero } = helpers.stringHelper
 
@@ -58,7 +58,6 @@ const initialState = {
     puntoVentaNumero: null,
     puntoVentaNombre: null,
     renglones: [],
-    renglonesPersonalizados: [],
     subTotal: 0,
     total: 0,
     totalDescuento: 0,
@@ -423,9 +422,8 @@ const reducer = (state = initialState, action) => {
         case actions.SET_LINE_NOTE:
             return {
                 ...state,
-                renglones: state.renglones.map((line) => {
-                    if (line._id === action.payload.lineID)
-                        line.nota = action.payload.note
+                renglones: state.renglones.map(line => {
+                    if (line._id === action.payload.lineID) line.nota = action.payload.note
                     return line
                 })
             }
@@ -492,11 +490,9 @@ const reducer = (state = initialState, action) => {
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
                     const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                    if (line._id === action.payload._id) {
-                        line.fraccionar = action.payload.fraccionar
-                        if (line.fraccionar === false) line.cantidadUnidades = 1
-                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
-                    }
+                    if (line._id === action.payload._id) line.fraccionar = action.payload.fraccionar
+                    if (action.payload.fraccionar === false) line.cantidadUnidades = 1
+                    updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     return line
                 })
             }
@@ -694,6 +690,8 @@ const reducer = (state = initialState, action) => {
             const iva27 = roundTwoDecimals(iva27Total - baseImponible27)
             const importeIva = roundTwoDecimals(iva21 + iva10 + iva27)
             const total = roundTwoDecimals(totalLinesSum)
+            const totalRedondeado = roundTwoDecimals(roundToMultiple(total, 10))
+            const totalDiferencia = roundTwoDecimals(totalRedondeado - total)
             const subTotal = roundTwoDecimals(total - importeIva)
 
             return {
@@ -709,6 +707,8 @@ const reducer = (state = initialState, action) => {
                 importeIva,
                 subTotal,
                 total,
+                totalDiferencia,
+                totalRedondeado
             }
         default:
             return state

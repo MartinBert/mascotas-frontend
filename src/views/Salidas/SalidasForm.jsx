@@ -9,9 +9,13 @@ import icons from '../../components/icons'
 
 // Design Components
 import { Row, Col, Form, Input, Spin, DatePicker } from 'antd'
+import dayjs from 'dayjs'
 
 // Custom Context Providers
 import contextProviders from '../../contextProviders'
+
+// Helpers
+import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
@@ -19,7 +23,9 @@ import api from '../../services'
 // Imports Destructuring
 const { Add, Delete } = icons
 const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useProductOutputsContext } = contextProviders.ProductOutputs
 const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { localFormat } = helpers.dateHelper
 
 
 const SalidasForm = () => {
@@ -27,10 +33,10 @@ const SalidasForm = () => {
     //------------------------------------------------------ State declarations ------------------------------------------------------/
     const navigate = useNavigate()
     const { id } = useParams()
-    const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state] = loggedUserContext
-    const productSelectionModalContext = useProductSelectionModalContext()
-    const [productSelectionModal_state, productSelectionModal_dispatch] = productSelectionModalContext
+    const [loggedUser_state] = useLoggedUserContext()
+    const [productOutputs_state, productOutputs_dispatch] = useProductOutputsContext()
+    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
+
     const [salidaIsReady, setSalidaIsReady] = useState(false)
     const [total, setTotal] = useState(0)
     const [loading, setLoading] = useState(true)
@@ -74,13 +80,10 @@ const SalidasForm = () => {
 
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
-        setSalida({
-            ...salida,
-            productos: productSelectionModal_state.selectedProducts
-        })
-    },
-        //eslint-disable-next-line
-        [productSelectionModal_state.selectedProducts])
+        setSalida(salida => ({
+            ...salida, productos: productOutputs_state.products
+        }))
+    }, [productOutputs_state.products])
 
     useEffect(() => {
         setTotal(
@@ -144,6 +147,7 @@ const SalidasForm = () => {
                     .then((response) => {
                         if (response.code === 200) {
                             successAlert('El registro se guardó correctamente')
+                            productOutputs_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
                             redirectToSalidas()
                         } else {
                             errorAlert('Fallo al guardar el registro')
@@ -160,6 +164,21 @@ const SalidasForm = () => {
     }
     //------------------------------------------------------------------------------------------------------------------------------/
 
+    const openModal = () => {
+        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
+    }
+
+    const deleteProductFromOutput = (productID) => {
+        productOutputs_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
+    }
+
+    const changeDate = (e) => {
+        const newDate = (!e) ? new Date() : new Date(e.$d)
+        setSalida({
+            ...salida,
+            fecha: newDate
+        })
+    }
 
     return (
         <Row>
@@ -170,6 +189,7 @@ const SalidasForm = () => {
                     :
                     <Form
                         autoComplete='off'
+                    // onFinish={() => handleSubmit()}
                     >
                         <Row gutter={8}>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
@@ -195,13 +215,9 @@ const SalidasForm = () => {
                                 >
                                     <DatePicker
                                         name='fecha'
-                                        locale='es-es'
-                                        onChange={e => {
-                                            setSalida({
-                                                ...salida,
-                                                fecha: new Date(e.$d)
-                                            })
-                                        }}
+                                        format={['DD/MM/YYYY']}
+                                        onChange={e => changeDate(e)}
+                                        value={dayjs(localFormat(salida.fecha), ['DD/MM/YYYY'])}
                                     />
                                 </Form.Item>
                             </Col>
@@ -218,7 +234,7 @@ const SalidasForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div onClick={() => { productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' }) }}>
+                                <div onClick={() => openModal()}>
                                     <Add customStyle={{ width: '70px', height: '70px' }} />
                                 </div>
                             </Col>
@@ -274,7 +290,12 @@ const SalidasForm = () => {
                                             </Col>
                                             <Col span={4}>
                                                 <Form.Item
-                                                    required
+                                                    rules={[
+                                                        {
+                                                            message: '¡Debes especificar la cantidad!',
+                                                            required: true
+                                                        }
+                                                    ]}
                                                 >
                                                     <Input
                                                         name='quantity'
@@ -321,11 +342,7 @@ const SalidasForm = () => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={4}>
-                                                <div onClick={
-                                                    () => {
-                                                        productSelectionModal_dispatch({ type: 'DELETE_PRODUCT', payload: productSelectionModal_state.selectedProducts.find(product => product._id === item._id) })
-                                                    }
-                                                }>
+                                                <div onClick={() => deleteProductFromOutput(item._id)}>
                                                     <Delete />
                                                 </div>
                                             </Col>
@@ -336,21 +353,24 @@ const SalidasForm = () => {
                             </Col>
                             <Col span={24} align='start' style={{ display: 'flex' }}>
                                 <Row>
-                                    <Col span={12} style={{ display: 'flex' }}>
-                                        <button
-                                            className='btn-primary'
-                                            onClick={() => handleSubmit()}
-                                            style={{ marginRight: '15px' }}
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button
-                                            className='btn-secondary'
-                                            onClick={() => { redirectToSalidas() }}
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </Col>
+                                    <Form.Item>
+                                        <Col span={12} style={{ display: 'flex' }}>
+                                            <button
+                                                className='btn-primary'
+                                                onClick={() => handleSubmit()}
+                                                style={{ marginRight: '15px' }}
+                                            // type='submit'
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button
+                                                className='btn-secondary'
+                                                onClick={() => redirectToSalidas()}
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </Col>
+                                    </Form.Item>
                                 </Row>
                             </Col>
                         </Row>

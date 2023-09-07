@@ -11,10 +11,14 @@ import contextProviders from './contextProviders'
 import 'antd/dist/reset.css'
 
 // Imports Destructurings
+const { CustomProductsContext } = contextProviders.CustomProducts
 const { LoggedUserContext } = contextProviders.LoggedUserContextProvider
 const { PrivateRouteContext } = contextProviders.PrivateRouteContextProvider
+const { ProductEntriesContext } = contextProviders.ProductEntries
+const { ProductOutputsContext } = contextProviders.ProductOutputs
 const { ProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
 const { SaleContext } = contextProviders.SaleContextProvider
+const { SaleProductsContext } = contextProviders.SaleProducts
 
 
 function App() {
@@ -24,11 +28,19 @@ function App() {
             <LoggedUserContext>
                 <PrivateRouteContext>
                     <ProductSelectionModalContext>
-                        <SaleContext>
-                            <Router>
-                                <AppRouter />
-                            </Router>
-                        </SaleContext>
+                        <SaleProductsContext>
+                            <CustomProductsContext>
+                                <ProductEntriesContext>
+                                    <ProductOutputsContext>
+                                        <SaleContext>
+                                            <Router>
+                                                <AppRouter />
+                                            </Router>
+                                        </SaleContext>
+                                    </ProductOutputsContext>
+                                </ProductEntriesContext>
+                            </CustomProductsContext>
+                        </SaleProductsContext>
                     </ProductSelectionModalContext>
                 </PrivateRouteContext>
             </LoggedUserContext>

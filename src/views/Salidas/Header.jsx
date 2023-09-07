@@ -91,12 +91,16 @@ const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => 
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
-
+    
     return (
         <Row gutter={8}>
             <Col span={4}>
                 <Link to='/salidas/nuevo'>
-                    <button className='btn-primary'>Nueva salida</button>
+                    <button
+                        className='btn-primary'
+                    >
+                        Nueva salida
+                    </button>
                 </Link>
             </Col>
             <Col span={4}>
