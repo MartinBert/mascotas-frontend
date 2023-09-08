@@ -20,7 +20,7 @@ import PriceModificatorModal from './PriceModificatorModal'
 
 // Imports Destructuring
 const { exportSimpleExcel } = helpers.excel
-const { roundToMultiple } = helpers.mathHelper
+const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 
 
 const Header = ({ setFilters, filters, setLoading, detailsData }) => {
@@ -50,7 +50,7 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
         const salePricePerUnit = (fraccionamiento < 1000)
             ? precioVentaFraccionado / fraccionamiento
             : precioVentaFraccionado * 1000 / fraccionamiento
-        const salePricePerUnitFixed = roundToMultiple(salePricePerUnit)
+        const salePricePerUnitFixed = roundToMultiple(salePricePerUnit, 10)
         return salePricePerUnitFixed
     }
 
@@ -60,7 +60,8 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
         const saleProfitPerUnit = (fraccionamiento < 1000)
             ? gananciaNetaFraccionado / fraccionamiento
             : gananciaNetaFraccionado * 1000 / fraccionamiento
-        return saleProfitPerUnit
+        const saleProfitPerUnitFixed = roundTwoDecimals(saleProfitPerUnit)
+        return saleProfitPerUnitFixed
     }
 
     const exportExcel = async () => {
