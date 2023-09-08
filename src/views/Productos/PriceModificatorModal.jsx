@@ -89,7 +89,7 @@ const PriceModificatorModal = ({
                     limit: limitPerPage,
                     filters: JSON.stringify(filtersToParams),
                 }
-                const response = await api.productos.findAll(params)
+                const response = await api.productos.findFiltered(params)
                 setProducts(response.docs)
                 setTotalDocsInPage(response.totalDocs)
                 setProductsLoading(false)

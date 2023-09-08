@@ -20,8 +20,7 @@ import api from '../../services'
 
 // Imports Destructuring
 const { Spinner } = graphics
-const roundTwoDecimals = helper.mathHelper.roundTwoDecimals
-const decimalPercent = helper.mathHelper.decimalPercent
+const {decimalPercent, roundToMultiple, roundTwoDecimals} = helper.mathHelper
 
 
 const ProductosForm = () => {
@@ -93,25 +92,39 @@ const ProductosForm = () => {
     }, [loading, id])
 
     useEffect(() => {
-        const ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))))
-        const ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta))
-        const gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia))
-        const precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + ivaVenta + gananciaNeta)
-        const gananciaNetaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGananciaFraccionado))
-        const precioVentaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) + ivaVenta + gananciaNetaFraccionado)
+        const margenGanancia = decimalPercent(product.margenGanancia)
+        const margenGananciaFraccionado = decimalPercent(product.margenGananciaFraccionado)
+        const precioUnitario = parseFloat(product.precioUnitario)
+        const porcentajeIvaCompra = decimalPercent(product.porcentajeIvaCompra)
+        const porcentajeIvaVenta = decimalPercent(product.porcentajeIvaVenta)
+
+        const gananciaNeta = roundTwoDecimals(precioUnitario * margenGanancia)
+        const gananciaNetaFraccionado = roundTwoDecimals(precioUnitario * margenGananciaFraccionado)
+        const ivaCompra = roundTwoDecimals(precioUnitario - (precioUnitario / (1 + porcentajeIvaCompra)))
+        const ivaVenta = roundTwoDecimals(precioUnitario * porcentajeIvaVenta)
+        const precioVentaSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNeta)
+        const precioVenta = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNeta), 10)
+        const diferenciaPrecioVenta = precioVenta - precioVentaSinRedondear
+        const precioVentaFraccionadoSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado)
+        const precioVentaFraccionado = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado), 10)
+        const diferenciaPrecioVentaFraccionado = precioVentaFraccionado - precioVentaFraccionadoSinRedondear      
 
         setProduct({
             ...product,
             ivaCompra,
             ivaVenta,
-            gananciaNeta,
-            gananciaNetaFraccionado,
+            gananciaNeta: gananciaNeta + diferenciaPrecioVenta,
+            gananciaNetaFraccionado: gananciaNetaFraccionado + diferenciaPrecioVentaFraccionado,
             precioVenta,
             precioVentaFraccionado
         })
-    },
-        //eslint-disable-next-line
-        [product.precioUnitario, product.margenGanancia, product.margenGananciaFraccionado, product.porcentajeIvaCompra, product.porcentajeIvaVenta])
+    }, [
+        product.precioUnitario,
+        product.margenGanancia,
+        product.margenGananciaFraccionado,
+        product.porcentajeIvaCompra,
+        product.porcentajeIvaVenta
+    ])
 
     const setFormDataToProduct = async (e) => {
         setProduct({
@@ -559,7 +572,7 @@ const ProductosForm = () => {
                                 <Form.Item>
                                     <button
                                         className='btn-secondary'
-                                        onClick={() => { handleCancel() }}
+                                        onClick={() => handleCancel()}
                                         type='button'
                                     >
                                         Cancelar

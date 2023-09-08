@@ -16,7 +16,8 @@ const roundToMultiple = (value, multipleOf) => {
     const roundedValue = (rest >= roundingReference)
         ? value + multipleOf - rest
         : value - rest
-    return roundedValue
+    const roundedValueFixed = roundTwoDecimals(roundedValue)
+    return roundedValueFixed
 }
 
 const previousInteger = (value) => {

@@ -93,15 +93,15 @@ const voucherTemplate = (saleData, qrImage) => {
                     `
                 )
             })
-            .concat( `<div style='width: 100%; display: flex; font-size: 16px;'>
-                <div style='width: 12%;'>1</div>
-                <div style='width: 34%;'>Redondeo a múltiplo de 10</div>
-                <div style='width: 10%;'>${saleData.totalDiferencia}</div>
-                <div style='width: 10%;'>${saleData.totalDiferencia}</div>
-                <div style='width: 12%;'>0</div>
-                <div style='width: 12%;'>0</div>
-                <div style='width: 10%; text-align: right;'>${saleData.totalDiferencia}</div>
-                </div>` )
+            // .concat( `<div style='width: 100%; display: flex; font-size: 16px;'>
+            //     <div style='width: 12%;'>1</div>
+            //     <div style='width: 34%;'>Redondeo a múltiplo de 10</div>
+            //     <div style='width: 10%;'>${saleData.totalDiferencia}</div>
+            //     <div style='width: 10%;'>${saleData.totalDiferencia}</div>
+            //     <div style='width: 12%;'>0</div>
+            //     <div style='width: 12%;'>0</div>
+            //     <div style='width: 10%; text-align: right;'>${saleData.totalDiferencia}</div>
+            //     </div>` )
             .join('<br />')}
         </div>
         <div style='width: 100%; height: 215px; bottom: 0px; display: inline-block;'>
@@ -121,7 +121,7 @@ const voucherTemplate = (saleData, qrImage) => {
                 ${(saleData.iva21) ? `<p>Total IVA: $${saleData.importeIva}</p>` : ''}
                 </div>
                 <div style='width: 40%; text-align: right;'>
-                    <p><h2>Total: $${saleData.totalRedondeado}</h2></p>
+                    <p><h2>Total: $${saleData.total}</h2></p>
                 </div>
             </div>
             <div style='width: 100%; margin-top: 20px'>
@@ -228,15 +228,16 @@ const ticketTemplate = (saleData) => {
                     : ''
                 }
                 <br />
-                ${ (saleData.totalDiferencia)
-                    ? `
-                        <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                            <div style='width: 20%;'>1</div>
-                            <div style='width: 60%;'>Redondeo</div>
-                            <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalDiferencia)}</div>
-                        </div>
-                    `
-                    : ''
+                ${null
+                    // (saleData.totalDiferencia)
+                    //     ? `
+                    //         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                    //             <div style='width: 20%;'>1</div>
+                    //             <div style='width: 60%;'>Redondeo</div>
+                    //             <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalDiferencia)}</div>
+                    //         </div>
+                    //     `
+                    //     : ''
                 }
             </div>
         </div>

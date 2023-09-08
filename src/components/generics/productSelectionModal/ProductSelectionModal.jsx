@@ -47,7 +47,7 @@ const ProductSelectionModal = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.productos.findAll({ page, limit, filters: stringFilters })
+            const data = await api.productos.findFiltered({ page, limit, filters: stringFilters })
             setProductsForTable(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)
@@ -177,8 +177,9 @@ const ProductSelectionModal = () => {
                         </Col>
                         <Col span={6}>
                             <Button
-                                type='danger'
-                                onClick={() => { cleanFilters() }}
+                                danger
+                                onClick={() => cleanFilters()}
+                                type='primary'
                             >
                                 Limpiar filtros
                             </Button>

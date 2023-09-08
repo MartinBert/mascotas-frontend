@@ -9,7 +9,21 @@ const checkStorageStatus = (err) => {
 }
 
 
-const findAll = async(params) => {
+const findAll = async() => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    const page = 0
+    const limit = 1000000
+    const filters = null
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos?page=${page}&limit=${limit}&filters=${filters}`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findFiltered = async(params) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     const {page, limit, filters} = params
     try{
@@ -110,6 +124,7 @@ const modifyStock = async(body) => {
 
 const productos = {
     findAll,
+    findFiltered,
     findById,
     findMultipleIds,
     getByBarcode,

@@ -30,7 +30,7 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
     useEffect(() => { if (selectedHeading) { setFilters({ ...filters, rubro: selectedHeading }) } }, [selectedHeading, filters, setFilters])
     useEffect(() => {
         const findProductos = async () => {
-            const response = await api.productos.findAll({ page: 0, limit: 1000000, filters: null })
+            const response = await api.productos.findAll()
             setProductosToReport(response.docs)
         }
         findProductos()
