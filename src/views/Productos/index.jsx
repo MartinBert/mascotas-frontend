@@ -27,7 +27,7 @@ const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
 const Productos = () => {
     const navigate = useNavigate()
     const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
+    const [, loggedUser_dispatch] = loggedUserContext
     const [products, setProducts] = useState(null)
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
@@ -106,11 +106,11 @@ const Productos = () => {
         {
             title: 'Detalles',
             render: (product) => (
-                <div onClick={() => { seeDetails(product) }}>
+                <div onClick={() => seeDetails(product)}>
                     <Details title='Ver detalle' />
                 </div>
             ),
-            open: loggedUser_state.perfil
+            open: true
         },
         {
             title: 'Imagen',
@@ -129,14 +129,22 @@ const Productos = () => {
         {
             title: 'Acciones',
             render: (product) => (
-                <Row style={{ display: 'inline-flex' }}>
-                    <div onClick={() => { editProduct(product._id) }}>
+                <Row
+                    style={{ display: 'flex', justifyContent: 'start' }}
+                >
+                    <div
+                        onClick={() => editProduct(product._id)}
+                        style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
+                    >
                         <Edit />
                     </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(product._id)
-                        setDeleteVisible(true)
-                    }}>
+                    <div
+                        onClick={() => {
+                            setDeleteEntityIdConfirmation(product._id)
+                            setDeleteVisible(true)
+                        }}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
                         <Delete />
                     </div>
                 </Row>

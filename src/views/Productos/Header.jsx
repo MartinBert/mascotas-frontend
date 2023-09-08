@@ -135,7 +135,7 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
                         <Col>
                             <button
                                 className='btn-primary'
-                                onClick={() => { setPriceModalVisible(true) }}
+                                onClick={() => setPriceModalVisible(true)}
                             >
                                 Modificar precios
                             </button>
@@ -143,19 +143,20 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
                         <Col>
                             <button
                                 className='btn-primary'
-                                onClick={() => { exportExcel() }}
+                                onClick={() => exportExcel()}
                             >
                                 Exportar Excel
                             </button>
                         </Col>
                     </Row>
+                    <br />
                     <Row justify='space between' gutter={16}>
                         <Col span={6}>
                             <Input
                                 color='primary'
                                 style={{ width: 200, marginBottom: '10px' }}
                                 placeholder='Buscar por nombre'
-                                onChange={(e) => {
+                                onChange={e => {
                                     setFilters(
                                         {
                                             ...filters,
@@ -200,8 +201,9 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
                         </Col>
                         <Col span={6}>
                             <Button
-                                type='danger'
-                                onClick={() => { cleanFilters() }}
+                                danger
+                                onClick={() => cleanFilters()}
+                                type='primary'
                             >
                                 Limpiar filtros
                             </Button>

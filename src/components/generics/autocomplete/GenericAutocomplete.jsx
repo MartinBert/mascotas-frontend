@@ -55,14 +55,14 @@ const GenericAutocomplete = ({
     return (
         <Select
             id='generic_autocomplete'
-            mode={(multiple) ? 'tags' : null}
+            mode={multiple ? 'tags' : null}
             showSearch={true}
-            filterOption={(input) => options.map(option => option[keyToCompare].includes(input)[0])}
+            filterOption={input => options.map(option => option[keyToCompare].includes(input)[0])}
             labelInValue
             placeholder={label}
             loading={loading}
-            onSearch={(e) => handleSearch(e)}
-            onChange={(e) => returnResults(e)}
+            onSearch={e => handleSearch(e)}
+            onChange={e => returnResults(e)}
             style={{ width: '100%' }}
             value={
                 !selectedSearch
