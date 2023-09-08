@@ -2,7 +2,7 @@ import React from 'react'
 import { Modal, Table } from 'antd'
 import mathHelper from '../../../helpers/mathHelper'
 
-const { roundTwoDecimals } = mathHelper
+const { roundToMultiple } = mathHelper
 const margin0 = { margin: 0 }
 
 const GiselaDetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
@@ -12,17 +12,29 @@ const GiselaDetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) 
     const precioVentaFraccionado = detailsData.precioVentaFraccionado
     const fraccionamiento = detailsData.unidadMedida.fraccionamiento
     const salePricePerUnit = (fraccionamiento < 1000)
-            ? precioVentaFraccionado / fraccionamiento
-            : precioVentaFraccionado * 1000 / fraccionamiento
+        ? precioVentaFraccionado / fraccionamiento
+        : precioVentaFraccionado * 1000 / fraccionamiento
 
     const columnsTable = [
         { title: 'Característica', dataIndex: 'label', key: 'key', width: 190 },
         { title: 'Valor', dataIndex: 'value', key: 'key', width: 235 },
     ]
     const dataTable = [
-        { label: 'Nombre', value: <h3 style={margin0}>{nombre ? nombre : '-'}</h3>, key: 1 },
-        { label: 'Precio de venta total', value: <h3 style={margin0}>{precioVenta ? roundTwoDecimals(precioVenta) : '-'}</h3>, key: 2 },
-        { label: 'Precio de venta fraccionado en kg (o unidades)', value: <h3 style={margin0}>{precioVentaFraccionado && fraccionamiento !== 1 ? roundTwoDecimals(salePricePerUnit) : precioVenta}</h3>, key: 3 },
+        {
+            key: 1,
+            label: 'Nombre',
+            value: <h3 style={margin0}>{nombre ? nombre : '-'}</h3>,
+        },
+        {
+            key: 2,
+            label: 'Precio de venta total',
+            value: <h3 style={margin0}>{precioVenta ? precioVenta : '-'}</h3>,
+        },
+        {
+            key: 3,
+            label: 'Precio de venta fraccionado en kg (o unidades)',
+            value: <h3 style={margin0}>{precioVentaFraccionado && fraccionamiento !== 1 ? roundToMultiple(salePricePerUnit, 10) : precioVenta}</h3>,
+        },
     ]
 
     return (

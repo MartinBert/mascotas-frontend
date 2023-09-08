@@ -18,7 +18,7 @@ import api from '../../services'
 // Imports Destructuring
 const { Option } = Select
 const { Delete } = icons
-const { decimalPercent, roundTwoDecimals } = helper.mathHelper
+const { decimalPercent, roundToMultiple, roundTwoDecimals } = helper.mathHelper
 
 
 const PriceModificatorModal = ({
@@ -118,17 +118,36 @@ const PriceModificatorModal = ({
             return errorAlert(
                 'Debe seleccionar al menos 1 producto para modificar su precio...'
             )
+
         for (let product of addedProducts) {
-            product.precioUnitario =
+            const decimalIvaCompra = decimalPercent(parseFloat(product.porcentajeIvaCompra))
+            const decimalIvaVenta = decimalPercent(parseFloat(product.porcentajeIvaVenta))
+            const decimalMargenGanancia = decimalPercent(parseFloat(product.margenGanancia))
+            const decimalMargenGananciaFraccionado = decimalPercent(parseFloat(product.margenGananciaFraccionado))
+            const gananciaNeta = parseFloat(product.gananciaNeta)
+            const gananciaNetaFraccionado = parseFloat(product.gananciaNetaFraccionado)
+            const ivaVenta = parseFloat(product.ivaVenta)
+
+            const newPrecioUnitario =
                 selectedModificationType === '1'
                     ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
                     : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue))
-            product.ivaCompra = roundTwoDecimals(parseFloat(product.precioUnitario) - (parseFloat(product.precioUnitario) / (1 + decimalPercent(product.porcentajeIvaCompra))))
-            product.ivaVenta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.porcentajeIvaVenta))
-            product.gananciaNeta = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGanancia))
-            product.gananciaNetaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) * decimalPercent(product.margenGananciaFraccionado))
-            product.precioVenta = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNeta)
-            product.precioVentaFraccionado = roundTwoDecimals(parseFloat(product.precioUnitario) + product.ivaVenta + product.gananciaNetaFraccionado)
+            const newNananciaNeta = roundTwoDecimals(newPrecioUnitario * decimalMargenGanancia)
+            const newGananciaNetaFraccionado = roundTwoDecimals(newPrecioUnitario * decimalMargenGananciaFraccionado)
+            const newIvaCompra = roundTwoDecimals(newPrecioUnitario - (newPrecioUnitario / (1 + decimalIvaCompra)))
+            const newIvaVenta = roundTwoDecimals(newPrecioUnitario * decimalIvaVenta)
+            const newPrecioVentaSinRedondear = roundTwoDecimals(newPrecioUnitario + ivaVenta + gananciaNeta)
+            const newPrecioVenta = roundToMultiple(newPrecioVentaSinRedondear, 10)
+            const newPrecioVentaFraccionadoSinRedondear = roundTwoDecimals(newPrecioUnitario + ivaVenta + gananciaNetaFraccionado)
+            const newPrecioVentaFraccionado = roundToMultiple(newPrecioVentaFraccionadoSinRedondear, 10)
+
+            product.precioUnitario = newPrecioUnitario
+            product.ivaCompra = newIvaCompra
+            product.ivaVenta = newIvaVenta
+            product.gananciaNeta = newNananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear
+            product.gananciaNetaFraccionado = newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear
+            product.precioVenta = newPrecioVenta
+            product.precioVentaFraccionado = newPrecioVentaFraccionado
             api.productos.edit(product)
         }
         setPriceModalVisible(false)

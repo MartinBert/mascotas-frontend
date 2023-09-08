@@ -19,13 +19,9 @@ import api from '../../services'
 // Views
 import Header from './Header'
 
-// Helpers
-import helpers from '../../helpers'
-
 // Imports Destructuring
 const { Details, Edit, Delete } = icons
 const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 
 
 const Productos = () => {
@@ -60,38 +56,6 @@ const Productos = () => {
             setProducts(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)
-
-            const allProductsSearch = await api.productos.findAll()
-            const allProducts = allProductsSearch.docs
-            console.log(allProducts)
-            for (let index = 0; index < allProducts.length; index++) {
-                const element = allProducts[index]
-
-                const margenGanancia = decimalPercent(element.margenGanancia)
-                const margenGananciaFraccionado = decimalPercent(element.margenGananciaFraccionado)
-                const precioUnitario = parseFloat(element.precioUnitario)
-                const porcentajeIvaCompra = decimalPercent(element.porcentajeIvaCompra)
-                const porcentajeIvaVenta = decimalPercent(element.porcentajeIvaVenta)
-
-                const gananciaNeta = roundTwoDecimals(precioUnitario * margenGanancia)
-                const gananciaNetaFraccionado = roundTwoDecimals(precioUnitario * margenGananciaFraccionado)
-                const ivaCompra = roundTwoDecimals(precioUnitario - (precioUnitario / (1 + porcentajeIvaCompra)))
-                const ivaVenta = roundTwoDecimals(precioUnitario * porcentajeIvaVenta)
-                const precioVentaSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNeta)
-                const precioVenta = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNeta), 10)
-                const diferenciaPrecioVenta = precioVenta - precioVentaSinRedondear
-                const precioVentaFraccionadoSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado)
-                const precioVentaFraccionado = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado), 10)
-                const diferenciaPrecioVentaFraccionado = precioVentaFraccionado - precioVentaFraccionadoSinRedondear
-
-                    element.gananciaNeta = gananciaNeta + diferenciaPrecioVenta
-                    element.gananciaNetaFraccionado = gananciaNetaFraccionado + diferenciaPrecioVentaFraccionado
-                    element.ivaCompra = ivaCompra
-                    element.ivaVenta = ivaVenta
-                    element.precioVenta = precioVenta
-                    element.precioVentaFraccionado = precioVentaFraccionado
-                    await api.productos.edit(element)
-            }
         }
         fetchProducts()
     }, [page, limit, filters, loading, deleteEntityIdConfirmation])

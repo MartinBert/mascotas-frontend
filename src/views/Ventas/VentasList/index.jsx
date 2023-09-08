@@ -18,7 +18,6 @@ import Header from './Header'
 
 // Imports Destructuring
 const { PrintPdf } = icons
-const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 
@@ -40,14 +39,6 @@ const VentasList = () => {
             setVentas(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)
-
-            // const allVentas = await api.ventas.findAll()
-            // for (let index = 0; index < allVentas.length; index++) {
-            //     const element = allVentas[index]
-            //     element.totalRedondeado = roundTwoDecimals(roundToMultiple(element.total, 10))
-            //     element.totalDiferencia = roundTwoDecimals(element.total - roundToMultiple(element.total, 10))
-            //     await api.ventas.edit(element)
-            // }
         }
         fetchVentasList()
     }, [page, limit, filters, loading])
