@@ -52,7 +52,8 @@ const Productos = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.productos.findAll({ page, limit, filters: stringFilters })
+            const data = await api.productos.findFiltered({ page, limit, filters: stringFilters })
+            console.log(data.docs)
             setProducts(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)

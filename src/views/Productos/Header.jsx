@@ -17,7 +17,6 @@ import api from '../../services'
 // Views
 import PriceModificatorModal from './PriceModificatorModal'
 
-
 // Imports Destructuring
 const { exportSimpleExcel } = helpers.excel
 const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
