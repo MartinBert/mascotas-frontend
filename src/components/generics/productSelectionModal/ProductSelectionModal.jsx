@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom'
 import { GenericAutocomplete } from '../'
 
 // Custom Context Providers
-import contextProviders from '../../../contextProviders'
+import contexts from '../../../contexts'
 
 // Services
 import api from '../../../services'
@@ -15,16 +15,16 @@ import api from '../../../services'
 import { Modal, Row, Col, Input, Button, Table, Checkbox } from 'antd'
 
 // Imports Destructurings
-const { useProductEntriesContext } = contextProviders.ProductEntries
-const { useProductOutputsContext } = contextProviders.ProductOutputs
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
-const { useSaleProductsContext } = contextProviders.SaleProducts
+const { useEntriesContext } = contexts.Entries
+const { useOutputsContext } = contexts.Outputs
+const { useProductSelectionModalContext } = contexts.ProductSelectionModal
+const { useSaleProductsContext } = contexts.SaleProducts
 
 
 const ProductSelectionModal = () => {
     const location = useLocation()
-    const [productEntries_state, productEntries_dispatch] = useProductEntriesContext()
-    const [productOutputs_state, productOutputs_dispatch] = useProductOutputsContext()
+    const [entries_state, entries_dispatch] = useEntriesContext()
+    const [outputs_state, outputs_dispatch] = useOutputsContext()
     const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
     const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
 
@@ -38,8 +38,8 @@ const ProductSelectionModal = () => {
     const [loading, setLoading] = useState(true)
 
     const product_state = () => {
-        if (location.pathname === '/entradas/nuevo') return productEntries_state
-        if (location.pathname === '/salidas/nuevo') return productOutputs_state
+        if (location.pathname === '/entradas/nuevo') return entries_state
+        if (location.pathname === '/salidas/nuevo') return outputs_state
         if (location.pathname === '/venta') return saleProducts_state
     }
 
@@ -70,8 +70,8 @@ const ProductSelectionModal = () => {
     }, [selectedHeading])
 
     const product_dispatch = (action) => {
-        if (location.pathname === '/entradas/nuevo') productEntries_dispatch(action)
-        if (location.pathname === '/salidas/nuevo') productOutputs_dispatch(action)
+        if (location.pathname === '/entradas/nuevo') entries_dispatch(action)
+        if (location.pathname === '/salidas/nuevo') outputs_dispatch(action)
         if (location.pathname === '/venta') saleProducts_dispatch(action)
     }
 

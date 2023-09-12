@@ -8,7 +8,7 @@ import { errorAlert, successAlert } from '../../components/alerts'
 import { Modal, Row, Col } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Helpers
 import helpers from '../../helpers'
@@ -17,14 +17,14 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructurings
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { useSaleContext } = contextProviders.SaleContextProvider
+const { useAuthContext } = contexts.Auth
+const { useSaleContext } = contexts.Sale
 const { formatBody } = helpers.afipHelper
 const { createVoucherPdf, createTicketPdf } = helpers.pdf
 
 
 const FinalizeSaleModal = () => {
-    const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
+    const [auth_state, auth_dispatch] = useAuthContext()
     const [sale_state, sale_dispatch] = useSaleContext()
 
     const reload = () => {
@@ -35,14 +35,14 @@ const FinalizeSaleModal = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.usuarios.findById(userId)
-            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
         }
         fetchUser()
-    }, [loggedUser_dispatch])
+    }, [auth_dispatch])
 
     const closeFiscalOperation = async () => {
         const bodyToAfip = formatBody(sale_state)
-        const responseOfAfip = await api.afip.generateVoucher(loggedUser_state.user.empresa.cuit, bodyToAfip)
+        const responseOfAfip = await api.afip.generateVoucher(auth_state.user.empresa.cuit, bodyToAfip)
         if (!responseOfAfip) {
             return (
                 errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')

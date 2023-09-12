@@ -12,7 +12,7 @@ import { Row, Col, Form, Input, Spin, DatePicker } from 'antd'
 import dayjs from 'dayjs'
 
 // Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Helpers
 import helpers from '../../helpers'
@@ -22,9 +22,9 @@ import api from '../../services'
 
 // Imports Destructuring
 const { Add, Delete } = icons
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { useProductEntriesContext } = contextProviders.ProductEntries
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { useAuthContext } = contexts.Auth
+const { useEntriesContext } = contexts.Entries
+const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { localFormat } = helpers.dateHelper
 
 
@@ -33,8 +33,8 @@ const EntradasForm = () => {
     //------------------------------------------------------ State declarations ------------------------------------------------------/
     const navigate = useNavigate()
     const { id } = useParams()
-    const [loggedUser_state, loggedUser_dispatch] = useLoggedUserContext()
-    const [productEntries_state, productEntries_dispatch] = useProductEntriesContext()
+    const [auth_state, auth_dispatch] = useAuthContext()
+    const [entries_state, entries_dispatch] = useEntriesContext()
     const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
     const [total, setTotal] = useState(0)
     const [loading, setLoading] = useState(true)
@@ -56,10 +56,10 @@ const EntradasForm = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.usuarios.findById(userId)
-            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
         }
         fetchUser()
-    }, [loggedUser_dispatch])
+    }, [auth_dispatch])
 
     useEffect(() => {
         if (!loading) return
@@ -77,11 +77,11 @@ const EntradasForm = () => {
 
     useEffect(() => {
         if (!entradaIsReady) return
-        if (!entrada.usuario) setEntrada({ ...entrada, usuario: loggedUser_state.user })
+        if (!entrada.usuario) setEntrada({ ...entrada, usuario: auth_state.user })
         setLoading(false)
     },
         //eslint-disable-next-line
-        [entradaIsReady, loggedUser_dispatch])
+        [entradaIsReady, auth_dispatch])
 
     //------------------------------------------------------------------------------------------------------------------------------/
 
@@ -89,9 +89,9 @@ const EntradasForm = () => {
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
         setEntrada(entrada => ({
-            ...entrada, productos: productEntries_state.products
+            ...entrada, productos: entries_state.products
         }))
-    }, [productEntries_state.products])
+    }, [entries_state.products])
 
     useEffect(() => {
         setTotal(
@@ -155,7 +155,7 @@ const EntradasForm = () => {
                     .then((response) => {
                         if (response.code === 200) {
                             successAlert('El registro se guardó correctamente')
-                            productEntries_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
+                            entries_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
                             redirectToEntradas()
                         } else {
                             errorAlert('Fallo al guardar el registro')
@@ -177,7 +177,7 @@ const EntradasForm = () => {
     }
 
     const deleteProductFromEntry = (productID) => {
-        productEntries_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
+        entries_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
     }
 
     const changeDate = (e) => {
@@ -192,168 +192,169 @@ const EntradasForm = () => {
         <Row>
             <Col span={24}>
                 <h1>{(id === 'nuevo') ? 'Nueva entrada' : 'Editar entrada'}</h1>
-                {(loading)
-                    ? <Spin />
-                    :
-                    <Form
-                        autoComplete='off'
-                    >
-                        <Row gutter={8}>
-                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                <Form.Item
-                                    label='Descripción'
-                                >
-                                    <Input
-                                        name='descripcion'
-                                        placeholder='Descripción'
-                                        value={entrada.descripcion}
-                                        onChange={(e) => {
-                                            setEntrada({
-                                                ...entrada,
-                                                descripcion: e.target.value
-                                            })
-                                        }}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                <Form.Item
-                                    label='Fecha'
-                                >
-                                    <DatePicker
-                                        name='fecha'
-                                        format={['DD/MM/YYYY']}
-                                        onChange={e => changeDate(e)}
-                                        value={dayjs(localFormat(entrada.fecha), ['DD/MM/YYYY'])}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                <Form.Item
-                                    label='Costo total'
-                                >
-                                    <Input
-                                        name='costoTotal'
-                                        placeholder='Costo total'
-                                        value={total}
-                                        disabled={true}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={24}>
-                                <div onClick={() => openModal()}>
-                                    <Add customStyle={{ width: '70px', height: '70px' }} />
-                                </div>
-                            </Col>
-                            <Col span={24}>
-                                {(entrada.productos.length > 0) ?
-                                    entrada.productos.map((item, key) => (
-                                        <Row key={key} gutter={8}>
-                                            <Col span={8}>
-                                                <Form.Item
-                                                    required
-                                                >
-                                                    <Input
-                                                        disabled
-                                                        name='nombre'
-                                                        placeholder='Nombre del producto'
-                                                        value={item.nombre}
-                                                        onChange={(e) => {
-                                                            setEntrada({
-                                                                ...entrada,
-                                                                productos: entrada.productos.map(el => {
-                                                                    if (el._id === item._id) {
-                                                                        el.nombre = e.target.value
-                                                                    }
-                                                                    return el
+                {
+                    loading
+                        ? <Spin />
+                        :
+                        <Form
+                            autoComplete='off'
+                        >
+                            <Row gutter={8}>
+                                <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                    <Form.Item
+                                        label='Descripción'
+                                    >
+                                        <Input
+                                            name='descripcion'
+                                            placeholder='Descripción'
+                                            value={entrada.descripcion}
+                                            onChange={(e) => {
+                                                setEntrada({
+                                                    ...entrada,
+                                                    descripcion: e.target.value
+                                                })
+                                            }}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                    <Form.Item
+                                        label='Fecha'
+                                    >
+                                        <DatePicker
+                                            name='fecha'
+                                            format={['DD/MM/YYYY']}
+                                            onChange={e => changeDate(e)}
+                                            value={dayjs(localFormat(entrada.fecha), ['DD/MM/YYYY'])}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col xl={6} lg={8} md={12} sm={24} xs={24}>
+                                    <Form.Item
+                                        label='Costo total'
+                                    >
+                                        <Input
+                                            name='costoTotal'
+                                            placeholder='Costo total'
+                                            value={total}
+                                            disabled={true}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={24}>
+                                    <div onClick={() => openModal()}>
+                                        <Add customStyle={{ width: '70px', height: '70px' }} />
+                                    </div>
+                                </Col>
+                                <Col span={24}>
+                                    {(entrada.productos.length > 0) ?
+                                        entrada.productos.map((item, key) => (
+                                            <Row key={key} gutter={8}>
+                                                <Col span={8}>
+                                                    <Form.Item
+                                                        required
+                                                    >
+                                                        <Input
+                                                            disabled
+                                                            name='nombre'
+                                                            placeholder='Nombre del producto'
+                                                            value={item.nombre}
+                                                            onChange={(e) => {
+                                                                setEntrada({
+                                                                    ...entrada,
+                                                                    productos: entrada.productos.map(el => {
+                                                                        if (el._id === item._id) {
+                                                                            el.nombre = e.target.value
+                                                                        }
+                                                                        return el
+                                                                    })
                                                                 })
-                                                            })
-                                                        }}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item
-                                                    required
-                                                >
-                                                    <Input
-                                                        disabled
-                                                        name='barcode'
-                                                        placeholder='Codigo de barras de producto'
-                                                        value={item.codigoBarras}
-                                                        onChange={(e) => {
-                                                            setEntrada({
-                                                                ...entrada,
-                                                                productos: entrada.productos.map(el => {
-                                                                    if (el._id === item._id) {
-                                                                        el.codigoBarras = e.target.value
-                                                                    }
-                                                                    return el
+                                                            }}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item
+                                                        required
+                                                    >
+                                                        <Input
+                                                            disabled
+                                                            name='barcode'
+                                                            placeholder='Codigo de barras de producto'
+                                                            value={item.codigoBarras}
+                                                            onChange={(e) => {
+                                                                setEntrada({
+                                                                    ...entrada,
+                                                                    productos: entrada.productos.map(el => {
+                                                                        if (el._id === item._id) {
+                                                                            el.codigoBarras = e.target.value
+                                                                        }
+                                                                        return el
+                                                                    })
                                                                 })
-                                                            })
-                                                        }}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item
-                                                    rules={[
-                                                        {
-                                                            message: '¡Debes especificar la cantidad!',
-                                                            required: true
-                                                        }
-                                                    ]}
-                                                >
-                                                    <Input
-                                                        name='quantity'
-                                                        placeholder='Cantidad'
-                                                        type='number'
-                                                        value={item.cantidadesEntrantes}
-                                                        onChange={(e) => {
-                                                            setEntrada({
-                                                                ...entrada,
-                                                                productos: entrada.productos.map(el => {
-                                                                    if (el._id === item._id) {
-                                                                        el.cantidadesEntrantes = (!e.target.value) ? 0 : parseFloat(e.target.value)
-                                                                    }
-                                                                    return el
+                                                            }}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item
+                                                        rules={[
+                                                            {
+                                                                message: '¡Debes especificar la cantidad!',
+                                                                required: true
+                                                            }
+                                                        ]}
+                                                    >
+                                                        <Input
+                                                            name='quantity'
+                                                            placeholder='Cantidad'
+                                                            type='number'
+                                                            value={item.cantidadesEntrantes}
+                                                            onChange={(e) => {
+                                                                setEntrada({
+                                                                    ...entrada,
+                                                                    productos: entrada.productos.map(el => {
+                                                                        if (el._id === item._id) {
+                                                                            el.cantidadesEntrantes = (!e.target.value) ? 0 : parseFloat(e.target.value)
+                                                                        }
+                                                                        return el
+                                                                    })
                                                                 })
-                                                            })
-                                                        }}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={4}>
-                                                <div onClick={() => deleteProductFromEntry(item._id)}>
-                                                    <Delete />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    ))
-                                    : null
-                                }
-                            </Col>
-                            <Col span={24} align='start' style={{ display: 'flex' }}>
-                                <Row>
-                                    <Col span={12} style={{ display: 'flex' }}>
-                                        <button
-                                            className='btn-primary'
-                                            onClick={() => handleSubmit()}
-                                            style={{ marginRight: '15px' }}
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button
-                                            className='btn-secondary'
-                                            onClick={() => redirectToEntradas()}
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Form>
+                                                            }}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={4}>
+                                                    <div onClick={() => deleteProductFromEntry(item._id)}>
+                                                        <Delete />
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        ))
+                                        : null
+                                    }
+                                </Col>
+                                <Col span={24} align='start' style={{ display: 'flex' }}>
+                                    <Row>
+                                        <Col span={12} style={{ display: 'flex' }}>
+                                            <button
+                                                className='btn-primary'
+                                                onClick={() => handleSubmit()}
+                                                style={{ marginRight: '15px' }}
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button
+                                                className='btn-secondary'
+                                                onClick={() => redirectToEntradas()}
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Form>
                 }
             </Col>
             <ProductSelectionModal />

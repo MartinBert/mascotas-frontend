@@ -9,7 +9,7 @@ import { ProductSelectionModal } from '../../components/generics'
 import { Row, Col, Spin } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Services
 import api from '../../services'
@@ -23,7 +23,7 @@ import Lines from './Lines'
 import ListCustomLinesModal from './ListCustomLinesModal'
 
 // Imports Destructurings
-const { useSaleContext } = contextProviders.SaleContextProvider
+const { useSaleContext } = contexts.Sale
 
 
 const Ventas = () => {

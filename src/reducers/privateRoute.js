@@ -25,10 +25,10 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const privateRouteReducer = {
+const privateRoute = {
     initialState,
     actions,
     reducer
 }
 
-export default privateRouteReducer
+export default privateRoute

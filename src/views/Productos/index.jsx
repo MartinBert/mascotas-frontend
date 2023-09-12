@@ -11,7 +11,7 @@ import icons from '../../components/icons'
 import { Row, Col, Table } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Services
 import api from '../../services'
@@ -21,13 +21,13 @@ import Header from './Header'
 
 // Imports Destructuring
 const { Details, Edit, Delete } = icons
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useAuthContext } = contexts.Auth
 
 
 const Productos = () => {
     const navigate = useNavigate()
-    const loggedUserContext = useLoggedUserContext()
-    const [, loggedUser_dispatch] = loggedUserContext
+    const loggedUserContext = useAuthContext()
+    const [, auth_dispatch] = loggedUserContext
     const [products, setProducts] = useState(null)
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
@@ -44,16 +44,15 @@ const Productos = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.usuarios.findById(userId)
-            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
         }
         fetchUser()
-    }, [loggedUser_dispatch])
+    }, [auth_dispatch])
 
     useEffect(() => {
         const fetchProducts = async () => {
             const stringFilters = JSON.stringify(filters)
             const data = await api.productos.findFiltered({ page, limit, filters: stringFilters })
-            console.log(data.docs)
             setProducts(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)

@@ -5,10 +5,10 @@ import React from 'react'
 import { Modal, Row, Col, InputNumber, Select } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Imports Destructurings
-const { useSaleContext } = contextProviders.SaleContextProvider
+const { useSaleContext } = contexts.Sale
 const { Option } = Select
 
 

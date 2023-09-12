@@ -5,7 +5,7 @@ import React, { useEffect } from 'react'
 import { errorAlert } from '../../components/alerts'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Design Components
 import { Row, Col } from 'antd'
@@ -17,7 +17,7 @@ import HeaderElements from './HeaderElements'
 import api from '../../services'
 
 // Imports Destructurings
-const { useSaleContext } = contextProviders.SaleContextProvider
+const { useSaleContext } = contexts.Sale
 
 
 const Header = () => {

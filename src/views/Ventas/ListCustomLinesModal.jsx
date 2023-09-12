@@ -8,11 +8,11 @@ import icons from '../../components/icons'
 import { Button, Col, Modal, Row, Table } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Imports Destructurings
-const { useCustomProductsContext } = contextProviders.CustomProducts
-const { useSaleProductsContext } = contextProviders.SaleProducts
+const { useCustomProductsContext } = contexts.CustomProducts
+const { useSaleProductsContext } = contexts.SaleProducts
 const { Delete } = icons
 
 

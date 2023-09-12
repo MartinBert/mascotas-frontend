@@ -1,26 +1,26 @@
 import { createContext, useReducer, useContext } from 'react'
 import reducers from '../reducers'
 
-const createSaleContext = createContext()
-const { initialState, reducer } = reducers.saleReducer
+const CreateSaleContext = createContext()
+const { initialState, reducer } = reducers.sale
 
 const useSaleContext = () => {
-    return useContext(createSaleContext)
+    return useContext(CreateSaleContext)
 }
 
 const SaleContext = ({ children }) => {
     const [sale_state, sale_dispatch] = useReducer(reducer, initialState)
 
     return (
-        <createSaleContext.Provider value={[sale_state, sale_dispatch]}>
+        <CreateSaleContext.Provider value={[sale_state, sale_dispatch]}>
             {children}
-        </createSaleContext.Provider>
+        </CreateSaleContext.Provider>
     )
 }
 
-const SaleContextProvider = {
+const Sale = {
     SaleContext,
     useSaleContext
 }
 
-export default SaleContextProvider
+export default Sale

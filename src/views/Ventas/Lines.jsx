@@ -8,14 +8,14 @@ import icons from '../../components/icons'
 import { Button, Checkbox, Col, Input, Row, Space, Table } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Helpers
 import helpers from '../../helpers'
 
 // Imports Destructurings
-const { useSaleContext } = contextProviders.SaleContextProvider
-const { useSaleProductsContext } = contextProviders.SaleProducts
+const { useSaleContext } = contexts.Sale
+const { useSaleProductsContext } = contexts.SaleProducts
 const { round, roundTwoDecimals } = helpers.mathHelper
 const { Delete } = icons
 

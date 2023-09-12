@@ -5,45 +5,45 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './routes'
 
 // Custom Context Providers
-import contextProviders from './contextProviders'
+import contexts from './contexts'
 
 // Design Frameworks
 import 'antd/dist/reset.css'
 
 // Imports Destructurings
-const { CustomProductsContext } = contextProviders.CustomProducts
-const { LoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { PrivateRouteContext } = contextProviders.PrivateRouteContextProvider
-const { ProductEntriesContext } = contextProviders.ProductEntries
-const { ProductOutputsContext } = contextProviders.ProductOutputs
-const { ProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
-const { SaleContext } = contextProviders.SaleContextProvider
-const { SaleProductsContext } = contextProviders.SaleProducts
+const { CustomProductsContext } = contexts.CustomProducts
+const { AuthContext } = contexts.Auth
+const { PrivateRouteContext } = contexts.PrivateRoute
+const { EntriesContext } = contexts.Entries
+const { OutputsContext } = contexts.Outputs
+const { ProductSelectionModalContext } = contexts.ProductSelectionModal
+const { SaleContext } = contexts.Sale
+const { SaleProductsContext } = contexts.SaleProducts
 
 
 function App() {
 
     return (
         <div style={{ height: '100%' }}>
-            <LoggedUserContext>
+            <AuthContext>
                 <PrivateRouteContext>
                     <ProductSelectionModalContext>
                         <SaleProductsContext>
                             <CustomProductsContext>
-                                <ProductEntriesContext>
-                                    <ProductOutputsContext>
+                                <EntriesContext>
+                                    <OutputsContext>
                                         <SaleContext>
                                             <Router>
                                                 <AppRouter />
                                             </Router>
                                         </SaleContext>
-                                    </ProductOutputsContext>
-                                </ProductEntriesContext>
+                                    </OutputsContext>
+                                </EntriesContext>
                             </CustomProductsContext>
                         </SaleProductsContext>
                     </ProductSelectionModalContext>
                 </PrivateRouteContext>
-            </LoggedUserContext>
+            </AuthContext>
         </div>
     )
 }

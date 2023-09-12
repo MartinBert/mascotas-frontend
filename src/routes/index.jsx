@@ -7,7 +7,7 @@ import PublicRouter from './PublicRouter'
 import PrivateRouter from './PrivateRouter'
 
 // Custom Context Providers
-import contextProviders from '../contextProviders'
+import contexts from '../contexts'
 
 // Design Components
 import { Spin } from 'antd'
@@ -18,14 +18,14 @@ import api from '../services'
 // Imports Destructurings
 const { publicRoutesData } = PublicRouter
 const { privateRoutesData } = PrivateRouter
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { usePrivateRouteContext } = contextProviders.PrivateRouteContextProvider
+const { useAuthContext } = contexts.Auth
+const { usePrivateRouteContext } = contexts.PrivateRoute
 
 
 const AppRouter = () => {
     const navigate = useNavigate()
-    const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
+    const loggedUserContext = useAuthContext()
+    const [auth_state, auth_dispatch] = loggedUserContext
     const privateRouteContext = usePrivateRouteContext()
     const [privateRoute_state, privateRoute_dispatch] = privateRouteContext
 
@@ -39,12 +39,12 @@ const AppRouter = () => {
             const token = localStorage.getItem('token')
             const userId = localStorage.getItem('userId')
             if (!token || !userId || token === undefined || userId === undefined) {
-                loggedUser_dispatch({ type: 'SET_LOADING', payload: true })
+                auth_dispatch({ type: 'SET_LOADING', payload: true })
                 return redirectToLogin()
             }
             const loggedUser = await api.usuarios.findById(userId)
-            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
-            loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'SET_LOADING', payload: false })
             if (privateRoute_state.openKey.length === 0)
                 privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
             else redirectToLogin()
@@ -53,7 +53,7 @@ const AppRouter = () => {
     }, [
         privateRoute_state.openKey.length,
         privateRoute_dispatch,
-        loggedUser_dispatch,
+        auth_dispatch,
         redirectToLogin
     ])
 
@@ -73,9 +73,9 @@ const AppRouter = () => {
             exact
             path={route.path}
             element={
-                (loggedUser_state.loading || !loggedUser_state.user)
+                (auth_state.loading || !auth_state.user)
                 ? <Spin />
-                : (loggedUser_state.user.perfil === false && route.onlySuperadmin === true)
+                : (auth_state.user.perfil === false && route.onlySuperadmin === true)
                     ? <Navigate to={'/ventas'} />
                     : route.element
             }

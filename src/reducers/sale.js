@@ -715,10 +715,10 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const saleReducer = {
+const sale = {
     initialState,
     actions,
     reducer
 }
 
-export default saleReducer
+export default sale

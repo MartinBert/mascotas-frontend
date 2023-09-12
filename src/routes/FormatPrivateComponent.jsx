@@ -28,14 +28,14 @@ import {
 import { Layout, Menu } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../contextProviders'
+import contexts from '../contexts'
 
 // Imports Destructurings
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useAuthContext } = contexts.Auth
 
 
 const FormatPrivateComponent = ({ children, activeKey }) => {
-    const [loggedUser_state] = useLoggedUserContext()
+    const [auth_state] = useAuthContext()
     const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false)
     const { Header, Sider, Content } = Layout
@@ -61,31 +61,31 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const saleMenu = [
         getItem('1', 'Ventas', <FaShoppingCart />, '/venta'),
         getItem('2', 'Lista de ventas', <FaList />, '/listaVentas'),
-        loggedUser_state.user.perfil ? getItem('3', 'Documentos', <FaFile />, '/documentos') : null,
-        loggedUser_state.user.perfil ? getItem('4', 'Clientes', <FaUsers />, '/clientes') : null,
-        loggedUser_state.user.perfil ? getItem('5', 'Medios de pago', <FaMoneyBillWave />, '/mediospago') : null,
+        auth_state.user.perfil ? getItem('3', 'Documentos', <FaFile />, '/documentos') : null,
+        auth_state.user.perfil ? getItem('4', 'Clientes', <FaUsers />, '/clientes') : null,
+        auth_state.user.perfil ? getItem('5', 'Medios de pago', <FaMoneyBillWave />, '/mediospago') : null,
     ]
 
     const productAndStockMenu = [
-        loggedUser_state.user.perfil ? getItem('6', 'Productos', <FaBookmark />, '/productos') : null,
-        loggedUser_state.user.perfil ? getItem('7', 'Salidas', <FaCheck />, '/salidas') : null,
-        loggedUser_state.user.perfil ? getItem('8', 'Entradas', <FaInbox />, '/entradas') : null,
-        loggedUser_state.user.perfil ? getItem('9', 'Marcas', <FaTag />, '/marcas') : null,
-        loggedUser_state.user.perfil ? getItem('10', 'Rubros', <FaTags />, '/rubros') : null,
-        loggedUser_state.user.perfil ? getItem('11', 'Unid. medida', <FaWeightHanging />, '/unidadesmedida') : null,
+        auth_state.user.perfil ? getItem('6', 'Productos', <FaBookmark />, '/productos') : null,
+        auth_state.user.perfil ? getItem('7', 'Salidas', <FaCheck />, '/salidas') : null,
+        auth_state.user.perfil ? getItem('8', 'Entradas', <FaInbox />, '/entradas') : null,
+        auth_state.user.perfil ? getItem('9', 'Marcas', <FaTag />, '/marcas') : null,
+        auth_state.user.perfil ? getItem('10', 'Rubros', <FaTags />, '/rubros') : null,
+        auth_state.user.perfil ? getItem('11', 'Unid. medida', <FaWeightHanging />, '/unidadesmedida') : null,
     ]
 
     const configurationMenu = [
-        loggedUser_state.user.perfil ? getItem('12', 'Usuarios', <FaUser />, '/usuarios') : null,
-        loggedUser_state.user.perfil ? getItem('13', 'Empresas', <FaBusinessTime />, '/empresas') : null,
-        loggedUser_state.user.perfil ? getItem('14', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
-        loggedUser_state.user.perfil ? getItem('15', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
+        auth_state.user.perfil ? getItem('12', 'Usuarios', <FaUser />, '/usuarios') : null,
+        auth_state.user.perfil ? getItem('13', 'Empresas', <FaBusinessTime />, '/empresas') : null,
+        auth_state.user.perfil ? getItem('14', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
+        auth_state.user.perfil ? getItem('15', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
     ]
 
     const subMenusToSidebar = [
         getItem('sub1', 'Ventas', <FaChartLine />, null, saleMenu),
-        loggedUser_state.user.perfil ? getItem('sub2', 'Productos y Stock', <FaCubes />, null, productAndStockMenu) : null,
-        loggedUser_state.user.perfil ? getItem('sub3', 'Configuraciones', <FaCogs />, null, configurationMenu) : null,
+        auth_state.user.perfil ? getItem('sub2', 'Productos y Stock', <FaCubes />, null, productAndStockMenu) : null,
+        auth_state.user.perfil ? getItem('sub3', 'Configuraciones', <FaCogs />, null, configurationMenu) : null,
     ]
 
     const toolbarMenu = [

@@ -9,18 +9,22 @@ const useProductSelectionModalContext = () => {
 }
 
 const ProductSelectionModalContext = ({ children }) => {
-    const [product_state, product_dispatch] = useReducer(reducer, initialState)
+    const [
+        productSelectionModal_state,
+        productSelectionModal_dispatch
+    ] = useReducer(reducer, initialState)
 
     return (
-        <CreateProductSelectionModalContext.Provider value={[product_state, product_dispatch]}>
+        <CreateProductSelectionModalContext.Provider
+            value={[productSelectionModal_state, productSelectionModal_dispatch]}>
             {children}
         </CreateProductSelectionModalContext.Provider>
     )
 }
 
-const ProductSelectionModalContextProvider = {
+const ProductSelectionModal = {
     ProductSelectionModalContext,
     useProductSelectionModalContext
 }
 
-export default ProductSelectionModalContextProvider
+export default ProductSelectionModal

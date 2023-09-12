@@ -25,9 +25,9 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const loggedUserReducer = {
+const auth = {
     initialState,
     reducer,
 }
 
-export default loggedUserReducer
+export default auth

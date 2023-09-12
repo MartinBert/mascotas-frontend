@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import messages from '../../components/messages'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Services
 import api from '../../services'
@@ -16,7 +16,7 @@ import { Form, Input, Button } from 'antd'
 
 // Imports Destructurings
 const { Error } = messages
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useAuthContext } = contexts.Auth
 
 const LoginForm = () => {
     const navigate = useNavigate()
@@ -25,8 +25,8 @@ const LoginForm = () => {
         email: '',
         password: '',
     })
-    const loggedUserContext = useLoggedUserContext()
-    const [, loggedUser_dispatch] = loggedUserContext
+    const loggedUserContext = useAuthContext()
+    const [, auth_dispatch] = loggedUserContext
 
     const loadCredentials = (e) => {
         setCredentials({
@@ -57,7 +57,7 @@ const LoginForm = () => {
         }
         localStorage.setItem('token', token)
         localStorage.setItem('userId', data)
-        loggedUser_dispatch({ type: 'SET_LOADING', payload: false })
+        auth_dispatch({ type: 'SET_LOADING', payload: false })
         return redirectToVentas()
     }
 

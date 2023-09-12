@@ -34,10 +34,10 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const productOutputs = {
+const outputs = {
     initialState,
     actions,
     reducer,
 }
 
-export default productOutputs
+export default outputs

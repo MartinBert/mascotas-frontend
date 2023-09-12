@@ -11,7 +11,7 @@ import { errorAlert, successAlert } from '../../components/alerts'
 import { Row, Col, Form, Input, Button } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Helpers
 import helpers from '../../helpers'
@@ -22,14 +22,14 @@ import api from '../../services'
 // Imports Destructuring
 const { Spinner } = graphics
 const { formHelper } = helpers
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
+const { useAuthContext } = contexts.Auth
 
 
 const ClientesForm = () => {
 
     const navigate = useNavigate()
-    const loggedUserContext = useLoggedUserContext()
-    const [loggedUser_state, loggedUser_dispatch] = loggedUserContext
+    const loggedUserContext = useAuthContext()
+    const [auth_state, auth_dispatch] = loggedUserContext
     const { id } = useParams()
     const [loading, setLoading] = useState(true)
     const [cliente, setCliente] = useState({
@@ -60,10 +60,10 @@ const ClientesForm = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.usuarios.findById(userId)
-            loggedUser_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
         }
         fetchUser()
-    }, [loggedUser_dispatch])
+    }, [auth_dispatch])
 
     useEffect(() => {
         const fetchCliente = async (id) => {
@@ -175,7 +175,7 @@ const ClientesForm = () => {
                                             setLoading(true)
                                             if (!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.')
 
-                                            const userCuit = loggedUser_state.user.empresa.cuit
+                                            const userCuit = auth_state.user.empresa.cuit
                                             const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit)
 
                                             if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)

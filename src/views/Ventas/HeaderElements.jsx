@@ -10,16 +10,16 @@ import { DatePicker, Select, Spin } from 'antd'
 import dayjs from 'dayjs'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Helpers
 import helpers from '../../helpers'
 
 // Imports Destructurings
-const { useCustomProductsContext } = contextProviders.CustomProducts
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
-const { useSaleContext } = contextProviders.SaleContextProvider
-const { useSaleProductsContext } = contextProviders.SaleProducts
+const { useCustomProductsContext } = contexts.CustomProducts
+const { useProductSelectionModalContext } = contexts.ProductSelectionModal
+const { useSaleContext } = contexts.Sale
+const { useSaleProductsContext } = contexts.SaleProducts
 const { isItLater, localFormat } = helpers.dateHelper
 const { Option } = Select
 

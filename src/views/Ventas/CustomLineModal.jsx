@@ -5,11 +5,11 @@ import React, { useEffect, useState } from 'react'
 import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Imports Destructuring
-const { useCustomProductsContext } = contextProviders.CustomProducts
-const { useSaleProductsContext } = contextProviders.SaleProducts
+const { useCustomProductsContext } = contexts.CustomProducts
+const { useSaleProductsContext } = contexts.SaleProducts
 
 const initialProductState = {
     _id: '',

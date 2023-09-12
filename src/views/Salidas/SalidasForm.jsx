@@ -12,7 +12,7 @@ import { Row, Col, Form, Input, Spin, DatePicker } from 'antd'
 import dayjs from 'dayjs'
 
 // Custom Context Providers
-import contextProviders from '../../contextProviders'
+import contexts from '../../contexts'
 
 // Helpers
 import helpers from '../../helpers'
@@ -22,9 +22,9 @@ import api from '../../services'
 
 // Imports Destructuring
 const { Add, Delete } = icons
-const { useLoggedUserContext } = contextProviders.LoggedUserContextProvider
-const { useProductOutputsContext } = contextProviders.ProductOutputs
-const { useProductSelectionModalContext } = contextProviders.ProductSelectionModalContextProvider
+const { useAuthContext } = contexts.Auth
+const { useOutputsContext } = contexts.Outputs
+const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { localFormat } = helpers.dateHelper
 
 
@@ -33,8 +33,8 @@ const SalidasForm = () => {
     //------------------------------------------------------ State declarations ------------------------------------------------------/
     const navigate = useNavigate()
     const { id } = useParams()
-    const [loggedUser_state] = useLoggedUserContext()
-    const [productOutputs_state, productOutputs_dispatch] = useProductOutputsContext()
+    const [auth_state] = useAuthContext()
+    const [outputs_state, outputs_dispatch] = useOutputsContext()
     const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
     const [salidaIsReady, setSalidaIsReady] = useState(false)
@@ -69,7 +69,7 @@ const SalidasForm = () => {
 
     useEffect(() => {
         if (!salidaIsReady) return
-        if (!salida.usuario) setSalida({ ...salida, usuario: loggedUser_state.user })
+        if (!salida.usuario) setSalida({ ...salida, usuario: auth_state.user })
         setLoading(false)
     },
         //eslint-disable-next-line
@@ -81,9 +81,9 @@ const SalidasForm = () => {
     //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
     useEffect(() => {
         setSalida(salida => ({
-            ...salida, productos: productOutputs_state.products
+            ...salida, productos: outputs_state.products
         }))
-    }, [productOutputs_state.products])
+    }, [outputs_state.products])
 
     useEffect(() => {
         setTotal(
@@ -147,7 +147,7 @@ const SalidasForm = () => {
                     .then((response) => {
                         if (response.code === 200) {
                             successAlert('El registro se guardó correctamente')
-                            productOutputs_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
+                            outputs_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
                             redirectToSalidas()
                         } else {
                             errorAlert('Fallo al guardar el registro')
@@ -169,7 +169,7 @@ const SalidasForm = () => {
     }
 
     const deleteProductFromOutput = (productID) => {
-        productOutputs_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
+        outputs_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
     }
 
     const changeDate = (e) => {
