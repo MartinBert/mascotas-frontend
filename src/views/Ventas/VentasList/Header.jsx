@@ -29,7 +29,10 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
         else {
             const initialDate = (addDays(value[0].$d, 0)).toISOString()
             const finalDate = (addDays(value[1].$d, 1)).toISOString()
-            const response = await api.ventas.findByDates({ initialDate, finalDate })
+            const dateFilters = JSON.stringify({
+                fechaEmision: { $gte: initialDate, $lte: finalDate }
+            })
+            const response = await api.ventas.findByDates(dateFilters)
             setVentasToReport(response)
         }
     }
@@ -74,7 +77,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
     const onChangeFecha = (value) => {
         clearInputs()
         setFecha(value)
-        setFilters(JSON.stringify({ fechaEmisionString: value }))
+        setFilters({ fechaEmisionString: value })
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
@@ -82,7 +85,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
     const onChangeClientes = (value) => {
         clearInputs()
         setCliente(value)
-        setFilters(JSON.stringify({ clienteRazonSocial: value }))
+        setFilters({ clienteRazonSocial: value })
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
@@ -94,7 +97,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
             if (value.includes(doc.nombre)) return doc
             else return null
         }).filter(doc => doc !== null)
-        setFilters(JSON.stringify({ documento: documentosForFilters }))
+        setFilters({ documento: documentosForFilters })
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
@@ -106,7 +109,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
             if (value.includes(mp.nombre)) return mp._id
             else return null
         }).filter(mp => mp !== null)
-        setFilters(JSON.stringify({ mediosPago: mediosDePagoForFilters }))
+        setFilters({ mediosPago: mediosDePagoForFilters })
         if (value.length < 1) setFilters(null)
         setPage(1)
     }

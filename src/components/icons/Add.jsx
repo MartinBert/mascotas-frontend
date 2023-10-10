@@ -1,9 +1,9 @@
 import React from 'react'
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
+import AddCircleIcon from '@mui/icons-material/AddCircle'
 
 const Add = ({customStyle}) => {
     return (
-        <AddBoxOutlinedIcon style={customStyle}/>
+        <AddCircleIcon style={customStyle}/>
     )
 }
 

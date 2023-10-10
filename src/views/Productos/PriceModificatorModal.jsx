@@ -46,14 +46,10 @@ const PriceModificatorModal = ({
     ]
 
     useEffect(() => {
-        if (brands) return
         const fetchBrands = async () => {
-            const response = await api.marcas.findAll({
-                page: 0,
-                limit: 100000,
-                filters: null,
-            })
-            setBrands(response.docs)
+            if (brands) return
+            const response = await api.marcas.findAll()
+            setBrands(response)
         }
         fetchBrands()
     })
@@ -61,50 +57,42 @@ const PriceModificatorModal = ({
     useEffect(() => {
         if (headings) return
         const fetchHeadings = async () => {
-            const response = await api.rubros.findAll({
-                page: 0,
-                limit: 100000,
-                filters: null,
-            })
-            setHeadings(response.docs)
+            const response = await api.rubros.findAll()
+            setHeadings(response)
         }
         fetchHeadings()
     })
 
-    useEffect(
-        () => {
+    useEffect(() => {
+        const fetchProducts = async () => {
             setProductsLoading(true)
-            const fetchProducts = async () => {
-                const filtersToParams = {
-                    nombre: productNameSearch,
-                }
-                if (selectedHeading) {
-                    filtersToParams.rubro = selectedHeading
-                }
-                if (selectedBrand) {
-                    filtersToParams.marca = selectedBrand
-                }
-                const params = {
-                    page: currentPage,
-                    limit: limitPerPage,
-                    filters: JSON.stringify(filtersToParams),
-                }
-                const response = await api.productos.findFiltered(params)
-                setProducts(response.docs)
-                setTotalDocsInPage(response.totalDocs)
-                setProductsLoading(false)
+            const filtersToParams = {
+                nombre: productNameSearch,
             }
-            fetchProducts()
-        },
-        //eslint-disable-next-line
-        [
-            selectedBrand,
-            selectedHeading,
-            productNameSearch,
-            currentPage,
-            limitPerPage,
-        ]
-    )
+            if (selectedHeading) {
+                filtersToParams.rubro = selectedHeading
+            }
+            if (selectedBrand) {
+                filtersToParams.marca = selectedBrand
+            }
+            const params = {
+                page: currentPage,
+                limit: limitPerPage,
+                filters: JSON.stringify(filtersToParams),
+            }
+            const response = await api.productos.findPaginated(params)
+            setProducts(response.docs)
+            setTotalDocsInPage(response.totalDocs)
+            setProductsLoading(false)
+        }
+        fetchProducts()
+    }, [
+        selectedBrand,
+        selectedHeading,
+        productNameSearch,
+        currentPage,
+        limitPerPage,
+    ])
 
     const handleOk = () => {
         setLoading(true)

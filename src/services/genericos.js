@@ -6,7 +6,6 @@ const checkStorageStatus = (err) => {
     }
 }
 
-
 const filterAutocompleteOptions = async(service, search, keyToCompare) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{

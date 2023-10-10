@@ -1,34 +1,45 @@
 
 // React Components and Hooks
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 // Design Components
-import { Row, Col, Button, Input } from 'antd'
+import { Button, Col, Input, Row } from 'antd'
 
 
-const Header = ({ setFilters }) => {
+const Header = ({ filters, setFilters }) => {
+    const navigate = useNavigate()
+
+    const redirectToForm = () => {
+        navigate('/usuarios/nuevo')
+    }
+
+    const updateFilters = (e) => {
+        setFilters({
+            ...filters,
+            [e.target.name]: e.target.value
+        })
+    }
+
     return (
         <Row>
             <Col span={24}>
                 <Row align='end'>
                     <Col span={4}>
-                        <Link to='/usuarios/nuevo'>
-                            <Button className='btn-primary'>
-                                Nuevo
-                            </Button>
-                        </Link>
+                    <Button
+                            className='btn-primary'
+                            onClick={() => redirectToForm()}
+                        >
+                            Nuevo
+                        </Button>
                     </Col>
                     <Col span={16}></Col>
                     <Col span={4}>
                         <Input
-                            type='primary'
+                            name='nombre'
+                            onChange={(e) => updateFilters(e)}
                             placeholder='Buscar por nombre de usuario'
-                            onChange={(e) => {
-                                setFilters(JSON.stringify({
-                                    nombre: e.target.value,
-                                }))
-                            }}
+                            type='primary'
                         />
                     </Col>
                 </Row>

@@ -47,7 +47,7 @@ const ProductSelectionModal = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.productos.findFiltered({ page, limit, filters: stringFilters })
+            const data = await api.productos.findPaginated({ page, limit, filters: stringFilters })
             setProductsForTable(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)
@@ -93,25 +93,29 @@ const ProductSelectionModal = () => {
 
     const columns = [
         {
-            title: 'Nombre',
-            dataIndex: 'nombre',
+            dataIndex: 'productSelectionModal_productName',
+            render: (_, product) => product.nombre,
+            title: 'Nombre'
         },
         {
-            title: 'Codigo de producto',
-            dataIndex: 'codigoProducto',
+            dataIndex: 'productSelectionModal_productCode',
+            render: (_, product) => product.codigoProducto,
+            title: 'Codigo de producto'
         },
         {
-            title: 'Codigo de barras',
-            dataIndex: 'codigoBarras',
+            dataIndex: 'productSelectionModal_barCode',
+            render: (_, product) => product.codigoBarras,
+            title: 'Codigo de barras'
         },
         {
-            title: 'Marcar',
-            render: (product) => (
+            dataIndex: 'productSelectionModal_actions',
+            render: (_, product) => (
                 <Checkbox
                     checked={product_state().products.includes(product) ? true : false}
                     onChange={e => checkProduct(e, product)}
                 />
-            )
+            ),
+            title: 'Marcar'
         }
     ]
 

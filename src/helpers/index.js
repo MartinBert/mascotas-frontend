@@ -1,19 +1,19 @@
-import mathHelper from './mathHelper';
-import dateHelper from './dateHelper';
-import stringHelper from './stringHelper';
-import afipHelper from './afipHelper';
-import formHelper from './formHelper';
-import excel from './excel';
-import pdf from './pdf';
+import afipHelper from './afipHelper'
+import dateHelper from './dateHelper'
+import excel from './excel'
+import formHelper from './formHelper'
+import mathHelper from './mathHelper'
+import pdf from './pdf'
+import stringHelper from './stringHelper'
 
 const helpers = {
-    mathHelper,
-    dateHelper,
-    stringHelper,
     afipHelper,
-    formHelper,
+    dateHelper,
     excel,
-    pdf
+    formHelper,
+    mathHelper,
+    pdf,
+    stringHelper
 }
 
-export default helpers;
+export default helpers

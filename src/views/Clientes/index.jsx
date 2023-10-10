@@ -3,8 +3,13 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import { DeleteModal } from '../../components/generics'
 import icons from '../../components/icons'
+
+// Custom Contexts
+import actions from '../../actions'
+import contexts from '../../contexts'
 
 // Design Components
 import { Row, Col, Table } from 'antd'
@@ -16,81 +21,154 @@ import api from '../../services'
 import Header from './Header'
 
 // Imports Destructuring
+const { validateDeletion } = actions.deleteModal
+const { useDeleteModalContext } = contexts.DeleteModal
 const { Edit, Delete } = icons
 
 
 const Clientes = () => {
+    const navigate = useNavigate()
+    const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [clientes, setClientes] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
     const [limit, setLimit] = useState(10)
     const [filters, setFilters] = useState(null)
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteEntityId, setDeleteEntityId] = useState(null)
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
-    const navigate = useNavigate()
 
+    // ------------------ Fetch Clients ------------------ //
     useEffect(() => {
         const fetchClientes = async () => {
-            const data = await api.clientes.findAll({ page, limit, filters })
+            const stringFilters = JSON.stringify(filters)
+            const data = await api.clientes.findPaginated({ page, limit, filters: stringFilters })
             setClientes(data.docs)
             setTotalDocs(data.totalDocs)
-            setLoading(false)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchClientes()
-    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
+    }, [
+        deleteModal_state.loading,
+        filters,
+        limit,
+        page,
+    ])
+
+    // ------------------ Client Deletion ------------------ //
+    const clientDeletion = (clientID) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: clientID })
+        deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
+    }
 
     useEffect(() => {
-        if (deleteEntityId === null) return
         const deleteClient = async () => {
-            setLoading(true)
-            await api.clientes.deleteCliente(deleteEntityId)
-                .then(() => {
-                    setDeleteEntityId(null)
-                    setLoading(false)
-                })
+            const validation = validateDeletion(
+                deleteModal_state.confirmDeletion,
+                deleteModal_state.entityID
+            )
+            if (validation === 'OK') {
+                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+                await api.clientes.deleteCliente(deleteModal_state.entityID)
+                    .then(response => {
+                        if (response.code === 200) {
+                            successAlert('El registro se eliminó correctamente')
+                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
+                        } else {
+                            errorAlert('Fallo al eliminar el registro')
+                        }
+                    })
+            }
         }
         deleteClient()
-    }, [deleteEntityId])
+    }, [
+        deleteModal_state.confirmDeletion,
+        deleteModal_state.entityID
+    ])
 
-    const editClient = (id) => {
+    // ------------------ Client Edition ------------------ //
+    const clientEdition = (id) => {
         navigate(`/clientes/${id}`)
     }
 
+
     const columnsForTable = [
-        { title: 'Cond. Fiscal', render: (data) => (data.condicionFiscal.nombre) },
-        { title: 'Cliente', dataIndex: 'razonSocial' },
-        { title: 'CUIT / CUIL', dataIndex: 'cuit' },
-        { title: 'Email', dataIndex: 'email' },
-        { title: 'Teléfono', dataIndex: 'telefono' },
-        { title: 'Dirección', dataIndex: 'direccion' },
-        { title: 'Ciudad', dataIndex: 'ciudad' },
-        { title: 'Provincia', dataIndex: 'provincia' },
         {
-            title: 'Acciones',
-            render: (client) => (
-                <Row>
-                    <div onClick={() => { editClient(client._id) }}>
+            dataIndex: 'client_fiscalCondition',
+            render: (_, data) => data.condicionFiscal.nombre,
+            title: 'Cond. Fiscal'
+        },
+        {
+            dataIndex: 'client_businessName',
+            render: (_, data) => data.razonSocial,
+            title: 'Cliente'
+        },
+        {
+            dataIndex: 'client_cuit',
+            render: (_, data) => data.cuit,
+            title: 'CUIT / CUIL'
+        },
+        {
+            dataIndex: 'client_email',
+            render: (_, data) => data.email,
+            title: 'Email'
+        },
+        {
+            dataIndex: 'client_phone',
+            render: (_, data) => data.telefono,
+            title: 'Teléfono'
+        },
+        {
+            dataIndex: 'client_direction',
+            render: (_, data) => data.direccion,
+            title: 'Dirección'
+        },
+        {
+            dataIndex: 'client_city',
+            render: (_, data) => data.ciudad,
+            title: 'Ciudad'
+        },
+        {
+            dataIndex: 'client_province',
+            render: (_, data) => data.provincia,
+            title: 'Provincia'
+        },
+        {
+            dataIndex: 'client_actions',
+            render: (_, client) => (
+                <Row
+                    justify='start'
+                >
+                    <Col
+                        onClick={() => clientEdition(client._id)}
+                        span={12}
+                    >
                         <Edit />
-                    </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(client._id)
-                        setDeleteVisible(true)
-                    }}>
+                    </Col>
+                    <Col
+                        onClick={() => clientDeletion(client._id)}
+                        span={12}
+                    >
                         <Delete />
-                    </div>
+                    </Col>
                 </Row>
-            )
+            ),
+            title: 'Acciones'
         }
     ]
 
     return (
-        <Row>
-            <Col span={24} style={{ marginBottom: '10px' }}>
-                <Header setFilters={setFilters} />
+        <Row
+            gutter={[0, 16]}
+        >
+            <Col
+                span={24}
+            >
+                <Header
+                    setFilters={setFilters}
+                    filters={filters}
+                />
             </Col>
-            <Col span={24}>
+            <Col
+                span={24}
+            >
                 <Table
                     width={'100%'}
                     dataSource={clientes}
@@ -100,21 +178,16 @@ const Clientes = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
-                        onShowSizeChange: (e, val) => { setLimit(val) }
+                        onChange: e => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
                     }}
                     rowKey='_id'
                     tableLayout='auto'
                     size='small'
-                    loading={loading}
+                    loading={deleteModal_state.loading}
                 />
                 <DeleteModal
                     title='Eliminar cliente'
-                    deleteVisible={deleteVisible}
-                    setLoading={setLoading}
-                    setDeleteVisible={setDeleteVisible}
-                    setDeleteEntityId={setDeleteEntityId}
-                    deleteEntityIdConfirmation={deleteEntityIdConfirmation}
                 />
             </Col>
         </Row>

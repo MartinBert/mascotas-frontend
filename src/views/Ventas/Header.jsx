@@ -65,7 +65,7 @@ const Header = () => {
 
     const header = [
         {
-            body: HeaderElements.BillingDate,
+            element: HeaderElements.BillingDate,
             name: 'billingDate',
             order_lg: 2,
             order_md: 2,
@@ -75,7 +75,7 @@ const Header = () => {
             order_xxl: 2
         },
         {
-            body: HeaderElements.BillingClient,
+            element: HeaderElements.BillingClient,
             name: 'billingClient',
             order_lg: 3,
             order_md: 4,
@@ -85,7 +85,7 @@ const Header = () => {
             order_xxl: 3
         },
         {
-            body: HeaderElements.BillingDocument,
+            element: HeaderElements.BillingDocument,
             name: 'billingDocument',
             order_lg: 6,
             order_md: 6,
@@ -95,7 +95,7 @@ const Header = () => {
             order_xxl: 6
         },
         {
-            body: HeaderElements.BillingLoadingDocument,
+            element: HeaderElements.BillingLoadingDocument,
             name: 'billingLoadingDocument',
             order_lg: 7,
             order_md: 8,
@@ -105,7 +105,7 @@ const Header = () => {
             order_xxl: 7
         },
         {
-            body: HeaderElements.BillingPaymentMethods,
+            element: HeaderElements.BillingPaymentMethods,
             name: 'billingPaymentMethods',
             order_lg: 10,
             order_md: 10,
@@ -115,7 +115,7 @@ const Header = () => {
             order_xxl: 10
         },
         {
-            body: HeaderElements.BillingPaymentPlans,
+            element: HeaderElements.BillingPaymentPlans,
             name: 'billingPaymentPlans',
             order_lg: 11,
             order_md: 12,
@@ -125,7 +125,7 @@ const Header = () => {
             order_xxl: 11
         },
         {
-            body: HeaderElements.CleanFieldsButton,
+            element: HeaderElements.CleanFieldsButton,
             name: 'cleanFieldsButton',
             order_lg: 4,
             order_md: 7,
@@ -135,7 +135,7 @@ const Header = () => {
             order_xxl: 4
         },
         {
-            body: HeaderElements.CleanGlobalPercentageButton,
+            element: HeaderElements.CleanGlobalPercentageButton,
             name: 'cleanGlobalPercentageButton',
             order_lg: 12,
             order_md: 11,
@@ -145,7 +145,7 @@ const Header = () => {
             order_xxl: 12
         },
         {
-            body: HeaderElements.CleanProductsButton,
+            element: HeaderElements.CleanProductsButton,
             name: 'cleanProductsButton',
             order_lg: 8,
             order_md: 9,
@@ -155,7 +155,7 @@ const Header = () => {
             order_xxl: 8
         },
         {
-            body: HeaderElements.CustomProductListButton,
+            element: HeaderElements.CustomProductListButton,
             name: 'customProductListButton',
             order_lg: 5,
             order_md: 3,
@@ -165,7 +165,7 @@ const Header = () => {
             order_xxl: 5
         },
         {
-            body: HeaderElements.GlobalPercentageButton,
+            element: HeaderElements.GlobalPercentageButton,
             name: 'globalPercentageButton',
             order_lg: 9,
             order_md: 5,
@@ -175,7 +175,7 @@ const Header = () => {
             order_xxl: 9
         },
         {
-            body: HeaderElements.ProductListButton,
+            element: HeaderElements.ProductListButton,
             name: 'productListButton',
             order_lg: 1,
             order_md: 1,
@@ -238,7 +238,7 @@ const Header = () => {
                                             span: responsiveGrid.col_span_xxl
                                         }}
                                     >
-                                        {item.body}
+                                        {item.element}
                                     </Col>
                                 )
                             })

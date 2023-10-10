@@ -3,8 +3,13 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import { DeleteModal } from '../../components/generics'
 import icons from '../../components/icons'
+
+// Custom Contexts
+import actions from '../../actions'
+import contexts from '../../contexts'
 
 // Design Components
 import { Row, Col, Table } from 'antd'
@@ -17,104 +22,150 @@ import Header from './Header'
 import DetailsModal from './DetailsModal'
 
 // Imports Destructuring
+const { validateDeletion } = actions.deleteModal
+const { useDeleteModalContext } = contexts.DeleteModal
 const { Edit, Delete, Details } = icons
 
 
 const MediosPago = () => {
     const navigate = useNavigate()
+    const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [mediospago, setMediosPago] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
     const [limit, setLimit] = useState(10)
     const [filters, setFilters] = useState(null)
     const [detailsVisible, setDetailsVisible] = useState(false)
     const [detailsData, setDetailsData] = useState(null)
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteEntityId, setDeleteEntityId] = useState(null)
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
+    // ------------------ Fetch Payment Methods ------------------ //
     useEffect(() => {
-        const fetchMediosPago = async () => {
-            const data = await api.mediospago.findAll({ page, limit, filters })
-            setMediosPago(data)
-            setTotalDocs(data.length)
-            setLoading(false)
+        const fetchPaymentMethods = async () => {
+            const stringFilters = JSON.stringify(filters)
+            const data = await api.mediospago.findPaginated({ page, limit, filters: stringFilters })
+            setMediosPago(data.docs)
+            setTotalDocs(data.totalDocs)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
-        fetchMediosPago()
-    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
+        fetchPaymentMethods()
+    }, [
+        deleteModal_state.loading,
+        filters,
+        limit,
+        page,
+    ])
+
+    // ------------------ Payment Methods Deletion ------------------ //
+    const paymentMethodDeletion = (paymentMethodID) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: paymentMethodID })
+        deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
+    }
 
     useEffect(() => {
-        if (deleteEntityId === null) return
         const deleteMedioPago = async () => {
-            setLoading(true)
-            api.mediospago.deleteMedioPago(deleteEntityId)
-                .then(() => {
-                    setDeleteEntityId(null)
-                    setLoading(false)
-                })
+            const validation = validateDeletion(
+                deleteModal_state.confirmDeletion,
+                deleteModal_state.entityID
+            )
+            if (validation === 'OK') {
+                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+                await api.mediospago.deleteMedioPago(deleteModal_state.entityID)
+                    .then(response => {
+                        if (response.code === 200) {
+                            successAlert('El registro se eliminó correctamente')
+                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
+                        } else {
+                            errorAlert('Fallo al eliminar el registro')
+                        }
+                    })
+            }
         }
         deleteMedioPago()
-    }, [deleteEntityId])
+    }, [
+        deleteModal_state.confirmDeletion,
+        deleteModal_state.entityID
+    ])
 
-    const editMedioPago = (id) => {
+    // ------------------ Payment Methods Edition ------------------ //
+    const paymentMethodEdition = (id) => {
         navigate(`/mediospago/${id}`)
     }
 
+    // ------------------ Payment Methods Details ------------------ //
     const seeDetails = (data) => {
         setDetailsData(data)
         setDetailsVisible(true)
     }
 
+
     const columnsForTable = [
         {
-            title: 'Nombre',
-            dataIndex: 'nombre',
+            dataIndex: 'paymentMethod_name',
+            render: (_, paymentMethod) => paymentMethod.nombre,
+            title: 'Nombre'
         },
         {
-            title: 'Suma en cierre z',
-            render: (data) => (
-                (data.cierrez) ? 'Si' : 'No'
-            )
+            dataIndex: 'paymentMethod_zClose',
+            render: (_, paymentMethod) => paymentMethod.cierrez ? 'Si' : '-',
+            title: 'Suma en cierre z'
         },
         {
-            title: 'Suma en arqueo',
-            render: (data) => (
-                (data.arqueoCaja) ? 'Si' : 'No'
-            )
+            dataIndex: 'paymentMethod_additionInCashRegister',
+            render: (_, paymentMethod) => paymentMethod.arqueoCaja ? 'Si' : '-',
+            title: 'Suma en arqueo'
         },
         {
-            title: 'Detalles',
-            render: (data) => (
-                <div onClick={() => { seeDetails(data.planes) }}>
-                    <Details title='Ver detalle' />
+            dataIndex: 'paymentMethod_details',
+            render: (_, paymentMethod) => (
+                <div
+                    onClick={() => seeDetails(paymentMethod.planes)}
+                >
+                    <Details
+                        title='Ver detalle'
+                    />
                 </div>
-            )
+            ),
+            title: 'Detalles'
         },
         {
-            title: 'Acciones',
-            render: ({ _id }) => (
-                <Row>
-                    <div onClick={() => { editMedioPago(_id) }}>
+            dataIndex: 'paymentMethod_actions',
+            render: (_, paymentMethod) => (
+                <Row
+                    justify='start'
+                >
+                    <Col
+                        onClick={() => paymentMethodEdition(paymentMethod._id)}
+                        span={12}
+                    >
                         <Edit />
-                    </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(_id)
-                        setDeleteVisible(true)
-                    }}>
+                    </Col>
+                    <Col
+                        onClick={() => paymentMethodDeletion(paymentMethod._id)}
+                        span={12}
+                    >
                         <Delete />
-                    </div>
+                    </Col>
                 </Row>
-            )
+            ),
+            title: 'Acciones'
         }
     ]
 
     return (
-        <Row>
-            <Col span={24} style={{ marginBottom: '10px' }}>
-                <Header setFilters={setFilters} />
+        <Row
+            gutter={[0, 16]}
+        >
+            <Col
+                span={24}
+            >
+                <Header
+                    filters={filters}
+                    setFilters={setFilters}
+                />
             </Col>
-            <Col span={24}>
+            <Col
+                span={24}
+            >
                 <Table
                     width={'100%'}
                     dataSource={mediospago}
@@ -124,21 +175,16 @@ const MediosPago = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
-                        onShowSizeChange: (e, val) => { setLimit(val) }
+                        onChange: e => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
                     }}
                     rowKey='_id'
                     tableLayout='auto'
                     size='small'
-                    loading={loading}
+                    loading={deleteModal_state.loading}
                 />
                 <DeleteModal
                     title='Eliminar medio de pago'
-                    deleteVisible={deleteVisible}
-                    setLoading={setLoading}
-                    setDeleteVisible={setDeleteVisible}
-                    setDeleteEntityId={setDeleteEntityId}
-                    deleteEntityIdConfirmation={deleteEntityIdConfirmation}
                 />
                 <DetailsModal
                     detailsVisible={detailsVisible}

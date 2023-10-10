@@ -1,9 +1,9 @@
 // React Components and Hooks
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 // Design Components
-import { Row, Col, Input, DatePicker } from 'antd'
+import { Button, Col, DatePicker, Input, Row } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -18,7 +18,8 @@ const { exportSimpleExcel } = helpers.excel
 const { simpleDateWithHours } = helpers.dateHelper
 
 
-const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => {
+const Header = ({ filters, setFilters, setPage, salidas_paginadas, salidas_totales }) => {
+    const navigate = useNavigate()
     const [fecha, setFecha] = useState(null)
     const [descripcion, setDescripcion] = useState(null)
     const [salidasToReport, setSalidasToReport] = useState(null)
@@ -29,8 +30,11 @@ const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => 
         else {
             const initialDate = (addDays(value[0].$d, 0)).toISOString()
             const finalDate = (addDays(value[1].$d, 1)).toISOString()
-            const response = await api.salidas.findByDates({ initialDate, finalDate })
-            setSalidasToReport(response)
+            const dateFilters = JSON.stringify({
+                fecha: { $gte: initialDate, $lte: finalDate }
+            })
+            const response = await api.salidas.findByDates(dateFilters)
+            setSalidasToReport(response.docs)
         }
     }
 
@@ -79,7 +83,7 @@ const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => 
             if (fechaToCompare.includes(value)) return entry.fecha
             else return null
         })
-        setFilters(JSON.stringify({ fecha: fechaForFilters }))
+        setFilters({ fecha: fechaForFilters })
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
@@ -87,29 +91,32 @@ const Header = ({ setFilters, setPage, salidas_paginadas, salidas_totales }) => 
     const onChangeDescripcion = (value) => {
         clearInputs()
         setDescripcion(value)
-        setFilters(JSON.stringify({ descripcion: value }))
+        setFilters({ descripcion: value })
         if (value.length < 1) setFilters(null)
         setPage(1)
     }
-    
+
+    const redirectToForm = () => {
+        navigate('/salidas/nuevo')
+    }
+
     return (
         <Row gutter={8}>
             <Col span={4}>
-                <Link to='/salidas/nuevo'>
-                    <button
-                        className='btn-primary'
-                    >
-                        Nueva salida
-                    </button>
-                </Link>
+                <Button
+                            className='btn-primary'
+                    onClick={() => redirectToForm()}
+                >
+                    Nueva salida
+                </Button>
             </Col>
             <Col span={4}>
-                <button
-                    className='btn-primary'
+                <Button
+                            className='btn-primary'
                     onClick={() => exportExcel()}
                 >
                     Exportar Excel
-                </button>
+                </Button>
             </Col>
             <Col span={8}>
                 <RangePicker

@@ -1,12 +1,12 @@
 // React Components and Hooks
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { GenericAutocomplete } from '../../components/generics'
 
 // Design Components
-import { Row, Col, Button, Input } from 'antd'
+import { Button, Col, Input, Row } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -23,19 +23,35 @@ const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 
 
 const Header = ({ setFilters, filters, setLoading, detailsData }) => {
+    const navigate = useNavigate()
     const [productosToReport, setProductosToReport] = useState(null)
     const [selectedBrand, setSelectedBrand] = useState(null)
     const [selectedHeading, setSelectedHeading] = useState(null)
     const [priceModalVisible, setPriceModalVisible] = useState(false)
-    useEffect(() => { if (selectedBrand) { setFilters({ ...filters, marca: selectedBrand }) } }, [selectedBrand, filters, setFilters])
-    useEffect(() => { if (selectedHeading) { setFilters({ ...filters, rubro: selectedHeading }) } }, [selectedHeading, filters, setFilters])
+
+    useEffect(() => {
+        if (!selectedBrand) return
+        setFilters({
+            ...filters,
+            marca: selectedBrand
+        })
+    }, [selectedBrand])
+
+    useEffect(() => {
+        if (!selectedHeading) return
+        setFilters({
+            ...filters,
+            rubro: selectedHeading
+        })
+    }, [selectedHeading])
+
     useEffect(() => {
         const findProductos = async () => {
-            const response = await api.productos.findAll()
-            setProductosToReport(response.docs)
+            const data = await api.productos.findAll()
+            setProductosToReport(data.docs)
         }
         findProductos()
-    }, [selectedHeading])
+    }, [selectedBrand, selectedHeading])
 
     const cleanFilters = () => {
         setSelectedBrand(null)
@@ -125,35 +141,45 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
         return processedLines
     }
 
+    const redirectToForm = () => {
+        navigate('/productos/nuevo')
+    }
+
+    const updateFilters = (e) => {
+        setFilters({
+            ...filters,
+            [e.target.name]: e.target.value
+        })
+    }
+
     return (
         <>
             <Row>
                 <Col span={24}>
                     <Row gutter={8}>
                         <Col>
-                            <button
+                            <Button
                                 className='btn-primary'
+                                onClick={() => redirectToForm()}
                             >
-                                <Link to='/productos/nuevo'>
-                                    Nuevo
-                                </Link>
-                            </button>
+                                Nuevo
+                            </Button>
                         </Col>
                         <Col>
-                            <button
+                            <Button
                                 className='btn-primary'
                                 onClick={() => setPriceModalVisible(true)}
                             >
                                 Modificar precios
-                            </button>
+                            </Button>
                         </Col>
                         <Col>
-                            <button
+                            <Button
                                 className='btn-primary'
                                 onClick={() => exportExcel()}
                             >
                                 Exportar Excel
-                            </button>
+                            </Button>
                         </Col>
                     </Row>
                     <br />
@@ -161,49 +187,31 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
                         <Col span={6}>
                             <Input
                                 color='primary'
-                                style={{ width: 200, marginBottom: '10px' }}
+                                name='nombre'
+                                onChange={e => updateFilters(e)}
                                 placeholder='Buscar por nombre'
-                                onChange={e => {
-                                    setFilters(
-                                        {
-                                            ...filters,
-                                            nombre: e.target.value
-                                        }
-                                    )
-                                }}
-                                value={(filters) ? filters.nombre : null}
+                                style={{ width: 200, marginBottom: '10px' }}
+                                value={filters ? filters.nombre : null}
                             />
                         </Col>
                         <Col span={6}>
                             <Input
                                 color='primary'
-                                style={{ width: 200, marginBottom: '10px' }}
+                                name='codigoBarras'
+                                onChange={e => updateFilters(e)}
                                 placeholder='Buscar por codigo de barras'
-                                onChange={(e) => {
-                                    setFilters(
-                                        {
-                                            ...filters,
-                                            codigoBarras: e.target.value
-                                        }
-                                    )
-                                }}
-                                value={(filters) ? filters.codigoBarras : null}
+                                style={{ width: 200, marginBottom: '10px' }}
+                                value={filters ? filters.codigoBarras : null}
                             />
                         </Col>
                         <Col span={6}>
                             <Input
                                 color='primary'
-                                style={{ width: 200, marginBottom: '10px' }}
+                                name='codigoProducto'
+                                onChange={e => updateFilters(e)}
                                 placeholder='Buscar por codigo de producto'
-                                onChange={(e) => {
-                                    setFilters(
-                                        {
-                                            ...filters,
-                                            codigoProducto: e.target.value
-                                        }
-                                    )
-                                }}
-                                value={(filters) ? filters.codigoProducto : null}
+                                style={{ width: 200, marginBottom: '10px' }}
+                                value={filters ? filters.codigoProducto : null}
                             />
                         </Col>
                         <Col span={6}>

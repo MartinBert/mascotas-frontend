@@ -3,8 +3,13 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import { DeleteModal } from '../../components/generics'
 import icons from '../../components/icons'
+
+// Custom Context Providers
+import actions from '../../actions'
+import contexts from '../../contexts'
 
 // Design Components
 import { Row, Col, Table } from 'antd'
@@ -20,136 +25,186 @@ import DetailsModal from './DetailsModal'
 import Header from './Header'
 
 // Imports Destructuring
-const { Details, Edit, Delete } = icons
-const { dateHelper, mathHelper } = helpers
-const { roundTwoDecimals } = mathHelper
+const { validateDeletion } = actions.deleteModal
+const { useDeleteModalContext } = contexts.DeleteModal
+const { Delete, Details, Edit } = icons
+const { dateHelper } = helpers
+
+const findOutputToDelete = async (outputID) => {
+    const findOutput = await api.salidas.findById(outputID)
+    const output = findOutput.data
+    return output
+}
+
+const fixStock = async (outputToDelete) => {
+    for (let productOfOutput of outputToDelete.productos) {
+        const findProduct = await api.productos.findById(productOfOutput._id)
+        const product = await findProduct.data
+        await api.productos.modifyStock({
+            product,
+            isIncrement: true,
+            quantity: productOfOutput.cantidadesSalientes
+        })
+    }
+}
 
 
 const Salidas = () => {
     const navigate = useNavigate()
+    const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [salidas_paginadas, setSalidas_paginadas] = useState(null)
     const [salidas_totales, setSalidas_totales] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
     const [limit, setLimit] = useState(10)
     const [filters, setFilters] = useState(null)
     const [detailsVisible, setDetailsVisible] = useState(false)
     const [detailsData, setDetailsData] = useState(null)
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteEntityId, setDeleteEntityId] = useState(null)
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
+    // ------------------ Fetch Outputs ------------------ //
     useEffect(() => {
         const fetchSalidas_paginadas = async () => {
-            const response = await api.salidas.findAll({ page, limit, filters })
-            const responseFixed = response.data.docs.map(item => {
-                item.gananciaNeta = roundTwoDecimals(item.gananciaNeta)
-                return item
-            })
-            setSalidas_paginadas(responseFixed)
-            setTotalDocs(response.data.totalDocs)
-            setLoading(false)
+            const stringFilters = JSON.stringify(filters)
+            const data = await api.salidas.findPaginated({ page, limit, filters: stringFilters })
+            setSalidas_paginadas(data.docs)
+            setTotalDocs(data.totalDocs)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchSalidas_paginadas()
-    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
+    }, [
+        deleteModal_state.loading,
+        filters,
+        limit,
+        page,
+    ])
 
     useEffect(() => {
         const fetchSalidas_totales = async () => {
-            const data = await api.salidas.findAll(null)
-            setSalidas_totales(data)
+            const data = await api.salidas.findAll()
+            setSalidas_totales(data.docs)
         }
         fetchSalidas_totales()
     }, [])
 
+    // ------------------ Output Deletion ------------------ //
+    const outputDeletion = (outputID) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: outputID })
+        deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
+    }
+
     useEffect(() => {
-        if (deleteEntityId === null) return
         const deleteSalida = async () => {
-            setLoading(true)
-            api.salidas.deleteById(deleteEntityId)
-                .then(() => {
-                    setDeleteEntityId(null)
-                    setLoading(false)
-                })
+            const validation = validateDeletion(
+                deleteModal_state.confirmDeletion,
+                deleteModal_state.entityID
+            )
+            if (validation === 'OK') {
+                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+                const outputToDelete = await findOutputToDelete(deleteModal_state.entityID)
+                fixStock(outputToDelete)
+                await api.salidas.deleteById(deleteModal_state.entityID)
+                    .then(response => {
+                        if (response.code === 200) {
+                            successAlert('El registro se eliminó correctamente')
+                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
+                        } else {
+                            errorAlert('Fallo al eliminar el registro')
+                        }
+                    })
+            }
         }
         deleteSalida()
-    }, [deleteEntityId])
+    }, [
+        deleteModal_state.confirmDeletion,
+        deleteModal_state.entityID
+    ])
 
-    const editSalida = (id) => {
+    // ------------------ Output Edition ------------------ //
+    const outputEdition = (id) => {
         navigate(`/salidas/${id}`)
     }
 
+    // ------------------ Product Details ------------------ //
+    const openProductDetails = (output) => {
+        setDetailsData(output.productos)
+        setDetailsVisible(true)
+    }
+
+
     const columnsForTable = [
         {
-            title: 'Usuario',
-            dataIndex: 'usuario',
-            render: usuario => (usuario) ? usuario.nombre : 'Usuario inexistente'
+            dataIndex: 'output_user',
+            render: (_, output) => output.usuario ? output.usuario.nombre : 'Usuario inexistente',
+            title: 'Usuario'
         },
         {
-            title: 'Productos que salieron',
-            render: data => (
+            dataIndex: 'output_details',
+            render: (_, output) => (
                 <div
-                    onClick={() => {
-                        setDetailsData(data.productos)
-                        setDetailsVisible(true)
-                    }}
-                    style={{ display: 'flex', alignItems: 'center' }}
+                    onClick={() => openProductDetails(output)}
                 >
                     <Details />
                 </div>
-            )
-        },
-        {
-            title: 'Fecha',
-            render: (data) => (
-                <p>{dateHelper.simpleDateWithHours(data.fecha) + ' hs'}</p>
             ),
+            title: 'Productos que salieron'
         },
         {
-            title: 'Descripción',
-            dataIndex: 'descripcion',
+            dataIndex: 'output_date',
+            render: (_, output) => dateHelper.simpleDateWithHours(output.fecha) + ' hs',
+            title: 'Fecha'
         },
         {
-            title: 'Ganancia neta',
-            dataIndex: 'gananciaNeta',
+            dataIndex: 'output_description',
+            render: (_, output) => output.descripcion,
+            title: 'Descripción'
         },
         {
-            title: 'Acciones',
-            render: (salida) => (
+            dataIndex: 'output_netProfit',
+            render: (_, output) => output.gananciaNeta,
+            title: 'Ganancia neta'
+        },
+        {
+            dataIndex: 'output_actions',
+            render: (_, output) => (
                 <Row
-                    style={{ display: 'flex', justifyContent: 'start' }}
+                    justify='start'
                 >
-                    <div
-                        onClick={() => editSalida(salida._id)}
-                        style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
+                    <Col
+                        onClick={() => outputEdition(output._id)}
+                        span={12}
                     >
                         <Edit />
-                    </div>
-                    <div
-                        onClick={() => {
-                            setDeleteEntityIdConfirmation(salida._id)
-                            setDeleteVisible(true)
-                        }}
-                        style={{ display: 'flex', alignItems: 'center' }}
+                    </Col>
+                    <Col
+                        onClick={() => outputDeletion(output._id)}
+                        span={12}
                     >
                         <Delete />
-                    </div>
+                    </Col>
                 </Row>
-            )
+            ),
+            title: 'Acciones'
         },
     ]
 
     return (
-        <Row>
-            <Col span={24}>
+        <Row
+            gutter={[0, 16]}
+        >
+            <Col
+                span={24}
+            >
                 <Header
-                    setFilters={setFilters}
-                    setPage={setPage}
+                    filters={filters}
                     salidas_paginadas={salidas_paginadas}
                     salidas_totales={salidas_totales}
+                    setFilters={setFilters}
+                    setPage={setPage}
                 />
             </Col>
-            <Col span={24}>
+            <Col
+                span={24}
+            >
                 <Table
                     width={'100%'}
                     dataSource={salidas_paginadas}
@@ -159,10 +214,10 @@ const Salidas = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => setPage(e),
+                        onChange: e => setPage(e),
                         onShowSizeChange: (e, val) => setLimit(val)
                     }}
-                    loading={loading}
+                    loading={deleteModal_state.loading}
                     rowKey='_id'
                     tableLayout='auto'
                     size='small'
@@ -175,11 +230,6 @@ const Salidas = () => {
             />
             <DeleteModal
                 title='Eliminar salida'
-                deleteVisible={deleteVisible}
-                setLoading={setLoading}
-                setDeleteVisible={setDeleteVisible}
-                setDeleteEntityId={setDeleteEntityId}
-                deleteEntityIdConfirmation={deleteEntityIdConfirmation}
             />
         </Row>
     )

@@ -3,8 +3,13 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import { DeleteModal } from '../../components/generics'
 import icons from '../../components/icons'
+
+// Custom Context Providers
+import actions from '../../actions'
+import contexts from '../../contexts'
 
 // Design Components
 import { Row, Col, Table } from 'antd'
@@ -16,77 +21,119 @@ import api from '../../services'
 import Header from './Header'
 
 // Imports Destructuring
+const { validateDeletion } = actions.deleteModal
+const { useDeleteModalContext } = contexts.DeleteModal
 const { Edit, Delete } = icons
 
 
 const Rubros = () => {
     const navigate = useNavigate()
+    const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [rubros, setRubros] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
     const [limit, setLimit] = useState(10)
     const [filters, setFilters] = useState(null)
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteEntityId, setDeleteEntityId] = useState(null)
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
+    // ------------------ Fetch Product Categories ------------------ //
     useEffect(() => {
         const fetchRubros = async () => {
-            const data = await api.rubros.findAll({ page, limit, filters })
+            const stringFilters = JSON.stringify(filters)
+            const data = await api.rubros.findPaginated({ page, limit, filters: stringFilters })
             setRubros(data.docs)
             setTotalDocs(data.totalDocs)
-            setLoading(false)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchRubros()
-    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
+    }, [
+        deleteModal_state.loading,
+        filters,
+        limit,
+        page,
+    ])
+
+    // ------------------ Product Category Deletion ------------------ //
+    const productCategoryDeletion = (productCategoryID) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: productCategoryID })
+        deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
+    }
 
     useEffect(() => {
-        if (deleteEntityId === null) return
-        const deleteHeading = async () => {
-            setLoading(true)
-            api.rubros.deleteRubro(deleteEntityId)
-                .then(() => {
-                    setDeleteEntityId(null)
-                    setLoading(false)
-                })
+        const deleteProductCategory = async () => {
+            const validation = validateDeletion(
+                deleteModal_state.confirmDeletion,
+                deleteModal_state.entityID
+            )
+            if (validation === 'OK') {
+                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+                await api.rubros.deleteRubro(deleteModal_state.entityID)
+                    .then(response => {
+                        if (response.code === 200) {
+                            successAlert('El registro se eliminó correctamente')
+                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
+                        } else {
+                            errorAlert('Fallo al eliminar el registro')
+                        }
+                    })
+            }
         }
-        deleteHeading()
-    }, [deleteEntityId])
+        deleteProductCategory()
+    }, [
+        deleteModal_state.confirmDeletion,
+        deleteModal_state.entityID
+    ])
 
-    const editHeading = (id) => {
+    // ------------------ Product Category Edition ------------------ //
+    const productCategoryEdition = (id) => {
         navigate(`/rubros/${id}`)
     }
 
+
     const columnsForTable = [
         {
-            title: 'Nombre',
-            dataIndex: 'nombre',
+            dataIndex: 'productCategory_name',
+            render: (_, productCategory) => productCategory.nombre,
+            title: 'Nombre'
         },
         {
-            title: 'Acciones',
-            render: (heading) => (
-                <Row>
-                    <div onClick={() => { editHeading(heading._id) }}>
+            dataIndex: 'productCategory_actions',
+            render: (_, productCategory) => (
+                <Row
+                    justify='start'
+                >
+                    <Col
+                        onClick={() => productCategoryEdition(productCategory._id)}
+                        span={12}
+                    >
                         <Edit />
-                    </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(heading._id)
-                        setDeleteVisible(true)
-                    }}>
+                    </Col>
+                    <Col
+                        onClick={() => productCategoryDeletion(productCategory._id)}
+                        span={12}
+                    >
                         <Delete />
-                    </div>
+                    </Col>
                 </Row>
-            )
+            ),
+            title: 'Acciones'
         }
     ]
 
     return (
-        <Row>
-            <Col span={24} style={{ marginBottom: '10px' }}>
-                <Header setFilters={setFilters} />
+        <Row
+            gutter={[0, 16]}
+        >
+            <Col
+                span={24}
+            >
+                <Header
+                    filters={filters}
+                    setFilters={setFilters}
+                />
             </Col>
-            <Col span={24}>
+            <Col
+                span={24}
+            >
                 <Table
                     width={'100%'}
                     dataSource={rubros}
@@ -96,21 +143,16 @@ const Rubros = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
-                        onShowSizeChange: (e, val) => { setLimit(val) }
+                        onChange: e => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
                     }}
                     rowKey='_id'
                     tableLayout='auto'
                     size='small'
-                    loading={loading}
+                    loading={deleteModal_state.loading}
                 />
                 <DeleteModal
                     title='Eliminar rubro'
-                    deleteVisible={deleteVisible}
-                    setLoading={setLoading}
-                    setDeleteVisible={setDeleteVisible}
-                    setDeleteEntityId={setDeleteEntityId}
-                    deleteEntityIdConfirmation={deleteEntityIdConfirmation}
                 />
             </Col>
         </Row>

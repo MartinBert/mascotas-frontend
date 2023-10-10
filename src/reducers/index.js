@@ -1,21 +1,23 @@
-import customSaleProducts from './customSaleProducts'
 import auth from './auth'
-import privateRoute from './privateRoute'
+import customSaleProducts from './customSaleProducts'
+import deleteModal from './deleteModal'
 import entries from './entries'
 import outputs from './outputs'
+import privateRoute from './privateRoute'
 import productSelectionModal from './productSelectionModal'
-import saleProducts from './saleProducts'
 import sale from './sale'
+import saleProducts from './saleProducts'
 
 const reducers = {
-    customSaleProducts,
     auth,
-    privateRoute,
+    customSaleProducts,
+    deleteModal,
     entries,
     outputs,
+    privateRoute,
     productSelectionModal,
-    saleProducts,
-    sale
+    sale,
+    saleProducts
 }
 
 export default reducers

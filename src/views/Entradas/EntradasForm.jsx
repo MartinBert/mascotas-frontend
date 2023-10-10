@@ -1,364 +1,249 @@
 // React Components and Hooks
-import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
 
 // Custom Components
 import { ProductSelectionModal } from '../../components/generics'
-import { errorAlert, successAlert } from '../../components/alerts'
-import icons from '../../components/icons'
 
 // Design Components
-import { Row, Col, Form, Input, Spin, DatePicker } from 'antd'
-import dayjs from 'dayjs'
+import { Row, Col, Spin } from 'antd'
 
 // Context Providers
 import contexts from '../../contexts'
 
-// Helpers
-import helpers from '../../helpers'
-
 // Services
 import api from '../../services'
 
+// Views
+import EntradasElements from './elements'
+
 // Imports Destructuring
-const { Add, Delete } = icons
 const { useAuthContext } = contexts.Auth
 const { useEntriesContext } = contexts.Entries
-const { useProductSelectionModalContext } = contexts.ProductSelectionModal
-const { localFormat } = helpers.dateHelper
+const {
+    AddButton,
+    CancelButton,
+    CleanFields,
+    CleanProducts,
+    InputHidden,
+    ProductDate,
+    ProductDescription,
+    SaveButton,
+    SelectedProductsTable,
+    TotalCost
+} = EntradasElements
 
 
 const EntradasForm = () => {
-
-    //------------------------------------------------------ State declarations ------------------------------------------------------/
-    const navigate = useNavigate()
+    const location = useLocation()
     const { id } = useParams()
     const [auth_state, auth_dispatch] = useAuthContext()
     const [entries_state, entries_dispatch] = useEntriesContext()
-    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
-    const [total, setTotal] = useState(0)
-    const [loading, setLoading] = useState(true)
-    const [entradaIsReady, setEntradaIsReady] = useState(false)
-    const [entrada, setEntrada] = useState({
-        descripcion: '',
-        fecha: new Date(),
-        cantidad: 0,
-        gananciaNeta: 0,
-        productos: [],
-        usuario: null,
-    })
-    //------------------------------------------------------------------------------------------------------------------------------/
 
-
-    //--------------------------------------------------------- First load ---------------------------------------------------------/
-
+    // ---------------- First load ---------------- //
     useEffect(() => {
-        const fetchUser = async () => {
-            const userId = localStorage.getItem('userId')
-            const loggedUser = await api.usuarios.findById(userId)
+        const loadEntryData = async () => {
+            // Load User
+            const userID = localStorage.getItem('userId')
+            const loggedUser = await api.usuarios.findById(userID)
             auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
-        }
-        fetchUser()
-    }, [auth_dispatch])
 
-    useEffect(() => {
-        if (!loading) return
-        if (id === 'nuevo') {
-            setEntradaIsReady(true)
-        } else {
-            const fetchEntrada = async () => {
-                const response = await api.entradas.findById(id)
-                setEntrada(response.data)
-                setEntradaIsReady(true)
+            // Recover entry data for edit
+            if (id !== 'nuevo') {
+                const entryID = location.pathname.replace('/entradas/', '')
+                const response = await api.entradas.findById(entryID)
+                entries_dispatch({ type: 'SET_ENTRY', payload: response.data })
             }
-            fetchEntrada()
         }
-    }, [loading, id])
+        loadEntryData()
+    }, [auth_dispatch, entries_dispatch, id])
 
+    // ---------------- Loading state ---------------- //
     useEffect(() => {
-        if (!entradaIsReady) return
-        if (!entrada.usuario) setEntrada({ ...entrada, usuario: auth_state.user })
-        setLoading(false)
-    },
-        //eslint-disable-next-line
-        [entradaIsReady, auth_dispatch])
+        if (!auth_state.user) entries_dispatch({ type: 'SET_LOADING', payload: true })
+        entries_dispatch({ type: 'SET_LOADING', payload: false })
+    }, [auth_state.user])
 
-    //------------------------------------------------------------------------------------------------------------------------------/
-
-
-    //----------------------------------------------- Product Selection Modal ------------------------------------------------------/
+    // ---------------- Update state values ---------------- //
     useEffect(() => {
-        setEntrada(entrada => ({
-            ...entrada, productos: entries_state.products
-        }))
+        const updateEntriesState = () => {
+            entries_dispatch({ type: 'CALCULATE_TOTAL_COST' })
+            entries_dispatch({ type: 'SET_QUANTITY' })
+        }
+        updateEntriesState()
     }, [entries_state.products])
 
-    useEffect(() => {
-        setTotal(
-            entrada.productos.reduce(
-                (acc, item) => acc + ((item.cantidadesEntrantes) ? (item.precioUnitario * item.cantidadesEntrantes) : 0), 0
-            ))
-    }, [entrada.productos])
-    //------------------------------------------------------------------------------------------------------------------------------/
 
+    const entryData = [
+        {
+            element: <AddButton />,
+            name: 'addProduct',
+            order_lg: 1,
+            order_md: 1,
+            order_sm: 1,
+            order_xl: 1,
+            order_xs: 1,
+            order_xxl: 1
+        },
+        {
+            element: <CleanFields />,
+            name: 'cleanFields',
+            order_lg: 3,
+            order_md: 2,
+            order_sm: 5,
+            order_xl: 3,
+            order_xs: 5,
+            order_xxl: 3
+        },
+        {
+            element: <CleanProducts />,
+            name: 'cleanProducts',
+            order_lg: 6,
+            order_md: 4,
+            order_sm: 6,
+            order_xl: 6,
+            order_xs: 6,
+            order_xxl: 6
+        },
+        {
+            element: <InputHidden />,
+            name: 'complement_1',
+            order_lg: 4,
+            order_md: 6,
+            order_sm: 4,
+            order_xl: 4,
+            order_xs: 4,
+            order_xxl: 4
+        },
+        {
+            element: <InputHidden />,
+            name: 'complement_2',
+            order_lg: 7,
+            order_md: 7,
+            order_sm: 7,
+            order_xl: 7,
+            order_xs: 7,
+            order_xxl: 7
+        },
+        {
+            element: <ProductDate />,
+            name: 'productDate',
+            order_lg: 5,
+            order_md: 5,
+            order_sm: 3,
+            order_xl: 5,
+            order_xs: 3,
+            order_xxl: 5
+        },
+        {
+            element: <ProductDescription />,
+            name: 'productDescription',
+            order_lg: 2,
+            order_md: 3,
+            order_sm: 2,
+            order_xl: 2,
+            order_xs: 2,
+            order_xxl: 2
+        },
+    ]
 
-    //----------------------------------------------- Submit form action -----------------------------------------------------------/
-    const handleSubmit = async () => {
-        try {
-            if (id !== 'nuevo') {
-                for (let product of entrada.productos) {
-                    const firstEntradaRequest = await api.entradas.findById(id)
-                    const firstEntradaInstance = firstEntradaRequest.data
-                    const originalProductInstance = firstEntradaInstance.productos.find(el => el._id === product._id)
-                    if (originalProductInstance && originalProductInstance.cantidadesEntrantes !== product.cantidadesEntrantes) {
-                        const productToModifyRequest = await api.productos.findById(product._id)
-                        const productToModify = productToModifyRequest.data
-                        productToModify.cantidadStock -= originalProductInstance.cantidadesEntrantes
-                        productToModify.cantidadStock += parseFloat(product.cantidadesEntrantes)
-                        await api.productos.edit(productToModify)
-                    } else {
-                        await api.productos.modifyStock({
-                            product,
-                            isIncrement: true,
-                            quantity: product.cantidadesEntrantes
-                        })
-                    }
-                }
-                entrada.fecha = new Date()
-                entrada.cantidad = entrada.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0)
-                await api.entradas.edit(entrada)
-                    .then((response) => {
-                        if (response.code === 200) {
-                            successAlert('El registro se editó correctamente')
-                            redirectToEntradas()
-                        } else {
-                            errorAlert('Fallo al editar el registro')
-                        }
-                    })
-            } else {
-                if (!entrada.descripcion || entrada.descripcion === '') {
-                    entrada.descripcion = '-- Sin descripción --'
-                }
-                if (!entrada.fecha || entrada.fecha === null) {
-                    entrada.fecha = new Date()
-                }
-                entrada.cantidad = entrada.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0)
-                entrada.costoTotal = total
-                for (const product of entrada.productos) {
-                    await api.productos.modifyStock({
-                        product,
-                        isIncrement: true,
-                        quantity: product.cantidadesEntrantes
-                    })
-                }
-                await api.entradas.save(entrada)
-                    .then((response) => {
-                        if (response.code === 200) {
-                            successAlert('El registro se guardó correctamente')
-                            entries_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
-                            redirectToEntradas()
-                        } else {
-                            errorAlert('Fallo al guardar el registro')
-                        }
-                    })
-            }
-        } catch (err) {
-            console.error(err)
-        }
-    }
-
-    const redirectToEntradas = () => {
-        navigate('/entradas')
-    }
-    //------------------------------------------------------------------------------------------------------------------------------/
-
-    const openModal = () => {
-        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
-    }
-
-    const deleteProductFromEntry = (productID) => {
-        entries_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
-    }
-
-    const changeDate = (e) => {
-        const newDate = (!e) ? new Date() : new Date(e.$d)
-        setEntrada({
-            ...entrada,
-            fecha: newDate
-        })
-    }
+    const responsiveFormGutter = { horizontal: 0, vertical: 16 }
+    const responsiveHeadGutter = { horizontal: 8, vertical: 8 }
+    const responsiveColSpan = { lg: 8, md: 12, sm: 24, xl: 8, xs: 24, xxl: 8 }
 
     return (
-        <Row>
-            <Col span={24}>
-                <h1>{(id === 'nuevo') ? 'Nueva entrada' : 'Editar entrada'}</h1>
-                {
-                    loading
-                        ? <Spin />
-                        :
-                        <Form
-                            autoComplete='off'
-                        >
-                            <Row gutter={8}>
-                                <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                    <Form.Item
-                                        label='Descripción'
+        <>
+            <h1>{id === 'nuevo' ? 'Nueva entrada' : 'Editar entrada'}</h1>
+            {
+                entries_state.loading
+                    ? <Spin />
+                    : (
+                        <>
+                            <Row
+                                gutter={[
+                                    responsiveFormGutter.horizontal,
+                                    responsiveFormGutter.vertical
+                                ]}
+                            >
+                                <Col>
+                                    <Row
+                                        gutter={[
+                                            responsiveHeadGutter.horizontal,
+                                            responsiveHeadGutter.vertical
+                                        ]}
                                     >
-                                        <Input
-                                            name='descripcion'
-                                            placeholder='Descripción'
-                                            value={entrada.descripcion}
-                                            onChange={(e) => {
-                                                setEntrada({
-                                                    ...entrada,
-                                                    descripcion: e.target.value
-                                                })
-                                            }}
-                                        />
-                                    </Form.Item>
+                                        {
+                                            entryData.map(item => {
+                                                return (
+                                                    <Col
+                                                        key={item.name}
+                                                        lg={{
+                                                            order: item.order_lg,
+                                                            span: responsiveColSpan.lg
+                                                        }}
+                                                        md={{
+                                                            order: item.order_md,
+                                                            span: responsiveColSpan.md
+                                                        }}
+                                                        sm={{
+                                                            order: item.order_sm,
+                                                            span: responsiveColSpan.sm
+                                                        }}
+                                                        xl={{
+                                                            order: item.order_xl,
+                                                            span: responsiveColSpan.xl
+                                                        }}
+                                                        xs={{
+                                                            order: item.order_xs,
+                                                            span: responsiveColSpan.xs
+                                                        }}
+                                                        xxl={{
+                                                            order: item.order_xxl,
+                                                            span: responsiveColSpan.xxl
+                                                        }}
+                                                    >
+                                                        {item.element}
+                                                    </Col>
+                                                )
+                                            })
+                                        }
+                                    </Row>
                                 </Col>
-                                <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                    <Form.Item
-                                        label='Fecha'
+                                <Col
+                                    span={24}
+                                    style={{ textAlign: 'right' }}
+                                >
+                                    <TotalCost />
+                                </Col>
+                                <Col
+                                    span={24}
+                                >
+                                    <SelectedProductsTable />
+                                </Col>
+                                <Col
+                                    span={24}
+                                >
+                                    <Row
+                                        justify='space-around'
                                     >
-                                        <DatePicker
-                                            name='fecha'
-                                            format={['DD/MM/YYYY']}
-                                            onChange={e => changeDate(e)}
-                                            value={dayjs(localFormat(entrada.fecha), ['DD/MM/YYYY'])}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col xl={6} lg={8} md={12} sm={24} xs={24}>
-                                    <Form.Item
-                                        label='Costo total'
-                                    >
-                                        <Input
-                                            name='costoTotal'
-                                            placeholder='Costo total'
-                                            value={total}
-                                            disabled={true}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={24}>
-                                    <div onClick={() => openModal()}>
-                                        <Add customStyle={{ width: '70px', height: '70px' }} />
-                                    </div>
-                                </Col>
-                                <Col span={24}>
-                                    {(entrada.productos.length > 0) ?
-                                        entrada.productos.map((item, key) => (
-                                            <Row key={key} gutter={8}>
-                                                <Col span={8}>
-                                                    <Form.Item
-                                                        required
-                                                    >
-                                                        <Input
-                                                            disabled
-                                                            name='nombre'
-                                                            placeholder='Nombre del producto'
-                                                            value={item.nombre}
-                                                            onChange={(e) => {
-                                                                setEntrada({
-                                                                    ...entrada,
-                                                                    productos: entrada.productos.map(el => {
-                                                                        if (el._id === item._id) {
-                                                                            el.nombre = e.target.value
-                                                                        }
-                                                                        return el
-                                                                    })
-                                                                })
-                                                            }}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item
-                                                        required
-                                                    >
-                                                        <Input
-                                                            disabled
-                                                            name='barcode'
-                                                            placeholder='Codigo de barras de producto'
-                                                            value={item.codigoBarras}
-                                                            onChange={(e) => {
-                                                                setEntrada({
-                                                                    ...entrada,
-                                                                    productos: entrada.productos.map(el => {
-                                                                        if (el._id === item._id) {
-                                                                            el.codigoBarras = e.target.value
-                                                                        }
-                                                                        return el
-                                                                    })
-                                                                })
-                                                            }}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item
-                                                        rules={[
-                                                            {
-                                                                message: '¡Debes especificar la cantidad!',
-                                                                required: true
-                                                            }
-                                                        ]}
-                                                    >
-                                                        <Input
-                                                            name='quantity'
-                                                            placeholder='Cantidad'
-                                                            type='number'
-                                                            value={item.cantidadesEntrantes}
-                                                            onChange={(e) => {
-                                                                setEntrada({
-                                                                    ...entrada,
-                                                                    productos: entrada.productos.map(el => {
-                                                                        if (el._id === item._id) {
-                                                                            el.cantidadesEntrantes = (!e.target.value) ? 0 : parseFloat(e.target.value)
-                                                                        }
-                                                                        return el
-                                                                    })
-                                                                })
-                                                            }}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={4}>
-                                                    <div onClick={() => deleteProductFromEntry(item._id)}>
-                                                        <Delete />
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        ))
-                                        : null
-                                    }
-                                </Col>
-                                <Col span={24} align='start' style={{ display: 'flex' }}>
-                                    <Row>
-                                        <Col span={12} style={{ display: 'flex' }}>
-                                            <button
-                                                className='btn-primary'
-                                                onClick={() => handleSubmit()}
-                                                style={{ marginRight: '15px' }}
-                                            >
-                                                Guardar
-                                            </button>
-                                            <button
-                                                className='btn-secondary'
-                                                onClick={() => redirectToEntradas()}
-                                            >
-                                                Cancelar
-                                            </button>
+                                        <Col
+                                            span={6}
+                                        >
+                                            <CancelButton />
+                                        </Col>
+                                        <Col
+                                            span={6}
+                                        >
+                                            <SaveButton />
                                         </Col>
                                     </Row>
                                 </Col>
                             </Row>
-                        </Form>
-                }
-            </Col>
+                        </>
+                    )
+            }
             <ProductSelectionModal />
-        </Row>
+        </>
     )
 }
 

@@ -7,7 +7,7 @@ const roundTwoDecimals = (value) => {
 }
 
 const decimalPercent = (value) => {
-    return Number(value) / 100;
+    return Number(value) / 100
 }
 
 const roundToMultiple = (value, multipleOf) => {

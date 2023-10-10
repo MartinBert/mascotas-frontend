@@ -11,11 +11,12 @@ import contexts from './contexts'
 import 'antd/dist/reset.css'
 
 // Imports Destructurings
-const { CustomProductsContext } = contexts.CustomProducts
 const { AuthContext } = contexts.Auth
-const { PrivateRouteContext } = contexts.PrivateRoute
+const { CustomProductsContext } = contexts.CustomProducts
+const { DeleteModalContext } = contexts.DeleteModal
 const { EntriesContext } = contexts.Entries
 const { OutputsContext } = contexts.Outputs
+const { PrivateRouteContext } = contexts.PrivateRoute
 const { ProductSelectionModalContext } = contexts.ProductSelectionModal
 const { SaleContext } = contexts.Sale
 const { SaleProductsContext } = contexts.SaleProducts
@@ -26,23 +27,25 @@ function App() {
     return (
         <div style={{ height: '100%' }}>
             <AuthContext>
-                <PrivateRouteContext>
-                    <ProductSelectionModalContext>
-                        <SaleProductsContext>
-                            <CustomProductsContext>
-                                <EntriesContext>
-                                    <OutputsContext>
+                <CustomProductsContext>
+                    <DeleteModalContext>
+                        <EntriesContext>
+                            <OutputsContext>
+                                <PrivateRouteContext>
+                                    <ProductSelectionModalContext>
                                         <SaleContext>
-                                            <Router>
-                                                <AppRouter />
-                                            </Router>
+                                            <SaleProductsContext>
+                                                <Router>
+                                                    <AppRouter />
+                                                </Router>
+                                            </SaleProductsContext>
                                         </SaleContext>
-                                    </OutputsContext>
-                                </EntriesContext>
-                            </CustomProductsContext>
-                        </SaleProductsContext>
-                    </ProductSelectionModalContext>
-                </PrivateRouteContext>
+                                    </ProductSelectionModalContext>
+                                </PrivateRouteContext>
+                            </OutputsContext>
+                        </EntriesContext>
+                    </DeleteModalContext>
+                </CustomProductsContext>
             </AuthContext>
         </div>
     )

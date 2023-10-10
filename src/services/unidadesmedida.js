@@ -6,56 +6,10 @@ const checkStorageStatus = (err) => {
     }
 }
 
-
-const findAll = async(params) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    const {page, limit, filters} = params
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida?page=${page}&limit=${limit}&filters=${filters}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findById = async(id) => {
+const deleteUnidadMedida = async(id) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida/${id}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findMultipleIds = async(ids) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findByName = async(name) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida/name/${name}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const save = async(unidadmedida) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/unidadesmedida`, unidadmedida, headers)
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/unidadesmedida/${id}`, headers)
         return response.data.message
     }catch(err){
         checkStorageStatus(err)
@@ -74,10 +28,66 @@ const edit = async(unidadmedida) => {
     }
 }
 
-const deleteUnidadMedida = async(id) => {
+const findAll = async() => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/unidadesmedida/${id}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findById = async(id) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida/${id}`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findByName = async(name) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida/name/${name}`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findMultipleIds = async(ids) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findPaginated = async(params) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    const {page, limit, filters} = params
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/unidadesmedida?page=${page}&limit=${limit}&filters=${filters}`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const save = async(unidadmedida) => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    try{
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/unidadesmedida`, unidadmedida, headers)
         return response.data.message
     }catch(err){
         checkStorageStatus(err)
@@ -86,13 +96,14 @@ const deleteUnidadMedida = async(id) => {
 }
 
 const unidadesmedida = {
+    deleteUnidadMedida,
+    edit,
     findAll,
     findById,
-    findMultipleIds,
     findByName,
-    save,
-    edit,
-    deleteUnidadMedida
+    findMultipleIds,
+    findPaginated,
+    save
 }
 
 export default unidadesmedida

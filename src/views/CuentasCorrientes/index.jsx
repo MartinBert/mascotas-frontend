@@ -3,7 +3,12 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import icons from '../../components/icons'
+
+// Custom Contexts
+import actions from '../../actions'
+import contexts from '../../contexts'
 
 // Design Components
 import { Row, Col, Table } from 'antd'
@@ -16,105 +21,154 @@ import Header from './Header'
 import DeleteModal from './DeleteModal'
 
 // Imports Destructuring
+const { validateDeletion } = actions.deleteModal
+const { useDeleteModalContext } = contexts.DeleteModal
 const { Edit, Delete } = icons
 
 
 const CuentasCorrientes = () => {
     const navigate = useNavigate()
+    const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [cuentasCorrientes, setCuentasCorrientes] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
     const [limit, setLimit] = useState(10)
     const [filters, setFilters] = useState(null)
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteEntityId, setDeleteEntityId] = useState(null)
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
+    // ------------------ Fetch Current Account ------------------ //
     useEffect(() => {
         const fetchCuentasCorrientes = async () => {
-            const data = await api.cuentasCorrientes.findAll({ page, limit, filters })
+            const stringFilters = JSON.stringify(filters)
+            const data = await api.cuentasCorrientes.findPaginated({ page, limit, filters: stringFilters })
             setCuentasCorrientes(data.docs)
             setTotalDocs(data.totalDocs)
-            setLoading(false)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchCuentasCorrientes()
-    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
+    }, [
+        deleteModal_state.loading,
+        filters,
+        limit,
+        page,
+    ])
+
+    // ------------------ Current Account Deletion ------------------ //
+    const currentAccountDeletion = (currentAccountID) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: currentAccountID })
+        deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
+    }
 
     useEffect(() => {
-        if (deleteEntityId === null) return
         const deleteCurrentAccount = async () => {
-            setLoading(true)
-            api.cuentasCorrientes.deleteCuentaCorriente(deleteEntityId)
-                .then(() => {
-                    setDeleteEntityId(null)
-                    setLoading(false)
-                })
+            const validation = validateDeletion(
+                deleteModal_state.confirmDeletion,
+                deleteModal_state.entityID
+            )
+            if (validation === 'OK') {
+                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+                await api.cuentasCorrientes.deleteCuentaCorriente(deleteModal_state.entityID)
+                    .then(response => {
+                        if (response.code === 200) {
+                            successAlert('El registro se eliminó correctamente')
+                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
+                        } else {
+                            errorAlert('Fallo al eliminar el registro')
+                        }
+                    })
+            }
         }
         deleteCurrentAccount()
-    }, [deleteEntityId])
+    }, [
+        deleteModal_state.confirmDeletion,
+        deleteModal_state.entityID
+    ])
 
-    const editCurrentAccount = (id) => {
+    // ------------------ Current Account Edition ------------------ //
+    const currentAccountEdition = (id) => {
         navigate(`/cuentasCorrientes/${id}`)
     }
 
+
     const columnsForTable = [
         {
+            dataIndex: 'currentAccount_razonSocial',
+            render: (_, currentAccount) => currentAccount.razonSocial,
             title: 'Razón social',
-            dataIndex: 'razonSocial',
         },
         {
+            dataIndex: 'currentAccount_cuit',
+            render: (_, currentAccount) => currentAccount.cuit,
             title: 'CUIT',
-            dataIndex: 'cuit',
         },
         {
+            dataIndex: 'currentAccount_condicionFiscal',
+            render: (_, currentAccount) => currentAccount.condicionFiscal,
             title: 'Cond. Fiscal',
-            dataIndex: 'condicionFiscal',
         },
         {
+            dataIndex: 'currentAccount_email',
+            render: (_, currentAccount) => currentAccount.email,
             title: 'Email',
-            dataIndex: 'email',
         },
         {
+            dataIndex: 'currentAccount_telefono',
+            render: (_, currentAccount) => currentAccount.telefono,
             title: 'Teléfono',
-            dataIndex: 'telefono',
         },
         {
+            dataIndex: 'currentAccount_direccion',
+            render: (_, currentAccount) => currentAccount.direccion,
             title: 'Dirección',
-            dataIndex: 'direccion',
         },
         {
+            dataIndex: 'currentAccount_ciudad',
+            render: (_, currentAccount) => currentAccount.ciudad,
             title: 'Ciudad',
-            dataIndex: 'ciudad',
         },
         {
+            dataIndex: 'currentAccount_provincia',
+            render: (_, currentAccount) => currentAccount.provincia,
             title: 'Provincia',
-            dataIndex: 'provincia',
         },
         {
-            title: 'Acciones',
-            render: ({ _id }) => (
-                <Row>
-                    <div onClick={() => { editCurrentAccount(_id) }}>
+            dataIndex: 'currentAccount_actions',
+            render: (_, currentAccount) => (
+                <Row
+                    justify='start'
+                >
+                    <Col
+                        onClick={() => currentAccountEdition(currentAccount._id)}
+                        span={12}
+                    >
                         <Edit />
-                    </div>
-                    <div onClick={() => {
-                        setDeleteEntityIdConfirmation(_id)
-                        setDeleteVisible(true)
-                    }}>
+                    </Col>
+                    <Col
+                        onClick={() => currentAccountDeletion(currentAccount._id)}
+                        span={12}
+                    >
                         <Delete />
-                    </div>
+                    </Col>
                 </Row>
-            )
+            ),
+            title: 'Acciones',
         }
     ]
 
     return (
-        <Row>
-            <Col span={24} style={{ marginBottom: '10px' }}>
-                <Header setFilters={setFilters} />
+        <Row
+            gutter={[0, 16]}
+        >
+            <Col
+                span={24}
+            >
+                <Header
+                    filters={filters}
+                    setFilters={setFilters}
+                />
             </Col>
-            <Col span={24}>
+            <Col
+                span={24}
+            >
                 <Table
                     width={'100%'}
                     dataSource={cuentasCorrientes}
@@ -124,7 +178,7 @@ const CuentasCorrientes = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
+                        onChange: e => { setPage(e) },
                         onShowSizeChange: (e, val) => { setLimit(val) }
                     }}
                     rowKey='_id'
@@ -134,11 +188,6 @@ const CuentasCorrientes = () => {
                 />
                 <DeleteModal
                     title='Eliminar cuenta corriente'
-                    deleteVisible={deleteVisible}
-                    setLoading={setLoading}
-                    setDeleteVisible={setDeleteVisible}
-                    setDeleteEntityId={setDeleteEntityId}
-                    deleteEntityIdConfirmation={deleteEntityIdConfirmation}
                 />
             </Col>
         </Row>

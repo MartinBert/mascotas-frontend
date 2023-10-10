@@ -32,7 +32,7 @@ const voucherTemplate = (saleData, qrImage) => {
                 <div style='background-color: #C2BDBC; margin-left: 10px; margin-right: 10px; border: 1px solid; border-radius: 5px;'>
                     <h1 style='font-size: 52px; font-weight: bold; color: #fff; margin-top: 15px'>${saleData.documentoLetra}</h1>
                 </div>
-                <p style='vertical-align: text-top;'>Código ${saleData.documentoCodigo}</p>
+                <p style='vertical-align: text-top; margin-top: 5px;'>Código ${saleData.documentoCodigo}</p>
                 ${saleData.documento.fiscal === false ? `<div style='font-size: 16px; bottom: 0;'>NO VÁLIDO COMO FACTURA</div>` : ''}
             </div>
             <div style='width: 40%; text-align: left; margin-left: 20px'>
@@ -93,15 +93,6 @@ const voucherTemplate = (saleData, qrImage) => {
                     `
                 )
             })
-            // .concat( `<div style='width: 100%; display: flex; font-size: 16px;'>
-            //     <div style='width: 12%;'>1</div>
-            //     <div style='width: 34%;'>Redondeo a múltiplo de 10</div>
-            //     <div style='width: 10%;'>${saleData.totalDiferencia}</div>
-            //     <div style='width: 10%;'>${saleData.totalDiferencia}</div>
-            //     <div style='width: 12%;'>0</div>
-            //     <div style='width: 12%;'>0</div>
-            //     <div style='width: 10%; text-align: right;'>${saleData.totalDiferencia}</div>
-            //     </div>` )
             .join('<br />')}
         </div>
         <div style='width: 100%; height: 215px; bottom: 0px; display: inline-block;'>
@@ -162,7 +153,7 @@ const ticketTemplate = (saleData) => {
                 <div style='background-color: #C2BDBC; border: 1px solid; border-radius: 5px;'>
                     <h1 style='font-size: 32px; font-weight: bold; color: #fff; margin-top: 15px'>${saleData.documentoLetra}</h1>
                 </div>
-                <p style='vertical-align: text-top;'>Código ${saleData.documentoCodigo}</p>
+                <p style='vertical-align: text-top; margin-top: 5px;'>Código ${saleData.documentoCodigo}</p>
             </div>
             <div style='width: 100%; margin-top: 15px; padding-left: 10px; text-align: left;'>
                 <p style='margin-top: 5px;'><i>Razón social:</i> ${saleData.empresaRazonSocial}</p>
@@ -175,27 +166,27 @@ const ticketTemplate = (saleData) => {
             <hr>
         </div>
         <div style='width: 100%; height: 39px; display: flex; padding-bottom: 15px;'>
-            <div style='width: 20%; text-align: left; padding-left: 5px;'><i>Cant.</i></div>
+            <div style='width: 15%; text-align: left; padding-left: 5px;'><i>Cant.</i></div>
             <div style='width: 60%; text-align: left;'><i>Producto</i></div>
-            <div style='width: 20%; text-align: right; padding-right: 5px;'><i>P. Neto</i></div>
+            <div style='width: 25%; text-align: right; padding-right: 5px;'><i>P. Neto</i></div>
         </div>
         <div style='width: 100%; height: 733px; display: inline-block;'>
             <div>
                 ${ saleData.renglones.map(renglon => {
                     return `
                         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                            <div style='width: 20%;'>${renglon.fraccionar
+                            <div style='width: 15%;'>${renglon.fraccionar
                                 ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
                                 : roundTwoDecimals(renglon.cantidadUnidades)}
                             </div>
                             <div style='width: 60%;'>${renglon.nombre}</div>
-                            <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
+                            <div style='width: 25%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
                         </div>
                         ${ renglon.nota === (null || '')
                                 ? ''
                                 : (
                                     `<div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                                        <div style='margin-left: 20%; width: 80%;'>
+                                        <div style='margin-left: 15%; width: 85%;'>
                                             <i>${renglon.nota}</i>
                                         </div>
                                     </div>`
@@ -209,9 +200,9 @@ const ticketTemplate = (saleData) => {
                 ${ (saleData.totalRecargo)
                     ? `
                         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                            <div style='width: 20%;'>1</div>
+                            <div style='width: 15%;'>1</div>
                             <div style='width: 60%;'>Recargo aplicado</div>
-                            <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalRecargo)}</div>
+                            <div style='width: 25%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalRecargo)}</div>
                         </div>
                     `
                     : ''
@@ -220,25 +211,14 @@ const ticketTemplate = (saleData) => {
                 ${ (saleData.totalDescuento)
                     ? `
                         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                            <div style='width: 20%;'>1</div>
+                            <div style='width: 15%;'>1</div>
                             <div style='width: 60%;'>Descuento aplicado</div>
-                            <div style='width: 20%; text-align: right; padding-right: 5px;'>- ${roundTwoDecimals(saleData.totalDescuento)}</div>
+                            <div style='width: 25%; text-align: right; padding-right: 5px;'>- ${roundTwoDecimals(saleData.totalDescuento)}</div>
                         </div>
                     `
                     : ''
                 }
                 <br />
-                ${null
-                    // (saleData.totalDiferencia)
-                    //     ? `
-                    //         <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                    //             <div style='width: 20%;'>1</div>
-                    //             <div style='width: 60%;'>Redondeo</div>
-                    //             <div style='width: 20%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(saleData.totalDiferencia)}</div>
-                    //         </div>
-                    //     `
-                    //     : ''
-                }
             </div>
         </div>
         <div style='width: 100%; height: 110px; bottom: 0; font-size: 9px;'>
@@ -247,7 +227,7 @@ const ticketTemplate = (saleData) => {
             </div>
             <div style='width: 100%; padding: 10px;'>
                 <div style='width: 100%; text-align: right; font-size: 20px;'>
-                    <p>Total: $${saleData.totalRedondeado}</p>
+                    <p>Total: $${saleData.total}</p>
                 </div>
             </div>
         </div>

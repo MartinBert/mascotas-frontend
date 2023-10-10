@@ -49,31 +49,31 @@ const ListCustomLinesModal = () => {
         {
             align: 'start',
             colSpan: 2,
-            dataIndex: 'concept',
+            dataIndex: 'customLinesModal_concept',
             ellipsis: true,
-            key: 'concept',
+            key: 'customLinesModal_concept',
             onCell: () => ({ colSpan: 2 }),
             render: (_, product) => product.nombre,
             title: 'Concepto'
         },
         {
             align: 'start',
-            dataIndex: 'unitPrice',
-            key: 'unitPrice',
+            dataIndex: 'customLinesModal_unitPrice',
+            key: 'customLinesModal_unitPrice',
             render: (_, product) => product.precioVenta,
             title: 'Precio unitario'
         },
         {
             align: 'start',
-            dataIndex: 'percentageIVA',
-            key: 'percentageIVA',
+            dataIndex: 'customLinesModal_percentageIVA',
+            key: 'customLinesModal_percentageIVA',
             render: (_, product) => product.porcentajeIvaVenta,
             title: 'Porcentaje IVA'
         },
         {
             align: 'start',
-            dataIndex: 'remove',
-            key: 'remove',
+            dataIndex: 'customLinesModal_remove',
+            key: 'customLinesModal_remove',
             onCell: () => ({ width: '100%' }),
             render: (_, product) => (
                 <Col

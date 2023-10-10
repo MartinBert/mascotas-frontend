@@ -35,7 +35,8 @@ const VentasList = () => {
 
     useEffect(() => {
         const fetchVentasList = async () => {
-            const data = await api.ventas.findAll({ page, limit, filters })
+            const stringFilters = JSON.stringify(filters)
+            const data = await api.ventas.findPaginated({ page, limit, filters: stringFilters })
             setVentas(data.docs)
             setTotalDocs(data.totalDocs)
             setLoading(false)
@@ -45,9 +46,9 @@ const VentasList = () => {
 
     useEffect(() => {
         const fetchDocumentos = async () => {
-            const data = await api.documentos.findAll(null)
-            const todosLosDocumentos = data.map(doc => { return { value: doc.nombre, label: doc.nombre } })
-            setDocumentos(data)
+            const data = await api.documentos.findAll()
+            const todosLosDocumentos = data.docs.map(doc => { return { value: doc.nombre, label: doc.nombre } })
+            setDocumentos(data.docs)
             setDocumentosNombres(todosLosDocumentos)
         }
         fetchDocumentos()
@@ -55,9 +56,9 @@ const VentasList = () => {
 
     useEffect(() => {
         const fetchMediosPago = async () => {
-            const data = await api.mediospago.findAll(null)
-            const todosLosMediosDePago = data.map(mp => { return { value: mp.nombre, label: mp.nombre } })
-            setMediosPago(data)
+            const data = await api.mediospago.findAll()
+            const todosLosMediosDePago = data.docs.map(mp => { return { value: mp.nombre, label: mp.nombre } })
+            setMediosPago(data.docs)
             setMediosPagoNombres(todosLosMediosDePago)
         }
         fetchMediosPago()
@@ -127,6 +128,7 @@ const VentasList = () => {
             <Col span={24} style={{ marginBottom: '10px' }}>
                 <Header
                     setFilters={setFilters}
+                    filters={filters}
                     setPage={setPage}
                     ventas={ventas}
                     documentos={documentos}

@@ -1,18 +1,20 @@
-import CustomProducts from './CustomProducts'
 import Auth from './Auth'
-import PrivateRoute from './PrivateRoute'
+import CustomProducts from './CustomProducts'
+import DeleteModal from './DeleteModal'
 import Entries from './Entries'
 import Outputs from './Outputs'
+import PrivateRoute from './PrivateRoute'
 import ProductSelectionModal from './ProductSelectionModal'
 import Sale from './Sale'
 import SaleProducts from './SaleProducts'
 
 const contexts = {
-    CustomProducts,
     Auth,
-    PrivateRoute,
+    CustomProducts,
+    DeleteModal,
     Entries,
     Outputs,
+    PrivateRoute,
     ProductSelectionModal,
     Sale,
     SaleProducts

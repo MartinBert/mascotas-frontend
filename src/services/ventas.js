@@ -6,29 +6,43 @@ const checkStorageStatus = (err) => {
     }
 }
 
-
-const findAll = async (params) => {
+const deleteVenta = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        if (!params) {
-            const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas`, headers)
-            return response.data
-        } else {
-            const { page, limit, filters } = params
-            const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?page=${page}&limit=${limit}&filters=${filters}`, headers)
-            return response.data
-        }
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/ventas/${id}`, headers)
+        return response.data.message
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
     }
 }
 
-const findByDates = async (params) => {
+const edit = async (venta) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    const { initialDate, finalDate } = params
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?initialDate=${initialDate}&finalDate=${finalDate}`, headers)
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/${venta._id}`, venta, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findAll = async() => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas`, headers)
+        return response.data
+    }catch(err){
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findByDates = async (dateFilters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?filters=${dateFilters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -40,17 +54,6 @@ const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findMultipleIds = async (ids) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -71,10 +74,32 @@ const findLastIndex = async () => {
 
 const findLastVoucherNumber = async (code) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    console.log(headers)
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/last/voucher/number/${code}`, headers)
         return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findMultipleIds = async (ids) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findPaginated = async (params) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const { page, limit, filters } = params
+            const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?page=${page}&limit=${limit}&filters=${filters}`, headers)
+            return response.data
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
@@ -92,38 +117,17 @@ const save = async (venta) => {
     }
 }
 
-const edit = async (venta) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/${venta._id}`, venta, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const deleteVenta = async (id) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/ventas/${id}`, headers)
-        return response.data.message
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
 const ventas = {
+    deleteVenta,
+    edit,
     findAll,
     findByDates,
     findById,
-    findMultipleIds,
     findLastIndex,
     findLastVoucherNumber,
-    save,
-    edit,
-    deleteVenta
+    findMultipleIds,
+    findPaginated,
+    save
 }
 
 export default ventas

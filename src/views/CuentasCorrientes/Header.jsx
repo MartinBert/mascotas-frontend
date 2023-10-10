@@ -1,41 +1,52 @@
-
 // React Components and Hooks
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 // Styles
 import '../../index.css'
 
 // Design Components
-import { Row, Col, Button, Input} from 'antd'
+import { Button, Col, Input, Row } from 'antd'
 
 
-const Header = ({setFilters}) => {
-    return(
+const Header = ({ filters, setFilters }) => {
+    const navigate = useNavigate()
+
+    const redirectToForm = () => {
+        navigate('/cuentasCorrientes/nuevo')
+    }
+
+    const updateFilters = (e) => {
+        setFilters({
+            ...filters,
+            [e.target.name]: e.target.value
+        })
+    }
+
+    return (
         <Row>
             <Col span={24}>
                 <Row align='end'>
                     <Col span={20}>
-                        <Button 
-                            className='btn-primary-bg'> 
-                            <Link to='/cuentasCorrientes/nuevo'>
-                                Nuevo    
-                            </Link>
+                        <Button
+                            className='btn-primary'
+                            onClick={() => redirectToForm()}
+                        >
+                            Nuevo
                         </Button>
                     </Col>
                     <Col span={4}>
-                        <Input 
-                            type='primary' 
+                        <Input
+                            name='cliente'
+                            onChange={(e) => updateFilters(e)}
                             placeholder='Buscar cuenta corriente'
-                            onChange={(e) => { setFilters(JSON.stringify({
-                                cliente: e.target.value,
-                            }))}}
-                        /> 
+                            type='primary'
+                        />
                     </Col>
                 </Row>
             </Col>
         </Row>
-    ) 
+    )
 }
 
 export default Header

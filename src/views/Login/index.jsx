@@ -12,65 +12,26 @@ import LoginForm from './LoginForm'
 
 
 const Login = () => {
+    const bubbles = []
+    for (let index = 0; index < 25; index++) {
+        bubbles.push(
+            <div
+                className='bubble'
+                key={index}
+            ></div>
+        )
+    }
 
     return (
         <Row className='login'>
             <div className='bubbles'>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
+                {bubbles}
                 <div style={{ width: '100%', marginTop: '10%', justifyContent: 'center', display: 'flex' }}>
                     <div style={{ width: '300px', height: '200px' }}>
                         <LoginForm />
                     </div>
                 </div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
-                <div className='bubble'></div>
+                {bubbles}
             </div>
         </Row>
     )

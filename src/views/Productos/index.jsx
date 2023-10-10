@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import { DeleteModal, OpenImage } from '../../components/generics'
 import GiselaDetailsModal from '../../components/generics/productDetailsModal/GiselaDetailsModal'
 import icons from '../../components/icons'
@@ -11,6 +12,7 @@ import icons from '../../components/icons'
 import { Row, Col, Table } from 'antd'
 
 // Custom Context Providers
+import actions from '../../actions'
 import contexts from '../../contexts'
 
 // Services
@@ -20,26 +22,25 @@ import api from '../../services'
 import Header from './Header'
 
 // Imports Destructuring
-const { Details, Edit, Delete } = icons
+const { validateDeletion } = actions.deleteModal
 const { useAuthContext } = contexts.Auth
+const { useDeleteModalContext } = contexts.DeleteModal
+const { Details, Edit, Delete } = icons
 
 
 const Productos = () => {
     const navigate = useNavigate()
-    const loggedUserContext = useAuthContext()
-    const [, auth_dispatch] = loggedUserContext
+    const [, auth_dispatch] = useAuthContext()
+    const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [products, setProducts] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
     const [limit, setLimit] = useState(6)
     const [filters, setFilters] = useState(null)
     const [detailsVisible, setDetailsVisible] = useState(false)
     const [detailsData, setDetailsData] = useState(null)
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteEntityId, setDeleteEntityId] = useState(null)
-    const [deleteEntityIdConfirmation, setDeleteEntityIdConfirmation] = useState(null)
 
+    // ------------------ Fetch Logged User ------------------ //
     useEffect(() => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
@@ -49,72 +50,108 @@ const Productos = () => {
         fetchUser()
     }, [auth_dispatch])
 
+    // ------------------ Fetch Products ------------------ //
     useEffect(() => {
         const fetchProducts = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.productos.findFiltered({ page, limit, filters: stringFilters })
+            const data = await api.productos.findPaginated({ page, limit, filters: stringFilters })
             setProducts(data.docs)
             setTotalDocs(data.totalDocs)
-            setLoading(false)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchProducts()
-    }, [page, limit, filters, loading, deleteEntityIdConfirmation])
+    }, [
+        deleteModal_state.loading,
+        filters,
+        limit,
+        page,
+    ])
+
+    // ------------------ Products Deletion ------------------ //
+    const productDeletion = (productID) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: productID })
+        deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
+    }
 
     useEffect(() => {
-        if (deleteEntityId === null) return
         const deleteProduct = async () => {
-            setLoading(true)
-            api.productos.deleteById(deleteEntityId)
-                .then(() => {
-                    setDeleteEntityId(null)
-                    setLoading(false)
-                })
+            const validation = validateDeletion(
+                deleteModal_state.confirmDeletion,
+                deleteModal_state.entityID
+            )
+            if (validation === 'OK') {
+                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+                await api.productos.deleteById(deleteModal_state.entityID)
+                    .then(response => {
+                        if (response.code === 200) {
+                            successAlert('El registro se eliminó correctamente')
+                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
+                        } else {
+                            errorAlert('Fallo al eliminar el registro')
+                        }
+                    })
+            }
         }
         deleteProduct()
-    }, [deleteEntityId])
+    }, [
+        deleteModal_state.confirmDeletion,
+        deleteModal_state.entityID
+    ])
 
+    // ------------------ Products Edition ------------------ //
+    const productEdition = (id) => {
+        navigate(`/productos/${id}`)
+    }
+
+    // ------------------ Products Details ------------------ //
     const seeDetails = (data) => {
         setDetailsData(data)
         setDetailsVisible(true)
     }
 
-    const editProduct = (id) => {
-        navigate(`/productos/${id}`)
-    }
 
     const columnsForTable = [
         {
-            title: 'Nombre',
-            dataIndex: 'nombre',
-            open: true
+            dataIndex: 'product_name',
+            open: true,
+            render: (_, product) => product.nombre,
+            title: 'Nombre'
         },
         {
-            title: 'Codigo de producto',
-            dataIndex: 'codigoProducto',
-            open: true
+            dataIndex: 'product_productCode',
+            open: true,
+            render: (_, product) => product.codigoProducto,
+            title: 'Codigo de producto'
         },
         {
-            title: 'Codigo de barras',
-            dataIndex: 'codigoBarras',
-            open: true
+            dataIndex: 'product_barCode',
+            open: true,
+            render: (_, product) => product.codigoBarras,
+            title: 'Codigo de barras'
         },
         {
-            title: 'Stock',
-            dataIndex: 'cantidadStock',
-            open: true
+            dataIndex: 'product_stockQuantity',
+            open: true,
+            render: (_, product) => product.cantidadStock,
+            title: 'Stock'
         },
         {
-            title: 'Detalles',
-            render: (product) => (
-                <div onClick={() => seeDetails(product)}>
-                    <Details title='Ver detalle' />
+            dataIndex: 'product_details',
+            render: (_, product) => (
+                <div
+                    onClick={() => seeDetails(product)}
+                >
+                    <Details
+                        title='Ver detalle'
+                    />
                 </div>
             ),
-            open: true
+            open: true,
+            title: 'Detalles'
         },
         {
-            title: 'Imagen',
-            render: (product) => (
+            dataIndex: 'product_image',
+            render: (_, product) => (
                 <OpenImage
                     alt='Ver imagen'
                     imageUrl={
@@ -124,86 +161,88 @@ const Productos = () => {
                     }
                 />
             ),
-            open: true
+            open: true,
+            title: 'Imagen'
         },
         {
-            title: 'Acciones',
-            render: (product) => (
+            dataIndex: 'product_actions',
+            render: (_, product) => (
                 <Row
-                    style={{ display: 'flex', justifyContent: 'start' }}
+                    justify='start'
                 >
-                    <div
-                        onClick={() => editProduct(product._id)}
-                        style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
+                    <Col
+                        onClick={() => productEdition(product._id)}
+                        span={12}
                     >
                         <Edit />
-                    </div>
-                    <div
-                        onClick={() => {
-                            setDeleteEntityIdConfirmation(product._id)
-                            setDeleteVisible(true)
-                        }}
-                        style={{ display: 'flex', alignItems: 'center' }}
+                    </Col>
+                    <Col
+                        onClick={() => productDeletion(product._id)}
+                        span={12}
                     >
                         <Delete />
-                    </div>
+                    </Col>
                 </Row>
             ),
-            open: true
+            open: true,
+            title: 'Acciones'
         },
-    ].filter(item => item.open)
+    ]
+        .filter(item => item.open)
 
     return (
-        <>
-            <Row>
-                <Col span={24} style={{ marginBottom: '10px' }}>
-                    <Header
-                        setFilters={setFilters}
-                        filters={filters}
-                        setLoading={setLoading}
-                        detailsData={detailsData}
-                    />
-                </Col>
-                <Col span={24}>
-                    <Table
-                        width={'100%'}
-                        dataSource={products}
-                        columns={columnsForTable}
-                        pagination={{
-                            defaultCurrent: page,
-                            limit: limit,
-                            total: totalDocs,
-                            showSizeChanger: true,
-                            defaultPageSize: 7,
-                            pageSizeOptions: [7, 14, 28, 56],
-                            onChange: (e) => { setPage(e) },
-                            onShowSizeChange: (e, val) => { setLimit(val) }
-                        }}
-                        loading={loading}
-                        rowKey='_id'
-                        tableLayout='auto'
-                        size='small'
-                    />
-                </Col>
-                {
-                    (detailsData)
-                        ? <GiselaDetailsModal
+        <Row
+            gutter={[0, 16]}
+        >
+            <Col
+                span={24}
+            >
+                <Header
+                    setFilters={setFilters}
+                    filters={filters}
+                    setLoading={deleteModal_state.setLoading}
+                    detailsData={detailsData}
+                />
+            </Col>
+            <Col
+                span={24}
+            >
+                <Table
+                    width={'100%'}
+                    dataSource={products}
+                    columns={columnsForTable}
+                    pagination={{
+                        defaultCurrent: page,
+                        limit: limit,
+                        total: totalDocs,
+                        showSizeChanger: true,
+                        defaultPageSize: 7,
+                        pageSizeOptions: [7, 14, 28, 56],
+                        onChange: e => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
+                    }}
+                    loading={deleteModal_state.loading}
+                    rowKey='_id'
+                    tableLayout='auto'
+                    size='small'
+                />
+            </Col>
+            {
+                !detailsData
+                    ? null
+                    : (
+                        <GiselaDetailsModal
                             detailsVisible={detailsVisible}
                             setDetailsVisible={setDetailsVisible}
                             detailsData={detailsData}
                         />
-                        : ''
-                }
-            </Row>
+                    )
+            }
             <DeleteModal
                 title='Eliminar producto'
-                deleteVisible={deleteVisible}
-                setLoading={setLoading}
-                setDeleteVisible={setDeleteVisible}
-                setDeleteEntityId={setDeleteEntityId}
-                deleteEntityIdConfirmation={deleteEntityIdConfirmation}
             />
-        </>
+        </Row>
+
     )
 }
 

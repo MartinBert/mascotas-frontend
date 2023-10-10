@@ -690,7 +690,7 @@ const reducer = (state = initialState, action) => {
             const iva27 = roundTwoDecimals(iva27Total - baseImponible27)
             const importeIva = roundTwoDecimals(iva21 + iva10 + iva27)
             const total = roundTwoDecimals(totalLinesSum)
-            const totalRedondeado = roundTwoDecimals(roundToMultiple(total, 10))
+            const totalRedondeado = roundToMultiple(total, 10)
             const totalDiferencia = roundTwoDecimals(totalRedondeado - total)
             const subTotal = roundTwoDecimals(total - importeIva)
 
