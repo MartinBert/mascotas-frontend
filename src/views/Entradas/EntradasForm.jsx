@@ -74,7 +74,7 @@ const EntradasForm = () => {
     }, [entries_state.products])
 
 
-    const entryData = [
+    const entriesRender = [
         {
             element: <AddButton />,
             name: 'addProduct',
@@ -173,7 +173,7 @@ const EntradasForm = () => {
                                         ]}
                                     >
                                         {
-                                            entryData.map(item => {
+                                            entriesRender.map(item => {
                                                 return (
                                                     <Col
                                                         key={item.name}

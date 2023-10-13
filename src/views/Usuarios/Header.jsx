@@ -37,7 +37,7 @@ const Header = ({ filters, setFilters }) => {
                     <Col span={4}>
                         <Input
                             name='nombre'
-                            onChange={(e) => updateFilters(e)}
+                            onChange={e => updateFilters(e)}
                             placeholder='Buscar por nombre de usuario'
                             type='primary'
                         />

@@ -7,6 +7,7 @@ import privateRoute from './privateRoute'
 import productSelectionModal from './productSelectionModal'
 import sale from './sale'
 import saleProducts from './saleProducts'
+import salesAreas from './salesAreas'
 
 const reducers = {
     auth,
@@ -17,7 +18,8 @@ const reducers = {
     privateRoute,
     productSelectionModal,
     sale,
-    saleProducts
+    saleProducts,
+    salesAreas
 }
 
 export default reducers

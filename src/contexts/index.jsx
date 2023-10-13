@@ -7,6 +7,7 @@ import PrivateRoute from './PrivateRoute'
 import ProductSelectionModal from './ProductSelectionModal'
 import Sale from './Sale'
 import SaleProducts from './SaleProducts'
+import SalesAreas from './SalesAreas'
 
 const contexts = {
     Auth,
@@ -17,7 +18,8 @@ const contexts = {
     PrivateRoute,
     ProductSelectionModal,
     Sale,
-    SaleProducts
+    SaleProducts,
+    SalesAreas
 }
 
 export default contexts

@@ -1,32 +1,36 @@
 // React Components and Hooks
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-
-// Custom Components
-import { GenericAutocomplete } from '../../components/generics'
 
 // Design Components
-import { Button, Col, Input, Row } from 'antd'
-
-// Helpers
-import helpers from '../../helpers'
+import { Col, Row } from 'antd'
 
 // Services
 import api from '../../services'
 
 // Views
+import ProductElements from './elements'
 import PriceModificatorModal from './PriceModificatorModal'
 
 // Imports Destructuring
-const { exportSimpleExcel } = helpers.excel
-const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const {
+    CleanFilters,
+    ExportExcel,
+    FilterByBarcode,
+    FilterByBrand,
+    FilterByCategory,
+    FilterByName,
+    FilterByProductcode,
+    InputHidden,
+    ModifyPrices,
+    NewProduct,
+    SelectSalesArea
+} = ProductElements
 
 
 const Header = ({ setFilters, filters, setLoading, detailsData }) => {
-    const navigate = useNavigate()
     const [productosToReport, setProductosToReport] = useState(null)
     const [selectedBrand, setSelectedBrand] = useState(null)
-    const [selectedHeading, setSelectedHeading] = useState(null)
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const [priceModalVisible, setPriceModalVisible] = useState(false)
 
     useEffect(() => {
@@ -38,12 +42,12 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
     }, [selectedBrand])
 
     useEffect(() => {
-        if (!selectedHeading) return
+        if (!selectedCategory) return
         setFilters({
             ...filters,
-            rubro: selectedHeading
+            rubro: selectedCategory
         })
-    }, [selectedHeading])
+    }, [selectedCategory])
 
     useEffect(() => {
         const findProductos = async () => {
@@ -51,98 +55,12 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
             setProductosToReport(data.docs)
         }
         findProductos()
-    }, [selectedBrand, selectedHeading])
+    }, [selectedBrand, selectedCategory])
 
     const cleanFilters = () => {
         setSelectedBrand(null)
-        setSelectedHeading(null)
+        setSelectedCategory(null)
         setFilters(null)
-    }
-
-    const calculateSalePricePerUnit = (product) => {
-        const precioVentaFraccionado = product.precioVentaFraccionado
-        const fraccionamiento = product.unidadMedida.fraccionamiento
-        const salePricePerUnit = (fraccionamiento < 1000)
-            ? precioVentaFraccionado / fraccionamiento
-            : precioVentaFraccionado * 1000 / fraccionamiento
-        const salePricePerUnitFixed = roundToMultiple(salePricePerUnit, 10)
-        return salePricePerUnitFixed
-    }
-
-    const calculateSaleProfitPerUnit = (product) => {
-        const fraccionamiento = product.unidadMedida.fraccionamiento
-        const gananciaNetaFraccionado = product.gananciaNetaFraccionado
-        const saleProfitPerUnit = (fraccionamiento < 1000)
-            ? gananciaNetaFraccionado / fraccionamiento
-            : gananciaNetaFraccionado * 1000 / fraccionamiento
-        const saleProfitPerUnitFixed = roundTwoDecimals(saleProfitPerUnit)
-        return saleProfitPerUnitFixed
-    }
-
-    const exportExcel = async () => {
-        const nameOfSheet = 'Hoja de productos'
-        const nameOfDocument = 'Lista de productos'
-        const columnHeaders = [
-            'Producto',
-            'Rubro',
-            'Marca',
-            'Cód. producto',
-            'Cód. barras',
-            '% IVA compra',
-            'IVA compra ($)',
-            'Precio de lista ($)',
-            '% IVA venta',
-            'IVA venta ($)',
-            'Porcentaje ganancia',
-            'Precio de venta ($)',
-            'Ganancia venta ($)',
-            'Porcentaje ganancia fraccionada',
-            'Precio de venta fraccionada ($)',
-            'Ganancia venta fraccionada ($)',
-            'Precio de venta por unidad fraccionada ($)',
-            'Ganancia venta por unidad fraccionada ($)',
-            'Stock',
-            'Stock fraccionado',
-            'Unidad de medida',
-            'Fraccionamiento',
-        ]
-        const lines = await processExcelLines(productosToReport)
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
-    }
-
-    const processExcelLines = async (productosToReport) => {
-        const processedLines = []
-        for await (let product of productosToReport) {
-            processedLines.push([
-                (product.nombre) ? product.nombre : '-',
-                (product.rubro) ? product.rubro.nombre : '-',
-                (product.marca) ? product.marca.nombre : '-',
-                (product.codigoProducto) ? product.codigoProducto : '-',
-                (product.codigoBarras) ? product.codigoBarras : '-',
-                (product.porcentajeIvaCompra) ? '% ' + product.porcentajeIvaCompra : '-',
-                (product.ivaCompra) ? product.ivaCompra : '-',
-                (product.precioUnitario) ? product.precioUnitario : '-',
-                (product.porcentajeIvaVenta) ? '% ' + product.porcentajeIvaVenta : '-',
-                (product.ivaVenta) ? product.ivaVenta : '-',
-                (product.margenGanancia) ? '% ' + product.margenGanancia : '-',
-                (product.precioVenta) ? product.precioVenta : '-',
-                (product.gananciaNeta) ? product.gananciaNeta : '-',
-                (product.margenGananciaFraccionado) ? '% ' + product.margenGananciaFraccionado : '-- Sin fraccionar --',
-                (product.precioVentaFraccionado) ? product.precioVentaFraccionado : '-- Sin fraccionar --',
-                (product.gananciaNetaFraccionado) ? product.gananciaNetaFraccionado : '-- Sin fraccionar --',
-                (product.precioVentaFraccionado && product.unidadMedida) ? calculateSalePricePerUnit(product) : '-- Sin fraccionar --',
-                (product.gananciaNetaFraccionado && product.unidadMedida) ? calculateSaleProfitPerUnit(product) : '-- Sin fraccionar --',
-                (product.cantidadStock) ? product.cantidadStock : '-',
-                (product.cantidadFraccionadaStock) ? product.cantidadFraccionadaStock : '-- Sin fraccionar --',
-                (product.unidadMedida) ? product.unidadMedida.nombre : '-- Sin fraccionar --',
-                (product.unidadMedida) ? product.unidadMedida.fraccionamiento : '-- Sin fraccionar --',
-            ])
-        }
-        return processedLines
-    }
-
-    const redirectToForm = () => {
-        navigate('/productos/nuevo')
     }
 
     const updateFilters = (e) => {
@@ -152,110 +70,203 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
         })
     }
 
+    const productsRender = [
+        {
+            element: (
+                <CleanFilters
+                    cleanFilters={cleanFilters}
+                />
+            ),
+            name: 'cleanFilters',
+            order_lg: 9,
+            order_md: 9,
+            order_sm: 10,
+            order_xl: 9,
+            order_xs: 10,
+            order_xxl: 9
+        },
+        {
+            element: (
+                <Row gutter={8}>
+                    <Col span={12}>
+                        <ExportExcel
+                            productosToReport={productosToReport}
+                        />
+                    </Col>
+                    <Col span={12}>
+                        <SelectSalesArea />
+                    </Col>
+                </Row>
+            ),
+            name: 'exportExcel',
+            order_lg: 5,
+            order_md: 5,
+            order_sm: 3,
+            order_xl: 5,
+            order_xs: 3,
+            order_xxl: 5
+        },
+        {
+            element: (
+                <FilterByBarcode
+                    updateFilters={updateFilters}
+                />
+            ),
+            name: 'filterByBarcode',
+            order_lg: 4,
+            order_md: 4,
+            order_sm: 6,
+            order_xl: 4,
+            order_xs: 6,
+            order_xxl: 4
+        },
+        {
+            element: (
+                <FilterByBrand
+                    selectedBrand={selectedBrand}
+                    setSelectedBrand={setSelectedBrand}
+                />
+            ),
+            name: 'filterByBrand',
+            order_lg: 8,
+            order_md: 8,
+            order_sm: 8,
+            order_xl: 8,
+            order_xs: 8,
+            order_xxl: 8
+        },
+        {
+            element: (
+                <FilterByCategory
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                />
+            ),
+            name: 'filterByCategory',
+            order_lg: 10,
+            order_md: 10,
+            order_sm: 9,
+            order_xl: 10,
+            order_xs: 9,
+            order_xxl: 10
+        },
+        {
+            element: (
+                <FilterByName
+                    updateFilters={updateFilters}
+                />
+            ),
+            name: 'filterByName',
+            order_lg: 2,
+            order_md: 2,
+            order_sm: 5,
+            order_xl: 2,
+            order_xs: 5,
+            order_xxl: 2
+        },
+        {
+            element: (
+                <FilterByProductcode
+                    updateFilters={updateFilters}
+                />
+            ),
+            name: 'filterByProductcode',
+            order_lg: 6,
+            order_md: 6,
+            order_sm: 7,
+            order_xl: 6,
+            order_xs: 7,
+            order_xxl: 6
+        },
+        {
+            element: <InputHidden />,
+            name: 'inputHidden_1',
+            order_lg: 7,
+            order_md: 7,
+            order_sm: 4,
+            order_xl: 7,
+            order_xs: 4,
+            order_xxl: 7
+        },
+        {
+            element: (
+                <ModifyPrices
+                    setPriceModalVisible={setPriceModalVisible}
+                />
+            ),
+            name: 'modifyPrices',
+            order_lg: 3,
+            order_md: 3,
+            order_sm: 2,
+            order_xl: 3,
+            order_xs: 2,
+            order_xxl: 3
+        },
+        {
+            element: <NewProduct />,
+            name: 'newProduct',
+            order_lg: 1,
+            order_md: 1,
+            order_sm: 1,
+            order_xl: 1,
+            order_xs: 1,
+            order_xxl: 1
+        }
+    ]
+
+    const responsiveGutter = { horizontal: 0, vertical: 16 }
+    const responsiveHeadGutter = { horizontal: 8, vertical: 8 }
+    const responsiveColSpan = { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
+
     return (
-        <>
-            <Row>
-                <Col span={24}>
-                    <Row gutter={8}>
-                        <Col>
-                            <Button
-                                className='btn-primary'
-                                onClick={() => redirectToForm()}
-                            >
-                                Nuevo
-                            </Button>
+        <Row
+            gutter={[
+                responsiveHeadGutter.horizontal,
+                responsiveHeadGutter.vertical
+            ]}
+            justify='space-around'
+        >
+            {
+                productsRender.map(item => {
+                    return (
+                        <Col
+                            key={item.name}
+                            lg={{
+                                order: item.order_lg,
+                                span: responsiveColSpan.lg
+                            }}
+                            md={{
+                                order: item.order_md,
+                                span: responsiveColSpan.md
+                            }}
+                            sm={{
+                                order: item.order_sm,
+                                span: responsiveColSpan.sm
+                            }}
+                            xl={{
+                                order: item.order_xl,
+                                span: responsiveColSpan.xl
+                            }}
+                            xs={{
+                                order: item.order_xs,
+                                span: responsiveColSpan.xs
+                            }}
+                            xxl={{
+                                order: item.order_xxl,
+                                span: responsiveColSpan.xxl
+                            }}
+                        >
+                            {item.element}
                         </Col>
-                        <Col>
-                            <Button
-                                className='btn-primary'
-                                onClick={() => setPriceModalVisible(true)}
-                            >
-                                Modificar precios
-                            </Button>
-                        </Col>
-                        <Col>
-                            <Button
-                                className='btn-primary'
-                                onClick={() => exportExcel()}
-                            >
-                                Exportar Excel
-                            </Button>
-                        </Col>
-                    </Row>
-                    <br />
-                    <Row justify='space between' gutter={16}>
-                        <Col span={6}>
-                            <Input
-                                color='primary'
-                                name='nombre'
-                                onChange={e => updateFilters(e)}
-                                placeholder='Buscar por nombre'
-                                style={{ width: 200, marginBottom: '10px' }}
-                                value={filters ? filters.nombre : null}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input
-                                color='primary'
-                                name='codigoBarras'
-                                onChange={e => updateFilters(e)}
-                                placeholder='Buscar por codigo de barras'
-                                style={{ width: 200, marginBottom: '10px' }}
-                                value={filters ? filters.codigoBarras : null}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input
-                                color='primary'
-                                name='codigoProducto'
-                                onChange={e => updateFilters(e)}
-                                placeholder='Buscar por codigo de producto'
-                                style={{ width: 200, marginBottom: '10px' }}
-                                value={filters ? filters.codigoProducto : null}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Button
-                                danger
-                                onClick={() => cleanFilters()}
-                                type='primary'
-                            >
-                                Limpiar filtros
-                            </Button>
-                        </Col>
-                        <Col span={8}>
-                            <GenericAutocomplete
-                                label='Filtrar por marcas'
-                                modelToFind='marca'
-                                keyToCompare='nombre'
-                                controller='marcas'
-                                setResultSearch={setSelectedBrand}
-                                selectedSearch={selectedBrand}
-                                returnCompleteModel={true}
-                                styles={{ backgroundColor: '#fff' }}
-                            />
-                        </Col>
-                        <Col span={8}>
-                            <GenericAutocomplete
-                                label='Filtrar por rubros'
-                                modelToFind='rubro'
-                                keyToCompare='nombre'
-                                controller='rubros'
-                                setResultSearch={setSelectedHeading}
-                                selectedSearch={selectedHeading}
-                                returnCompleteModel={true}
-                                styles={{ backgroundColor: '#fff' }}
-                            />
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+                    )
+                })
+            }
             <PriceModificatorModal
                 priceModalVisible={priceModalVisible}
                 setPriceModalVisible={setPriceModalVisible}
                 setLoading={setLoading}
             />
-        </>
+        </Row>
     )
 }
 

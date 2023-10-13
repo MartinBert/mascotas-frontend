@@ -5,19 +5,19 @@ import api from '../../../services'
 const { Option } = Select
 
 const GenericAutocomplete = ({
-    multiple,
-    modelToFind,
-    keyToCompare,
-    controller,
-    selectedSearch,
-    label,
-    setResultSearch,
-    dispatch,
     action,
     actionSecondary,
     actionTertiary,
+    controller,
+    dispatch,
+    keyToCompare,
+    label,
+    multiple,
+    modelToFind,
     payloadSecondary,
-    returnCompleteModel
+    returnCompleteModel,
+    selectedSearch,
+    setResultSearch
 }) => {
     const [loading, setLoading] = useState(false)
     const [options, setOptions] = useState([])

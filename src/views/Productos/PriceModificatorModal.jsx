@@ -16,9 +16,9 @@ import helper from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
-const { Option } = Select
-const { Delete } = icons
 const { decimalPercent, roundToMultiple, roundTwoDecimals } = helper.mathHelper
+const { Delete } = icons
+const { Option } = Select
 
 
 const PriceModificatorModal = ({

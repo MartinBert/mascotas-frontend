@@ -1,41 +1,44 @@
-import auth from './auth'
-import productos from './productos'
-import salidas from './salidas'
-import entradas from './entradas'
-import marcas from './marcas'
-import rubros from './rubros'
-import usuarios from './usuarios'
-import clientes from './clientes'
-import mediospago from './mediospago'
-import documentos from './documentos'
-import uploader from './uploader'
-import genericos from './genericos'
-import empresas from './empresas'
-import ventas from './ventas'
-import puntosventa from './puntosventa'
-import condicionesfiscales from './condicionesfiscales'
-import unidadesmedida from './unidadesmedida'
 import afip from './afip'
+import auth from './auth'
+import clientes from './clientes'
+import condicionesfiscales from './condicionesfiscales'
+import documentos from './documentos'
+import empresas from './empresas'
+import entradas from './entradas'
+import genericos from './genericos'
+import marcas from './marcas'
+import mediospago from './mediospago'
+import productos from './productos'
+import puntosventa from './puntosventa'
+import rubros from './rubros'
+import salidas from './salidas'
+import unidadesmedida from './unidadesmedida'
+import uploader from './uploader'
+import usuarios from './usuarios'
+import ventas from './ventas'
+import zonasdeventas from './zonasdeventas'
+
 
 const api = {
+    afip,
     auth,
-    productos,
-    salidas,
-    entradas,
-    marcas,
-    rubros,
-    usuarios,
     clientes,
-    mediospago,
-    documentos,
-    uploader,
-    genericos,
-    empresas,
-    ventas,
-    puntosventa,
     condicionesfiscales,
+    documentos,
+    empresas,
+    entradas,
+    genericos,
+    marcas,
+    mediospago,
+    productos,
+    puntosventa,
+    rubros,
+    salidas,
     unidadesmedida,
-    afip
+    uploader,
+    usuarios,
+    ventas,
+    zonasdeventas
 }
 
 export default api

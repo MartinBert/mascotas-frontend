@@ -20,6 +20,7 @@ const { PrivateRouteContext } = contexts.PrivateRoute
 const { ProductSelectionModalContext } = contexts.ProductSelectionModal
 const { SaleContext } = contexts.Sale
 const { SaleProductsContext } = contexts.SaleProducts
+const { SalesAreasContext } = contexts.SalesAreas
 
 
 function App() {
@@ -35,9 +36,11 @@ function App() {
                                     <ProductSelectionModalContext>
                                         <SaleContext>
                                             <SaleProductsContext>
-                                                <Router>
-                                                    <AppRouter />
-                                                </Router>
+                                                <SalesAreasContext>
+                                                    <Router>
+                                                        <AppRouter />
+                                                    </Router>
+                                                </SalesAreasContext>
                                             </SaleProductsContext>
                                         </SaleContext>
                                     </ProductSelectionModalContext>

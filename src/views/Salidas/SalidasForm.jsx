@@ -74,7 +74,7 @@ const SalidasForm = () => {
     }, [outputs_state.products])
 
 
-    const outputData = [
+    const outputsRender = [
         {
             element: <AddButton />,
             name: 'addProduct',
@@ -173,7 +173,7 @@ const SalidasForm = () => {
                                         ]}
                                     >
                                         {
-                                            outputData.map(item => {
+                                            outputsRender.map(item => {
                                                 return (
                                                     <Col
                                                         key={item.name}
