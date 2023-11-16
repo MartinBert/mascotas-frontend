@@ -79,18 +79,12 @@ const Productos = () => {
                 deleteModal_state.confirmDeletion,
                 deleteModal_state.entityID
             )
-            if (validation === 'OK') {
-                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-                await api.productos.deleteById(deleteModal_state.entityID)
-                    .then(response => {
-                        if (response.code === 200) {
-                            successAlert('El registro se eliminó correctamente')
-                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-                        } else {
-                            errorAlert('Fallo al eliminar el registro')
-                        }
-                    })
-            }
+            if (validation === 'FAIL') return
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+            const response = await api.productos.deleteById(deleteModal_state.entityID)
+            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+            successAlert('El registro se eliminó correctamente.')
+            deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteProduct()
     }, [

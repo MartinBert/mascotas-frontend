@@ -15,7 +15,7 @@ const { existsProperty } = helpers.objHelper
 const Home = () => {
 
     const console_documentTypes = false // 'True' to console log all supported voucher types by the afip controller
-    const changeModel = false
+    const changeModel = false // 'True' to modify database records. You must configure it before.
 
     useEffect(() => {
         const findDocumentsTypes = async () => {

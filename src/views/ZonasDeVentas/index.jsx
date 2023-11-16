@@ -67,8 +67,8 @@ const ZonasDeVentas = () => {
             if (validation === 'FAIL') return
             deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
             const response = await api.zonasdeventas.deleteByID(deleteModal_state.entityID)
-            if (response.code === 500) return errorAlert('Fallo al eliminar el registro')
-            successAlert('El registro se eliminó correctamente')
+            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+            successAlert('El registro se eliminó correctamente.')
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteSalesArea()

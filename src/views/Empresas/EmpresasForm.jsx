@@ -47,44 +47,28 @@ const EmpresasForm = () => {
     }
 
     useEffect(() => {
-        if (empresa.razonSocial) return
-        if (id === 'nuevo') {
-            setLoading(false)
-            return
-        }
-
         const fetchEmpresa = async () => {
+            if (id === 'nuevo') {
+                setLoading(false)
+                return
+            }
             const searchedItem = await api.empresas.findById(id)
-            const {
-                _id,
-                razonSocial,
-                cuit,
-                actividad,
-                fechaInicioActividad,
-                ingresosBrutos,
-                direccion,
-                telefono,
-                email,
-                logo,
-                condicionFiscal,
-                puntosVenta
-            } = searchedItem
             setEmpresa({
-                _id,
-                razonSocial,
-                cuit,
-                actividad,
-                fechaInicioActividad,
-                ingresosBrutos,
-                direccion,
-                telefono,
-                email,
-                logo,
-                condicionFiscal,
-                puntosVenta
+                _id: searchedItem._id,
+                razonSocial: searchedItem.razonSocial,
+                cuit: searchedItem.cuit,
+                actividad: searchedItem.actividad,
+                fechaInicioActividad: searchedItem.fechaInicioActividad,
+                ingresosBrutos: searchedItem.ingresosBrutos,
+                direccion: searchedItem.direccion,
+                telefono: searchedItem.telefono,
+                email: searchedItem.email,
+                logo: searchedItem.logo,
+                condicionFiscal: searchedItem.condicionFiscal,
+                puntosVenta: searchedItem.puntosVenta
             })
-            setSelectedCondition(condicionFiscal)
-            setSelectedSalePoint(puntosVenta[0])
+            setSelectedCondition(searchedItem.condicionFiscal)
+            setSelectedSalePoint(searchedItem.puntosVenta[0])
             setLoading(false)
         }
         fetchEmpresa()
@@ -107,6 +91,7 @@ const EmpresasForm = () => {
         }
 
         const editBusiness = async () => {
+            console.log(empresa)
             const response = await api.empresas.edit(empresa)
             if (response.code === 200) {
                 success()

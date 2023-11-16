@@ -1,9 +1,6 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
 
-// Custom Components
-import { errorAlert } from '../../components/alerts'
-
 // Custom Context Providers
 import contexts from '../../contexts'
 
@@ -12,9 +9,6 @@ import { Row, Col } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
-
-// Services
-import api from '../../services'
 
 // Views
 import HeaderElements from './HeaderElements'

@@ -30,10 +30,9 @@ const { useDeleteModalContext } = contexts.DeleteModal
 const { Delete, Details, Edit } = icons
 const { dateHelper } = helpers
 
-const findOutputToDelete = async (outputID) => {
+const findOutput = async (outputID) => {
     const findOutput = await api.salidas.findById(outputID)
-    const output = findOutput.data
-    return output
+    return findOutput
 }
 
 const fixStock = async (outputToDelete) => {
@@ -98,20 +97,15 @@ const Salidas = () => {
                 deleteModal_state.confirmDeletion,
                 deleteModal_state.entityID
             )
-            if (validation === 'OK') {
-                deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-                const outputToDelete = await findOutputToDelete(deleteModal_state.entityID)
-                fixStock(outputToDelete)
-                await api.salidas.deleteById(deleteModal_state.entityID)
-                    .then(response => {
-                        if (response.code === 200) {
-                            successAlert('El registro se eliminó correctamente')
-                            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-                        } else {
-                            errorAlert('Fallo al eliminar el registro')
-                        }
-                    })
-            }
+            if (validation === 'FAIL') return
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+            const findOutputToDelete = await findOutput(deleteModal_state.entityID)
+            if (findOutputToDelete.message !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
+            fixStock(findOutputToDelete.data)
+            const response = await api.salidas.deleteById(deleteModal_state.entityID)
+            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+            successAlert('El registro se eliminó correctamente.')
+            deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteSalida()
     }, [

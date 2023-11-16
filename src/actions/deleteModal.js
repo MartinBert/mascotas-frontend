@@ -1,9 +1,6 @@
 const validateDeletion = (confirmDeletion, entityID) => {
-    if (
-        confirmDeletion === false
-        || entityID === null
-    ) return 'FAIL'
-    return 'OK'
+    if (confirmDeletion === false || entityID === null) return 'FAIL'
+    else return 'OK'
 }
 
 const deleteModal = {
