@@ -20,7 +20,7 @@ import api from '../../services'
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { formatBody } = helpers.afipHelper
-const { createVoucherPdf, createTicketPdf } = helpers.pdf
+const { createVoucherPdf, createTicketPdf } = helpers.pdfHelper.commercialDocumentsPDF
 
 
 const FinalizeSaleModal = () => {

@@ -2,6 +2,7 @@ import Auth from './Auth'
 import CustomProducts from './CustomProducts'
 import DeleteModal from './DeleteModal'
 import Entries from './Entries'
+import FiscalNoteModal from './FiscalNoteModal'
 import Outputs from './Outputs'
 import PrivateRoute from './PrivateRoute'
 import ProductSelectionModal from './ProductSelectionModal'
@@ -14,6 +15,7 @@ const contexts = {
     CustomProducts,
     DeleteModal,
     Entries,
+    FiscalNoteModal,
     Outputs,
     PrivateRoute,
     ProductSelectionModal,

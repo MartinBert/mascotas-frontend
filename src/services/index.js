@@ -5,6 +5,7 @@ import condicionesfiscales from './condicionesfiscales'
 import documentos from './documentos'
 import empresas from './empresas'
 import entradas from './entradas'
+import fiscalNotes from './fiscalNotes'
 import genericos from './genericos'
 import marcas from './marcas'
 import mediospago from './mediospago'
@@ -27,6 +28,7 @@ const api = {
     documentos,
     empresas,
     entradas,
+    fiscalNotes,
     genericos,
     marcas,
     mediospago,

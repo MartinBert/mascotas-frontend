@@ -21,7 +21,7 @@ import api from '../../services'
 
 // Imports Destructuring
 const { Spinner } = graphics
-const { formHelper } = helpers
+const { noEmptyKeys } = helpers.objHelper
 const { useAuthContext } = contexts.Auth
 
 
@@ -94,7 +94,7 @@ const ClientesForm = () => {
 
 
     const save = async () => {
-        if (id && formHelper.noEmptyKeys(cliente) === true) {
+        if (id && noEmptyKeys(cliente) === true) {
             const response = (id === 'nuevo') ? await api.clientes.save(cliente) : await api.clientes.edit(cliente)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')

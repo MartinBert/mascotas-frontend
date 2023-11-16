@@ -1,13 +1,16 @@
 import autocomplete from './autocomplete/GenericAutocomplete'
+import deleteModal from './deleteModal/DeleteModal'
 import giselaDetailsModal from './productDetailsModal/GiselaDetailsModal'
+import inputHidden from './InputHidden'
+import openImage from './openImage/OpenImage'
 import productDetailsModal from './productDetailsModal/ProductDetailsModal'
 import productSelectionModal from './productSelectionModal/ProductSelectionModal'
-import deleteModal from './deleteModal/DeleteModal'
-import openImage from './openImage/OpenImage'
 
+
+export const DeleteModal = deleteModal
 export const GenericAutocomplete = autocomplete
 export const GiselaDetailsModal = giselaDetailsModal
+export const InputHidden = inputHidden
+export const OpenImage = openImage
 export const ProductDetailsModal = productDetailsModal
 export const ProductSelectionModal = productSelectionModal
-export const DeleteModal = deleteModal
-export const OpenImage = openImage

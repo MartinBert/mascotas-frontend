@@ -36,10 +36,21 @@ const findTaxpayerData = async (userCuit, taxpayerCuit) => {
     }
 }
 
+const getDocumentsTypes = async (cuit) => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/obtenerTiposDocumentos/${cuit}`)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const marcas = {
     findLastVoucherNumber,
     generateVoucher,
-    findTaxpayerData
+    findTaxpayerData,
+    getDocumentsTypes
 }
 
 export default marcas

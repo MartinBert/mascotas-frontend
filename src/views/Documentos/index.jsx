@@ -115,13 +115,11 @@ const Documentos = () => {
             title: 'Remito',
         },
         {
-
             dataIndex: 'document_letra',
             render: (_, document) => document.letra,
             title: 'Letra',
         },
         {
-
             dataIndex: 'document_uniqueCode',
             render: (_, document) => document.codigoUnico,
             title: 'Código único',

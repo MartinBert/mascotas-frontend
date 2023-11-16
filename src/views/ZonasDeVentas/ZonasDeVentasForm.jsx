@@ -19,7 +19,7 @@ import api from '../../services'
 
 // Imports Destructuring
 const { useSalesAreasContext } = contexts.SalesAreas
-const { formatValue } = helpers.formHelper
+const { formatValue } = helpers.objHelper
 
 
 const ZonasDeVentasForm = () => {
@@ -59,9 +59,15 @@ const ZonasDeVentasForm = () => {
     }
 
     const updateValues = (e) => {
+        const convertToNumberTargets = [
+            'discountPercentage',
+            'surchargePercentage'
+        ]
         const updatedValues = {
             ...salesAreas_state.currentSalesArea,
-            [e.target.id]: formatValue(e.target.id, e.target.value)
+            [e.target.id]: convertToNumberTargets.includes(e.target.id)
+                ? parseFloat(e.target.value)
+                : e.target.value
         }
         salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: updatedValues })
     }
@@ -106,26 +112,27 @@ const ZonasDeVentasForm = () => {
 
     const formRenderInputs = [
         {
+            element: <Input id='name' style={{ width: '100%' }} />,
             initialValue: null,
             label: 'Nombre de la zona de venta',
             name: 'name',
             rules: [{
                 message: '¡Debes especificar el nombre de la zona de venta!',
                 required: true
-            }],
-            element: <Input id='name' style={{ width: '100%' }} />
+            }]
         },
         {
+            element: <Input id='description' style={{ width: '100%' }} />,
             initialValue: null,
             label: 'Descripción de la zona de venta',
             name: 'description',
             rules: [{
                 message: '¡Debes especificar la descripción de la zona de venta!',
                 required: false
-            }],
-            element: <Input id='description' style={{ width: '100%' }} />
+            }]
         },
         {
+            element: <InputNumber id='discountPercentage' style={{ width: '100%' }} />,
             initialValue: 0,
             label: 'Porcentaje de descuento',
             name: 'discountPercentage',
@@ -134,10 +141,10 @@ const ZonasDeVentasForm = () => {
                 min: 0,
                 required: true,
                 type: 'number'
-            }],
-            element: <InputNumber id='discountPercentage' style={{ width: '100%' }} />
+            }]
         },
         {
+            element: <InputNumber id='surchargePercentage' style={{ width: '100%' }} />,
             initialValue: 0,
             label: 'Porcentaje de recargo',
             name: 'surchargePercentage',
@@ -146,8 +153,7 @@ const ZonasDeVentasForm = () => {
                 min: 0,
                 required: true,
                 type: 'number'
-            }],
-            element: <InputNumber id='surchargePercentage' style={{ width: '100%' }} />
+            }]
         },
     ]
 
@@ -191,7 +197,10 @@ const ZonasDeVentasForm = () => {
                         {
                             formRenderButtons.map((item, index) => {
                                 return (
-                                    <Col key={index} span={6}>
+                                    <Col
+                                        key={'salesAreasRenderButtons_' + index}
+                                        span={6}
+                                    >
                                         <Form.Item>
                                             {item.element}
                                         </Form.Item>

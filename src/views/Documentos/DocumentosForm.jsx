@@ -17,7 +17,7 @@ import api from '../../services'
 
 // Imports Destructuring
 const { Spinner } = graphics
-const { formHelper } = helpers
+const { noEmptyKeys } = helpers.objHelper
 
 
 const DocumentosForm = () => {
@@ -60,7 +60,7 @@ const DocumentosForm = () => {
     }, [loading, id])
 
     const save = async () => {
-        if (id && formHelper.noEmptyKeys(documento) === true) {
+        if (id && noEmptyKeys(documento) === true) {
             const response = (id === 'nuevo') ? await api.documentos.save(documento) : await api.documentos.edit(documento)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')

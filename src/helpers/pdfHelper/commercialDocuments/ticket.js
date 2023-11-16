@@ -1,0 +1,110 @@
+// Helpers
+import dateHelper from '../../dateHelper'
+import mathHelper from '../../mathHelper'
+
+// Imports Destruvturing
+const { simpleDateWithHours } = dateHelper
+const { roundTwoDecimals } = mathHelper
+
+
+const ticketTemplate = (ticketData) => {
+    return `
+        <div style='width: 283px; height: 1102px; display: inline-block; line-height: 1; margin: 10px; '>
+            <div style='width: 100%; height: 210px; border: solid 2px; border-color: #C2BDBC; border-radius: 5px;'>
+                <div style='width: 30%; text-align: center; margin: 0 auto; margin-top: 5px;'>
+                    <div style='background-color: #C2BDBC; border: 1px solid; border-radius: 5px;'>
+                        <h1 style='font-size: 32px; font-weight: bold; color: #fff; margin-top: 15px'>${ticketData.documentoLetra}</h1>
+                    </div>
+                    <p style='vertical-align: text-top; margin-top: 5px;'>Código ${ticketData.documentoCodigo}</p>
+                </div>
+                <div style='width: 100%; margin-top: 15px; padding-left: 10px; text-align: left;'>
+                    <p style='margin-top: 5px;'><i>Razón social:</i> ${ticketData.empresaRazonSocial}</p>
+                    <p style='margin-top: 3px;'><i>Dirección:</i> ${ticketData.empresaDireccion}</p>
+                    <p style='margin-top: 3px;'><i>Fecha emisión:</i> ${simpleDateWithHours(ticketData.fechaEmision)}</p>
+                    <div style='width: 100%; text-align: center; margin-top: 3px;'>NO VÁLIDO COMO FACTURA</div>
+                </div>
+            </div>
+            <div style='width: 100%; color: #C2BDBC;'>
+                <hr>
+            </div>
+            <div style='width: 100%; height: 39px; display: flex; padding-bottom: 15px;'>
+                <div style='width: 15%; text-align: left; padding-left: 5px;'><i>Cant.</i></div>
+                <div style='width: 60%; text-align: left;'><i>Producto</i></div>
+                <div style='width: 25%; text-align: right; padding-right: 5px;'><i>P. Neto</i></div>
+            </div>
+            <div style='width: 100%; height: 733px; display: inline-block;'>
+                <div>
+                    ${
+                        ticketData.renglones.map(renglon => {
+                            return `
+                                <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                                    <div style='width: 15%;'>
+                                        ${
+                                            renglon.fraccionar
+                                                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
+                                                : roundTwoDecimals(renglon.cantidadUnidades)}
+                                    </div>
+                                    <div style='width: 60%;'>${renglon.nombre}</div>
+                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
+                                </div>
+                                ${
+                                    renglon.nota === (null || '')
+                                        ? ''
+                                        : (`
+                                            <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                                                <div style='margin-left: 15%; width: 85%;'>
+                                                    <i>${renglon.nota}</i>
+                                                </div>
+                                            </div>
+                                        `)
+                                }
+                            `
+                        }).join('<br />')}
+                </div>
+                <div style='width: 100%; display: inline-block;'>
+                    <br />
+                    ${
+                        !ticketData.totalRecargo
+                            ? ''
+                            : (`
+                                <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                                    <div style='width: 15%;'>1</div>
+                                    <div style='width: 60%;'>Recargo aplicado</div>
+                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(ticketData.totalRecargo)}</div>
+                                </div>
+                            `)
+                    }
+                    <br />
+                    ${
+                        !ticketData.totalDescuento
+                            ? ''
+                            : (`
+                                <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
+                                    <div style='width: 15%;'>1</div>
+                                    <div style='width: 60%;'>Descuento aplicado</div>
+                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>- ${roundTwoDecimals(ticketData.totalDescuento)}</div>
+                                </div>
+                            `)
+                    }
+                    <br />
+                </div>
+            </div>
+            <div style='width: 100%; height: 110px; bottom: 0; font-size: 9px;'>
+                <div style='width: 100%; color: #C2BDBC;'>
+                    <hr>
+                </div>
+                <div style='width: 100%; padding: 10px;'>
+                    <div style='width: 100%; text-align: right; font-size: 20px;'>
+                        <p>Total: $${ticketData.total}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}
+
+const ticket = {
+    ticketTemplate
+}
+
+export default ticket

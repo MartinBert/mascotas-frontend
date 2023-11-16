@@ -6,10 +6,10 @@ const checkStorageStatus = (err) => {
     }
 }
 
-const deleteDocumento = async (id) => {
+const deleteFiscalNote = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/documentos/${id}`, headers)
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/fiscalNotes/${id}`, headers)
         return response.data.message
     } catch (err) {
         checkStorageStatus(err)
@@ -17,10 +17,10 @@ const deleteDocumento = async (id) => {
     }
 }
 
-const edit = async (documento) => {
+const edit = async (venta) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/documentos/${documento._id}`, documento, headers)
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/fiscalNotes/${venta._id}`, venta, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -28,21 +28,21 @@ const edit = async (documento) => {
     }
 }
 
-const findAll = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos`, headers)
+const findAll = async() => {
+    const headers = {headers: {Authorization: localStorage.getItem('token')}}
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes`, headers)
         return response.data
-    } catch (err) {
+    }catch(err){
         checkStorageStatus(err)
         console.error(err)
     }
 }
 
-const findByCode = async (code) => {
+const findByDates = async (dateFilters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/code/${code}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes?filters=${dateFilters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -53,7 +53,7 @@ const findByCode = async (code) => {
 const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/${id}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes/${id}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -61,10 +61,21 @@ const findById = async (id) => {
     }
 }
 
-const findByName = async (name) => {
+const findLastIndex = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/name/${name}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes/last/index/number`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findLastVoucherNumber = async (code) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes/last/voucher/number/${code}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -75,7 +86,7 @@ const findByName = async (name) => {
 const findMultipleIds = async (ids) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -85,20 +96,20 @@ const findMultipleIds = async (ids) => {
 
 const findPaginated = async (params) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    const { page, limit, filters } = params
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos?page=${page}&limit=${limit}&filters=${filters}`, headers)
-        return response.data
+        const { page, limit, filters } = params
+            const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes?page=${page}&limit=${limit}&filters=${filters}`, headers)
+            return response.data
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
     }
 }
 
-const save = async (documento) => {
+const save = async (fiscalNote) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/documentos`, documento, headers)
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/fiscalNotes`, fiscalNote, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -106,16 +117,17 @@ const save = async (documento) => {
     }
 }
 
-const documentos = {
-    deleteDocumento,
+const fiscalNotes = {
+    deleteFiscalNote,
     edit,
     findAll,
-    findByCode,
+    findByDates,
     findById,
-    findByName,
+    findLastIndex,
+    findLastVoucherNumber,
     findMultipleIds,
     findPaginated,
     save
 }
 
-export default documentos
+export default fiscalNotes

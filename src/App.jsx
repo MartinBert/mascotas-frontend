@@ -15,6 +15,7 @@ const { AuthContext } = contexts.Auth
 const { CustomProductsContext } = contexts.CustomProducts
 const { DeleteModalContext } = contexts.DeleteModal
 const { EntriesContext } = contexts.Entries
+const { FiscalNoteModalContext } = contexts.FiscalNoteModal
 const { OutputsContext } = contexts.Outputs
 const { PrivateRouteContext } = contexts.PrivateRoute
 const { ProductSelectionModalContext } = contexts.ProductSelectionModal
@@ -31,21 +32,23 @@ function App() {
                 <CustomProductsContext>
                     <DeleteModalContext>
                         <EntriesContext>
-                            <OutputsContext>
-                                <PrivateRouteContext>
-                                    <ProductSelectionModalContext>
-                                        <SaleContext>
-                                            <SaleProductsContext>
-                                                <SalesAreasContext>
-                                                    <Router>
-                                                        <AppRouter />
-                                                    </Router>
-                                                </SalesAreasContext>
-                                            </SaleProductsContext>
-                                        </SaleContext>
-                                    </ProductSelectionModalContext>
-                                </PrivateRouteContext>
-                            </OutputsContext>
+                            <FiscalNoteModalContext>
+                                <OutputsContext>
+                                    <PrivateRouteContext>
+                                        <ProductSelectionModalContext>
+                                            <SaleContext>
+                                                <SaleProductsContext>
+                                                    <SalesAreasContext>
+                                                        <Router>
+                                                            <AppRouter />
+                                                        </Router>
+                                                    </SalesAreasContext>
+                                                </SaleProductsContext>
+                                            </SaleContext>
+                                        </ProductSelectionModalContext>
+                                    </PrivateRouteContext>
+                                </OutputsContext>
+                            </FiscalNoteModalContext>
                         </EntriesContext>
                     </DeleteModalContext>
                 </CustomProductsContext>

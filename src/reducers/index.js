@@ -2,6 +2,7 @@ import auth from './auth'
 import customSaleProducts from './customSaleProducts'
 import deleteModal from './deleteModal'
 import entries from './entries'
+import fiscalNoteModal from './fiscalNoteModal'
 import outputs from './outputs'
 import privateRoute from './privateRoute'
 import productSelectionModal from './productSelectionModal'
@@ -14,6 +15,7 @@ const reducers = {
     customSaleProducts,
     deleteModal,
     entries,
+    fiscalNoteModal,
     outputs,
     privateRoute,
     productSelectionModal,

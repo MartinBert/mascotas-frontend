@@ -1,18 +1,18 @@
 import afipHelper from './afipHelper'
 import dateHelper from './dateHelper'
 import excel from './excel'
-import formHelper from './formHelper'
 import mathHelper from './mathHelper'
-import pdf from './pdf'
+import objHelper from './objHelper'
+import pdfHelper from './pdfHelper'
 import stringHelper from './stringHelper'
 
 const helpers = {
     afipHelper,
     dateHelper,
     excel,
-    formHelper,
     mathHelper,
-    pdf,
+    objHelper,
+    pdfHelper,
     stringHelper
 }
 

@@ -5,14 +5,6 @@ export const errorAlert = async(message) => {
         icon: 'error',
         title: 'Error',
         text: message,
-    });
-}
-
-export const successAlert = async(message) => {
-    return Swal.fire({
-        icon: 'success',
-        title: 'Éxito!',
-        text: message
     })
 }
 
@@ -25,5 +17,21 @@ export const questionAlert = async(message) => {
         showConfirmButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
+    })
+}
+
+export const successAlert = async(message) => {
+    return Swal.fire({
+        icon: 'success',
+        title: 'Éxito!',
+        text: message
+    })
+}
+
+export const warningAlert = async(message) => {
+    return Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia!',
+        text: message,
     })
 }

@@ -4,6 +4,7 @@ import Clear from './Clear'
 import Delete from './Delete'
 import Details from './Details'
 import Edit from './Edit'
+import EmitDocument from './EmitDocument'
 import PrintPdf from './PrintPdf'
 
 const icons = {
@@ -13,6 +14,7 @@ const icons = {
     Delete,
     Details,
     Edit,
+    EmitDocument,
     PrintPdf
 }
 

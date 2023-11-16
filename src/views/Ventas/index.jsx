@@ -45,9 +45,7 @@ const Ventas = () => {
 
         fetchUser()
         fetchLastVoucherIndex()
-    },
-        //eslint-disable-next-line
-        [])
+    }, [])
 
     const checkState = async () => {
         const result = new Promise(resolve => {

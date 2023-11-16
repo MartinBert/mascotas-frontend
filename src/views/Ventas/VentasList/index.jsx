@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react'
 // Custom Components
 import icons from '../../../components/icons'
 
+// Custom Contexts
+import contexts from '../../../contexts'
+
 // Design Components
-import { Row, Col, Table } from 'antd'
+import { Col, Row, Table } from 'antd'
 
 // Helpers
 import helpers from '../../../helpers'
@@ -14,14 +17,18 @@ import helpers from '../../../helpers'
 import api from '../../../services'
 
 // Views
+import FiscalNoteModal from './FiscalNoteModal'
 import Header from './Header'
 
 // Imports Destructuring
-const { PrintPdf } = icons
-const { createVoucherPdf, createTicketPdf } = helpers.pdf
+const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
+const { EmitDocument, PrintPdf } = icons
+const { fiscalVouchersCodes } = helpers.afipHelper
+const { createVoucherPdf, createTicketPdf } = helpers.pdfHelper.commercialDocumentsPDF
 
 
 const VentasList = () => {
+    const [, fiscalNoteModal_dispatch] = useFiscalNoteModalContext()
     const [ventas, setVentas] = useState(null)
     const [documentos, setDocumentos] = useState(null)
     const [documentosNombres, setDocumentosNombres] = useState(null)
@@ -36,9 +43,9 @@ const VentasList = () => {
     useEffect(() => {
         const fetchVentasList = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.ventas.findPaginated({ page, limit, filters: stringFilters })
-            setVentas(data.docs)
-            setTotalDocs(data.totalDocs)
+            const salesData = await api.ventas.findPaginated({ page, limit, filters: stringFilters })
+            setVentas(salesData.docs)
+            setTotalDocs(salesData.totalDocs)
             setLoading(false)
         }
         fetchVentasList()
@@ -64,60 +71,81 @@ const VentasList = () => {
         fetchMediosPago()
     }, [])
 
+    const openFiscalNoteModal = async (ventaID) => {
+        const referenceVoucher = await api.ventas.findById(ventaID)
+        fiscalNoteModal_dispatch({ type: 'SET_REFERENCE_VOUCHER', payload: referenceVoucher })
+        fiscalNoteModal_dispatch({ type: 'SHOW_FISCAL_NOTE_MODAL' })
+    }
+
+    const printVoucher = (venta) => {
+        venta.documentoFiscal
+            ? createVoucherPdf(venta)
+            : createTicketPdf(venta)
+    }
+
     const columnsForTable = [
         {
-            title: 'Usuario',
-            render: (venta) => (
-                <p>{(venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente'}</p>
-            ),
+            dataIndex: 'salesList_user',
+            render: (_, venta) => (venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente',
+            title: 'Usuario'
         },
         {
-            title: 'Fecha',
-            render: (venta) => (
-                <p>{venta.fechaEmisionString}</p>
-            ),
+            dataIndex: 'salesList_date',
+            render: (_, venta) => venta.fechaEmisionString,
+            title: 'Fecha'
         },
         {
-            title: 'Cliente',
-            render: (venta) => (
-                <p>{venta.clienteRazonSocial}</p>
-            ),
+            dataIndex: 'salesList_clientName',
+            render: (_, venta) => venta.clienteRazonSocial,
+            title: 'Cliente'
         },
         {
-            title: 'Importe',
-            render: (venta) => (
-                <p>{venta.total}</p>
-            ),
+            dataIndex: 'salesList_saleTotal',
+            render: (_, venta) => venta.total,
+            title: 'Importe'
         },
         {
-            title: 'Comprobante',
-            render: (venta) => (
-                <p>{venta.documento.nombre}</p>
-            ),
+            dataIndex: 'salesList_documentName',
+            render: (_, venta) => venta.documento.nombre,
+            title: 'Comprobante'
         },
         {
-            title: 'Medio de pago',
-            render: (venta) => (
+            dataIndex: 'salesList_paymentMethods',
+            render: (_, venta) => (
                 <div style={{ lineHeight: 0 }}>
-                    <p>{venta.mediosPagoNombres}</p>
-                    <small>{venta.planesPagoNombres}</small>
+                    <p>{venta.mediosPagoNombres[0]}</p>
+                    <small>{venta.planesPagoNombres[0]}</small>
                 </div>
             ),
+            title: 'Medio de pago'
         },
         {
-            title: 'Acciones',
-            render: (venta) => (
-                <Row>
-                    <div onClick={() => {
-                        venta.documentoFiscal
-                            ? createVoucherPdf(venta)
-                            : createTicketPdf(venta)
-                    }}
+            dataIndex: 'salesList_actions',
+            render: (_, venta) => (
+                <Row
+                    justify='start'
+                >
+                    <Col
+                        onClick={() => printVoucher(venta)}
+                        span={12}
                     >
                         <PrintPdf />
-                    </div>
+                    </Col>
+                    {
+                        fiscalVouchersCodes.includes(venta.documento.codigoUnico)
+                            ? (
+                                <Col
+                                    onClick={() => openFiscalNoteModal(venta._id)}
+                                    span={12}
+                                >
+                                    <EmitDocument />
+                                </Col>
+                            )
+                            : null
+                    }
                 </Row>
-            )
+            ),
+            title: 'Acciones'
         }
     ]
 
@@ -147,8 +175,8 @@ const VentasList = () => {
                         limit: limit,
                         total: totalDocs,
                         showSizeChanger: true,
-                        onChange: (e) => { setPage(e) },
-                        onShowSizeChange: (e, val) => { setLimit(val) }
+                        onChange: e => setPage(e),
+                        onShowSizeChange: (e, val) => setLimit(val)
                     }}
                     rowKey='_id'
                     tableLayout='auto'
@@ -156,6 +184,7 @@ const VentasList = () => {
                     loading={loading}
                 />
             </Col>
+            <FiscalNoteModal />
         </Row>
     )
 }

@@ -1,8 +1,8 @@
 import helpers from '../helpers'
 
 const { decimalPercent, previousInteger, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { formatToCompleteVoucherNumber } = helpers.afipHelper
 const { simpleDateWithHours } = helpers.dateHelper
-const { completeLengthWithZero } = helpers.stringHelper
 
 const initialState = {
     //----------------------------------------------- Generics state of view -----------------------------------------------------------/
@@ -572,10 +572,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 numeroFactura: action.payload,
-                numeroCompletoFactura:
-                    completeLengthWithZero(state.puntoVentaNumero, 4) +
-                    '-' +
-                    completeLengthWithZero(action.payload, 8),
+                numeroCompletoFactura: formatToCompleteVoucherNumber(state.puntoVentaNumero, action.payload)
             }
         case actions.SET_PAYMENT_METHODS:
             if (!action.payload) {
