@@ -122,7 +122,7 @@ const FinalizeSaleModal = () => {
         if (!saleData.isSaved) return errorAlert('No se pudo guardar la venta.').then(() => reload())
 
         //Create document
-        if (sale_state.documento.nombre === 'TIQUE') await createTicketPdf(sale_state)
+        if (sale_state.documento.nombre === 'TICKET') await createTicketPdf(sale_state)
         else if (sale_state.documento.nombre !== 'TIQUE') await createVoucherPdf(sale_state)
         else return errorAlert('No se pudo generar el comprobante de la operación.').then(() => reload())
 

@@ -19,7 +19,7 @@ const SelectSalesArea = () => {
 
     useEffect(() => {
         const findSalesAreas = async () => {
-            const salesAreas = await api.zonasdeventas.findByName('Reconquista')
+            const salesAreas = await api.zonasdeventas.findByName('Default')
             salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: salesAreas.docs[0] })
         }
         findSalesAreas()

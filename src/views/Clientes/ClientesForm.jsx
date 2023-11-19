@@ -91,8 +91,6 @@ const ClientesForm = () => {
         }
     }
 
-
-
     const save = async () => {
         if (id && noEmptyKeys(cliente) === true) {
             const response = (id === 'nuevo') ? await api.clientes.save(cliente) : await api.clientes.edit(cliente)
@@ -101,6 +99,28 @@ const ClientesForm = () => {
                 redirectToClientes()
             } else errorAlert('Error al guardar el registro.')
         } else errorAlert('Ocurrió un error, inténtelo de nuevo.')
+    }
+
+    const searchAfipClientData = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        if (!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.')
+
+        const userCuit = auth_state.user.empresa.cuit
+        const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit)
+        if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
+
+        setCliente({
+            ...cliente,
+            razonSocial: taxpayerData.razonSocial,
+            condicionFiscal: null,
+            email: (taxpayerData.email) ? taxpayerData.email[0].direccion : '',
+            telefono: (taxpayerData.telefono) ? taxpayerData.telefono[0].numero : '',
+            direccion: (taxpayerData.domicilio[0].direccion) ? taxpayerData.domicilio[0].direccion : '',
+            ciudad: (taxpayerData.domicilio[0].localidad) ? taxpayerData.domicilio[0].localidad : '',
+            provincia: (taxpayerData.domicilio[0].descripcionProvincia) ? taxpayerData.domicilio[0].descripcionProvincia : '',
+            documentoReceptor: 80
+        })
     }
 
     const formProps = [
@@ -170,29 +190,7 @@ const ClientesForm = () => {
                                     <Button
                                         className='btn-primary'
                                         type='button'
-                                        onClick={async (e) => {
-                                            e.preventDefault()
-                                            setLoading(true)
-                                            if (!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.')
-
-                                            const userCuit = auth_state.user.empresa.cuit
-                                            const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit)
-
-                                            if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
-
-                                            setCliente({
-                                                ...cliente,
-                                                razonSocial: taxpayerData.razonSocial,
-                                                condicionFiscal: null,
-                                                email: (taxpayerData.email) ? taxpayerData.email[0].direccion : '',
-                                                telefono: (taxpayerData.telefono) ? taxpayerData.telefono[0].numero : '',
-                                                direccion: (taxpayerData.domicilio[0].direccion) ? taxpayerData.domicilio[0].direccion : '',
-                                                ciudad: (taxpayerData.domicilio[0].localidad) ? taxpayerData.domicilio[0].localidad : '',
-                                                provincia: (taxpayerData.domicilio[0].descripcionProvincia) ? taxpayerData.domicilio[0].descripcionProvincia : '',
-                                                documentoReceptor: 80
-                                            })
-                                        }
-                                        }
+                                        onClick={async (e) => searchAfipClientData(e)}
                                     >
                                         Buscar datos
                                     </Button>
