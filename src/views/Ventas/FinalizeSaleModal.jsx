@@ -19,9 +19,10 @@ import api from '../../services'
 // Imports Destructurings
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
-const { formatBody } = helpers.afipHelper
-const { createVoucherPdf, createTicketPdf } = helpers.pdfHelper.commercialDocumentsPDF
+const { fiscalVouchersCodes, formatBody } = helpers.afipHelper
+const { createBudgetPdf, createRemittancePdf, createVoucherPdf, createTicketPdf } = helpers.pdfHelper.commercialDocumentsPDF
 
+const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
 
 const FinalizeSaleModal = () => {
     const [auth_state, auth_dispatch] = useAuthContext()
@@ -100,7 +101,7 @@ const FinalizeSaleModal = () => {
                 delete renglon._id
                 return renglon
             })
-            
+
             sale_state.productos = sale_state.productos
                 .filter(product => !(product._id.startsWith('customProduct_')))
 
@@ -114,18 +115,29 @@ const FinalizeSaleModal = () => {
 
     const save = async () => {
         //Modify stock of products
-        const stock = await applyStockModification()
-        if (!stock.isModified) return errorAlert('Error al modificar stock.').then(() => reload())
+        const noModifyStock = ['PRESUPUESTO', 'REMITO']
+        if(!noModifyStock.includes(sale_state.documento.nombre)) {
+            const stock = await applyStockModification()
+            if (!stock.isModified) return errorAlert('Error al modificar stock.').then(() => reload())
+        }
 
         //Save sale data
         const saleData = await saveSaleData()
         if (!saleData.isSaved) return errorAlert('No se pudo guardar la venta.').then(() => reload())
 
         //Create document
-        if (sale_state.documento.nombre === 'TICKET') await createTicketPdf(sale_state)
-        else if (sale_state.documento.nombre !== 'TIQUE') await createVoucherPdf(sale_state)
-        else return errorAlert('No se pudo generar el comprobante de la operación.').then(() => reload())
+        let isCreated
+        // No fiscal
+        if (sale_state.documento.codigoUnico === '000') {
+            if (sale_state.documento.nombre === 'PRESUPUESTO') isCreated = await createBudgetPdf(sale_state)
+            else if (sale_state.documento.nombre === 'REMITO') isCreated = await createRemittancePdf(sale_state)
+            else if (sale_state.documento.nombre === 'TICKET') isCreated = await createTicketPdf(sale_state)
+        // Fiscal
+        } else {
+            if (billCodes.includes(sale_state.documento.codigoUnico)) isCreated = await createVoucherPdf(sale_state)
+        }
 
+        if (!isCreated) return errorAlert('No se pudo generar el comprobante de la operación.').then(() => reload())
         return successAlert('Venta realizada').then(() => reload())
     }
 

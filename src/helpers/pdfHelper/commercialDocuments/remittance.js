@@ -11,29 +11,29 @@ const { completeLengthWithZero } = stringHelper
 const { existIva } = validations
 
 
-const remittanceTemplate = (qrImage, remittanceData) => {
+const remittanceTemplate = (qrImage = null, remittanceData) => {
     return `
         <div style='width: 753px; height: 1082px; display: inline-block; line-height: 1; margin: 20px;'>
             <div style='display: flex; width: 100%; height: 180px; text-align: center; padding: 10px; padding-bot: 8px; border: solid 2px; border-radius: 5px; border-color: #C2BDBC'>
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
-                        <img crossorigin='anonymous' src='${remittanceData.businessLogo}' alt='voucher-logo' width='50' height='50'>
+                        <img crossorigin='anonymous' src='${remittanceData.empresaLogo}' alt='budget-logo' width='50' height='50'>
                     </div>
                     <div style='text-align: left;'>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Razón social:</i> ${remittanceData.referenceVoucher.empresaRazonSocial}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Dirección:</i> ${remittanceData.referenceVoucher.empresaDireccion}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Cond. IVA:</i> ${remittanceData.referenceVoucher.empresaCondicionIva}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>CUIT:</i> ${remittanceData.referenceVoucher.empresaCuit}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Ing. brutos:</i> ${remittanceData.referenceVoucher.empresaIngresosBrutos}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${simpleDateWithHours(remittanceData.referenceVoucher.empresaInicioActividad)}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Razón social:</i> ${remittanceData.empresaRazonSocial}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Dirección:</i> ${remittanceData.empresaDireccion}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Cond. IVA:</i> ${remittanceData.empresaCondicionIva}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>CUIT:</i> ${remittanceData.empresaCuit}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Ing. brutos:</i> ${remittanceData.empresaIngresosBrutos}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${simpleDateWithHours(remittanceData.empresaInicioActividad)}</p>
                     </div>
                 </div>
                 <div style='width: 20%; text-align: center;'>
                     <div style='background-color: #C2BDBC; margin-left: 10px; margin-right: 10px; border: 1px solid; border-radius: 5px;'>
-                        <h1 style='font-size: 52px; font-weight: bold; color: #fff; margin-top: 15px'>${remittanceData.remittanceLetter}</h1>
+                        <h1 style='font-size: 52px; font-weight: bold; color: #fff; margin-top: 15px'>${remittanceData.documentoLetra}</h1>
                     </div>
-                    <p style='vertical-align: text-top; margin-top: 5px;'>Código ${remittanceData.remittanceCode}</p>
-                    ${!remittanceData.documento.fiscal ? `<div style='font-size: 16px; bottom: 0;'>NO VÁLIDO COMO FACTURA</div>` : ''}
+                    <p style='vertical-align: text-top; margin-top: 5px;'>Código ${remittanceData.documentoCodigo}</p>
+                    <div style='font-size: 16px; bottom: 0;'>NO VÁLIDO COMO FACTURA</div>
                 </div>
                 <div style='width: 40%; text-align: left; margin-left: 20px'>
                     <p style='font-size: 26px; margin: 0px; margin-top: 3px;'>REMITO</p>
@@ -42,6 +42,23 @@ const remittanceTemplate = (qrImage, remittanceData) => {
                         - Comp. nro: ${completeLengthWithZero(remittanceData.numeroFactura, 8)}
                     </p>
                     <p style='font-size: 16px; margin: 0px; margin-top: 3px;'>Fecha emisión: ${simpleDateWithHours(remittanceData.fechaEmision)}</p>
+                    ${
+                        !remittanceData.documento.fiscal
+                            ? ''
+                            : (`
+                                <br />
+                                <p style='margin: 0px; margin-top: 3px;'>Comprobante asociado:</p>
+                                <p style='margin: 0px; margin-top: 3px;'>
+                                    ${remittanceData.referenceVoucher.documento.nombre}
+                                    ${remittanceData.referenceVoucher.documentoLetra}
+                                </p>
+                                <p style='margin: 0px; margin-top: 3px;'>
+                                    Pto. vta: ${completeLengthWithZero(remittanceData.referenceVoucher.puntoVentaNumero, 4)}
+                                    Comp. nro: ${completeLengthWithZero(remittanceData.referenceVoucher.numeroFactura, 8)}
+                                </p>
+                                <p style='margin: 0px; margin-top: 3px;'>Fecha emisión: ${simpleDateWithHours(remittanceData.referenceVoucher.fechaEmision)}</p>
+                            `)
+                    }
                 </div>
             </div>
             <div style='width: 100%; height: 70px; background-color: #C2BDBC; padding: 10px; margin-top: 10px; border: solid 2px; border-radius: 5px; border-color: #C2BDBC'>
@@ -52,7 +69,7 @@ const remittanceTemplate = (qrImage, remittanceData) => {
                 </div>
                 <div style='width: 100%; margin-top: 2px;'><i>Dirección:</i> ${remittanceData.clienteDireccion}</div>
                 <div style='width: 100%; margin-top: 2px;'>
-                    <i>Cond. venta:</i> ${remittanceData.paymentMethodName} - ${remittanceData.paymentPlanName}
+                    <i>Cond. venta:</i> ${remittanceData.mediosPagoNombres[0]} - ${remittanceData.planesPagoNombres[0]}
                 </div>
             </div>
             <div style='width: 100%; height: 35px; padding: 10px; display: flex; padding-bottom: 15px; font-style: italic'>
@@ -96,7 +113,7 @@ const remittanceTemplate = (qrImage, remittanceData) => {
                                         `)
                                 }
                             </div>
-                    `)
+                        `)
                 }).join('<br />')}
             </div>
             <div style='width: 100%; height: 215px; bottom: 0px; display: inline-block;'>

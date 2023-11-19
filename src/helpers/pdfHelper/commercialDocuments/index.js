@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas'
 import QRCode from 'qrcode'
 
 // Templates
+import budget from './budget'
 import creditNote from './creditNote.js'
 import debitNote from './debitNote.js'
 import remittance from './remittance.js'
@@ -13,6 +14,7 @@ import voucher from './voucher.js'
 
 // Imports Destructuring
 const { AfipQR } = qr
+const { budgetTemplate } = budget
 const { creditNoteTemplate } = creditNote
 const { debitNoteTemplate } = debitNote
 const { remittanceTemplate } = remittance
@@ -40,6 +42,16 @@ const processCanvas = async (frameToCanvas, htmlObject, docName, size) => {
     return await canvasResult
 }
 
+const createBudgetPdf = async (budgetData) => {
+    const frameToCanvas = document.getElementById('voucher')
+    const htmlObject = document.createElement('div')
+    const docName = budgetData.numeroCompletoFactura
+    const size = [297, 210] // Expresed in mm
+    htmlObject.innerHTML = budgetTemplate(budgetData)
+    const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
+    return { isCreated: doc.isProcesseed }
+}
+
 const createCreditNotePdf = async (creditData) => {
     const qrToVoucher = new AfipQR(creditData)
     const qrImage = await QRCode.toDataURL(qrToVoucher.url)
@@ -65,11 +77,16 @@ const createDebitNotePdf = async (debitData) => {
 }
 
 const createRemittancePdf = async (remittanceData) => {
+    let qrImage
+    if (remittanceData.documento.fiscal) {
+        const qrToVoucher = new AfipQR(remittanceData)
+        qrImage = await QRCode.toDataURL(qrToVoucher.url)
+    } else qrImage = null
     const frameToCanvas = document.getElementById('voucher')
     const htmlObject = document.createElement('div')
     const docName = remittanceData.numeroCompletoFactura
     const size = [297, 210] // Expresed in mm
-    htmlObject.innerHTML = remittanceTemplate(remittanceData)
+    htmlObject.innerHTML = remittanceTemplate(qrImage, remittanceData)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
     return { isCreated: doc.isProcesseed }
 }
@@ -97,6 +114,7 @@ const createTicketPdf = async (ticketData) => {
 }
 
 const commercialDocumentsPDF = {
+    createBudgetPdf,
     createCreditNotePdf,
     createDebitNotePdf,
     createRemittancePdf,
