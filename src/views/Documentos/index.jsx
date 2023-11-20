@@ -86,36 +86,43 @@ const Documentos = () => {
         {
             dataIndex: 'document_name',
             render: (_, document) => document.nombre,
+            renderable: true,
             title: 'Nombre',
         },
         {
             dataIndex: 'document_isFiscal',
             render: (_, document) => document.fiscal ? 'Si' : '-',
+            renderable: true,
             title: 'Fiscal',
         },
         {
             dataIndex: 'document_isTicket',
             render: (_, document) => document.ticket ? 'Si' : '-',
+            renderable: true,
             title: 'Ticket',
         },
         {
             dataIndex: 'document_isBudget',
             render: (_, document) => document.presupuesto ? 'Si' : '-',
+            renderable: true,
             title: 'Presupuesto',
         },
         {
             dataIndex: 'document_isRemittance',
             render: (_, document) => document.remito ? 'Si' : '-',
+            renderable: true,
             title: 'Remito',
         },
         {
             dataIndex: 'document_letra',
             render: (_, document) => document.letra,
+            renderable: true,
             title: 'Letra',
         },
         {
             dataIndex: 'document_uniqueCode',
             render: (_, document) => document.codigoUnico,
+            renderable: true,
             title: 'Código único',
         },
         {
@@ -138,6 +145,7 @@ const Documentos = () => {
                     </Col>
                 </Row>
             ),
+            renderable: false,
             title: 'Acciones'
         }
     ]
@@ -160,7 +168,7 @@ const Documentos = () => {
                 <Table
                     width={'100%'}
                     dataSource={documentos}
-                    columns={columnsForTable}
+                    columns={columnsForTable.filter(element => element.renderable)}
                     pagination={{
                         defaultCurrent: page,
                         limit: limit,

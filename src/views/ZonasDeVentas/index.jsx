@@ -137,22 +137,26 @@ const ZonasDeVentas = () => {
         {
             dataIndex: 'salesArea_actions',
             render: (_, salesArea) => (
-                <Row
-                    justify='start'
-                >
-                    <Col
-                        onClick={() => salesAreaEdition(salesArea._id)}
-                        span={12}
-                    >
-                        <Edit />
-                    </Col>
-                    <Col
-                        onClick={() => salesAreaDeletion(salesArea._id)}
-                        span={12}
-                    >
-                        <Delete />
-                    </Col>
-                </Row>
+                salesArea.name === 'Default'
+                    ? null
+                    : (
+                        <Row
+                            justify='start'
+                        >
+                            <Col
+                                onClick={() => salesAreaEdition(salesArea._id)}
+                                span={12}
+                            >
+                                <Edit />
+                            </Col>
+                            <Col
+                                onClick={() => salesAreaDeletion(salesArea._id)}
+                                span={12}
+                            >
+                                <Delete />
+                            </Col>
+                        </Row>
+                    )
             ),
             title: 'Acciones',
         }

@@ -25,8 +25,9 @@ const Header = ({ filters, setFilters }) => {
             <Col span={24}>
                 <Row align='end'>
                     <Col span={4}>
-                    <Button
+                        <Button
                             className='btn-primary'
+                            disabled
                             onClick={() => redirectToForm()}
                         >
                             Nuevo
