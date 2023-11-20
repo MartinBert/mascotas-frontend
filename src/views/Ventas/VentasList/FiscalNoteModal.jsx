@@ -148,6 +148,8 @@ const FiscalNoteModal = () => {
   const findAndSetVoucherNumber = async () => {
     const validation = existsFiscalNoteParams(fiscalNoteModal_state)
     if (!validation) return
+    console.log(validation)
+    console.log(fiscalNoteModal_state.params)
     const number = await findNextVoucherNumber_fiscal(
       fiscalNoteModal_state.params.fiscalNote.codigoUnico,
       fiscalNoteModal_state.params.referenceVoucher.empresaCuit,
