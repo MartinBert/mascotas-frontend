@@ -28,7 +28,7 @@ const Header = () => {
             sale_dispatch({ type: 'SET_TOTAL' })
 
             let number
-            if (sale_state.documentoFiscal) {
+            if (sale_state.documento.fiscal) {
                 number = await findNextVoucherNumber_fiscal(
                     sale_state.documentoCodigo,
                     sale_state.empresaCuit,

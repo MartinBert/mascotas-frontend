@@ -1,5 +1,6 @@
 import Auth from './Auth'
 import CustomProducts from './CustomProducts'
+import DailyBusinessStatistics from './DailyBusinessStatistics'
 import DeleteModal from './DeleteModal'
 import Entries from './Entries'
 import FiscalNoteModal from './FiscalNoteModal'
@@ -13,6 +14,7 @@ import SalesAreas from './SalesAreas'
 const contexts = {
     Auth,
     CustomProducts,
+    DailyBusinessStatistics,
     DeleteModal,
     Entries,
     FiscalNoteModal,

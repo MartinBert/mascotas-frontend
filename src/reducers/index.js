@@ -1,5 +1,6 @@
 import auth from './auth'
 import customSaleProducts from './customSaleProducts'
+import dailyBusinessStatistics from './dailyBusinessStatistics'
 import deleteModal from './deleteModal'
 import entries from './entries'
 import fiscalNoteModal from './fiscalNoteModal'
@@ -13,6 +14,7 @@ import salesAreas from './salesAreas'
 const reducers = {
     auth,
     customSaleProducts,
+    dailyBusinessStatistics,
     deleteModal,
     entries,
     fiscalNoteModal,

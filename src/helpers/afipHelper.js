@@ -7,50 +7,51 @@ import stringHelper from './stringHelper.js'
 
 // Services
 import api from '../services/index.js'
-import objHelper from './objHelper'
 
 // Imports Destructuring
 const { dateToAfip } = dateHelper
-const { existsProperty } = objHelper
 const { completeLengthWithZero } = stringHelper
+
+let attemps = 0
+const delay = ms => new Promise(result => setTimeout(result, ms))
 
 
 const findNextVoucherNumber_fiscal = async (codigoUnico, empresaCuit, puntoVentaNumero) => {
-    const number = await api.afip.findLastVoucherNumber(empresaCuit, puntoVentaNumero, codigoUnico)
-    let attemps = 0
-    if (number === undefined && attemps < 10) {
-        return setTimeout(() => {
-            attemps++
-            return findNextVoucherNumber_fiscal()
-        }, 500)
+    const lastVoucherNumber = await api.afip.findLastVoucherNumber(empresaCuit, puntoVentaNumero, codigoUnico)
+    if (lastVoucherNumber === undefined) {
+        if (attemps === 10) {
+            return errorAlert(`
+                No se pudo recuperar la correlación de AFIP del último comprobante emitido,
+                intente de nuevo más tarde.
+            `).then(() => window.location.reload())
+        }
+    } else {
+        attemps = 0
+        return lastVoucherNumber + 1
     }
-    if (number === undefined) {
-        return errorAlert(`
-        No se pudo recuperar la correlación de AFIP del último comprobante emitido,
-        intente de nuevo más tarde.
-    `)
-            .then(() => window.location.reload())
-    }
-    return number + 1
+
+    attemps++
+    await delay(800)
+    await findNextVoucherNumber_fiscal(codigoUnico, empresaCuit, puntoVentaNumero)
 }
 
 const findNextVoucherNumber_noFiscal = async (documentoCodigo) => {
-    const number = await api.ventas.findLastVoucherNumber(documentoCodigo)
-    let attemps = 0
-    if (number === undefined && attemps < 10) {
-        return setTimeout(() => {
-            attemps++
-            return findNextVoucherNumber_noFiscal()
-        }, 500)
+    const lastVoucherNumber = await api.ventas.findLastVoucherNumber(documentoCodigo)
+    if (lastVoucherNumber === undefined) {
+        if (attemps === 10) {
+            return errorAlert(`
+                No se pudo recuperar la correlación de AFIP del último comprobante emitido,
+                intente de nuevo más tarde.
+            `).then(() => window.location.reload())
+        }
+    } else {
+        attemps = 0
+        return lastVoucherNumber + 1
     }
-    if (number === undefined) {
-        return errorAlert(`
-        No se pudo recuperar la correlación de comprobantes,
-        intente de nuevo más tarde.
-    `)
-            .then(() => window.location.reload())
-    }
-    return number + 1
+
+    attemps++
+    await delay(800)
+    await findNextVoucherNumber_noFiscal(documentoCodigo)
 }
 
 const fiscalVouchersCodes = [
