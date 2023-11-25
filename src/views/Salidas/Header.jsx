@@ -33,8 +33,9 @@ const Header = ({ filters, setFilters, setPage, salidas_paginadas, salidas_total
             const dateFilters = JSON.stringify({
                 fecha: { $gte: initialDate, $lte: finalDate }
             })
-            const response = await api.salidas.findByDates(dateFilters)
-            setSalidasToReport(response.docs)
+            const data = await api.salidas.findByDates(dateFilters)
+            const salidas = data.docs
+            setSalidasToReport(salidas)
         }
     }
 

@@ -32,8 +32,9 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
             const dateFilters = JSON.stringify({
                 fechaEmision: { $gte: initialDate, $lte: finalDate }
             })
-            const response = await api.ventas.findByDates(dateFilters)
-            setVentasToReport(response)
+            const data = await api.ventas.findByDates(dateFilters)
+            const ventas = data.docs
+            setVentasToReport(ventas)
         }
     }
 

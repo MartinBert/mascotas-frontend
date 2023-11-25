@@ -32,6 +32,7 @@ const Productos = () => {
     const navigate = useNavigate()
     const [, auth_dispatch] = useAuthContext()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
+    const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState(null)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
@@ -194,7 +195,7 @@ const Productos = () => {
                 <Header
                     setFilters={setFilters}
                     filters={filters}
-                    setLoading={deleteModal_state.setLoading}
+                    setLoading={setLoading}
                     detailsData={detailsData}
                 />
             </Col>
