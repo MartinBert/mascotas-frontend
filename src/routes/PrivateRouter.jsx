@@ -3,6 +3,7 @@ import Clientes from '../views/Clientes'
 import ClientesForm from '../views/Clientes/ClientesForm'
 import CondicionesFiscales from '../views/CondicionesFiscales'
 import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm'
+import DailyBusinessStatistics from '../views/DailyBusinessStatistics'
 import Documentos from '../views/Documentos'
 import DocumentosForm from '../views/Documentos/DocumentosForm'
 import Empresas from '../views/Empresas'
@@ -35,221 +36,228 @@ import ZonasDeVentasForm from '../views/ZonasDeVentas/ZonasDeVentasForm'
 
 const privateRoutesPreData = [
     {
-        path: '/',
-        element: <Home />,
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/clientes',
-        element: <Clientes />,
-        activeKey: '4',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/clientes/:id',
         element: <ClientesForm />,
+        onlySuperadmin: true,
+        path: '/clientes/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/condicionesfiscales',
-        element: <CondicionesFiscales />,
-        activeKey: '16',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/condicionesfiscales/:id',
         element: <CondicionesFiscalesForm />,
+        onlySuperadmin: true,
+        path: '/condicionesfiscales/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/documentos',
-        element: <Documentos />,
-        activeKey: '3',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/documentos/:id',
         element: <DocumentosForm />,
+        onlySuperadmin: true,
+        path: '/documentos/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/empresas',
-        element: <Empresas />,
-        activeKey: '14',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/empresas/:id',
         element: <EmpresasForm />,
+        onlySuperadmin: true,
+        path: '/empresas/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/entradas',
-        element: <Entradas />,
-        activeKey: '9',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/entradas/:id',
         element: <EntradasForm />,
+        onlySuperadmin: true,
+        path: '/entradas/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
+        element: <Home />,
+        onlySuperadmin: true,
+        path: '/',
+        private: true
     },
     {
-        path: '/listaVentas',
-        element: <VentasList />,
-        activeKey: '2',
-        private: true,
-        onlySuperadmin: false
-    },
-    {
-        path: '/marcas',
-        element: <Marcas />,
-        activeKey: '10',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/marcas/:id',
+        activeKey: null,
         element: <MarcasForm />,
+        onlySuperadmin: true,
+        path: '/marcas/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/mediospago',
-        element: <MediosPago />,
-        activeKey: '5',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/mediospago/:id',
         element: <MediosPagoForm />,
+        onlySuperadmin: true,
+        path: '/mediospago/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/productos',
-        element: <Productos />,
-        activeKey: '7',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/productos/:id',
         element: <ProductosForm />,
+        onlySuperadmin: true,
+        path: '/productos/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/puntosventa',
-        element: <PuntosVenta />,
-        activeKey: '15',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/puntosventa/:id',
         element: <PuntosVentaForm />,
+        onlySuperadmin: true,
+        path: '/puntosventa/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/rubros',
-        element: <Rubros />,
-        activeKey: '11',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/rubros/:id',
         element: <RubrosForm />,
+        onlySuperadmin: true,
+        path: '/rubros/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/salidas',
-        element: <Salidas />,
-        activeKey: '8',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/salidas/:id',
         element: <SalidasForm />,
+        onlySuperadmin: true,
+        path: '/salidas/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/unidadesmedida',
-        element: <UnidadesMedida />,
-        activeKey: '12',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/unidadesmedida/:id',
         element: <UnidadesMedidaForm />,
+        onlySuperadmin: true,
+        path: '/unidadesmedida/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/usuarios',
-        element: <Usuarios />,
-        activeKey: '13',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/usuarios/:id',
         element: <UsuariosForm />,
+        onlySuperadmin: true,
+        path: '/usuarios/:id',
+        private: true
+    },
+    {
         activeKey: null,
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/venta',
-        element: <Ventas />,
-        activeKey: '1',
-        private: true,
-        onlySuperadmin: false
-    },
-    {
-        path: '/zonasdeventas',
-        element: <ZonasDeVentas />,
-        activeKey: '6',
-        private: true,
-        onlySuperadmin: true
-    },
-    {
-        path: '/zonasdeventas/:id',
         element: <ZonasDeVentasForm />,
+        onlySuperadmin: true,
+        path: '/zonasdeventas/:id',
+        private: true
+    },
+    {
         activeKey: '1',
+        element: <Ventas />,
+        onlySuperadmin: false,
+        path: '/venta',
+        private: true
+    },
+    {
+        activeKey: '2',
+        element: <VentasList />,
+        onlySuperadmin: false,
+        path: '/listaVentas',
+        private: true
+    },
+    {
+        activeKey: '3',
+        element: <Documentos />,
+        onlySuperadmin: true,
+        path: '/documentos',
+        private: true
+    },
+    {
+        activeKey: '4',
+        element: <Clientes />,
+        onlySuperadmin: true,
+        path: '/clientes',
+        private: true
+    },
+    {
+        activeKey: '5',
+        element: <MediosPago />,
+        onlySuperadmin: true,
+        path: '/mediospago',
+        private: true
+    },
+    {
+        activeKey: '6',
+        element: <ZonasDeVentas />,
+        onlySuperadmin: true,
+        path: '/zonasdeventas',
+        private: true
+    },
+    {
+        activeKey: '7',
+        element: <Productos />,
+        onlySuperadmin: true,
+        path: '/productos',
+        private: true
+    },
+    {
+        activeKey: '8',
+        element: <Salidas />,
+        onlySuperadmin: true,
+        path: '/salidas',
+        private: true
+    },
+    {
+        activeKey: '9',
+        element: <Entradas />,
+        path: '/entradas',
         private: true,
-        onlySuperadmin: true
+        onlySuperadmin: true,
+    },
+    {
+        activeKey: '10',
+        element: <Marcas />,
+        onlySuperadmin: true,
+        path: '/marcas',
+        private: true
+    },
+    {
+        activeKey: '11',
+        element: <Rubros />,
+        onlySuperadmin: true,
+        path: '/rubros',
+        private: true
+    },
+    {
+        activeKey: '12',
+        element: <UnidadesMedida />,
+        onlySuperadmin: true,
+        path: '/unidadesmedida',
+        private: true
+    },
+    {
+        activeKey: '13',
+        element: <DailyBusinessStatistics />,
+        onlySuperadmin: true,
+        path: '/daily_business_statistics',
+        private: true
+    },
+    {
+        activeKey: '14',
+        element: <Usuarios />,
+        onlySuperadmin: true,
+        path: '/usuarios',
+        private: true
+    },
+    {
+        activeKey: '15',
+        element: <Empresas />,
+        onlySuperadmin: true,
+        path: '/empresas',
+        private: true
+    },
+    {
+        activeKey: '16',
+        element: <PuntosVenta />,
+        onlySuperadmin: true,
+        path: '/puntosventa',
+        private: true
+    },
+    {
+        activeKey: '17',
+        element: <CondicionesFiscales />,
+        onlySuperadmin: true,
+        path: '/condicionesfiscales',
+        private: true
     }
 ]
 

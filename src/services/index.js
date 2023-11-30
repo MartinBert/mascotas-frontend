@@ -2,6 +2,7 @@ import afip from './afip'
 import auth from './auth'
 import clientes from './clientes'
 import condicionesfiscales from './condicionesfiscales'
+import dailyBusinessStatistics from './dailyBusinessStatistics'
 import documentos from './documentos'
 import empresas from './empresas'
 import entradas from './entradas'
@@ -25,6 +26,7 @@ const api = {
     auth,
     clientes,
     condicionesfiscales,
+    dailyBusinessStatistics,
     documentos,
     empresas,
     entradas,

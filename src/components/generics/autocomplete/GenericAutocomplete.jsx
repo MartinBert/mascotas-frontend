@@ -37,14 +37,14 @@ const GenericAutocomplete = ({
         const singleObject = async () => await api[controller].findById(items.value)
         const collectionObject = async () => await api[controller].findMultipleIds(items.map(item => item.value))
         if (returnCompleteModel) {
-            if(actionSecondary) dispatch({ type: actionSecondary, payload: payloadSecondary })
-            if(actionTertiary) dispatch({ type: actionTertiary })
             if (setResultSearch) setResultSearch(multiple ? await collectionObject() : await singleObject())
-            return dispatch({ type: action, payload: multiple ? await collectionObject() : await singleObject() })
+            if (action) dispatch({ type: action, payload: multiple ? await collectionObject() : await singleObject() })
+            if (actionSecondary) dispatch({ type: actionSecondary, payload: payloadSecondary })
+            if (actionTertiary) dispatch({ type: actionTertiary })
         } else {
-            if(actionSecondary) dispatch({ type: actionSecondary, payload: payloadSecondary })
+            if (action) dispatch({ type: action, payload: items })
+            if (actionSecondary) dispatch({ type: actionSecondary, payload: payloadSecondary })
             if (setResultSearch) setResultSearch(items)
-            return dispatch({ type: action, payload: items })
         }
     }
 
