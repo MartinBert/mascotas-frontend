@@ -28,7 +28,7 @@ const { useSaleContext } = contexts.Sale
 
 const Ventas = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
-
+    
     useEffect(() => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')

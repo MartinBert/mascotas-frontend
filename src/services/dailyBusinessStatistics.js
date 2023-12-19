@@ -39,10 +39,43 @@ const findAll = async () => {
     }
 }
 
+const findByDate = async (dateFilters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics?filters=${dateFilters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics/${id}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findNewerRecord = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics/recordsInfo/newer`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findOldestRecord = async (params) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics/recordsInfo/oldest`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -77,7 +110,10 @@ const dailyBusinessStatistics = {
     deleteDailyBusinessStatistics,
     edit,
     findAll,
+    findByDate,
     findById,
+    findNewerRecord,
+    findOldestRecord,
     findPaginated,
     save
 }

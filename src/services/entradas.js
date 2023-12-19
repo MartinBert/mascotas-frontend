@@ -6,6 +6,17 @@ const checkStorageStatus = (err) => {
     }
 }
 
+const countRecords = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/entradas/recordsInfo/quantity`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const deleteById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -39,7 +50,18 @@ const findAll = async () => {
     }
 }
 
-const findByDates = async (dateFilters) => {
+const findByDate = async (dateFilters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/entradas?filters=${dateFilters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findByDatesRange = async (dateFilters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/entradas?filters=${dateFilters}`, headers)
@@ -64,7 +86,29 @@ const findById = async (id) => {
 const findMultipleIds = async (ids) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/entradas/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findNewerRecord = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/entradas/recordsInfo/newer`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findOldestRecord = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/entradas/recordsInfo/oldest`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -96,12 +140,16 @@ const save = async (entrada) => {
 }
 
 const entradas = {
+    countRecords,
     deleteById,
     edit,
     findAll,
-    findByDates,
+    findByDate,
+    findByDatesRange,
     findById,
     findMultipleIds,
+    findNewerRecord,
+    findOldestRecord,
     findPaginated,
     save
 }

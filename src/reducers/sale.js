@@ -54,6 +54,7 @@ const initialState = {
     porcentajeRecargoGlobal: 0,
     porcentajeDescuentoGlobal: 0,
     productos: [],
+    profit: 0,
     puntoVenta: null,
     puntoVentaNumero: null,
     puntoVentaNombre: null,
@@ -460,17 +461,18 @@ const reducer = (state = initialState, action) => {
                         descuento: 0,
                         fraccionamiento: fractionament,
                         fraccionar: false,
-                        importeIva: (line.ivaVenta) ? line.ivaVenta : 0,
+                        importeIva: line.ivaVenta ? line.ivaVenta : 0,
                         key: line._id,
                         nombre: line.nombre,
                         nota: '',
                         porcentajeDescuentoRenglon: 0,
-                        porcentajeIva: (line.porcentajeIvaVenta) ? line.porcentajeIvaVenta : 0,
+                        porcentajeIva: line.porcentajeIvaVenta ? line.porcentajeIvaVenta : 0,
                         porcentajeRecargoRenglon: 0,
                         precioBruto: line.precioVenta,
                         precioNeto: line.precioVenta,
                         precioNetoFijo: false,
                         precioUnitario: line.precioVenta,
+                        profit: line.profit ? line.profit : line.gananciaNeta,
                         recargo: 0,
                         unidadMedida: productUnitOfMeasure,
                     }
@@ -487,11 +489,19 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: state.renglones.map(line => {
+                    const lineProduct = state.productos.find(product => product._id === line._id)
                     const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
-                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                    if (line._id === action.payload._id) line.fraccionar = action.payload.fraccionar
-                    if (action.payload.fraccionar === false) line.cantidadUnidades = 1
+                    const productUnfractionedPrice = lineProduct.precioVenta
+                    const productUnfractionedProfit = lineProduct.gananciaNeta
+                    const productFractionedPrice = lineProduct.precioVentaFraccionado
+                    const productFractionedProfit = lineProduct.gananciaNetaFraccionado / lineProduct.unidadMedida.fraccionamiento
+                    if (line._id === action.payload._id) {
+                        line.fraccionar = action.payload.fraccionar
+                        line.profit = action.payload.fraccionar
+                            ? productFractionedProfit * action.payload.cantidadUnidades
+                            : productUnfractionedProfit * action.payload.cantidadUnidades
+                        if (!action.payload.fraccionar) line.cantidadUnidades = 1
+                    }
                     updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
                     return line
                 })
@@ -629,17 +639,18 @@ const reducer = (state = initialState, action) => {
             }
         case actions.SET_TOTAL:
             if (state.renglones.length === 0) {
-                state.totalDescuento = 0
-                state.totalRecargo = 0
-                state.baseImponible21 = 0
                 state.baseImponible10 = 0
+                state.baseImponible21 = 0
                 state.baseImponible27 = 0
-                state.iva21 = 0
                 state.iva10 = 0
+                state.iva21 = 0
                 state.iva27 = 0
                 state.importeIva = 0
+                state.profit = 0
                 state.subTotal = 0
                 state.total = 0
+                state.totalDescuento = 0
+                state.totalRecargo = 0
                 return state
             }
 
@@ -690,6 +701,7 @@ const reducer = (state = initialState, action) => {
             const totalRedondeado = roundToMultiple(total, 10)
             const totalDiferencia = roundTwoDecimals(totalRedondeado - total)
             const subTotal = roundTwoDecimals(total - importeIva)
+            const profit = state.renglones.reduce((acc, el) => acc + el.profit, 0)
 
             return {
                 ...state,
@@ -702,6 +714,7 @@ const reducer = (state = initialState, action) => {
                 iva10,
                 iva27,
                 importeIva,
+                profit,
                 subTotal,
                 total,
                 totalDiferencia,

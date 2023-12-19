@@ -3,9 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from 'antd'
 import api from '../../../services'
 import contexts from '../../../contexts'
+import helpers from '../../../helpers'
 import { errorAlert, successAlert } from '../../../components/alerts'
 const { useAuthContext } = contexts.Auth
 const { useOutputsContext } = contexts.Outputs
+const { simpleDateWithHours } = helpers.dateHelper
 
 const formatOutput = (output, auth_state) => {
     const formattedOutput = {
@@ -21,6 +23,11 @@ const formatOutput = (output, auth_state) => {
             output.date
                 ? output.date
                 : new Date()
+        ,
+        fechaString:
+            output.dateString
+                ? output.date
+                : simpleDateWithHours(new Date())
         ,
         productos: output.products,
         usuario: auth_state.user._id

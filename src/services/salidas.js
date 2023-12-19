@@ -6,6 +6,17 @@ const checkStorageStatus = (err) => {
     }
 }
 
+const countRecords = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/recordsInfo/quantity`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const deleteById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -39,7 +50,18 @@ const findAll = async () => {
     }
 }
 
-const findByDates = async (dateFilters) => {
+const findByDate = async (dateFilters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas?filters=${dateFilters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findByDatesRange = async (dateFilters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas?filters=${dateFilters}`, headers)
@@ -72,6 +94,28 @@ const findMultipleIds = async (ids) => {
     }
 }
 
+const findNewerRecord = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/recordsInfo/newer`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findOldestRecord = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/recordsInfo/oldest`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findPaginated = async (params) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -96,12 +140,16 @@ const save = async (salida) => {
 }
 
 const salidas = {
+    countRecords,
     deleteById,
     edit,
     findAll,
-    findByDates,
+    findByDate,
+    findByDatesRange,
     findById,
     findMultipleIds,
+    findNewerRecord,
+    findOldestRecord,
     findPaginated,
     save
 }

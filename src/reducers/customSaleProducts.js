@@ -50,17 +50,19 @@ const reducer = (state = initialState, action) => {
                 listOfCustomProductModalIsVisible: false
             }
         case actions.SET_CUSTOM_PRODUCT:
-            if (state.customSaleProducts.find(product => product._id === action.payload._id)) return state;
+            if (state.customSaleProducts.find(product => product._id === action.payload._id)) return state
+            const ivaVenta = roundTwoDecimals(action.payload.unitPrice * action.payload.percentageIVA / 100)
             return {
                 ...state,
                 customSaleProducts: state.customSaleProducts.concat({
                     _id: action.payload._id,
                     codigoBarras: action.payload._id,
-                    ivaVenta: roundTwoDecimals(action.payload.unitPrice * action.payload.percentageIVA / 100),
+                    ivaVenta: ivaVenta,
                     key: action.payload._id,
                     nombre: action.payload.concept,
                     precioVenta: action.payload.unitPrice,
                     porcentajeIvaVenta: action.payload.percentageIVA,
+                    profit: action.payload.unitPrice - ivaVenta,
                     unidadMedida: { fraccionamiento: 1, nombre: 'Unid.' }
                 })
             }

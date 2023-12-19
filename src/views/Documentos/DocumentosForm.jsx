@@ -25,13 +25,14 @@ const DocumentosForm = () => {
     const { id } = useParams()
     const [loading, setLoading] = useState(true)
     const [documento, setDocumento] = useState({
-        nombre: '',
+        cashRegister: false,
+        codigoUnico: 0,
         fiscal: false,
-        ticket: false,
+        letra: '',
+        nombre: '',
         presupuesto: false,
         remito: false,
-        letra: '',
-        codigoUnico: 0,
+        ticket: false,
         _id: null
     })
 
@@ -92,7 +93,8 @@ const DocumentosForm = () => {
         { label: 'Fiscal', name: 'fiscal', required: true, checked: documento.fiscal },
         { label: 'Ticket', name: 'ticket', required: true, checked: documento.ticket },
         { label: 'Presupuesto', name: 'presupuesto', required: true, checked: documento.presupuesto },
-        { label: 'Remito', name: 'remito', required: true, checked: documento.remito }
+        { label: 'Remito', name: 'remito', required: true, checked: documento.remito },
+        { label: 'Arqueo de caja', name: 'cashRegister', required: true, checked: documento.cashRegister }
     ]
 
     return loading

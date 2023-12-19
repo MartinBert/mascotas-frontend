@@ -15,6 +15,7 @@ const initialProductState = {
     _id: '',
     concept: '',
     percentageIVA: 21,
+    profit: 0,
     unitPrice: 0
 }
 

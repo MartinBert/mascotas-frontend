@@ -3,7 +3,7 @@ import helpers from '../helpers'
 import dayjs from 'dayjs'
 
 // Imports Destructuring
-const { localFormat } = helpers.dateHelper
+const { localFormat, simpleDateWithHours } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 
 
@@ -35,6 +35,7 @@ const formatDate = (dateToFormat) => {
 const initialState = {
     _id: null,
     date: null, // loaded by useEffect on first render of view
+    dateString: null, // loaded by useEffect on first render of view
     description: '',
     formattedDate: null, // loaded by useEffect on first render of view
     loading: true,
@@ -65,6 +66,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 date: new Date(),
+                dateString: simpleDateWithHours(new Date()),
                 description: '',
                 formattedDate: formatDate(new Date())
             }
@@ -83,7 +85,8 @@ const reducer = (state = initialState, action) => {
         case actions.SET_DATE:
             return {
                 ...state,
-                date: action.payload
+                date: action.payload,
+                dateString: simpleDateWithHours(action.payload)
             }
         case actions.SET_DESCRIPTION:
             return {
@@ -95,6 +98,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 _id: action.payload._id,
                 date: action.payload.fecha,
+                dateString: action.payload.dateString,
                 description: action.payload.descripcion,
                 formattedDate: formatDate(action.payload.fecha),
                 products: action.payload.productos,

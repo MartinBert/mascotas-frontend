@@ -1,13 +1,26 @@
-const round = (value) => {
-    return Math.round(value)
-}
-
-const roundTwoDecimals = (value) => {
-    return Math.round(Number(value) * 100) / 100
-}
-
 const decimalPercent = (value) => {
     return Number(value) / 100
+}
+
+const nextInteger = (value) => {
+    return Math.ceil(value)
+}
+
+const nextIntegerMultipleOf_10 = (value) => {
+    const roundedNumber = value - value % 10 + 10
+    return roundedNumber
+}
+
+const previousInteger = (value) => {
+    return Math.floor(value)
+}
+
+const randomFiveDecimals = () => {
+    return Math.floor(Math.random()*90000) + 10000
+}
+
+const round = (value) => {
+    return Math.round(value)
 }
 
 const roundToMultiple = (value, multipleOf) => {
@@ -20,27 +33,19 @@ const roundToMultiple = (value, multipleOf) => {
     return roundedValueFixed
 }
 
-const previousInteger = (value) => {
-    return Math.floor(value)
-}
-
-const randomFiveDecimals = () => {
-    return Math.floor(Math.random()*90000) + 10000
-}
-
-const nextIntegerMultipleOf_10 = (value) => {
-    const roundedNumber = value - value % 10 + 10
-    return roundedNumber
+const roundTwoDecimals = (value) => {
+    return Math.round(Number(value) * 100) / 100
 }
 
 const mathHelper = {
-    round,
-    roundToMultiple,
-    roundTwoDecimals,
     decimalPercent,
+    nextInteger,
+    nextIntegerMultipleOf_10,
     previousInteger,
     randomFiveDecimals,
-    nextIntegerMultipleOf_10
+    round,
+    roundToMultiple,
+    roundTwoDecimals
 }
 
 export default mathHelper

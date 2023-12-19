@@ -96,22 +96,10 @@ const Documentos = () => {
             title: 'Fiscal',
         },
         {
-            dataIndex: 'document_isTicket',
-            render: (_, document) => document.ticket ? 'Si' : '-',
+            dataIndex: 'document_cashRegister',
+            render: (_, document) => document.cashRegister ? 'Si' : '-',
             renderable: true,
-            title: 'Ticket',
-        },
-        {
-            dataIndex: 'document_isBudget',
-            render: (_, document) => document.presupuesto ? 'Si' : '-',
-            renderable: true,
-            title: 'Presupuesto',
-        },
-        {
-            dataIndex: 'document_isRemittance',
-            render: (_, document) => document.remito ? 'Si' : '-',
-            renderable: true,
-            title: 'Remito',
+            title: 'Arqueo de caja',
         },
         {
             dataIndex: 'document_letra',
@@ -145,7 +133,7 @@ const Documentos = () => {
                     </Col>
                 </Row>
             ),
-            renderable: false,
+            renderable: true,
             title: 'Acciones'
         }
     ]

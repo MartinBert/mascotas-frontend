@@ -93,7 +93,7 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const subMenusToSidebar = [
         getItem('sub1', 'Ventas', <FaFileInvoiceDollar />, null, saleMenu),
         auth_state.user.perfil ? getItem('sub2', 'Productos y Stock', <FaCubes />, null, productAndStockMenu) : null,
-        // auth_state.user.perfil ? getItem('sub3', 'Estadísticas de negocio', <FaChartBar />, null, businessStatisticsMenu) : null,
+        auth_state.user.perfil ? getItem('sub3', 'Estadísticas de negocio', <FaChartBar />, null, businessStatisticsMenu) : null,
         auth_state.user.perfil ? getItem('sub4', 'Configuraciones', <FaCogs />, null, configurationMenu) : null,
     ]
 

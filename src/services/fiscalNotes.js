@@ -39,7 +39,18 @@ const findAll = async() => {
     }
 }
 
-const findByDates = async (dateFilters) => {
+const findByDate = async (dateFilters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes?filters=${dateFilters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findByDatesRange = async (dateFilters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/fiscalNotes?filters=${dateFilters}`, headers)
@@ -121,7 +132,8 @@ const fiscalNotes = {
     deleteFiscalNote,
     edit,
     findAll,
-    findByDates,
+    findByDate,
+    findByDatesRange,
     findById,
     findLastIndex,
     findLastVoucherNumber,

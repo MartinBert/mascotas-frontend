@@ -1,19 +1,25 @@
+// Helpers
 import dayjs from 'dayjs'
+
 
 const actions = {
     CLEAR_STATE: 'CLEAR_STATE',
     CLEAR_INPUTS: 'CLEAR_INPUTS',
+    HIDE_FIX_STATISTICS_MODAL: 'HIDE_FIX_STATISTICS_MODAL',
     SAVE_DAILY_STATISTICS: 'SAVE_DAILY_STATISTICS',
     SET_DAILY_STATISTICS_RECORDS: 'SET_DAILY_STATISTICS_RECORDS',
     SET_LOADING: 'SET_LOADING',
     SET_LOADING_SAVING_OPERATION: 'SET_LOADING_SAVING_OPERATION',
+    SET_LOADING_UPDATING_RECORDS: 'SET_LOADING_UPDATING_RECORDS',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
+    SET_REFERENCE_STATISTICS: 'SET_REFERENCE_STATISTICS',
+    SHOW_FIX_STATISTICS_MODAL: 'SHOW_FIX_STATISTICS_MODAL',
     UPDATE_DATE_PICKERS_VALUES: 'UPDATE_DATE_PICKERS_VALUES'
 }
 
 const initialState = {
     dailyStatistics_paginatedList: null,
-    dailyStatistics_totalQuantity: 0,
+    dailyStatistics_totalRecords: 0,
     datePickersValues: {
         day_datePicker: null,
         day_rangePicker: null,
@@ -23,22 +29,24 @@ const initialState = {
     fixStatisticsModalIsVisible: false,
     loading: true,
     loadingSavingOperation: false,
+    loadingUpdatingRecords: false,
     paginationParams: {
         filters: null,
         limit: 10,
         page: 1
     },
     params: {
-        concept: 'Generado automáticamente',
+        concept: '',
         dailyExpense: 0,
         dailyIncome: 0,
         dailyProfit: 0,
-        date: new Date()
+        date: null,
+        dateString: null
     },
     referenceStatistics: {
         concept: '',
-        date: 0,
-        profit: new Date()
+        dailyProfit: 0,
+        dateString: null
     }
 }
 
@@ -57,6 +65,11 @@ const reducer = (state = initialState, action) => {
                     dailyProfit: 0
                 }
             }
+        case actions.HIDE_FIX_STATISTICS_MODAL:
+            return {
+                ...state,
+                fixStatisticsModalIsVisible: false
+            }
         case actions.SAVE_DAILY_STATISTICS:
             return {
                 ...state,
@@ -65,15 +78,14 @@ const reducer = (state = initialState, action) => {
                     concept: action.payload.concept,
                     dailyExpense: action.payload.dailyExpense,
                     dailyIncome: action.payload.dailyIncome,
-                    dailyProfit: action.payload.dailyIncome - action.payload.dailyExpense,
-                    date: action.payload.date || new Date(),
+                    dailyProfit: action.payload.dailyIncome - action.payload.dailyExpense
                 }
             }
         case actions.SET_DAILY_STATISTICS_RECORDS:
             return {
                 ...state,
                 dailyStatistics_paginatedList: action.payload.docs,
-                dailyStatistics_totalQuantity: parseInt(action.payload.totalDocs),
+                dailyStatistics_totalRecords: parseInt(action.payload.totalDocs),
                 loading: false
             }
         case actions.SET_LOADING:
@@ -86,10 +98,35 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 loadingSavingOperation: action.payload
             }
+        case actions.SET_LOADING_UPDATING_RECORDS:
+            return {
+                ...state,
+                loadingUpdatingRecords: action.payload
+            }
         case actions.SET_PAGINATION_PARAMS:
             return {
                 ...state,
                 paginationParams: action.payload
+            }
+        case actions.SET_REFERENCE_STATISTICS:
+            const referenceStatistics = {
+                concept: action.payload.concept,
+                dailyProfit: action.payload.dailyProfit,
+                dateString: action.payload.dateString
+            }
+            return {
+                ...state,
+                params: {
+                    ...state.params,
+                    date: action.payload.date,
+                    dateString: action.payload.dateString
+                },
+                referenceStatistics: referenceStatistics
+            }
+        case actions.SHOW_FIX_STATISTICS_MODAL:
+            return {
+                ...state,
+                fixStatisticsModalIsVisible: true
             }
         case actions.UPDATE_DATE_PICKERS_VALUES:
             const pickerType = action.payload.pickerType
