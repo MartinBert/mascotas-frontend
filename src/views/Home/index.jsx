@@ -27,7 +27,7 @@ const Home = () => {
         findDocumentsTypes()
     }, [console_documentTypes])
 
-    const activate = true
+    const activate = false
     // ACTUALIZAR TAMBIEN DOCUMENTOS DESDE LA INTERFAZ
     
     useEffect(() => {
@@ -100,13 +100,17 @@ const Home = () => {
         addProp()
     }, [activate])
 
-    // useEffect(() => {
-    //     const viewProps = async () => {
-    //         const res = await api.ventas.findAll()
-    //         console.log(res.docs)
-    //     }
-    //     viewProps()
-    // }, [])
+    useEffect(() => {
+        const viewProps = async () => {
+            const entriesData = await api.entradas.findAll()
+            const outputsData = await api.salidas.findAll()
+            const salesData = await api.ventas.findAll()
+            console.log(entriesData.docs)
+            console.log(outputsData.docs)
+            console.log(salesData.docs)
+        }
+        viewProps()
+    }, [])
 
     return (
         <h1>Home</h1>
