@@ -1,5 +1,6 @@
 import CleanFilters from './CleanFilters'
 import ExportExcel from './ExportExcel'
+import ExportExcelOptions from './ExportExcelOptions'
 import FilterByBarcode from './FilterByBarcode'
 import FilterByBrand from './FilterByBrand'
 import FilterByCategory from './FilterByCategory'
@@ -13,6 +14,7 @@ import SelectSalesArea from './SelectSalesArea'
 const ProductElements = {
     CleanFilters,
     ExportExcel,
+    ExportExcelOptions,
     FilterByBarcode,
     FilterByBrand,
     FilterByCategory,

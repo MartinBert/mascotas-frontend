@@ -12,7 +12,6 @@ const countRecords = async () => {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/recordsInfo/quantity`, headers)
         return response.data
     } catch (err) {
-        checkStorageStatus(err)
         console.error(err)
     }
 }

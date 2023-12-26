@@ -12,13 +12,14 @@ import 'antd/dist/reset.css'
 
 // Imports Destructurings
 const { AuthContext } = contexts.Auth
-const { CustomProductsContext } = contexts.CustomProducts
+const { SaleCustomProductsContext } = contexts.SaleCustomProducts
 const { DailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { DeleteModalContext } = contexts.DeleteModal
 const { EntriesContext } = contexts.Entries
 const { FiscalNoteModalContext } = contexts.FiscalNoteModal
 const { OutputsContext } = contexts.Outputs
 const { PrivateRouteContext } = contexts.PrivateRoute
+const { ProductsContext } = contexts.Products
 const { ProductSelectionModalContext } = contexts.ProductSelectionModal
 const { SaleContext } = contexts.Sale
 const { SaleProductsContext } = contexts.SaleProducts
@@ -30,31 +31,33 @@ function App() {
     return (
         <div style={{ height: '100%' }}>
             <AuthContext>
-                <CustomProductsContext>
-                    <DailyBusinessStatisticsContext>
-                        <DeleteModalContext>
-                            <EntriesContext>
-                                <FiscalNoteModalContext>
-                                    <OutputsContext>
-                                        <PrivateRouteContext>
+                <DailyBusinessStatisticsContext>
+                    <DeleteModalContext>
+                        <EntriesContext>
+                            <FiscalNoteModalContext>
+                                <OutputsContext>
+                                    <PrivateRouteContext>
+                                        <ProductsContext>
                                             <ProductSelectionModalContext>
                                                 <SaleContext>
-                                                    <SaleProductsContext>
-                                                        <SalesAreasContext>
-                                                            <Router>
-                                                                <AppRouter />
-                                                            </Router>
-                                                        </SalesAreasContext>
-                                                    </SaleProductsContext>
+                                                    <SaleCustomProductsContext>
+                                                        <SaleProductsContext>
+                                                            <SalesAreasContext>
+                                                                <Router>
+                                                                    <AppRouter />
+                                                                </Router>
+                                                            </SalesAreasContext>
+                                                        </SaleProductsContext>
+                                                    </SaleCustomProductsContext>
                                                 </SaleContext>
                                             </ProductSelectionModalContext>
-                                        </PrivateRouteContext>
-                                    </OutputsContext>
-                                </FiscalNoteModalContext>
-                            </EntriesContext>
-                        </DeleteModalContext>
-                    </DailyBusinessStatisticsContext>
-                </CustomProductsContext>
+                                        </ProductsContext>
+                                    </PrivateRouteContext>
+                                </OutputsContext>
+                            </FiscalNoteModalContext>
+                        </EntriesContext>
+                    </DeleteModalContext>
+                </DailyBusinessStatisticsContext>
             </AuthContext>
         </div>
     )

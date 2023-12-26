@@ -41,7 +41,6 @@ const getDocumentsTypes = async (cuit) => {
         const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/obtenerTiposDocumentos/${cuit}`)
         return response.data
     } catch (err) {
-        checkStorageStatus(err)
         console.error(err)
     }
 }

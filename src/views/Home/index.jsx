@@ -27,7 +27,7 @@ const Home = () => {
         findDocumentsTypes()
     }, [console_documentTypes])
 
-    const activate = false
+    const activate = true
     // ACTUALIZAR TAMBIEN DOCUMENTOS DESDE LA INTERFAZ
     
     useEffect(() => {

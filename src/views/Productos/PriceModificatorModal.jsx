@@ -112,27 +112,24 @@ const PriceModificatorModal = ({
             const decimalIvaVenta = decimalPercent(parseFloat(product.porcentajeIvaVenta))
             const decimalMargenGanancia = decimalPercent(parseFloat(product.margenGanancia))
             const decimalMargenGananciaFraccionado = decimalPercent(parseFloat(product.margenGananciaFraccionado))
-            const gananciaNeta = parseFloat(product.gananciaNeta)
-            const gananciaNetaFraccionado = parseFloat(product.gananciaNetaFraccionado)
-            const ivaVenta = parseFloat(product.ivaVenta)
 
             const newPrecioUnitario =
                 selectedModificationType === '1'
                     ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
                     : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue))
-            const newNananciaNeta = roundTwoDecimals(newPrecioUnitario * decimalMargenGanancia)
+            const newGananciaNeta = roundTwoDecimals(newPrecioUnitario * decimalMargenGanancia)
             const newGananciaNetaFraccionado = roundTwoDecimals(newPrecioUnitario * decimalMargenGananciaFraccionado)
             const newIvaCompra = roundTwoDecimals(newPrecioUnitario - (newPrecioUnitario / (1 + decimalIvaCompra)))
             const newIvaVenta = roundTwoDecimals(newPrecioUnitario * decimalIvaVenta)
-            const newPrecioVentaSinRedondear = roundTwoDecimals(newPrecioUnitario + ivaVenta + gananciaNeta)
+            const newPrecioVentaSinRedondear = roundTwoDecimals(newPrecioUnitario + newIvaVenta + newGananciaNeta)
             const newPrecioVenta = roundToMultiple(newPrecioVentaSinRedondear, 10)
-            const newPrecioVentaFraccionadoSinRedondear = roundTwoDecimals(newPrecioUnitario + ivaVenta + gananciaNetaFraccionado)
+            const newPrecioVentaFraccionadoSinRedondear = roundTwoDecimals(newPrecioUnitario + newIvaVenta + newGananciaNetaFraccionado)
             const newPrecioVentaFraccionado = roundToMultiple(newPrecioVentaFraccionadoSinRedondear, 10)
 
             product.precioUnitario = newPrecioUnitario
             product.ivaCompra = newIvaCompra
             product.ivaVenta = newIvaVenta
-            product.gananciaNeta = newNananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear
+            product.gananciaNeta = newGananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear
             product.gananciaNetaFraccionado = newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear
             product.precioVenta = newPrecioVenta
             product.precioVentaFraccionado = newPrecioVentaFraccionado
@@ -146,11 +143,9 @@ const PriceModificatorModal = ({
     }
 
     const addProductToModification = (product) => {
-        const duplicated = addedProducts.find((item) => item._id === product._id)
+        const duplicated = addedProducts.find(item => item._id === product._id)
         if (duplicated) {
-            const stateWithoutThisElement = addedProducts.filter(
-                (item) => item._id !== product._id
-            )
+            const stateWithoutThisElement = addedProducts.filter(item => item._id !== product._id)
             setAddedProducts(stateWithoutThisElement)
         } else {
             setAddedProducts([...addedProducts, product])

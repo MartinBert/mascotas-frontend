@@ -26,7 +26,7 @@ const formatEntry = (entry, auth_state) => {
         ,
         fechaString:
             entry.dateString
-                ? entry.date
+                ? simpleDateWithHours(entry.date)
                 : simpleDateWithHours(new Date())
         ,
         productos: entry.products,

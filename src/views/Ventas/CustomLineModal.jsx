@@ -8,7 +8,7 @@ import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd'
 import contexts from '../../contexts'
 
 // Imports Destructuring
-const { useCustomProductsContext } = contexts.CustomProducts
+const { useSaleCustomProductsContext } = contexts.SaleCustomProducts
 const { useSaleProductsContext } = contexts.SaleProducts
 
 const initialProductState = {
@@ -20,7 +20,7 @@ const initialProductState = {
 }
 
 const CustomLineModal = () => {
-    const [customProducts_state, customProducts_dispatch] = useCustomProductsContext()
+    const [customProducts_state, customProducts_dispatch] = useSaleCustomProductsContext()
     const [saleProducts_state] = useSaleProductsContext()
     const [quantityOf_notSaved_customProducts, setNotSavedQuantity] = useState(0)
     const [quantityOf_saved_customProducts, setSavedQuantity] = useState(0)
@@ -56,10 +56,10 @@ const CustomLineModal = () => {
     // Set quantity of custom products not saved
     useEffect(() => {
         const updateQuantityOf_notSaved_customProducts = () => {
-            setNotSavedQuantity(customProducts_state.customSaleProducts.length)
+            setNotSavedQuantity(customProducts_state.saleCustomProducts.length)
         }
         updateQuantityOf_notSaved_customProducts()
-    }, [customProducts_state.customSaleProducts.length])
+    }, [customProducts_state.saleCustomProducts.length])
 
     // Set quantity of custom products saved
     useEffect(() => {

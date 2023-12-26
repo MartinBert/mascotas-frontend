@@ -11,13 +11,13 @@ import { Button, Col, Modal, Row, Table } from 'antd'
 import contexts from '../../contexts'
 
 // Imports Destructurings
-const { useCustomProductsContext } = contexts.CustomProducts
+const { useSaleCustomProductsContext } = contexts.SaleCustomProducts
 const { useSaleProductsContext } = contexts.SaleProducts
 const { Delete } = icons
 
 
 const ListCustomLinesModal = () => {
-    const [customProducts_state, customProducts_dispatch] = useCustomProductsContext()
+    const [customProducts_state, customProducts_dispatch] = useSaleCustomProductsContext()
     const [, saleProducts_dispatch] = useSaleProductsContext()
 
     const cancelAndCloseModal = () => {
@@ -39,7 +39,7 @@ const ListCustomLinesModal = () => {
     const saveProductsAndCloseModal = () => {
         saleProducts_dispatch({
             type: 'UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS',
-            payload: customProducts_state.customSaleProducts
+            payload: customProducts_state.saleCustomProducts
         })
         customProducts_dispatch({ type: 'DELETE_ALL_CUSTOM_PRODUCTS' })
         customProducts_dispatch({ type: 'HIDE_LIST_OF_CUSTOM_PRODUCT_MODAL' })
@@ -98,7 +98,7 @@ const ListCustomLinesModal = () => {
         >
             <Table
                 columns={columns}
-                dataSource={customProducts_state.customSaleProducts}
+                dataSource={customProducts_state.saleCustomProducts}
             />
             <br />
             <Row justify='space-around'>

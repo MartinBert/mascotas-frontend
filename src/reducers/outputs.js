@@ -16,7 +16,7 @@ const actions = {
     DELETE_PRODUCT: 'DELETE_PRODUCT',
     SET_DATE: 'SET_DATE',
     SET_DESCRIPTION: 'SET_DESCRIPTION',
-    SET_OUTPUT: 'SET_ENTRY',
+    SET_OUTPUT: 'SET_OUTPUT',
     SET_FORMATTED_DATE: 'SET_FORMATTED_DATE',
     SET_LOADING: 'SET_LOADING',
     SET_NET_PROFIT: 'SET_NET_PROFIT',
@@ -93,7 +93,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 description: action.payload
             }
-        case actions.SET_ENTRY:
+        case actions.SET_OUTPUT:
             return {
                 ...state,
                 _id: action.payload._id,

@@ -4,7 +4,7 @@ const { roundTwoDecimals } = helpers.mathHelper
 const initialState = {
     customProductModalIsVisible: false,
     listOfCustomProductModalIsVisible: false,
-    customSaleProducts: []
+    saleCustomProducts: []
 }
 
 const actions = {
@@ -22,12 +22,12 @@ const reducer = (state = initialState, action) => {
         case actions.DELETE_ALL_CUSTOM_PRODUCTS:
             return {
                 ...state,
-                customSaleProducts: []
+                saleCustomProducts: []
             }
         case actions.DELETE_CUSTOM_PRODUCT:
             return {
                 ...state,
-                customSaleProducts: state.customSaleProducts
+                saleCustomProducts: state.saleCustomProducts
                     .filter(customProduct => customProduct._id !== action.payload)
                     .map((customProduct, index) => {
                         customProduct = {
@@ -50,11 +50,11 @@ const reducer = (state = initialState, action) => {
                 listOfCustomProductModalIsVisible: false
             }
         case actions.SET_CUSTOM_PRODUCT:
-            if (state.customSaleProducts.find(product => product._id === action.payload._id)) return state
+            if (state.saleCustomProducts.find(product => product._id === action.payload._id)) return state
             const ivaVenta = roundTwoDecimals(action.payload.unitPrice * action.payload.percentageIVA / 100)
             return {
                 ...state,
-                customSaleProducts: state.customSaleProducts.concat({
+                saleCustomProducts: state.saleCustomProducts.concat({
                     _id: action.payload._id,
                     codigoBarras: action.payload._id,
                     ivaVenta: ivaVenta,
@@ -81,10 +81,10 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const customSaleProducts = {
+const saleCustomProducts = {
     actions,
     initialState,
     reducer
 }
 
-export default customSaleProducts
+export default saleCustomProducts

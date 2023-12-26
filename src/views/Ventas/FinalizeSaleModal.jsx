@@ -115,7 +115,7 @@ const FinalizeSaleModal = () => {
 
     const save = async () => {
         //Modify stock of products
-        const noModifyStock = ['PRESUPUESTO', 'REMITO']
+        const noModifyStock = ['REMITO']
         if(!noModifyStock.includes(sale_state.documento.nombre)) {
             const stock = await applyStockModification()
             if (!stock.isModified) return errorAlert('Error al modificar stock.').then(() => reload())

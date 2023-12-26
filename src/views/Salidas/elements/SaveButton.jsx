@@ -26,7 +26,7 @@ const formatOutput = (output, auth_state) => {
         ,
         fechaString:
             output.dateString
-                ? output.date
+                ? simpleDateWithHours(output.date)
                 : simpleDateWithHours(new Date())
         ,
         productos: output.products,

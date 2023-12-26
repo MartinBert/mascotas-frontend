@@ -16,7 +16,7 @@ import contexts from '../../contexts'
 import helpers from '../../helpers'
 
 // Imports Destructurings
-const { useCustomProductsContext } = contexts.CustomProducts
+const { useSaleCustomProductsContext } = contexts.SaleCustomProducts
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { useSaleContext } = contexts.Sale
 const { useSaleProductsContext } = contexts.SaleProducts
@@ -204,7 +204,7 @@ const CleanProductsButton = () => {
 }
 
 const CustomProductListButton = () => {
-    const [, customProducts_dispatch] = useCustomProductsContext()
+    const [, customProducts_dispatch] = useSaleCustomProductsContext()
 
     const openCustomProductList = () => {
         customProducts_dispatch({ type: 'SHOW_LIST_OF_CUSTOM_PRODUCT_MODAL' })
