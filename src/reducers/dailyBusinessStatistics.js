@@ -6,6 +6,7 @@ const actions = {
     CLEAR_STATE: 'CLEAR_STATE',
     CLEAR_INPUTS: 'CLEAR_INPUTS',
     HIDE_FIX_STATISTICS_MODAL: 'HIDE_FIX_STATISTICS_MODAL',
+    HIDE_NULL_RECORDS: 'HIDE_NULL_RECORDS',
     SAVE_DAILY_STATISTICS: 'SAVE_DAILY_STATISTICS',
     SET_DAILY_STATISTICS_RECORDS: 'SET_DAILY_STATISTICS_RECORDS',
     SET_LOADING: 'SET_LOADING',
@@ -14,6 +15,7 @@ const actions = {
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_REFERENCE_STATISTICS: 'SET_REFERENCE_STATISTICS',
     SHOW_FIX_STATISTICS_MODAL: 'SHOW_FIX_STATISTICS_MODAL',
+    SHOW_NULL_RECORDS: 'SHOW_NULL_RECORDS',
     UPDATE_DATE_PICKERS_VALUES: 'UPDATE_DATE_PICKERS_VALUES'
 }
 
@@ -47,7 +49,8 @@ const initialState = {
         concept: '',
         dailyProfit: 0,
         dateString: null
-    }
+    },
+    showNullRecords: false
 }
 
 const reducer = (state = initialState, action) => {
@@ -69,6 +72,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 fixStatisticsModalIsVisible: false
+            }
+        case actions.HIDE_NULL_RECORDS:
+            return {
+                ...state,
+                showNullRecords: false
             }
         case actions.SAVE_DAILY_STATISTICS:
             return {
@@ -127,6 +135,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 fixStatisticsModalIsVisible: true
+            }
+        case actions.SHOW_NULL_RECORDS:
+            return {
+                ...state,
+                showNullRecords: true
             }
         case actions.UPDATE_DATE_PICKERS_VALUES:
             const pickerType = action.payload.pickerType
