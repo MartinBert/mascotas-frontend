@@ -227,6 +227,7 @@ const FixStatisticsModal = () => {
         onFinish={() => save()}
         onResetCapture={() => clearInputs()}
       >
+        <h2>Ingrese la corrección para el registro de referencia</h2>
         <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>
           {
             formRender.map((item, index) => {

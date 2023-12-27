@@ -160,24 +160,33 @@ const Header = () => {
 
         // Create new records
         const newRecords = data.map(dailyData => {
-            const dailyOutputs = dailyData.records.map(record => {
+            const dailyEntries = dailyData.records.map(record => {
                 if (record.documento) return 0
                 if (record.costoTotal) return record.costoTotal
                 else return 0
             }).reduce((acc, value) => acc + value, 0)
 
-            const dailyEntries = dailyData.records.map(record => {
+            const dailyOutputs = dailyData.records.map(record => {
                 if (record.documento) return 0
                 if (record.gananciaNeta) return record.gananciaNeta
                 else return 0
             }).reduce((acc, value) => acc + value, 0)
 
-            const dailySalesAndDebits = dailyData.records.map(record => {
+            const dailySalesAndDebits_iva = dailyData.records.map(record => {
                 if (!record.renglones && !record.documento) return 0
                 if (!record.documento.cashRegister) return 0
                 else {
-                    const saleProfit = !creditCodes.includes(record.documentoCodigo) ? record.profit : 0
-                    return saleProfit
+                    const saleIva = !creditCodes.includes(record.documentoCodigo) ? record.importeIva : 0
+                    return saleIva
+                }
+            }).reduce((acc, value) => acc + value, 0)
+
+            const dailySalesAndDebits_total = dailyData.records.map(record => {
+                if (!record.renglones && !record.documento) return 0
+                if (!record.documento.cashRegister) return 0
+                else {
+                    const saleTotal = !creditCodes.includes(record.documentoCodigo) ? record.total : 0
+                    return saleTotal
                 }
             }).reduce((acc, value) => acc + value, 0)
 
@@ -185,13 +194,13 @@ const Header = () => {
                 if (!record.renglones && !record.documento) return 0
                 if (!record.documento.cashRegister) return 0
                 else {
-                    const creditProfit = creditCodes.includes(record.documentoCodigo) ? record.profit : 0
-                    return creditProfit
+                    const creditTotal = creditCodes.includes(record.documentoCodigo) ? record.total : 0
+                    return creditTotal
                 }
             }).reduce((acc, value) => acc + value, 0)
 
-            const dailyExpense = dailyOutputs + dailyCredits
-            const dailyIncome = dailyEntries + dailySalesAndDebits
+            const dailyExpense = dailySalesAndDebits_iva + dailyEntries + dailyCredits
+            const dailyIncome = dailySalesAndDebits_total + dailyOutputs
             const dailyStatisticsToSave = {
                 concept: 'Generado automáticamente',
                 dailyExpense,

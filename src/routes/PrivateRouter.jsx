@@ -11,6 +11,7 @@ import EmpresasForm from '../views/Empresas/EmpresasForm'
 import Entradas from '../views/Entradas'
 import EntradasForm from '../views/Entradas/EntradasForm'
 import FormatPrivateComponent from './FormatPrivateComponent'
+import Graphics from '../views/DailyBusinessStatistics/Graphics'
 import Home from '../views/Home'
 import Marcas from '../views/Marcas'
 import MarcasForm from '../views/Marcas/MarcasForm'
@@ -233,27 +234,34 @@ const privateRoutesPreData = [
     },
     {
         activeKey: '14',
+        element: <Graphics />,
+        onlySuperadmin: true,
+        path: '/daily_business_statistics/graphics',
+        private: true
+    },
+    {
+        activeKey: '15',
         element: <Usuarios />,
         onlySuperadmin: true,
         path: '/usuarios',
         private: true
     },
     {
-        activeKey: '15',
+        activeKey: '16',
         element: <Empresas />,
         onlySuperadmin: true,
         path: '/empresas',
         private: true
     },
     {
-        activeKey: '16',
+        activeKey: '17',
         element: <PuntosVenta />,
         onlySuperadmin: true,
         path: '/puntosventa',
         private: true
     },
     {
-        activeKey: '17',
+        activeKey: '18',
         element: <CondicionesFiscales />,
         onlySuperadmin: true,
         path: '/condicionesfiscales',

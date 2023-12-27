@@ -9,6 +9,7 @@ import {
     FaChartArea,
     FaChartBar,
     FaChartLine,
+    FaChartPie,
     FaCheck,
     FaClosedCaptioning,
     FaCodeBranch,
@@ -81,13 +82,14 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
 
     const businessStatisticsMenu = [
         auth_state.user.perfil ? getItem('13', 'Estadísticas diarias', <FaChartLine />, '/daily_business_statistics') : null,
+        auth_state.user.perfil ? getItem('14', 'Gráficos', <FaChartPie />, '/daily_business_statistics/graphics') : null,
     ]
 
     const configurationMenu = [
-        auth_state.user.perfil ? getItem('14', 'Usuarios', <FaUser />, '/usuarios') : null,
-        auth_state.user.perfil ? getItem('15', 'Empresas', <FaBusinessTime />, '/empresas') : null,
-        auth_state.user.perfil ? getItem('16', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
-        auth_state.user.perfil ? getItem('17', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
+        auth_state.user.perfil ? getItem('15', 'Usuarios', <FaUser />, '/usuarios') : null,
+        auth_state.user.perfil ? getItem('16', 'Empresas', <FaBusinessTime />, '/empresas') : null,
+        auth_state.user.perfil ? getItem('17', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
+        auth_state.user.perfil ? getItem('18', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
     ]
 
     const subMenusToSidebar = [

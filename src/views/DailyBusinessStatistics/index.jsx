@@ -24,7 +24,12 @@ import Header from './Header'
 // Imports Destructuring
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { roundTwoDecimals } = helpers.mathHelper
-const { EmitDocument } = icons
+const { Edit } = icons
+
+const profitColorCss = (profit) => {
+    if (profit >= 0) return '#15DC24'
+    else return '#FF3C3C'
+}
 
 
 const DailyBusinessStatistics = () => {
@@ -83,29 +88,32 @@ const DailyBusinessStatistics = () => {
             title: 'Fecha',
         },
         {
-            dataIndex: 'dailyBusinessStatistics_dailyExpense',
-            render: (_, dailyBusinessStatistics) => roundTwoDecimals(dailyBusinessStatistics.dailyExpense),
-            title: 'Gasto total',
-        },
-        {
             dataIndex: 'dailyBusinessStatistics_dailyIncome',
             render: (_, dailyBusinessStatistics) => roundTwoDecimals(dailyBusinessStatistics.dailyIncome),
-            title: 'Ingreso total',
+            title: 'Ingreso',
+        },
+        {
+            dataIndex: 'dailyBusinessStatistics_dailyExpense',
+            render: (_, dailyBusinessStatistics) => roundTwoDecimals(dailyBusinessStatistics.dailyExpense),
+            title: 'Gasto',
         },
         {
             dataIndex: 'dailyBusinessStatistics_dailyBalance',
-            render: (_, dailyBusinessStatistics) => roundTwoDecimals(dailyBusinessStatistics.dailyProfit),
+            render: (_, dailyBusinessStatistics) => {
+                return (
+                    <div style={{ color: profitColorCss(dailyBusinessStatistics.dailyProfit), fontSize: '18px' }}>
+                        <b>{roundTwoDecimals(dailyBusinessStatistics.dailyProfit)}</b>
+                    </div>
+                )
+            },
             title: 'Balance',
         },
         {
             dataIndex: 'dailyBusinessStatistics_actions',
             render: (_, dailyBusinessStatistics) => (
                 <Row justify='start'>
-                    <Col
-                        onClick={() => openModal(dailyBusinessStatistics._id)}
-                        span={24}
-                    >
-                        <EmitDocument />
+                    <Col onClick={() => openModal(dailyBusinessStatistics._id)}>
+                        <Edit />
                     </Col>
                 </Row>
             ),
