@@ -33,7 +33,11 @@ const initialState = {
     loadingSavingOperation: false,
     loadingUpdatingRecords: false,
     paginationParams: {
-        filters: null,
+        filters: {
+            dailyProfit: { $ne: 0 },
+            date: null,
+            dateString: null
+        },
         limit: 10,
         page: 1
     },
@@ -144,6 +148,7 @@ const reducer = (state = initialState, action) => {
         case actions.UPDATE_DATE_PICKERS_VALUES:
             const pickerType = action.payload.pickerType
             const pickerValue = action.payload.pickerValue
+            if (!pickerType) return
             const updatedValues = {
                 day_datePicker: pickerType === 'day_datePicker' && pickerValue !== ''
                     ? dayjs(pickerValue, 'DD-MM-YYYY')

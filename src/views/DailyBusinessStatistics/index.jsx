@@ -31,13 +31,33 @@ const profitColorCss = (profit) => {
     else return '#FF3C3C'
 }
 
+const formatFindParams = (paginationParams) => {
+    const currentFilters = paginationParams.filters
+    const dailyProfit = currentFilters.dailyProfit
+        ? { dailyProfit: currentFilters.dailyProfit }
+        : null
+    const date = currentFilters.date
+        ? { date: currentFilters.date }
+        : null
+    const dateString = currentFilters.dateString
+        ? { dateString: currentFilters.dateString }
+        : null
+    const filtersWithoutNulls = { ...dailyProfit, ...date, ...dateString }
+    const params = {
+        ...paginationParams,
+        filters: JSON.stringify(filtersWithoutNulls)
+    }
+    return params
+}
+
 
 const DailyBusinessStatistics = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
 
     useEffect(() => {
         const fetchDailyBusinessStatistics = async () => {
-            const data = await api.dailyBusinessStatistics.findPaginated(dailyBusinessStatistics_state.paginationParams)
+            const findParams = formatFindParams(dailyBusinessStatistics_state.paginationParams)
+            const data = await api.dailyBusinessStatistics.findPaginated(findParams)
             dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: data })
         }
         fetchDailyBusinessStatistics()
@@ -132,7 +152,7 @@ const DailyBusinessStatistics = () => {
                     dataSource={dailyBusinessStatistics_state.dailyStatistics_paginatedList}
                     columns={columnsForTable}
                     pagination={{
-                        defaultCurrent: dailyBusinessStatistics_state.paginationParams.page,
+                        current: dailyBusinessStatistics_state.paginationParams.page,
                         limit: dailyBusinessStatistics_state.paginationParams.limit,
                         total: dailyBusinessStatistics_state.dailyStatistics_totalRecords,
                         showSizeChanger: true,

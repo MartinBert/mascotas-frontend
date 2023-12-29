@@ -238,33 +238,22 @@ const Header = () => {
     }
 
     // ---------------------------------- Set filters ----------------------------------- //
-    const dispatchParams = ({ filters, pickerValue = null, pickerType = null }) => {
-        const paginationParams = {
-            ...dailyBusinessStatistics_state.paginationParams,
-            filters: JSON.stringify(filters)
-        }
-        dailyBusinessStatistics_dispatch({
-            type: 'SET_PAGINATION_PARAMS',
-            payload: paginationParams
-        })
-        if (!pickerValue || !pickerType) return
-        dailyBusinessStatistics_dispatch({
-            type: 'UPDATE_DATE_PICKERS_VALUES',
-            payload: { pickerType, pickerValue }
-        })
+    const dispatchDateParams = ({ dateFilter, pickerValue, pickerType }) => {
+        const { date, dateString } = dateFilter
+        const filters = { ...dailyBusinessStatistics_state.paginationParams.filters, date, dateString }
+        const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
+        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+        dailyBusinessStatistics_dispatch({ type: 'UPDATE_DATE_PICKERS_VALUES', payload: { pickerType, pickerValue } })
     }
 
     // -------- Filter statistics by DAY -------- //
     const setParams_day = (date, dateString) => {
-        const dateFilter = !date ? null : { dateString: simpleDateWithHours(date.$d).substring(0, 10) }
-        const showNullRecordsFilter = dailyBusinessStatistics_state.showNullRecords
-            ? null
-            : { profit: { $gte: 0 } }
-        const filters = !date
-            ? showNullRecordsFilter
-            : { ...dateFilter, ...showNullRecordsFilter }
+        const dateFilter = {
+            date: null,
+            dateString: !date ? null : simpleDateWithHours(date.$d).substring(0, 10)
+        }
         const pickerValue = dateString
-        dispatchParams({ filters, pickerValue, pickerType: 'day_datePicker' })
+        dispatchDateParams({ dateFilter, pickerValue, pickerType: 'day_datePicker' })
     }
 
     const dayPicker =
@@ -278,15 +267,15 @@ const Header = () => {
 
     // -------- Filter statistics by DAY RANGE -------- //
     const setParams_dayRange = (date, dateString) => {
-        const dateFilter = !date ? null : { date: { $gte: date[0].$d, $lte: date[1].$d } }
-        const showNullRecordsFilter = dailyBusinessStatistics_state.showNullRecords
-            ? null
-            : { profit: { $gte: 0 } }
-        const filters = !date
-            ? showNullRecordsFilter
-            : { ...dateFilter, ...showNullRecordsFilter }
+        const dateFilter = {
+            date: !date ? null : {
+                $gte: resetDate(date[0].$d),
+                $lte: resetDate(date[1].$d)
+            },
+            dateString: null
+        }
         const pickerValue = dateString
-        dispatchParams({ filters, pickerValue, pickerType: 'day_rangePicker' })
+        dispatchDateParams({ dateFilter, pickerValue, pickerType: 'day_rangePicker' })
     }
 
     const dayRange =
@@ -301,19 +290,14 @@ const Header = () => {
     // -------- Filter statistics by MONTH -------- //
     const setParams_month = (date, dateString) => {
         const dateFilter = {
-            date: {
+            date: !date ? null : {
                 $gte: new Date(date.$d.getFullYear(), date.$d.getMonth(), 1),
                 $lte: new Date(date.$d.getFullYear(), date.$d.getMonth() + 1, 0)
-            }
+            },
+            dateString: null
         }
-        const showNullRecordsFilter = dailyBusinessStatistics_state.showNullRecords
-            ? null
-            : { profit: { $gte: 0 } }
-        const filters = !date
-            ? showNullRecordsFilter
-            : { ...dateFilter, ...showNullRecordsFilter }
         const pickerValue = dateString
-        dispatchParams({ filters, pickerValue, pickerType: 'month_datePicker' })
+        dispatchDateParams({ dateFilter, pickerValue, pickerType: 'month_datePicker' })
     }
 
     const monthPicker =
@@ -329,19 +313,14 @@ const Header = () => {
     // -------- Filter statistics by MONTH RANGE -------- //
     const setParams_monthRange = (date, dateString) => {
         const dateFilter = {
-            date: {
+            date: !date ? null : {
                 $gte: new Date(date[0].$d.getFullYear(), date[0].$d.getMonth(), 1),
                 $lte: new Date(date[1].$d.getFullYear(), date[1].$d.getMonth() + 1, 0)
-            }
+            },
+            dateString: null
         }
-        const showNullRecordsFilter = dailyBusinessStatistics_state.showNullRecords
-            ? null
-            : { profit: { $gte: 0 } }
-        const filters = !date
-            ? showNullRecordsFilter
-            : { ...dateFilter, ...showNullRecordsFilter }
         const pickerValue = dateString
-        dispatchParams({ filters, pickerValue, pickerType: 'month_rangePicker' })
+        dispatchDateParams({ dateFilter, pickerValue, pickerType: 'month_rangePicker' })
     }
 
     const monthRange =
@@ -356,29 +335,23 @@ const Header = () => {
 
     // -------- SHOW or HIDE button for null records -------- //
     const setNullRecordsVisibility = () => {
-        if (dailyBusinessStatistics_state.showNullRecords) {
-            dailyBusinessStatistics_dispatch({ type: 'SHOW_NULL_RECORDS' })
-        } else dailyBusinessStatistics_dispatch({ type: 'HIDE_NULL_RECORDS' })
-
-        const visibilitySelected = !dailyBusinessStatistics_state.showNullRecords
-        const dateFilter = dailyBusinessStatistics_state.paginationParams.filters
-            ? dailyBusinessStatistics_state.paginationParams.filters.date
-            : null
-        const showNullRecordsFilter = visibilitySelected
-            ? null
-            : { profit: { $gte: 0 } }
-        const filters = { ...dateFilter, ...showNullRecordsFilter }
-        dispatchParams({ filters })
+        const currentFilters = dailyBusinessStatistics_state.paginationParams.filters
+        const filters = { ...currentFilters, dailyProfit: currentFilters.dailyProfit ? null : { $ne: 0 } }
+        const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
+        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
     const nullRecordsVisibilityButton =
         <Button
             className='btn-primary'
-            // disabled={dailyBusinessStatistics_state.loading}
-            disabled
+            disabled={dailyBusinessStatistics_state.loading}
             onClick={setNullRecordsVisibility}
         >
-            Mostrar fechas sin actividad
+            {
+                dailyBusinessStatistics_state.paginationParams.filters.dailyProfit
+                    ? 'Mostrar fechas con balance cero'
+                    : 'Ocultar fechas con balance cero'
+            }
         </Button>
 
     const header = [
