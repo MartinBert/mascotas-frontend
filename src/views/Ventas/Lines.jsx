@@ -222,10 +222,10 @@ const Lines = () => {
     ]
 
     useEffect(() => {
-        sale_dispatch({ type: 'SET_LINES', payload: saleProducts_state.products })
-        sale_dispatch({ type: 'SET_PRODUCTS', payload: saleProducts_state.products })
+        sale_dispatch({ type: 'SET_LINES', payload: saleProducts_state.params.products })
+        sale_dispatch({ type: 'SET_PRODUCTS', payload: saleProducts_state.params.products })
         sale_dispatch({ type: 'SET_TOTAL' })
-    }, [sale_dispatch, saleProducts_state.products])
+    }, [sale_dispatch, saleProducts_state.params.products])
 
     const setNote = (value, lineID) => {
         sale_dispatch({

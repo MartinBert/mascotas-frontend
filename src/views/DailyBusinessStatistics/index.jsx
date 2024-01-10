@@ -6,6 +6,7 @@ import { errorAlert } from '../../components/alerts'
 import icons from '../../components/icons'
 
 // Custom Contexts
+import actions from '../../actions'
 import contexts from '../../contexts'
 
 // Design Components
@@ -22,6 +23,7 @@ import FixStatisticsModal from './FixStatisticsModal'
 import Header from './Header'
 
 // Imports Destructuring
+const { formatFindParams } = actions.paginationParams
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { roundTwoDecimals } = helpers.mathHelper
 const { Edit } = icons
@@ -29,25 +31,6 @@ const { Edit } = icons
 const profitColorCss = (profit) => {
     if (profit >= 0) return '#15DC24'
     else return '#FF3C3C'
-}
-
-const formatFindParams = (paginationParams) => {
-    const currentFilters = paginationParams.filters
-    const dailyProfit = currentFilters.dailyProfit
-        ? { dailyProfit: currentFilters.dailyProfit }
-        : null
-    const date = currentFilters.date
-        ? { date: currentFilters.date }
-        : null
-    const dateString = currentFilters.dateString
-        ? { dateString: currentFilters.dateString }
-        : null
-    const filtersWithoutNulls = { ...dailyProfit, ...date, ...dateString }
-    const params = {
-        ...paginationParams,
-        filters: JSON.stringify(filtersWithoutNulls)
-    }
-    return params
 }
 
 

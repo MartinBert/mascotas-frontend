@@ -70,9 +70,9 @@ const ProductSelectionModal = () => {
     }, [selectedHeading])
 
     const product_dispatch = (action) => {
-        if (location.pathname === '/entradas/nuevo') entries_dispatch(action)
-        if (location.pathname === '/salidas/nuevo') outputs_dispatch(action)
-        if (location.pathname === '/venta') saleProducts_dispatch(action)
+        if (location.pathname === '/entradas/nuevo') return entries_dispatch(action)
+        if (location.pathname === '/salidas/nuevo') return outputs_dispatch(action)
+        if (location.pathname === '/venta') return saleProducts_dispatch(action)
     }
 
     const checkProduct = (e, product) => {
@@ -111,7 +111,7 @@ const ProductSelectionModal = () => {
             dataIndex: 'productSelectionModal_actions',
             render: (_, product) => (
                 <Checkbox
-                    checked={product_state().products.includes(product) ? true : false}
+                    checked={product_state().params.productos.includes(product) ? true : false}
                     onChange={e => checkProduct(e, product)}
                 />
             ),

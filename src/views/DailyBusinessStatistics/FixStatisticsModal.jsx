@@ -8,7 +8,7 @@ import { errorAlert, successAlert } from '../../components/alerts'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Spin } from 'antd'
+import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd'
 
 // Services
 import api from '../../services'

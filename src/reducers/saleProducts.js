@@ -1,5 +1,7 @@
 const initialState = {
-    products: []
+    params: {
+        products: []
+    }
 }
 
 const actions = {
@@ -14,14 +16,14 @@ const reducer = (state = initialState, action) => {
         case actions.DELETE_ALL_PRODUCTS:
             return {
                 ...state,
-                products: []
+                params: { ...state.params, products: [] }
             }
         case actions.DELETE_PRODUCT:
-            const productsRemaining = state.products
+            const productsRemaining = state.params.products
                 .filter(product => product._id !== action.payload)
                 .filter(product => !(product._id.startsWith('customProduct_')))
 
-            const customProductsRemaining = state.products
+            const customProductsRemaining = state.params.products
                 .filter(product => product._id !== action.payload)
                 .filter(product => product._id.startsWith('customProduct_'))
                 .map((customProduct, index) => {
@@ -36,21 +38,30 @@ const reducer = (state = initialState, action) => {
 
             return {
                 ...state,
-                products: productsRemaining.concat(customProductsRemaining)
+                params: { 
+                    ...state.params,
+                    products: productsRemaining.concat(customProductsRemaining)
+                }
             }
         case actions.SET_PRODUCT:
-            if (state.products.find(product => product._id === action.payload._id)) return state;
+            if (state.params.products.find(product => product._id === action.payload._id)) return state;
             return {
                 ...state,
-                products: [
-                    ...state.products,
-                    action.payload
-                ]
+                params: {
+                    ...state.params,
+                    products: [
+                        ...state.params.products,
+                        action.payload
+                    ]
+                }
             }
         case actions.UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS:
             return {
                 ...state,
-                products: state.products.concat(action.payload)
+                params: {
+                    ...state.params,
+                    products: state.params.products.concat(action.payload)
+                }
             }
         default:
             return state;

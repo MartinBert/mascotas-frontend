@@ -102,7 +102,6 @@ const ExportExcel = ({ productosToReport }) => {
         const nameOfSheet = 'Hoja de productos'
         const selectedHeaders = products_state.activeExcelOptions.map(option => option.label)
         const columnHeaders = selectedHeaders.includes('Todas') ? products_state.allExcelTitles : selectedHeaders
-
         const lines = await processExcelLines(columnHeaders, productosToReport)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
     }
@@ -111,7 +110,7 @@ const ExportExcel = ({ productosToReport }) => {
     return (
         <Button
             className='btn-primary'
-            onClick={() => exportExcel()}
+            onClick={exportExcel}
         >
             Exportar Excel
         </Button>

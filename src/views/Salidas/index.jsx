@@ -144,7 +144,7 @@ const Salidas = () => {
         },
         {
             dataIndex: 'output_date',
-            render: (_, output) => dateHelper.simpleDateWithHours(output.fecha) + ' hs',
+            render: (_, output) => output.fechaString,
             title: 'Fecha'
         },
         {

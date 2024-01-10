@@ -14,12 +14,18 @@ const actions = {
     DELETE_ALL_PRODUCTS: 'DELETE_ALL_PRODUCTS',
     DELETE_ID: 'DELETE_ID',
     DELETE_PRODUCT: 'DELETE_PRODUCT',
+    DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
+    SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
     SET_DATE: 'SET_DATE',
     SET_DESCRIPTION: 'SET_DESCRIPTION',
-    SET_OUTPUT: 'SET_OUTPUT',
+    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS',
     SET_FORMATTED_DATE: 'SET_FORMATTED_DATE',
     SET_LOADING: 'SET_LOADING',
     SET_NET_PROFIT: 'SET_NET_PROFIT',
+    SET_OUTPUT: 'SET_OUTPUT',
+    SET_OUTPUTS_FOR_EXCEL_REPORT: 'SET_OUTPUTS_FOR_EXCEL_REPORT',
+    SET_OUTPUTS_FOR_RENDER: 'SET_OUTPUTS_FOR_RENDER',
+    SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PRODUCT: 'SET_PRODUCT',
     SET_PRODUCT_BARCODE: 'SET_PRODUCT_BARCODE',
     SET_PRODUCT_NAME: 'SET_PRODUCT_NAME',
@@ -34,12 +40,34 @@ const formatDate = (dateToFormat) => {
 
 const initialState = {
     _id: null,
+    activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }],
+    allExcelTitles: [
+        'Usuario',
+        'Fecha',
+        'Descripción',
+        'Productos',
+        'Ganancia Neta'
+    ],
     date: null, // loaded by useEffect on first render of view
     dateString: null, // loaded by useEffect on first render of view
     description: '',
+    filters: null,
     formattedDate: null, // loaded by useEffect on first render of view
     loading: true,
     netProfit: 0,
+    outputsForExcelReport: [],
+    outputsForRender: [],
+    outputsTotalQuantity: 0,
+    paginationParams: {
+        filters: {
+            costoTotal: null,
+            descripcion: null,
+            fecha: null,
+            fechaString: null
+        },
+        limit: 10,
+        page: 1
+    },
     products: [],
     quantity: 0,
     totalCost: 0
@@ -77,10 +105,30 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 products: []
             }
+        case actions.DELETE_ID:
+            return {
+                ...state,
+                _id: null
+            }
         case actions.DELETE_PRODUCT:
             return {
                 ...state,
                 products: state.products.filter(product => product._id !== action.payload)
+            }
+        case actions.DESELECT_ALL_EXCEL_OPTIONS:
+            const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
+            const optionsValues = notAllOptions.map(option => option.value)
+            const fixedOptions = optionsValues.includes('fecha')
+                ? notAllOptions
+                : [{ disabled: true, label: 'Fecha', value: 'fecha' }].concat(notAllOptions)
+            return {
+                ...state,
+                activeExcelOptions: fixedOptions
+            }
+        case actions.SELECT_ALL_EXCEL_OPTIONS:
+            return {
+                ...state,
+                activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }]
             }
         case actions.SET_DATE:
             return {
@@ -92,6 +140,28 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 description: action.payload
+            }
+        case actions.SET_EXCEL_OPTIONS:
+            return {
+                ...state,
+                activeExcelOptions: action.payload
+            }
+        case actions.SET_FORMATTED_DATE:
+            const formattedDate = formatDate(action.payload)
+            return {
+                ...state,
+                formattedDate: formattedDate
+            }
+        case actions.SET_LOADING:
+            return {
+                ...state,
+                loading: action.payload
+            }
+        case actions.SET_NET_PROFIT:
+            const netProfit = 0
+            return {
+                ...state,
+                netProfit: netProfit
             }
         case actions.SET_OUTPUT:
             return {
@@ -105,27 +175,22 @@ const reducer = (state = initialState, action) => {
                 quantity: action.payload.cantidad,
                 totalCost: action.payload.costoTotal
             }
-        case actions.SET_FORMATTED_DATE:
-            const formattedDate = formatDate(action.payload)
+        case actions.SET_OUTPUTS_FOR_EXCEL_REPORT:
             return {
                 ...state,
-                formattedDate: formattedDate
+                outputsForExcelReport: action.payload
             }
-        case actions.DELETE_ID:
+        case actions.SET_OUTPUTS_FOR_RENDER:
             return {
                 ...state,
-                _id: null
+                loading: false,
+                outputsForRender: action.payload.docs,
+                outputsTotalQuantity: parseInt(action.payload.totalDocs)
             }
-        case actions.SET_LOADING:
+        case actions.SET_PAGINATION_PARAMS:
             return {
                 ...state,
-                loading: action.payload
-            }
-        case actions.SET_NET_PROFIT:
-            const netProfit = 0
-            return {
-                ...state,
-                netProfit: netProfit
+                paginationParams: action.payload
             }
         case actions.SET_PRODUCT:
             if (state.products.find(product => product._id === action.payload._id)) return state

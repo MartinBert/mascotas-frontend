@@ -1,175 +1,385 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 // Custom Components
+import { errorAlert, successAlert } from '../../components/alerts'
 import { ProductSelectionModal } from '../../components/generics'
+import icons from '../../components/icons'
+
+// Custom Contexts
+import contexts from '../../contexts'
 
 // Design Components
-import { Row, Col, Spin } from 'antd'
+import { Button, Col, DatePicker, Input, InputNumber, Row, Spin, Table } from 'antd'
 
-// Context Providers
-import contexts from '../../contexts'
+// Helpers
+import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
 
-// Views
-import EntradasElements from './elements'
-
 // Imports Destructuring
-const { useAuthContext } = contexts.Auth
+const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
-const {
-    AddButton,
-    CancelButton,
-    CleanFields,
-    CleanProducts,
-    InputHidden,
-    ProductDate,
-    ProductDescription,
-    SaveButton,
-    SelectedProductsTable,
-    TotalCost
-} = EntradasElements
+const { useProductSelectionModalContext } = contexts.ProductSelectionModal
+const { simpleDateWithHours } = helpers.dateHelper
+const { Delete } = icons
 
 
 const EntradasForm = () => {
-    const location = useLocation()
-    const { id } = useParams()
-    const [auth_state, auth_dispatch] = useAuthContext()
+    const entryID = useLocation().pathname.replace('/entradas/', '')
+    const navigate = useNavigate()
+    const [deleteModal_state] = useDeleteModalContext()
     const [entries_state, entries_dispatch] = useEntriesContext()
+    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
-    // ---------------- First load ---------------- //
+    // ------------------------------------- First load ------------------------------------- //
     useEffect(() => {
         const loadEntryData = async () => {
-            // Load User
-            const userID = localStorage.getItem('userId')
-            const loggedUser = await api.usuarios.findById(userID)
-            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
-
-            // Recover entry data for edit
-            if (id !== 'nuevo') {
-                const entryID = location.pathname.replace('/entradas/', '')
+            if (entryID !== 'nuevo') {
                 const response = await api.entradas.findById(entryID)
-                entries_dispatch({ type: 'SET_ENTRY', payload: response.data })
+                entries_dispatch({ type: 'SET_PARAMS', payload: response.data })
+            } else {
+                const usuario = localStorage.getItem('userId')
+                const newParams = { ...entries_state.params, usuario }
+                entries_dispatch({ type: 'SET_PARAMS', payload: newParams })
             }
         }
         loadEntryData()
-    }, [auth_dispatch, entries_dispatch, id])
+    }, [entryID])
 
-    // ---------------- Loading state ---------------- //
+    // ------------------------------------- Actions ------------------------------------- //
+    const redirectToEntradas = () => {
+        navigate('/entradas')
+    }
+
+    // ------------------------------- Update state values -------------------------------- //
+    const dispatchParams = (newParams) => {
+        const params = { ...entries_state.params }
+        for (let index = 0; index < newParams.targets.length; index++) {
+            const target = newParams.targets[index]
+            const value = newParams.values[index]
+            params[target] = value
+        }
+        entries_dispatch({ type: 'SET_PARAMS', payload: params })
+    }
+
     useEffect(() => {
-        if (!auth_state.user) entries_dispatch({ type: 'SET_LOADING', payload: true })
-        entries_dispatch({ type: 'SET_LOADING', payload: false })
-    }, [auth_state.user])
+        const updateEntriesLoadingState = () => {
+            if (!entries_state.params.usuario) entries_dispatch({ type: 'SET_LOADING', payload: true })
+            entries_dispatch({ type: 'SET_LOADING', payload: false })
+        }
+        updateEntriesLoadingState()
+    }, [entries_state.params.usuario])
 
-    // ---------------- Update state values ---------------- //
     useEffect(() => {
         const updateEntriesState = () => {
-            entries_dispatch({ type: 'CALCULATE_TOTAL_COST' })
-            entries_dispatch({ type: 'SET_QUANTITY' })
+            entries_dispatch({ type: 'CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY' })
         }
         updateEntriesState()
-    }, [entries_state.products])
+    }, [entries_state.params.productos])
+
+    // ------------------- Button to cancel modal of entries product -------------------- //
+    const button_cancelModal = (
+        <Button
+            danger
+            onClick={redirectToEntradas}
+            style={{ width: '100%' }}
+            type='primary'
+        >
+            Cancelar
+        </Button>
+    )
+
+    // -------------------- Button to clear inputs of entries form --------------------- //
+    const clearFields = () => {
+        entries_dispatch({ type: 'CLEAR_INPUTS' })
+    }
+
+    const button_clearInputs = (
+        <Button
+            className='btn-primary'
+            onClick={clearFields}
+        >
+            Borrar campos
+        </Button>
+    )
+
+    // ------------------ Button to clear products of entries form ------------------- //
+    const clearProducts = () => {
+        entries_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
+    }
+
+    const button_clearProducts = (
+        <Button
+            className='btn-primary'
+            onClick={clearProducts}
+        >
+            Borrar productos
+        </Button>
+    )
+
+    // -------------------- Button to open modal of entries form --------------------- //
+    const openModal = () => {
+        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
+    }
+
+    const button_openModal = (
+        <Button
+            className='btn-primary'
+            onClick={openModal}
+        >
+            Añadir producto
+        </Button>
+    )
+
+    // ---------------------------- Button to save entry ---------------------------- //
+    const validateEntrySave = () => {
+        const quantityOfSelectedProducts = entries_state.params.productos.length
+        if (quantityOfSelectedProducts === 0) {
+            errorAlert('¡Debes seleccionar al menos un producto!')
+            return 'FAIL'
+        }
+        for (const product of entries_state.params.productos) {
+            if (product.cantidadesEntrantes === 0) {
+                errorAlert(`Indica una cantidad mayor que cero a: ${product.nombre}`)
+                return 'FAIL'
+            }
+        }
+        return 'OK'
+    }
+
+    const saveNew = async () => {
+        const result = validateEntrySave()
+        if (result === 'FAIL') return
+        for (const product of entries_state.params.productos) {
+            await api.productos.modifyStock({
+                product,
+                isIncrement: true,
+                quantity: product.cantidadesEntrantes
+            })
+        }
+        const response = await api.entradas.save(entries_state.params)
+        if (response.code === 200) {
+            successAlert('El registro se guardó correctamente')
+            entries_dispatch({ type: 'CLEAN_STATE' })
+            redirectToEntradas()
+        } else errorAlert('Fallo al guardar el registro. Intente de nuevo.')
+    }
+
+    const saveEdit = async () => {
+        for (let product of entries_state.params.productos) {
+            const findEntryToEdit = await api.entradas.findById(entryID)
+            const entryToEdit = findEntryToEdit.data
+            const productOfEntryToEdit = entryToEdit.productos.find(el => el._id === product._id)
+            if (productOfEntryToEdit && productOfEntryToEdit.cantidadesEntrantes !== product.cantidadesEntrantes) {
+                const findProductToModifyStock = await api.productos.findById(product._id)
+                const productToModifyStock = findProductToModifyStock.data
+                productToModifyStock.cantidadStock -= productOfEntryToEdit.cantidadesEntrantes
+                productToModifyStock.cantidadStock += parseFloat(product.cantidadesEntrantes)
+                await api.productos.edit(productToModifyStock)
+            } else {
+                await api.productos.modifyStock({
+                    product,
+                    isIncrement: true,
+                    quantity: product.cantidadesEntrantes
+                })
+            }
+        }
+        const entryToEdit = { ...entries_state.params, id: entryID }
+        const response = await api.entradas.edit(entryToEdit)
+        if (response.code === 200) {
+            successAlert('El registro se editó correctamente')
+            entries_dispatch({ type: 'CLEAN_STATE' })
+            redirectToEntradas()
+        } else {
+            errorAlert('Fallo al editar el registro. Intente de nuevo.')
+        }
+    }
+
+    const saveEntry = () => {
+        if (entryID === 'nuevo') saveNew()
+        else saveEdit()
+    }
+
+    const button_saveEntry = (
+        <Button
+            onClick={saveEntry}
+            style={{ width: '100%' }}
+            type='primary'
+        >
+            Guardar
+        </Button>
+    )
+
+    // --------------------- Input to set product description ----------------------- //
+    const setDescription = (e) => {
+        const newParams = {
+            targets: ['descripcion'],
+            values: e.target.value !== '' ? [e.target.value] : ['-- Sin descripción --']
+        }
+        dispatchParams(newParams)
+    }
+
+    const input_productsDescription = (
+        <Input
+            onChange={setDescription}
+            placeholder='-- Sin descripción --'
+        />
+    )
+
+    // ------------------------- Picker to set product date -------------------------- //
+    const setDate = (date) => {
+        const newParams = {
+            targets: ['fecha', 'fechaString'],
+            values: date
+                ? [new Date(date.$d), simpleDateWithHours(new Date(date.$d))]
+                : [new Date(), simpleDateWithHours(new Date())]
+        }
+        dispatchParams(newParams)
+    }
+
+    const picker_productsDate = (
+        <DatePicker
+            format={['DD/MM/YYYY']}
+            onChange={setDate}
+            style={{ width: '100%' }}
+            value={entries_state.datePickerValue}
+        />
+    )
+
+    // ------------------------- Table of selected products -------------------------- //
+    const deleteProduct = (product) => {
+        entries_dispatch({ type: 'DELETE_PRODUCT', payload: product._id })
+    }
+
+    const changeQuantity = (e, product) => {
+        const productsEditted = entries_state.params.productos.map(productInState => {
+            if (productInState._id === product._id) {
+                productInState.cantidadesEntrantes = e
+            }
+            return productInState
+        })
+        const newParams = {
+            targets: ['productos'],
+            values: [productsEditted]
+        }
+        dispatchParams(newParams)
+    }
+
+    const header = [
+        {
+            align: 'start',
+            dataIndex: 'entry_productBarcode',
+            key: 'entry_productBarcode',
+            render: (_, product) => product.codigoBarras,
+            title: 'Código de barras'
+        },
+        {
+            align: 'start',
+            dataIndex: 'entry_productName',
+            key: 'entry_productName',
+            render: (_, product) => product.nombre,
+            title: 'Producto'
+        },
+        {
+            align: 'start',
+            dataIndex: 'entry_productQuantity',
+            key: 'entry_productQuantity',
+            render: (_, product) => (
+                <InputNumber
+                    onChange={e => changeQuantity(e, product)}
+                    value={product.cantidadesEntrantes}
+                />
+            ),
+            title: 'Cantidad'
+        },
+        {
+            align: 'start',
+            dataIndex: 'entry_deleteProduct',
+            key: 'entry_deleteProduct',
+            render: (_, product) => (
+                <div onClick={() => deleteProduct(product)}>
+                    <Delete />
+                </div>
+            ),
+            title: 'Eliminar producto'
+        }
+    ]
+
+    const table_selectedProducts = (
+        <Table
+            columns={header}
+            dataSource={entries_state.params.productos}
+            rowKey='_id'
+        />
+    )
+
+    // -------------------------- Title of total cost of entry --------------------------- //
+    useEffect(() => {
+        entries_dispatch({ type: 'CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY' })
+    }, [entries_state.params.cantidad, entries_state.params.productos])
+
+    const title_totalCost = <h1>Neto Total: {entries_state.params.costoTotal}</h1>
 
 
     const entriesRender = [
         {
-            element: <AddButton />,
-            name: 'addProduct',
-            order_lg: 1,
-            order_md: 1,
-            order_sm: 1,
-            order_xl: 1,
-            order_xs: 1,
-            order_xxl: 1
+            element: button_openModal,
+            name: 'entries_addProduct',
+            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
         },
         {
-            element: <CleanFields />,
-            name: 'cleanFields',
-            order_lg: 3,
-            order_md: 2,
-            order_sm: 5,
-            order_xl: 3,
-            order_xs: 5,
-            order_xxl: 3
+            element: button_clearInputs,
+            name: 'entries_clearFields',
+            order: { lg: 2, md: 2, sm: 5, xl: 2, xs: 5, xxl: 2 }
         },
         {
-            element: <CleanProducts />,
-            name: 'cleanProducts',
-            order_lg: 6,
-            order_md: 4,
-            order_sm: 6,
-            order_xl: 6,
-            order_xs: 6,
-            order_xxl: 6
+            element: button_clearProducts,
+            name: 'entries_clearProducts',
+            order: { lg: 4, md: 4, sm: 6, xl: 4, xs: 6, xxl: 4 }
         },
         {
-            element: <InputHidden />,
-            name: 'complement_1',
-            order_lg: 4,
-            order_md: 6,
-            order_sm: 4,
-            order_xl: 4,
-            order_xs: 4,
-            order_xxl: 4
+            element: picker_productsDate,
+            name: 'entries_productDate',
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
-            element: <InputHidden />,
-            name: 'complement_2',
-            order_lg: 7,
-            order_md: 7,
-            order_sm: 7,
-            order_xl: 7,
-            order_xs: 7,
-            order_xxl: 7
-        },
-        {
-            element: <ProductDate />,
-            name: 'productDate',
-            order_lg: 5,
-            order_md: 5,
-            order_sm: 3,
-            order_xl: 5,
-            order_xs: 3,
-            order_xxl: 5
-        },
-        {
-            element: <ProductDescription />,
-            name: 'productDescription',
-            order_lg: 2,
-            order_md: 3,
-            order_sm: 2,
-            order_xl: 2,
-            order_xs: 2,
-            order_xxl: 2
-        },
+            element: input_productsDescription,
+            name: 'entries_productDescription',
+            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
+        }
     ]
 
-    const responsiveFormGutter = { horizontal: 0, vertical: 16 }
-    const responsiveHeadGutter = { horizontal: 8, vertical: 8 }
-    const responsiveColSpan = { lg: 8, md: 12, sm: 24, xl: 8, xs: 24, xxl: 8 }
+    const responsiveGrid = {
+        formGutter: { horizontal: 0, vertical: 16 },
+        headGutter: { horizontal: 8, vertical: 8 },
+        span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
+    }
+
 
     return (
-        <>
-            <h1>{id === 'nuevo' ? 'Nueva entrada' : 'Editar entrada'}</h1>
-            {
-                entries_state.loading
-                    ? <Spin />
-                    : (
-                        <>
+        <Row>
+            <Col span={24}>
+                <h1>{entryID === 'nuevo' ? 'Nueva entrada' : 'Editar entrada'}</h1>
+            </Col>
+            <Col span={24}>
+                {
+                    deleteModal_state.loading
+                        ? <Spin />
+                        : (
                             <Row
                                 gutter={[
-                                    responsiveFormGutter.horizontal,
-                                    responsiveFormGutter.vertical
+                                    responsiveGrid.formGutter.horizontal,
+                                    responsiveGrid.formGutter.vertical
                                 ]}
                             >
-                                <Col>
+                                <Col span={24}>
                                     <Row
                                         gutter={[
-                                            responsiveHeadGutter.horizontal,
-                                            responsiveHeadGutter.vertical
+                                            responsiveGrid.headGutter.horizontal,
+                                            responsiveGrid.headGutter.vertical
                                         ]}
                                     >
                                         {
@@ -177,30 +387,12 @@ const EntradasForm = () => {
                                                 return (
                                                     <Col
                                                         key={item.name}
-                                                        lg={{
-                                                            order: item.order_lg,
-                                                            span: responsiveColSpan.lg
-                                                        }}
-                                                        md={{
-                                                            order: item.order_md,
-                                                            span: responsiveColSpan.md
-                                                        }}
-                                                        sm={{
-                                                            order: item.order_sm,
-                                                            span: responsiveColSpan.sm
-                                                        }}
-                                                        xl={{
-                                                            order: item.order_xl,
-                                                            span: responsiveColSpan.xl
-                                                        }}
-                                                        xs={{
-                                                            order: item.order_xs,
-                                                            span: responsiveColSpan.xs
-                                                        }}
-                                                        xxl={{
-                                                            order: item.order_xxl,
-                                                            span: responsiveColSpan.xxl
-                                                        }}
+                                                        lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
+                                                        md={{ order: item.order.md, span: responsiveGrid.span.md }}
+                                                        sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
+                                                        xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
+                                                        xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
+                                                        xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
                                                     >
                                                         {item.element}
                                                     </Col>
@@ -209,41 +401,28 @@ const EntradasForm = () => {
                                         }
                                     </Row>
                                 </Col>
-                                <Col
-                                    span={24}
-                                    style={{ textAlign: 'right' }}
-                                >
-                                    <TotalCost />
+                                <Col span={24} style={{ textAlign: 'right' }}>
+                                    {title_totalCost}
                                 </Col>
-                                <Col
-                                    span={24}
-                                >
-                                    <SelectedProductsTable />
+                                <Col span={24}>
+                                    {table_selectedProducts}
                                 </Col>
-                                <Col
-                                    span={24}
-                                >
-                                    <Row
-                                        justify='space-around'
-                                    >
-                                        <Col
-                                            span={6}
-                                        >
-                                            <CancelButton />
+                                <Col span={24}>
+                                    <Row justify='space-around'>
+                                        <Col span={6}>
+                                            {button_cancelModal}
                                         </Col>
-                                        <Col
-                                            span={6}
-                                        >
-                                            <SaveButton />
+                                        <Col span={6}>
+                                            {button_saveEntry}
                                         </Col>
                                     </Row>
                                 </Col>
                             </Row>
-                        </>
-                    )
-            }
+                        )
+                }
+            </Col>
             <ProductSelectionModal />
-        </>
+        </Row>
     )
 }
 

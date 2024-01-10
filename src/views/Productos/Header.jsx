@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 
 // Design Components
-import { Col, Row, Space } from 'antd'
+import { Col, Row } from 'antd'
 
 // Services
 import api from '../../services'

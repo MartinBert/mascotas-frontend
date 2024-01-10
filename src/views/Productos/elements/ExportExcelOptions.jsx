@@ -22,8 +22,8 @@ const ExportExcelOptions = () => {
     }
 
     const selectExcelOptions = (e) => {
-        if (e.value === 'todas') products_dispatch({ type: 'SELECT_ALL_OPTIONS' })
-        else products_dispatch({ type: 'DESELECT_ALL_OPTIONS' })
+        if (e.value === 'todas') products_dispatch({ type: 'SELECT_ALL_EXCEL_OPTIONS' })
+        else products_dispatch({ type: 'DESELECT_ALL_EXCEL_OPTIONS' })
     }
 
     const selectOptions = [

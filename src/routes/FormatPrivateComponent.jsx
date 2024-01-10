@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     FaAddressBook,
+    FaBalanceScale,
     FaBars,
     FaBookmark,
     FaBusinessTime,
@@ -81,15 +82,16 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     ]
 
     const businessStatisticsMenu = [
-        auth_state.user.perfil ? getItem('13', 'Estadísticas diarias', <FaChartLine />, '/daily_business_statistics') : null,
-        auth_state.user.perfil ? getItem('14', 'Gráficos', <FaChartPie />, '/daily_business_statistics/graphics') : null,
+        auth_state.user.perfil ? getItem('13', 'Balance diario', <FaChartLine />, '/daily_business_statistics/daily_balance') : null,
+        auth_state.user.perfil ? getItem('14', 'Productos', <FaBalanceScale />, '/daily_business_statistics/quantities_of_products') : null,
+        auth_state.user.perfil ? getItem('15', 'Gráficos', <FaChartPie />, '/daily_business_statistics/graphics') : null,
     ]
 
     const configurationMenu = [
-        auth_state.user.perfil ? getItem('15', 'Usuarios', <FaUser />, '/usuarios') : null,
-        auth_state.user.perfil ? getItem('16', 'Empresas', <FaBusinessTime />, '/empresas') : null,
-        auth_state.user.perfil ? getItem('17', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
-        auth_state.user.perfil ? getItem('18', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
+        auth_state.user.perfil ? getItem('16', 'Usuarios', <FaUser />, '/usuarios') : null,
+        auth_state.user.perfil ? getItem('17', 'Empresas', <FaBusinessTime />, '/empresas') : null,
+        auth_state.user.perfil ? getItem('18', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
+        auth_state.user.perfil ? getItem('19', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
     ]
 
     const subMenusToSidebar = [

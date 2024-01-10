@@ -19,7 +19,7 @@ import api from '../../services'
 
 // Imports Destructurings
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
-const { getYesterdayDate, resetDate, simpleDateWithHours } = helpers.dateHelper
+const { getYesterdayDate, localFormat, resetDate, simpleDateWithHours } = helpers.dateHelper
 const { fiscalVouchersCodes } = helpers.afipHelper
 const { RangePicker } = DatePicker
 
@@ -38,14 +38,14 @@ const errorMessage = (activity) => {
 }
 
 const generateFilters_entriesAndOutputs = (date) => {
-    const query = JSON.stringify({ fechaString: (simpleDateWithHours(date)).substring(0, 10) })
+    const query = JSON.stringify({ fechaString: localFormat(date) })
     return query
 }
 
 const generateFilters_sales = (date) => {
     const query = JSON.stringify({
         cashRegister: true,
-        fechaEmisionString: (simpleDateWithHours(date)).substring(0, 10)
+        fechaEmisionString: localFormat(date)
     })
     return query
 }
@@ -353,6 +353,7 @@ const Header = () => {
                     : 'Ocultar fechas con balance cero'
             }
         </Button>
+
 
     const header = [
         {

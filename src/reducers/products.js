@@ -1,7 +1,9 @@
 const actions = {
-    DESELECT_ALL_OPTIONS: 'DESELECT_ALL_OPTIONS',
-    SELECT_ALL_OPTIONS: 'SELECT_ALL_OPTIONS',
-    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS',
+    DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
+    HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
+    SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
+    SET_PRODUCT_FOR_DETAILS_MODAL: 'SET_PRODUCT_FOR_DETAILS_MODAL',
+    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS'
 }
 
 const initialState = {
@@ -29,12 +31,14 @@ const initialState = {
         'Stock fraccionado',
         'Unidad de medida',
         'Fraccionamiento',
-    ]
+    ],
+    productDetailsModalVisibility: false,
+    productForDetailsModal: null
 }
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case actions.DESELECT_ALL_OPTIONS:
+        case actions.DESELECT_ALL_EXCEL_OPTIONS:
             const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
             const optionsValues = notAllOptions.map(option => option.value)
             const fixedOptions = optionsValues.includes('producto')
@@ -44,10 +48,22 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 activeExcelOptions: fixedOptions
             }
-        case actions.SELECT_ALL_OPTIONS:
+        case actions.HIDE_PRODUCT_DETAILS_MODAL:
+            return {
+                ...state,
+                productDetailsModalVisibility: false,
+                productForDetailsModal: null
+            }
+        case actions.SELECT_ALL_EXCEL_OPTIONS:
             return {
                 ...state,
                 activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }]
+            }
+        case actions.SET_PRODUCT_FOR_DETAILS_MODAL:
+            return {
+                ...state,
+                productDetailsModalVisibility: true,
+                productForDetailsModal: action.payload
             }
         case actions.SET_EXCEL_OPTIONS:
             return {

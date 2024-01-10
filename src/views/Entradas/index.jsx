@@ -1,5 +1,5 @@
 // React Components and Hooks
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
@@ -14,9 +14,6 @@ import contexts from '../../contexts'
 // Design Components
 import { Row, Col, Table } from 'antd'
 
-// Helpers
-import helpers from '../../helpers'
-
 // Services
 import api from '../../services'
 
@@ -26,9 +23,10 @@ import Header from './Header'
 
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
+const { formatFindParams } = actions.paginationParams
 const { useDeleteModalContext } = contexts.DeleteModal
+const { useEntriesContext } = contexts.Entries
 const { Delete, Details, Edit } = icons
-const { dateHelper } = helpers
 
 const findEntry = async (entryID) => {
     const findEntry = await api.entradas.findById(entryID)
@@ -51,43 +49,25 @@ const fixStock = async (entryToDelete) => {
 const Entradas = () => {
     const navigate = useNavigate()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
-    const [entradas_paginadas, setEntradas_paginadas] = useState(null)
-    const [entradas_totales, setEntradas_totales] = useState(null)
-    const [page, setPage] = useState(1)
-    const [totalDocs, setTotalDocs] = useState(null)
-    const [limit, setLimit] = useState(10)
-    const [filters, setFilters] = useState(null)
-    const [detailsVisible, setDetailsVisible] = useState(false)
-    const [detailsData, setDetailsData] = useState(null)
+    const [entries_state, entries_dispatch] = useEntriesContext()
 
     // ------------------ Fetch Entries ------------------ //
     useEffect(() => {
         const fetchEntries_paginated = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.entradas.findPaginated({ page, limit, filters: stringFilters })
-            setEntradas_paginadas(data.docs)
-            setTotalDocs(data.totalDocs)
+            const findParams = formatFindParams(entries_state.paginationParams)
+            const data = await api.entradas.findPaginated(findParams)
+            entries_dispatch({ type: 'SET_ENTRIES_FOR_RENDER', payload: data })
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchEntries_paginated()
     }, [
         deleteModal_state.loading,
-        filters,
-        limit,
-        page,
+        entries_state.paginationParams
     ])
 
-    useEffect(() => {
-        const fetchEntries_all = async () => {
-            const data = await api.entradas.findAll()
-            setEntradas_totales(data.docs)
-        }
-        fetchEntries_all()
-    }, [])
-
     // ------------------ Entry Deletion ------------------ //
-    const entryDeletion = (entryID) => {
-        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: entryID })
+    const entryDeletion = (entry) => {
+        deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: entry._id })
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
@@ -108,20 +88,33 @@ const Entradas = () => {
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteEntry()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Entry Edition ------------------ //
-    const entryEdition = (entryID) => {
-        navigate(`/entradas/${entryID}`)
+    const entryEdition = (entry) => {
+        navigate(`/entradas/${entry._id}`)
+    }
+
+    // --------------------- Actions --------------------- //
+    const setLimit = (val) => {
+        const paginationParams = {
+            ...entries_state.paginationParams,
+            limit: parseInt(val)
+        }
+        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const setPage = (e) => {
+        const paginationParams = {
+            ...entries_state.paginationParams,
+            page: parseInt(e)
+        }
+        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
     // ------------------ Product Details ------------------ //
-    const openProductDetails = (entry) => {
-        setDetailsData(entry.productos)
-        setDetailsVisible(true)
+    const openDetailsModal = (entry) => {
+        entries_dispatch({ type: 'SET_DATA_FOR_DETAILS_MODAL', payload: entry.productos })
     }
 
 
@@ -135,7 +128,7 @@ const Entradas = () => {
             dataIndex: 'entry_details',
             render: (_, entry) => (
                 <div
-                    onClick={() => openProductDetails(entry)}
+                    onClick={() => openDetailsModal(entry)}
                 >
                     <Details />
                 </div>
@@ -144,7 +137,7 @@ const Entradas = () => {
         },
         {
             dataIndex: 'entry_date',
-            render: (_, entry) => dateHelper.simpleDateWithHours(entry.fecha) + ' hs',
+            render: (_, entry) => entry.fechaString,
             title: 'Fecha'
         },
         {
@@ -162,17 +155,15 @@ const Entradas = () => {
         {
             dataIndex: 'entry_actions',
             render: (_, entry) => (
-                <Row
-                    justify='start'
-                >
+                <Row justify='start'>
                     <Col
-                        onClick={() => entryEdition(entry._id)}
+                        onClick={() => entryEdition(entry)}
                         span={12}
                     >
                         <Edit />
                     </Col>
                     <Col
-                        onClick={() => entryDeletion(entry._id)}
+                        onClick={() => entryDeletion(entry)}
                         span={12}
                     >
                         <Delete />
@@ -184,31 +175,19 @@ const Entradas = () => {
     ]
 
     return (
-        <Row
-            gutter={[0, 16]}
-        >
-            <Col
-                span={24}
-            >
-                <Header
-                    entradas_paginadas={entradas_paginadas}
-                    entradas_totales={entradas_totales}
-                    filters={filters}
-                    setFilters={setFilters}
-                    setPage={setPage}
-                />
+        <Row gutter={[0, 16]}>
+            <Col span={24}>
+                <Header />
             </Col>
-            <Col
-                span={24}
-            >
+            <Col span={24} >
                 <Table
                     width={'100%'}
-                    dataSource={entradas_paginadas}
+                    dataSource={entries_state.entriesForRender}
                     columns={columnsForTable}
                     pagination={{
-                        defaultCurrent: page,
-                        limit: limit,
-                        total: totalDocs,
+                        defaultCurrent: entries_state.paginationParams.page,
+                        limit: entries_state.paginationParams.limit,
+                        total: entries_state.entriesTotalQuantity,
                         showSizeChanger: true,
                         onChange: e => setPage(e),
                         onShowSizeChange: (e, val) => setLimit(val)
@@ -219,14 +198,8 @@ const Entradas = () => {
                     size='small'
                 />
             </Col>
-            <DetailsModal
-                detailsVisible={detailsVisible}
-                setDetailsVisible={setDetailsVisible}
-                detailsData={detailsData}
-            />
-            <DeleteModal
-                title='Eliminar entrada'
-            />
+            <DetailsModal />
+            <DeleteModal title='Eliminar entrada' />
         </Row>
     )
 }

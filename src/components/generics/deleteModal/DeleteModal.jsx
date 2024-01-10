@@ -27,8 +27,8 @@ const DeleteModal = ({ title }) => {
         <Modal
             title={title}
             open={deleteModal_state.modalIsVisible}
-            onCancel={() => cancelDeletion()}
-            onOk={() => confirmDeletion()}
+            onCancel={cancelDeletion}
+            onOk={confirmDeletion}
             width={800}
         >
             <h3>Esta acción eliminará el registro, ¿desea continuar?</h3>

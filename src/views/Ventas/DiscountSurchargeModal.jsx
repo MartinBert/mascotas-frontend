@@ -12,7 +12,7 @@ const { useSaleContext } = contexts.Sale
 const { Option } = Select
 
 
-const ProductSelectionModal = () => {
+const DiscountSurchargeModal = () => {
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
 
@@ -93,4 +93,4 @@ const ProductSelectionModal = () => {
     )
 }
 
-export default ProductSelectionModal
+export default DiscountSurchargeModal

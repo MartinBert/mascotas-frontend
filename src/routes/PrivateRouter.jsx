@@ -21,6 +21,7 @@ import Productos from '../views/Productos'
 import ProductosForm from '../views/Productos/ProductosForm'
 import PuntosVenta from '../views/PuntosVenta'
 import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm'
+import QuantitiesOfProducts from '../views/DailyBusinessStatistics/QuantitiesOfProducts'
 import Rubros from '../views/Rubros'
 import RubrosForm from '../views/Rubros/RubrosForm'
 import Salidas from '../views/Salidas'
@@ -229,39 +230,46 @@ const privateRoutesPreData = [
         activeKey: '13',
         element: <DailyBusinessStatistics />,
         onlySuperadmin: true,
-        path: '/daily_business_statistics',
+        path: '/daily_business_statistics/daily_balance',
         private: true
     },
     {
         activeKey: '14',
+        element: <QuantitiesOfProducts />,
+        onlySuperadmin: true,
+        path: '/daily_business_statistics/quantities_of_products',
+        private: true
+    },
+    {
+        activeKey: '15',
         element: <Graphics />,
         onlySuperadmin: true,
         path: '/daily_business_statistics/graphics',
         private: true
     },
     {
-        activeKey: '15',
+        activeKey: '16',
         element: <Usuarios />,
         onlySuperadmin: true,
         path: '/usuarios',
         private: true
     },
     {
-        activeKey: '16',
+        activeKey: '17',
         element: <Empresas />,
         onlySuperadmin: true,
         path: '/empresas',
         private: true
     },
     {
-        activeKey: '17',
+        activeKey: '18',
         element: <PuntosVenta />,
         onlySuperadmin: true,
         path: '/puntosventa',
         private: true
     },
     {
-        activeKey: '18',
+        activeKey: '19',
         element: <CondicionesFiscales />,
         onlySuperadmin: true,
         path: '/condicionesfiscales',

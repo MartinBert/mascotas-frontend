@@ -1,9 +1,12 @@
 // React Components and Hooks
-import React, { useState } from 'react'
+import React from 'react'
 
 // Custom Components
 import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
 import icons from '../../components/icons'
+
+// Custom Contexts
+import contexts from '../../contexts'
 
 // Design Components
 import { Modal, Table } from 'antd'
@@ -12,17 +15,22 @@ import { Modal, Table } from 'antd'
 import mathHelper from '../../helpers/mathHelper'
 
 // Imports Destructuring
+const { useEntriesContext } = contexts.Entries
+const { useProductsContext } = contexts.Products
 const { Details } = icons
 const { roundTwoDecimals } = mathHelper
 
 
-const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
-    const [productDetailsVisible, setProductDetailsVisible] = useState(false)
-    const [productDetails, setProductDetails] = useState(null)
+const DetailsModal = () => {
+    const [entries_state, entries_dispatch] = useEntriesContext()
+    const [, products_dispatch] = useProductsContext()
 
-    const seeDetails = (data) => {
-        setProductDetails(data)
-        setProductDetailsVisible(true)
+    const onCancel = () => {
+        entries_dispatch({ type: 'HIDE_DETAILS_MODAL' })
+    }
+
+    const setProductForDetailsModal = (product) => {
+        products_dispatch({ type: 'SET_PRODUCT_FOR_DETAILS_MODAL', payload: product })
     }
 
     const columns = [
@@ -65,33 +73,28 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
         {
             title: 'Detalles',
             render: (product) => (
-                <div onClick={() => { seeDetails(product) }}>
+                <div onClick={() => setProductForDetailsModal(product)}>
                     <Details title='Ver detalle' />
                 </div>
             )
-        },
+        }
     ]
 
     return (
         <Modal
             title='Detalle de producto'
-            open={detailsVisible}
-            onCancel={() => { setDetailsVisible(false) }}
+            open={entries_state.detailsModalVisibility}
+            onCancel={onCancel}
             footer={false}
             width={1000}
         >
             <Table
-                dataSource={detailsData}
+                dataSource={entries_state.dataForDetailsModal}
                 columns={columns}
                 pagination={false}
                 rowKey='_id'
             />
-
-            <ProductDetailsModal
-                detailsVisible={productDetailsVisible}
-                setDetailsVisible={setProductDetailsVisible}
-                detailsData={productDetails}
-            />
+            <ProductDetailsModal />
         </Modal>
     )
 }
