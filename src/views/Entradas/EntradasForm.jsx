@@ -226,6 +226,11 @@ const EntradasForm = () => {
         <Input
             onChange={setDescription}
             placeholder='-- Sin descripción --'
+            value={
+                entries_state.params.descripcion === '-- Sin descripción --'
+                    ? ''
+                    : entries_state.params.descripcion
+            }
         />
     )
 

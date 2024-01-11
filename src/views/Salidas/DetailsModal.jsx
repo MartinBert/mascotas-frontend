@@ -1,34 +1,42 @@
 // React Components and Hooks
-import React, { useState } from 'react'
+import React from 'react'
 
 // Custom Components
 import ProductDetailsModal from '../../components/generics/productDetailsModal/ProductDetailsModal'
 import icons from '../../components/icons'
 
+// Custom Contexts
+import contexts from '../../contexts'
+
 // Design Components
 import { Modal, Table } from 'antd'
 
 // Helpers
-import mathHelpers from '../../helpers/mathHelper'
+import mathHelper from '../../helpers/mathHelper'
 
 // Imports Destructuring
+const { useOutputsContext } = contexts.Outputs
+const { useProductsContext } = contexts.Products
 const { Details } = icons
-const { roundTwoDecimals } = mathHelpers
+const { roundTwoDecimals } = mathHelper
 
 
-const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
-    const [productDetailsVisible, setProductDetailsVisible] = useState(false)
-    const [productDetails, setProductDetails] = useState(null)
+const DetailsModal = () => {
+    const [outputs_state, outputs_dispatch] = useOutputsContext()
+    const [, products_dispatch] = useProductsContext()
 
-    const seeDetails = (data) => {
-        setProductDetails(data)
-        setProductDetailsVisible(true)
+    const onCancel = () => {
+        outputs_dispatch({ type: 'HIDE_DETAILS_MODAL' })
+    }
+
+    const setProductForDetailsModal = (product) => {
+        products_dispatch({ type: 'SET_PRODUCT_FOR_DETAILS_MODAL', payload: product })
     }
 
     const columns = [
         {
             title: 'Producto',
-            render: (product) => (
+            render: (_, product) => (
                 <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
                     <p>{product.nombre}</p>
                 </div>
@@ -60,37 +68,35 @@ const DetailsModal = ({ detailsVisible, setDetailsVisible, detailsData }) => {
         },
         {
             title: 'Ganancia neta total',
-            render: product => roundTwoDecimals(product.cantidadesSalientes * product.gananciaNeta)
+            render: (_, product) => roundTwoDecimals(
+                product.cantidadesSalientes * product.precioUnitario
+            )
         },
         {
             title: 'Detalles',
-            render: (product) => (
-                <div onClick={() => { seeDetails(product) }}>
+            render: (_, product) => (
+                <div onClick={() => setProductForDetailsModal(product)}>
                     <Details title='Ver detalle' />
                 </div>
             )
-        },
+        }
     ]
+
     return (
         <Modal
             title='Detalle de producto'
-            open={detailsVisible}
-            onCancel={() => { setDetailsVisible(false) }}
+            open={outputs_state.detailsModalVisibility}
+            onCancel={onCancel}
             footer={false}
             width={1000}
         >
             <Table
-                dataSource={detailsData}
+                dataSource={outputs_state.dataForDetailsModal}
                 columns={columns}
                 pagination={false}
                 rowKey='_id'
             />
-
-            <ProductDetailsModal
-                detailsVisible={productDetailsVisible}
-                setDetailsVisible={setProductDetailsVisible}
-                detailsData={productDetails}
-            />
+            <ProductDetailsModal />
         </Modal>
     )
 }

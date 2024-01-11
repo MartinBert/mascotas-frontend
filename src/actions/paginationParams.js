@@ -1,29 +1,45 @@
-const formatFindParams = (paginationParams) => {
+const formatFindFilters = (filters) => {
     let formattedFilters
-    const currentFilters = paginationParams.filters
-    if (!currentFilters || typeof currentFilters !== 'object') formattedFilters = null
+    if (!filters || typeof filters !== 'object') formattedFilters = null
     else {
-        const currentFiltersKeys = Object.keys(currentFilters)
-        const currentFiltersValues = Object.values(currentFilters)
+        const currentFiltersKeys = Object.keys(filters)
+        const currentFiltersValues = Object.values(filters)
         const filtersWithoutNulls = {}
         for (let index = 0; index < currentFiltersKeys.length; index++) {
             const key = currentFiltersKeys[index]
             const value = currentFiltersValues[index]
-            if(value) filtersWithoutNulls[key] = value
+            if (value) filtersWithoutNulls[key] = value
         }
         formattedFilters = Object.keys(filtersWithoutNulls).length === 0
             ? null
             : JSON.stringify(filtersWithoutNulls)
     }
+    return formattedFilters
+}
+
+const formatFindParams = (paginationParams) => {
+    const filters = formatFindFilters(paginationParams.filters)
     const params = {
         ...paginationParams,
-        filters: formattedFilters
+        filters
     }
     return params
 }
 
+const nullifyFilters = (filters) => {
+    const currentFiltersKeys = Object.keys(filters)
+    const nullFilters = {}
+    for (let index = 0; index < currentFiltersKeys.length; index++) {
+        const key = currentFiltersKeys[index]
+        nullFilters[key] = null
+    }
+    return nullFilters
+}
+
 const paginationParams = {
-    formatFindParams
+    formatFindFilters,
+    formatFindParams,
+    nullifyFilters
 }
 
 export default paginationParams

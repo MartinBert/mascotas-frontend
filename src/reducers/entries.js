@@ -44,7 +44,7 @@ const initialState = {
     datePickerValue: formatDate(new Date()),
     detailsModalVisibility: false,
     entriesForExcelReport: [],
-    entriesForRender: null,
+    entriesForRender: [],
     entriesTotalQuantity: 0,
     loading: true,
     paginationParams: {
@@ -65,7 +65,8 @@ const initialState = {
         costoTotal: 0,
         productos: [],
         usuario: null
-    }
+    },
+    rangePickerValueForExcelReport: null
 }
 
 
@@ -93,7 +94,7 @@ const reducer = (state = initialState, action) => {
                 datePickerValue: formatDate(new Date()),
                 params: {
                     ...state.params,
-                    descripcion: '',
+                    descripcion: '-- Sin descripción --',
                     fecha: new Date(),
                     fechaString: simpleDateWithHours(new Date()),
                 }
@@ -142,9 +143,13 @@ const reducer = (state = initialState, action) => {
                 detailsModalVisibility: true
             }
         case actions.SET_ENTRIES_FOR_EXCEL_REPORT:
+            const rangePickerValue = action.payload.rangePickerValueForExcelReport
             return {
                 ...state,
-                entriesForExcelReport: action.payload
+                entriesForExcelReport: action.payload.entriesForExcelReport,
+                rangePickerValueForExcelReport: rangePickerValue.includes('')
+                    ? ['', '']
+                    : [dayjs(rangePickerValue[0], 'DD-MM-YYYY'), dayjs(rangePickerValue[1], 'DD-MM-YYYY')]
             }
         case actions.SET_ENTRIES_FOR_RENDER:
             return {

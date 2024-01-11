@@ -127,9 +127,7 @@ const Entradas = () => {
         {
             dataIndex: 'entry_details',
             render: (_, entry) => (
-                <div
-                    onClick={() => openDetailsModal(entry)}
-                >
+                <div onClick={() => openDetailsModal(entry)}>
                     <Details />
                 </div>
             ),

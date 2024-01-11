@@ -36,7 +36,7 @@ const DetailsModal = () => {
     const columns = [
         {
             title: 'Producto',
-            render: (product) => (
+            render: (_, product) => (
                 <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
                     <p>{product.nombre}</p>
                 </div>
@@ -68,11 +68,11 @@ const DetailsModal = () => {
         },
         {
             title: 'Costo total',
-            render: product => roundTwoDecimals(product.cantidadesEntrantes * product.precioUnitario)
+            render: (_, product) => roundTwoDecimals(product.cantidadesEntrantes * product.precioUnitario)
         },
         {
             title: 'Detalles',
-            render: (product) => (
+            render: (_, product) => (
                 <div onClick={() => setProductForDetailsModal(product)}>
                     <Details title='Ver detalle' />
                 </div>

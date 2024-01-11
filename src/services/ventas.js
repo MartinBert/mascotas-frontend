@@ -49,18 +49,7 @@ const findAll = async () => {
     }
 }
 
-const findByDate = async (dateFilters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?filters=${dateFilters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findByDatesRange = async (dateFilters) => {
+const findAllByFilters = async (dateFilters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?filters=${dateFilters}`, headers)
@@ -75,17 +64,6 @@ const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findByImport = async (importFilters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?filters=${importFilters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -176,10 +154,8 @@ const ventas = {
     deleteVenta,
     edit,
     findAll,
-    findByDate,
-    findByDatesRange,
+    findAllByFilters,
     findById,
-    findByImport,
     findLastIndex,
     findLastVoucherNumber,
     findMultipleIds,

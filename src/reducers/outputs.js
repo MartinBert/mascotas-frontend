@@ -8,29 +8,22 @@ const { roundTwoDecimals } = helpers.mathHelper
 
 
 const actions = {
-    CALCULATE_TOTAL_COST: 'CALCULATE_TOTAL_COST',
-    CLEAN_INPUTS: 'CLEAN_INPUTS',
+    CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY',
+    CLEAR_INPUTS: 'CLEAR_INPUTS',
     CLEAN_STATE: 'CLEAN_STATE',
     DELETE_ALL_PRODUCTS: 'DELETE_ALL_PRODUCTS',
-    DELETE_ID: 'DELETE_ID',
     DELETE_PRODUCT: 'DELETE_PRODUCT',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
+    HIDE_DETAILS_MODAL: 'HIDE_DETAILS_MODAL',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
-    SET_DATE: 'SET_DATE',
-    SET_DESCRIPTION: 'SET_DESCRIPTION',
-    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS',
-    SET_FORMATTED_DATE: 'SET_FORMATTED_DATE',
-    SET_LOADING: 'SET_LOADING',
-    SET_NET_PROFIT: 'SET_NET_PROFIT',
-    SET_OUTPUT: 'SET_OUTPUT',
+    SET_DATA_FOR_DETAILS_MODAL: 'SET_DATA_FOR_DETAILS_MODAL',
     SET_OUTPUTS_FOR_EXCEL_REPORT: 'SET_OUTPUTS_FOR_EXCEL_REPORT',
     SET_OUTPUTS_FOR_RENDER: 'SET_OUTPUTS_FOR_RENDER',
+    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS',
+    SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
-    SET_PRODUCT: 'SET_PRODUCT',
-    SET_PRODUCT_BARCODE: 'SET_PRODUCT_BARCODE',
-    SET_PRODUCT_NAME: 'SET_PRODUCT_NAME',
-    SET_PRODUCT_QUANTITY: 'SET_PRODUCT_QUANTITY',
-    SET_QUANTITY: 'SET_QUANTITY'
+    SET_PARAMS: 'SET_PARAMS',
+    SET_PRODUCT: 'SET_PRODUCT'
 }
 
 const formatDate = (dateToFormat) => {
@@ -39,7 +32,6 @@ const formatDate = (dateToFormat) => {
 }
 
 const initialState = {
-    _id: null,
     activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }],
     allExcelTitles: [
         'Usuario',
@@ -48,36 +40,42 @@ const initialState = {
         'Productos',
         'Ganancia Neta'
     ],
-    date: null, // loaded by useEffect on first render of view
-    dateString: null, // loaded by useEffect on first render of view
-    description: '',
-    filters: null,
-    formattedDate: null, // loaded by useEffect on first render of view
-    loading: true,
-    netProfit: 0,
+    dataForDetailsModal: null,
+    datePickerValue: formatDate(new Date()),
+    detailsModalVisibility: false,
     outputsForExcelReport: [],
-    outputsForRender: [],
+    outputsForRender: null,
     outputsTotalQuantity: 0,
+    loading: true,
     paginationParams: {
         filters: {
-            costoTotal: null,
             descripcion: null,
             fecha: null,
-            fechaString: null
+            fechaString: null,
+            gananciaNeta: null
         },
         limit: 10,
         page: 1
     },
-    products: [],
-    quantity: 0,
-    totalCost: 0
+    params: {
+        descripcion: '-- Sin descripción --',
+        fecha: new Date(),
+        fechaString: simpleDateWithHours(new Date()),
+        cantidad: 0,
+        gananciaNeta: 0,
+        productos: [],
+        usuario: null
+    },
+    rangePickerValueForExcelReport: null
 }
+
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case actions.CALCULATE_TOTAL_COST:
-            const totalCost = roundTwoDecimals(
-                state.products.reduce(
+        case actions.CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY:
+            const cantidad = state.params.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0)
+            const gananciaNeta = roundTwoDecimals(
+                state.params.productos.reduce(
                     (acc, item) =>
                         acc + (
                             item.cantidadesSalientes
@@ -88,32 +86,35 @@ const reducer = (state = initialState, action) => {
             )
             return {
                 ...state,
-                totalCost: totalCost
+                params: { ...state.params, cantidad, gananciaNeta }
             }
-        case actions.CLEAN_INPUTS:
+        case actions.CLEAR_INPUTS:
             return {
                 ...state,
-                date: new Date(),
-                dateString: simpleDateWithHours(new Date()),
-                description: '',
-                formattedDate: formatDate(new Date())
+                datePickerValue: formatDate(new Date()),
+                params: {
+                    ...state.params,
+                    descripcion: '-- Sin descripción --',
+                    fecha: new Date(),
+                    fechaString: simpleDateWithHours(new Date()),
+                }
             }
         case actions.CLEAN_STATE:
             return initialState
         case actions.DELETE_ALL_PRODUCTS:
             return {
                 ...state,
-                products: []
-            }
-        case actions.DELETE_ID:
-            return {
-                ...state,
-                _id: null
+                params: { ...state.params, productos: [] }
             }
         case actions.DELETE_PRODUCT:
             return {
                 ...state,
-                products: state.products.filter(product => product._id !== action.payload)
+                params: {
+                    ...state.params,
+                    productos: state.params.productos.filter(
+                        product => product._id !== action.payload
+                    )
+                }
             }
         case actions.DESELECT_ALL_EXCEL_OPTIONS:
             const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
@@ -125,118 +126,68 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 activeExcelOptions: fixedOptions
             }
+        case actions.HIDE_DETAILS_MODAL:
+            return {
+                ...state,
+                detailsModalVisibility: false
+            }
         case actions.SELECT_ALL_EXCEL_OPTIONS:
             return {
                 ...state,
                 activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }]
             }
-        case actions.SET_DATE:
+        case actions.SET_DATA_FOR_DETAILS_MODAL:
             return {
                 ...state,
-                date: action.payload,
-                dateString: simpleDateWithHours(action.payload)
+                dataForDetailsModal: action.payload,
+                detailsModalVisibility: true
             }
-        case actions.SET_DESCRIPTION:
+        case actions.SET_OUTPUTS_FOR_EXCEL_REPORT:
+            const rangePickerValue = action.payload.rangePickerValueForExcelReport
             return {
                 ...state,
-                description: action.payload
+                outputsForExcelReport: action.payload.outputsForExcelReport,
+                rangePickerValueForExcelReport: rangePickerValue.includes('')
+                    ? ['', '']
+                    : [dayjs(rangePickerValue[0], 'DD-MM-YYYY'), dayjs(rangePickerValue[1], 'DD-MM-YYYY')]
+            }
+        case actions.SET_OUTPUTS_FOR_RENDER:
+            return {
+                ...state,
+                outputsForRender: action.payload.docs,
+                outputsTotalQuantity: parseInt(action.payload.totalDocs),
+                loading: false
             }
         case actions.SET_EXCEL_OPTIONS:
             return {
                 ...state,
                 activeExcelOptions: action.payload
             }
-        case actions.SET_FORMATTED_DATE:
-            const formattedDate = formatDate(action.payload)
-            return {
-                ...state,
-                formattedDate: formattedDate
-            }
         case actions.SET_LOADING:
             return {
                 ...state,
                 loading: action.payload
-            }
-        case actions.SET_NET_PROFIT:
-            const netProfit = 0
-            return {
-                ...state,
-                netProfit: netProfit
-            }
-        case actions.SET_OUTPUT:
-            return {
-                ...state,
-                _id: action.payload._id,
-                date: action.payload.fecha,
-                dateString: action.payload.dateString,
-                description: action.payload.descripcion,
-                formattedDate: formatDate(action.payload.fecha),
-                products: action.payload.productos,
-                quantity: action.payload.cantidad,
-                totalCost: action.payload.costoTotal
-            }
-        case actions.SET_OUTPUTS_FOR_EXCEL_REPORT:
-            return {
-                ...state,
-                outputsForExcelReport: action.payload
-            }
-        case actions.SET_OUTPUTS_FOR_RENDER:
-            return {
-                ...state,
-                loading: false,
-                outputsForRender: action.payload.docs,
-                outputsTotalQuantity: parseInt(action.payload.totalDocs)
             }
         case actions.SET_PAGINATION_PARAMS:
             return {
                 ...state,
                 paginationParams: action.payload
             }
+        case actions.SET_PARAMS:
+            return {
+                ...state,
+                datePickerValue: formatDate(action.payload.fecha),
+                params: action.payload
+            }
         case actions.SET_PRODUCT:
-            if (state.products.find(product => product._id === action.payload._id)) return state
+            if (state.params.productos.find(product => product._id === action.payload._id)) return state
             action.payload.cantidadesSalientes = 0
             return {
                 ...state,
-                products: [...state.products, action.payload]
-            }
-        case actions.SET_PRODUCT_BARCODE:
-            const fixedProductsBarcode = state.products.map(product => {
-                if (product._id === action.payload.productID) {
-                    product.codigoBarras = action.payload.barcode
+                params: {
+                    ...state.params,
+                    productos: [...state.params.productos, action.payload]
                 }
-                return product
-            })
-            return {
-                ...state,
-                products: fixedProductsBarcode
-            }
-        case actions.SET_PRODUCT_NAME:
-            const fixedProductsName = state.products.map(product => {
-                if (product._id === action.payload.productID) {
-                    product.nombre = action.payload.name
-                }
-                return product
-            })
-            return {
-                ...state,
-                products: fixedProductsName
-            }
-        case actions.SET_PRODUCT_QUANTITY:
-            const fixedProductsQuantity = state.products.map(product => {
-                if (product._id === action.payload.productID) {
-                    product.cantidadesSalientes = action.payload.quantity
-                }
-                return product
-            })
-            return {
-                ...state,
-                products: fixedProductsQuantity
-            }
-        case actions.SET_QUANTITY:
-            const quantity = state.products.reduce((acc, item) => acc + item.cantidadesSalientes, 0)
-            return {
-                ...state,
-                quantity: quantity
             }
         default:
             return state
@@ -244,9 +195,9 @@ const reducer = (state = initialState, action) => {
 }
 
 const outputs = {
-    initialState,
     actions,
-    reducer,
+    initialState,
+    reducer
 }
 
 export default outputs

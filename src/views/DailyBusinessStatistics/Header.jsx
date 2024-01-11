@@ -147,9 +147,9 @@ const Header = () => {
                 const dateString = simpleDateWithHours(date)
                 const filters_entriesAndOutputs = generateFilters_entriesAndOutputs(date)
                 const filters_sales = generateFilters_sales(date)
-                const findEntries = await api.entradas.findByDate(filters_entriesAndOutputs)
-                const findOutputs = await api.salidas.findByDate(filters_entriesAndOutputs)
-                const findSales = await api.ventas.findByDate(filters_sales)
+                const findEntries = await api.entradas.findAllByFilters(filters_entriesAndOutputs)
+                const findOutputs = await api.salidas.findAllByFilters(filters_entriesAndOutputs)
+                const findSales = await api.ventas.findAllByFilters(filters_sales)
                 const records = [...findEntries.docs, ...findOutputs.docs, ...findSales.docs]
                 return { date, dateString, records }
             })

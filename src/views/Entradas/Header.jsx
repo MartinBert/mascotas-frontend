@@ -2,14 +2,12 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// Custom Components
-import InputHidden from '../../components/generics/InputHidden'
-
-// Custom Components
+// Custom Contexts
+import actions from '../../actions'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, DatePicker, Input, InputNumber, Row, Select } from 'antd'
+import { Button, Col, DatePicker, Input, Row, Select } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -18,6 +16,7 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
+const { formatFindFilters, nullifyFilters } = actions.paginationParams
 const { useEntriesContext } = contexts.Entries
 const { RangePicker } = DatePicker
 const { addDays } = helpers.dateHelper
@@ -30,9 +29,33 @@ const Header = () => {
     const navigate = useNavigate()
     const [entries_state, entries_dispatch] = useEntriesContext()
 
+    // ------------------------------ Button to clean filters -------------------------------- //
+    const cleanFilters = () => {
+        const filters = nullifyFilters(entries_state.paginationParams.filters)
+        const paginationParams = { ...entries_state.paginationParams, filters, page: 1 }
+        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const buttonToCleanFilters = (
+        <Button
+            danger
+            onClick={cleanFilters}
+            style={{ width: '100%' }}
+            type='primary'
+        >
+            Limpiar filtros
+        </Button>
+    )
+
     // ------------------------------ Button to export Excel -------------------------------- //
     const processExcelLines = async (columnHeaders) => {
-        const entriesForReport = entries_state.entriesForExcelReport
+        let entriesForReport
+        if (entries_state.entriesForExcelReport.length > 0) {
+            entriesForReport = entries_state.entriesForExcelReport
+        } else {
+            const findAllFilteredEntries = await api.entradas.findAllByFilters(formatFindFilters(entries_state.paginationParams.filters))
+            entriesForReport = findAllFilteredEntries.docs
+        }
         const processedLines = []
         for await (let entrada of entriesForReport) {
             const productosString = entrada.productos.reduce((acc, item) => {
@@ -83,20 +106,21 @@ const Header = () => {
     )
 
     // ---------------------------- Range picker to export Excel ----------------------------- //
-    const fetchEntradasByDates = async (arrayOfDates) => {
-        let data
-        let entries
-        if (!arrayOfDates) {
-            data = await api.entradas.findPaginated({ ...entries_state.paginationParams, filters: null })
-            entries = data.docs
-        } else {
+    const fetchEntradasByDates = async (arrayOfDates, rangeDatesString) => {
+        let findEntries
+        if (!arrayOfDates) findEntries = { docs: [] }
+        else {
             const initialDate = (addDays(arrayOfDates[0].$d, 0)).toISOString()
             const finalDate = (addDays(arrayOfDates[1].$d, 1)).toISOString()
             const dateFilters = JSON.stringify({ fecha: { $gte: initialDate, $lte: finalDate } })
-            data = await api.entradas.findByDatesRange(dateFilters)
-            entries = data.docs
+            findEntries = await api.entradas.findAllByFilters(dateFilters)
         }
-        return entries_dispatch({ type: 'SET_ENTRIES_FOR_EXCEL_REPORT', payload: entries })
+        const entriesForExcelReport = findEntries.docs
+        const rangePickerValueForExcelReport = rangeDatesString
+        return entries_dispatch({
+            type: 'SET_ENTRIES_FOR_EXCEL_REPORT',
+            payload: { entriesForExcelReport, rangePickerValueForExcelReport }
+        })
     }
 
     const rangePickerToExportExcel = (
@@ -104,6 +128,7 @@ const Header = () => {
             format='DD-MM-YYYY'
             onChange={fetchEntradasByDates}
             style={{ width: '100%' }}
+            value={entries_state.rangePickerValueForExcelReport}
         />
     )
 
@@ -158,7 +183,10 @@ const Header = () => {
 
     // --------- Filter entries by date ---------- //
     const onChangeDate = (e) => {
-        const dateFilter = e.target.value === '' ? null : e.target.value
+        const ifNotNumbersOrBar = /[^0-9\/]/gm
+        const dateFilter = e.target.value === ''
+            ? null
+            : e.target.value.replace(ifNotNumbersOrBar, '')
         const filters = { fechaString: dateFilter }
         dispatchPaginationParams(filters)
     }
@@ -168,12 +196,16 @@ const Header = () => {
             type='primary'
             placeholder='Buscar por fecha'
             onChange={onChangeDate}
+            value={entries_state.paginationParams.filters.fechaString}
         />
     )
 
     // ------ Filter entries by description ------ //
     const onChangeDescription = (e) => {
-        const descriptionFilter = e.target.value === '' ? null : e.target.value
+        const ifSpecialCharacter = /\W/gm
+        const descriptionFilter = e.target.value === ''
+            ? null
+            : e.target.value.replace(ifSpecialCharacter, '')
         const filters = { descripcion: descriptionFilter }
         dispatchPaginationParams(filters)
     }
@@ -183,23 +215,28 @@ const Header = () => {
             type='primary'
             placeholder='Buscar por descripción'
             onChange={onChangeDescription}
+            value={entries_state.paginationParams.filters.descripcion}
         />
     )
 
     // -------- Filter entries by import --------- //
     const onChangeMaxImport = (e) => {
+        const ifNotNumber = /\D/gm
+        const value = e.target.value
         const totalCostFilter = entries_state.paginationParams.filters.costoTotal
         const existPreviousMin = existsProperty(totalCostFilter, '$gte')
         const minImport = existPreviousMin ? { $gte: totalCostFilter.$gte } : null
-        const maxImport = e ? { $lte: e } : null
+        const maxImport = value !== '' ? { $lte: value.replace(ifNotNumber, '') } : null
         const filtersData = { costoTotal: (!minImport && !maxImport) ? null : { ...minImport, ...maxImport } }
         dispatchPaginationParams(filtersData)
     }
 
     const onChangeMinImport = (e) => {
+        const ifNotNumber = /\D/gm
+        const value = e.target.value
         const totalCostFilter = entries_state.paginationParams.filters.costoTotal
         const existPreviousMax = existsProperty(totalCostFilter, '$lte')
-        const minImport = e ? { $gte: e } : null
+        const minImport = value !== '' ? { $gte: value.replace(ifNotNumber, '') } : null
         const maxImport = existPreviousMax ? { $lte: totalCostFilter.$lte } : null
         const filtersData = { costoTotal: (!minImport && !maxImport) ? null : { ...minImport, ...maxImport } }
         dispatchPaginationParams(filtersData)
@@ -208,19 +245,29 @@ const Header = () => {
     const filterByImport = (
         <Row gutter={8}>
             <Col span={12}>
-                <InputNumber
+                <Input
                     type='primary'
                     placeholder='Importe mínimo'
                     onChange={onChangeMinImport}
                     style={{ width: '100%' }}
+                    value={
+                        entries_state.paginationParams.filters.costoTotal
+                            ? entries_state.paginationParams.filters.costoTotal.$gte
+                            : null
+                    }
                 />
             </Col>
             <Col span={12}>
-                <InputNumber
+                <Input
                     type='primary'
                     placeholder='Importe máximo'
                     onChange={onChangeMaxImport}
                     style={{ width: '100%' }}
+                    value={
+                        entries_state.paginationParams.filters.costoTotal
+                            ? entries_state.paginationParams.filters.costoTotal.$lte
+                            : null
+                    }
                 />
             </Col>
         </Row>
@@ -234,37 +281,37 @@ const Header = () => {
         },
         {
             element: filterByDescription,
-            order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
+            order: { lg: 2, md: 2, sm: 5, xl: 2, xs: 5, xxl: 2 }
         },
         {
             element: buttonToExportExcel,
-            order: { lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 3 }
+            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
         {
             element: filterByDate,
-            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
+            order: { lg: 4, md: 4, sm: 6, xl: 4, xs: 6, xxl: 4 }
         },
         {
             element: rangePickerToExportExcel,
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
             element: filterByImport,
-            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
+            order: { lg: 6, md: 6, sm: 7, xl: 6, xs: 7, xxl: 6 }
         },
         {
             element: selectOptionsToExportExcel,
-            order: { lg: 7, md: 7, sm: 7, xl: 7, xs: 7, xxl: 7 }
+            order: { lg: 7, md: 7, sm: 4, xl: 7, xs: 4, xxl: 7 }
         },
         {
-            element: <InputHidden />,
+            element: buttonToCleanFilters,
             order: { lg: 8, md: 8, sm: 8, xl: 8, xs: 8, xxl: 8 }
         }
     ]
 
     const responsiveGrid = {
         gutter: { horizontal: 24, vertical: 8 },
-        span: { lg: 12, md: 24, sm: 24, xl: 12, xs: 24, xxl: 12 }
+        span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
     }
 
 
