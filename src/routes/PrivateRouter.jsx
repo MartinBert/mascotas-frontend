@@ -4,6 +4,7 @@ import ClientesForm from '../views/Clientes/ClientesForm'
 import CondicionesFiscales from '../views/CondicionesFiscales'
 import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm'
 import DailyBusinessStatistics from '../views/DailyBusinessStatistics'
+import DailyBusinessStatisticsGraphics from '../views/DailyBusinessStatistics/DailyBusinessStatisticsGraphics'
 import Documentos from '../views/Documentos'
 import DocumentosForm from '../views/Documentos/DocumentosForm'
 import Empresas from '../views/Empresas'
@@ -11,7 +12,6 @@ import EmpresasForm from '../views/Empresas/EmpresasForm'
 import Entradas from '../views/Entradas'
 import EntradasForm from '../views/Entradas/EntradasForm'
 import FormatPrivateComponent from './FormatPrivateComponent'
-import Graphics from '../views/DailyBusinessStatistics/Graphics'
 import Home from '../views/Home'
 import Marcas from '../views/Marcas'
 import MarcasForm from '../views/Marcas/MarcasForm'
@@ -21,7 +21,8 @@ import Productos from '../views/Productos'
 import ProductosForm from '../views/Productos/ProductosForm'
 import PuntosVenta from '../views/PuntosVenta'
 import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm'
-import QuantitiesOfProducts from '../views/DailyBusinessStatistics/QuantitiesOfProducts'
+import ProductStockHistory from '../views/ProductStockHistory'
+import ProductStockHistoryGraphics from '../views/ProductStockHistory/ProductStockHistoryGraphics'
 import Rubros from '../views/Rubros'
 import RubrosForm from '../views/Rubros/RubrosForm'
 import Salidas from '../views/Salidas'
@@ -235,41 +236,48 @@ const privateRoutesPreData = [
     },
     {
         activeKey: '14',
-        element: <QuantitiesOfProducts />,
-        onlySuperadmin: true,
-        path: '/daily_business_statistics/quantities_of_products',
-        private: true
-    },
-    {
-        activeKey: '15',
-        element: <Graphics />,
+        element: <DailyBusinessStatisticsGraphics />,
         onlySuperadmin: true,
         path: '/daily_business_statistics/graphics',
         private: true
     },
     {
+        activeKey: '15',
+        element: <ProductStockHistory />,
+        onlySuperadmin: true,
+        path: '/product_stock_history/stock_history',
+        private: true
+    },
+    {
         activeKey: '16',
+        element: <ProductStockHistoryGraphics />,
+        onlySuperadmin: true,
+        path: '/product_stock_history/graphics',
+        private: true
+    },
+    {
+        activeKey: '17',
         element: <Usuarios />,
         onlySuperadmin: true,
         path: '/usuarios',
         private: true
     },
     {
-        activeKey: '17',
+        activeKey: '18',
         element: <Empresas />,
         onlySuperadmin: true,
         path: '/empresas',
         private: true
     },
     {
-        activeKey: '18',
+        activeKey: '19',
         element: <PuntosVenta />,
         onlySuperadmin: true,
         path: '/puntosventa',
         private: true
     },
     {
-        activeKey: '19',
+        activeKey: '20',
         element: <CondicionesFiscales />,
         onlySuperadmin: true,
         path: '/condicionesfiscales',

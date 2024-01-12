@@ -20,7 +20,7 @@ import api from '../../services'
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 
 
-const Graphics = () => {
+const DailyBusinessStatisticsGraphics = () => {
     const [
         dailyBusinessStatistics_state,
         dailyBusinessStatistics_dispatch
@@ -39,4 +39,4 @@ const Graphics = () => {
     )
 }
 
-export default Graphics
+export default DailyBusinessStatisticsGraphics

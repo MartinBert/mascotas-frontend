@@ -7,6 +7,12 @@ const completeLengthWithZero = (value, length) => {
     return value
 }
 
+const regExp = {
+    ifNotNumber: /\D/gm,
+    ifNotNumbersOrBar: /[^0-9\/]/gm,
+    ifSpecialCharacter: /\W/gm
+}
+
 const replaceFor = (string, segment, newSegment) => {
     const newString = string.replaceAll(segment, newSegment)
     return newString
@@ -14,6 +20,7 @@ const replaceFor = (string, segment, newSegment) => {
 
 const stringHelper = {
     completeLengthWithZero,
+    regExp,
     replaceFor
 }
 

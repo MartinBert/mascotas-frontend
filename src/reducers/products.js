@@ -1,9 +1,16 @@
 const actions = {
+    CLEAR_FILTERS: 'CLEAR_FILTERS',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
     HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
+    SET_ACTIVE_BRAND: 'SET_ACTIVE_BRAND',
+    SET_ACTIVE_TYPE: 'SET_ACTIVE_TYPE',
+    SET_BRANDS_AND_TYPES: 'SET_BRANDS_AND_TYPES',
+    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS',
+    SET_LOADING: 'SET_LOADING',
+    SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PRODUCT_FOR_DETAILS_MODAL: 'SET_PRODUCT_FOR_DETAILS_MODAL',
-    SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS'
+    SET_PRODUCTS_FOR_RENDER: 'SET_PRODUCTS_FOR_RENDER',
 }
 
 const initialState = {
@@ -32,12 +39,39 @@ const initialState = {
         'Unidad de medida',
         'Fraccionamiento',
     ],
+    brandsForSelectOptions: {
+        allBrands: [],
+        selectedBrand: null
+    },
+    loading: true,
+    paginationParams: {
+        filters: {
+            nombre: null,
+            codigoBarras: null,
+            codigoProducto: null,
+            marca: null,
+            rubro: null
+        },
+        limit: 10,
+        page: 1
+    },
     productDetailsModalVisibility: false,
-    productForDetailsModal: null
+    productForDetailsModal: null,
+    productsForRender: [],
+    typesForSelectOptions: {
+        allTypes: [],
+        selectedType: null
+    },
 }
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
+        case actions.CLEAR_FILTERS:
+            return {
+                ...state,
+                productDetailsModalVisibility: false,
+                productForDetailsModal: null
+            }
         case actions.DESELECT_ALL_EXCEL_OPTIONS:
             const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
             const optionsValues = notAllOptions.map(option => option.value)
@@ -59,16 +93,61 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }]
             }
+        case actions.SET_ACTIVE_BRAND:
+            return {
+                ...state,
+                brandsForSelectOptions: {
+                    ...state.brandsForSelectOptions,
+                    selectedBrand: action.payload
+                }
+            }
+        case actions.SET_ACTIVE_TYPE:
+            return {
+                ...state,
+                typesForSelectOptions: {
+                    ...state.typesForSelectOptions,
+                    selectedType: action.payload
+                }
+            }
+        case actions.SET_BRANDS_AND_TYPES:
+            const allBrands = action.payload.allBrands.map(brand => {
+                return { value: brand.nombre }
+            })
+            const allTypes = action.payload.allTypes.map(type => {
+                return { value: type.nombre }
+            })
+            return {
+                ...state,
+                brandsForSelectOptions: { ...state.brandsForSelectOptions, allBrands },
+                typesForSelectOptions: { ...state.typesForSelectOptions, allTypes }
+            }
+        case actions.SET_EXCEL_OPTIONS:
+            return {
+                ...state,
+                activeExcelOptions: action.payload
+            }
+        case actions.SET_LOADING:
+            return {
+                ...state,
+                loading: action.payload
+            }
+        case actions.SET_PAGINATION_PARAMS:
+            return {
+                ...state,
+                paginationParams: action.payload
+            }
         case actions.SET_PRODUCT_FOR_DETAILS_MODAL:
             return {
                 ...state,
                 productDetailsModalVisibility: true,
                 productForDetailsModal: action.payload
             }
-        case actions.SET_EXCEL_OPTIONS:
+        case actions.SET_PRODUCTS_FOR_RENDER:
             return {
                 ...state,
-                activeExcelOptions: action.payload
+                loading: false,
+                productsForRender: action.payload.docs,
+                productsTotalRecords: action.payload.totalDocs
             }
         default:
             return state

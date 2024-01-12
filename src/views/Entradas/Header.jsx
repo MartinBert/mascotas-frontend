@@ -23,6 +23,8 @@ const { addDays } = helpers.dateHelper
 const { exportSimpleExcel } = helpers.excel
 const { simpleDateWithHours } = helpers.dateHelper
 const { existsProperty } = helpers.objHelper
+const { regExp } = helpers.stringHelper
+const { ifNotNumber, ifNotNumbersOrBar, ifSpecialCharacter } = regExp
 
 
 const Header = () => {
@@ -183,7 +185,6 @@ const Header = () => {
 
     // --------- Filter entries by date ---------- //
     const onChangeDate = (e) => {
-        const ifNotNumbersOrBar = /[^0-9\/]/gm
         const dateFilter = e.target.value === ''
             ? null
             : e.target.value.replace(ifNotNumbersOrBar, '')
@@ -202,7 +203,6 @@ const Header = () => {
 
     // ------ Filter entries by description ------ //
     const onChangeDescription = (e) => {
-        const ifSpecialCharacter = /\W/gm
         const descriptionFilter = e.target.value === ''
             ? null
             : e.target.value.replace(ifSpecialCharacter, '')
@@ -221,7 +221,6 @@ const Header = () => {
 
     // -------- Filter entries by import --------- //
     const onChangeMaxImport = (e) => {
-        const ifNotNumber = /\D/gm
         const value = e.target.value
         const totalCostFilter = entries_state.paginationParams.filters.costoTotal
         const existPreviousMin = existsProperty(totalCostFilter, '$gte')
@@ -232,7 +231,6 @@ const Header = () => {
     }
 
     const onChangeMinImport = (e) => {
-        const ifNotNumber = /\D/gm
         const value = e.target.value
         const totalCostFilter = entries_state.paginationParams.filters.costoTotal
         const existPreviousMax = existsProperty(totalCostFilter, '$lte')

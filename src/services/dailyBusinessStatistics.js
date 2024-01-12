@@ -39,10 +39,10 @@ const findAll = async () => {
     }
 }
 
-const findByDate = async (dateFilters) => {
+const findAllByFilters = async (filters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics?filters=${dateFilters}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics?filters=${filters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -54,17 +54,6 @@ const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findByImport = async (importFilters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics?filters=${importFilters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -121,9 +110,8 @@ const dailyBusinessStatistics = {
     deleteDailyBusinessStatistics,
     edit,
     findAll,
-    findByDate,
+    findAllByFilters,
     findById,
-    findByImport,
     findNewerRecord,
     findOldestRecord,
     findPaginated,

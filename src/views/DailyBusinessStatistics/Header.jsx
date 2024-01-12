@@ -420,7 +420,6 @@ const Header = () => {
                         </Button>
                     </Col>
                 </Row>
-
             </Col>
             <Col span={24}>
                 <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>
