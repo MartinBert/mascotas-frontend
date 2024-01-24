@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react'
 
 // Custom Components
-import { errorAlert, successAlert } from '../../components/alerts'
 import OpenImage from '../../components/generics/openImage/OpenImage'
 
 // Custom Contexts
@@ -10,13 +9,14 @@ import actions from '../../actions'
 import contexts from '../../contexts'
 
 // Design Components
-import { Col, Row, Table } from 'antd'
+import { Button, Col, Row, Spin, Table } from 'antd'
 
 // Services
 import api from '../../services'
 
 // Views
 import Header from './Header'
+import ProductStockHistoryModal from './ProductStockHistoryModal'
 
 // Imports Destructurings
 const { formatFindParams } = actions.paginationParams
@@ -27,21 +27,25 @@ const ProductStockHistory = () => {
 	const [products_state, products_dispatch] = useProductsContext()
 
 	// --------------------- Actions --------------------- //
-    const setLimit = (val) => {
-        const paginationParams = {
-            ...products_state.paginationParams,
-            limit: parseInt(val)
-        }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
+	const openProductStockHistory = (product) => {
+		products_dispatch({ type: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL', payload: product })
+	}
 
-    const setPage = (e) => {
-        const paginationParams = {
-            ...products_state.paginationParams,
-            page: parseInt(e)
-        }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
+	const setLimit = (val) => {
+		const paginationParams = {
+			...products_state.paginationParams,
+			limit: parseInt(val)
+		}
+		products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+	}
+
+	const setPage = (e) => {
+		const paginationParams = {
+			...products_state.paginationParams,
+			page: parseInt(e)
+		}
+		products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+	}
 
 	// ------------------ Fetch Products ------------------ //
 	useEffect(() => {
@@ -73,27 +77,31 @@ const ProductStockHistory = () => {
 		{
 			dataIndex: 'productStockHistory_image',
 			render: (_, product) => (
-                <OpenImage
-                    alt='Ver imagen'
-                    imageUrl={
-                        (product.imagenes && product.imagenes.length > 0)
-                            ? product.imagenes[product.imagenes.length - 1].url
-                            : '/no-image.png'
-                    }
-                />
-            ),
+				<OpenImage
+					alt='Ver imagen'
+					imageUrl={
+						(product.imagenes && product.imagenes.length > 0)
+							? product.imagenes[product.imagenes.length - 1].url
+							: '/no-image.png'
+					}
+				/>
+			),
 			title: 'Imagen'
 		},
 		{
 			dataIndex: 'productStockHistory_stockHistory',
 			render: (_, product) => {
 				return (
-					<div>
-						Próximamente...
-					</div>
+					<Button
+						onClick={() => openProductStockHistory(product)}
+						style={{ width: '100%' }}
+						type='primary'
+					>
+						Abrir historial
+					</Button>
 				)
 			},
-			title: 'Historial'
+			title: 'Historial de stock'
 		}
 	]
 
@@ -121,6 +129,13 @@ const ProductStockHistory = () => {
 					size='small'
 					loading={products_state.loading}
 				/>
+			</Col>
+			<Col span={24}>
+				{
+					!products_state.productForStockHistoryModal
+						? null
+						: <ProductStockHistoryModal />
+				}
 			</Col>
 		</Row>
 	)

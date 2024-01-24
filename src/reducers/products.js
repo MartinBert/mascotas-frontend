@@ -2,6 +2,7 @@ const actions = {
     CLEAR_FILTERS: 'CLEAR_FILTERS',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
     HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
+    HIDE_PRODUCT_STOCK_HISTORY_MODAL: 'HIDE_PRODUCT_STOCK_HISTORY_MODAL',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
     SET_ACTIVE_BRAND: 'SET_ACTIVE_BRAND',
     SET_ACTIVE_TYPE: 'SET_ACTIVE_TYPE',
@@ -10,7 +11,10 @@ const actions = {
     SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PRODUCT_FOR_DETAILS_MODAL: 'SET_PRODUCT_FOR_DETAILS_MODAL',
+    SET_PRODUCT_FOR_STOCK_HISTORY_MODAL: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL',
     SET_PRODUCTS_FOR_RENDER: 'SET_PRODUCTS_FOR_RENDER',
+    SET_STOCK_HISTORY_FOR_RENDER: 'SET_STOCK_HISTORY_FOR_RENDER',
+    SET_STOCK_HISTORY_PAGINATION_PARAMS: 'SET_STOCK_HISTORY_PAGINATION_PARAMS'
 }
 
 const initialState = {
@@ -57,7 +61,21 @@ const initialState = {
     },
     productDetailsModalVisibility: false,
     productForDetailsModal: null,
+    productForStockHistoryModal: [],
+    productStockHistoryModalVisibility: false,
     productsForRender: [],
+    productsTotalRecords: 0,
+    productsStockHistoryTotalRecords: 0,
+    stockHistoryForRender: [],
+    stockHistoryLoading: true,
+    stockHistoryPaginationParams: {
+        filters: {
+            dateString: null,
+        },
+        limit: 10,
+        page: 1
+    },
+    stockHistoryTotalRecords: 0,
     typesForSelectOptions: {
         allTypes: [],
         selectedType: null
@@ -87,6 +105,12 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 productDetailsModalVisibility: false,
                 productForDetailsModal: null
+            }
+        case actions.HIDE_PRODUCT_STOCK_HISTORY_MODAL:
+            return {
+                ...state,
+                productStockHistoryModalVisibility: false,
+                productForStockHistoryModal: null
             }
         case actions.SELECT_ALL_EXCEL_OPTIONS:
             return {
@@ -142,12 +166,30 @@ const reducer = (state = initialState, action) => {
                 productDetailsModalVisibility: true,
                 productForDetailsModal: action.payload
             }
+        case actions.SET_PRODUCT_FOR_STOCK_HISTORY_MODAL:
+            return {
+                ...state,
+                productStockHistoryModalVisibility: true,
+                productForStockHistoryModal: action.payload
+            }
         case actions.SET_PRODUCTS_FOR_RENDER:
             return {
                 ...state,
                 loading: false,
                 productsForRender: action.payload.docs,
                 productsTotalRecords: action.payload.totalDocs
+            }
+        case actions.SET_STOCK_HISTORY_FOR_RENDER:
+            return {
+                ...state,
+                stockHistoryLoading: false,
+                stockHistoryForRender: action.payload.docs,
+                stockHistoryTotalRecords: action.payload.totalDocs
+            }
+        case actions.SET_STOCK_HISTORY_PAGINATION_PARAMS:
+            return {
+                ...state,
+                stockHistoryPaginationParams: action.payload
             }
         default:
             return state

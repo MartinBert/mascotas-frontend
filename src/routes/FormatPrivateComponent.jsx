@@ -84,8 +84,8 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const businessStatisticsMenu = [
         auth_state.user.perfil ? getItem('13', 'Balance diario', <FaChartLine />, '/daily_business_statistics/daily_balance') : null,
         auth_state.user.perfil ? getItem('14', 'Gráficos de balance diario', <FaChartPie />, '/daily_business_statistics/graphics') : null,
-        auth_state.user.perfil ? getItem('15', 'Historial de stock de productos', <FaBalanceScale />, '/product_stock_history/stock_history') : null,
-        auth_state.user.perfil ? getItem('16', 'Gráficos de historial de stock', <FaChartPie />, '/product_stock_history/graphics') : null,
+        // auth_state.user.perfil ? getItem('15', 'Historial de stock de productos', <FaBalanceScale />, '/stock_history/history') : null,
+        // auth_state.user.perfil ? getItem('16', 'Gráficos de historial de stock', <FaChartPie />, '/stock_history/graphics') : null,
     ]
 
     const configurationMenu = [

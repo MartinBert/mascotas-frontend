@@ -245,14 +245,14 @@ const privateRoutesPreData = [
         activeKey: '15',
         element: <ProductStockHistory />,
         onlySuperadmin: true,
-        path: '/product_stock_history/stock_history',
+        path: '/stock_history/history',
         private: true
     },
     {
         activeKey: '16',
         element: <ProductStockHistoryGraphics />,
         onlySuperadmin: true,
-        path: '/product_stock_history/graphics',
+        path: '/stock_history/graphics',
         private: true
     },
     {

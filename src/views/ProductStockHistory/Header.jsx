@@ -1,10 +1,6 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
 
-// Custom Components
-import { errorAlert, successAlert } from '../../components/alerts'
-import InputHidden from '../../components/generics/InputHidden'
-
 // Custom Contexts
 import actions from '../../actions'
 import contexts from '../../contexts'
