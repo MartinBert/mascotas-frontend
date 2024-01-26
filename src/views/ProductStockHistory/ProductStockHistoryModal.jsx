@@ -52,6 +52,8 @@ const ProductStockHistoryModal = () => {
     const fetchStockHistory = async () => {
         const findStockHistory = formatFindParams(products_state.stockHistoryPaginationParams)
         const data = await api.stockHistory.findPaginated(findStockHistory)
+        if (!data) return console.log('falló')
+        console.log(data)
         products_dispatch({ type: 'SET_STOCK_HISTORY_FOR_RENDER', payload: data })
     }
 

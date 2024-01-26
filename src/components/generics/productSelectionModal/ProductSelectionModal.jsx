@@ -111,7 +111,7 @@ const ProductSelectionModal = () => {
             dataIndex: 'productSelectionModal_actions',
             render: (_, product) => (
                 <Checkbox
-                    checked={product_state().params.products.includes(product) ? true : false}
+                    checked={product_state().params.productos.includes(product) ? true : false}
                     onChange={e => checkProduct(e, product)}
                 />
             ),

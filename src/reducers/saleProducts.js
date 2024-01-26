@@ -1,6 +1,6 @@
 const initialState = {
     params: {
-        products: []
+        productos: []
     }
 }
 
@@ -16,14 +16,14 @@ const reducer = (state = initialState, action) => {
         case actions.DELETE_ALL_PRODUCTS:
             return {
                 ...state,
-                params: { ...state.params, products: [] }
+                params: { ...state.params, productos: [] }
             }
         case actions.DELETE_PRODUCT:
-            const productsRemaining = state.params.products
+            const productsRemaining = state.params.productos
                 .filter(product => product._id !== action.payload)
                 .filter(product => !(product._id.startsWith('customProduct_')))
 
-            const customProductsRemaining = state.params.products
+            const customProductsRemaining = state.params.productos
                 .filter(product => product._id !== action.payload)
                 .filter(product => product._id.startsWith('customProduct_'))
                 .map((customProduct, index) => {
@@ -40,17 +40,17 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 params: { 
                     ...state.params,
-                    products: productsRemaining.concat(customProductsRemaining)
+                    productos: productsRemaining.concat(customProductsRemaining)
                 }
             }
         case actions.SET_PRODUCT:
-            if (state.params.products.find(product => product._id === action.payload._id)) return state;
+            if (state.params.productos.find(product => product._id === action.payload._id)) return state;
             return {
                 ...state,
                 params: {
                     ...state.params,
-                    products: [
-                        ...state.params.products,
+                    productos: [
+                        ...state.params.productos,
                         action.payload
                     ]
                 }
@@ -60,7 +60,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 params: {
                     ...state.params,
-                    products: state.params.products.concat(action.payload)
+                    productos: state.params.productos.concat(action.payload)
                 }
             }
         default:
@@ -68,10 +68,10 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const products = {
+const saleProducts = {
     initialState,
     actions,
     reducer
 }
 
-export default products
+export default saleProducts

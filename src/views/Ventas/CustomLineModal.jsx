@@ -64,13 +64,13 @@ const CustomLineModal = () => {
     // Set quantity of custom products saved
     useEffect(() => {
         const updateQuantityOf_saved_customProducts = () => {
-            const quantity = saleProducts_state.params.products.reduce(
+            const quantity = saleProducts_state.params.productos.reduce(
                 (acc, el) => acc + ((el._id).startsWith('customProduct_') ? 1 : 0), 0
             )
             setSavedQuantity(quantity)
         }
         updateQuantityOf_saved_customProducts()
-    }, [saleProducts_state.params.products])
+    }, [saleProducts_state.params.productos])
 
     // Set index of following custom product
     useEffect(() => {

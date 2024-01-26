@@ -71,6 +71,7 @@ const initialState = {
     stockHistoryPaginationParams: {
         filters: {
             dateString: null,
+            product: null
         },
         limit: 10,
         page: 1
@@ -170,7 +171,14 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 productStockHistoryModalVisibility: true,
-                productForStockHistoryModal: action.payload
+                productForStockHistoryModal: action.payload,
+                stockHistoryPaginationParams: {
+                    ...state.stockHistoryPaginationParams,
+                    filters: {
+                        ...state.stockHistoryPaginationParams.filters,
+                        product: action.payload._id
+                    }
+                }
             }
         case actions.SET_PRODUCTS_FOR_RENDER:
             return {
