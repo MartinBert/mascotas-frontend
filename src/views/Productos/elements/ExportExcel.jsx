@@ -18,8 +18,8 @@ const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 
 
 const ExportExcel = ({ productosToReport }) => {
-    const [products_state, products_dispatch] = useProductsContext()
-    const [salesAreas_state, salesAreas_dispatch] = useSalesAreasContext()
+    const [products_state] = useProductsContext()
+    const [salesAreas_state] = useSalesAreasContext()
 
     const sumSalesAreaPercentage = (param) => {
         const fixedParam = param

@@ -193,6 +193,7 @@ const Productos = () => {
                 span={24}
             >
                 <Header
+                    products={products}
                     setFilters={setFilters}
                     filters={filters}
                     setLoading={setLoading}

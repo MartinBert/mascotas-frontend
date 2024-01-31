@@ -28,7 +28,7 @@ const {
 } = ProductElements
 
 
-const Header = ({ setFilters, filters, setLoading, detailsData }) => {
+const Header = ({ products, setFilters, filters, setLoading, detailsData }) => {
     const [productosToReport, setProductosToReport] = useState(null)
     const [selectedBrand, setSelectedBrand] = useState(null)
     const [selectedCategory, setSelectedCategory] = useState(null)
@@ -78,7 +78,7 @@ const Header = ({ setFilters, filters, setLoading, detailsData }) => {
             order: { lg: 12, md: 12, sm: 12, xl: 12, xs: 12, xxl: 12 }
         },
         {
-            element: <ExportExcel productosToReport={productosToReport} />,
+            element: <ExportExcel productosToReport={products} />,
             name: 'product_exportExcel',
             order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },

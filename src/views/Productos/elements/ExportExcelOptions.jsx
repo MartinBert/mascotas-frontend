@@ -14,18 +14,6 @@ const { useProductsContext } = contexts.Products
 const ExportExcelOptions = () => {
     const [products_state, products_dispatch] = useProductsContext()
 
-    const changeExcelOptions = (e) => {
-        let selectedOptions
-        if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
-        else selectedOptions = e
-        products_dispatch({ type: 'SET_EXCEL_OPTIONS', payload: selectedOptions })
-    }
-
-    const selectExcelOptions = (e) => {
-        if (e.value === 'todas') products_dispatch({ type: 'SELECT_ALL_EXCEL_OPTIONS' })
-        else products_dispatch({ type: 'DESELECT_ALL_EXCEL_OPTIONS' })
-    }
-
     const selectOptions = [
         { disabled: false, label: 'Todas', value: 'todas' },
         { disabled: true, label: 'Producto', value: 'producto' },
@@ -51,6 +39,24 @@ const ExportExcelOptions = () => {
         { disabled: false, label: 'Unidad de medida', value: 'unidadMedida' },
         { disabled: false, label: 'Fraccionamiento', value: 'fraccionamiento' }
     ]
+
+    const changeExcelOptions = (e) => {
+        let selectedOptions
+        if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
+        else {
+            selectedOptions = selectOptions.map(option => {
+                const eventValues = e.map(eventOption => eventOption.value)
+                if (eventValues.includes(option.value)) return option
+                else return null
+            }).filter(option => option)
+        }
+        products_dispatch({ type: 'SET_EXCEL_OPTIONS', payload: selectedOptions })
+    }
+
+    const selectExcelOptions = (e) => {
+        if (e.value === 'todas') products_dispatch({ type: 'SELECT_ALL_EXCEL_OPTIONS' })
+        else products_dispatch({ type: 'DESELECT_ALL_EXCEL_OPTIONS' })
+    }
 
     return (
         <Select

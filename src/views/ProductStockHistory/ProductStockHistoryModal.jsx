@@ -52,8 +52,6 @@ const ProductStockHistoryModal = () => {
     const fetchStockHistory = async () => {
         const findStockHistory = formatFindParams(products_state.stockHistoryPaginationParams)
         const data = await api.stockHistory.findPaginated(findStockHistory)
-        if (!data) return console.log('falló')
-        console.log(data)
         products_dispatch({ type: 'SET_STOCK_HISTORY_FOR_RENDER', payload: data })
     }
 
@@ -65,20 +63,20 @@ const ProductStockHistoryModal = () => {
 
     const columnsForTable = [
         {
-			dataIndex: 'stockHistoryModal_period',
-			// render: (_, stockHistory) => stockHistory.date,
-			title: 'Período'
-		},
+            dataIndex: 'stockHistoryModal_date',
+            render: (_, stockHistory) => stockHistory.dateString,
+            title: 'Fecha'
+        },
         {
-			dataIndex: 'stockHistoryModal_totalEntries',
-			// render: (_, stockHistory) => stockHistory.date,
-			title: 'Entradas totales'
-		},
+            dataIndex: 'stockHistoryModal_totalEntries',
+            render: (_, stockHistory) => stockHistory.entries,
+            title: 'Cantidad entradas'
+        },
         {
-			dataIndex: 'stockHistoryModal_totalOutputs',
-			// render: (_, stockHistory) => stockHistory.date,
-			title: 'Salidas totales'
-		}
+            dataIndex: 'stockHistoryModal_totalOutputs',
+            render: (_, stockHistory) => stockHistory.outputs,
+            title: 'Cantidad salidas'
+        }
     ]
 
     const responsiveGrid = {
@@ -96,7 +94,31 @@ const ProductStockHistoryModal = () => {
         >
             <Row>
                 <Col span={24}>
-                    <h1>{products_state.productForStockHistoryModal.nombre}</h1>
+                    <Row>
+                        <Col span={8}>
+                            <h1>{products_state.productForStockHistoryModal.nombre}</h1>
+                        </Col>
+                        <Col span={8}>
+                            <Row>
+                                <Col span={24}>
+                                    <h3>Entradas última quincena: </h3>
+                                </Col>
+                                <Col span={24}>
+                                    <h3>Entradas último mes: </h3>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col span={8}>
+                            <Row>
+                                <Col span={24}>
+                                    <h3>Salidas última quincena: </h3>
+                                </Col>
+                                <Col span={24}>
+                                    <h3>Salidas último mes: </h3>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
                 </Col>
                 <Col span={24}>
                     <Table

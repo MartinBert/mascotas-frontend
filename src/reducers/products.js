@@ -41,7 +41,7 @@ const initialState = {
         'Stock',
         'Stock fraccionado',
         'Unidad de medida',
-        'Fraccionamiento',
+        'Fraccionamiento'
     ],
     brandsForSelectOptions: {
         allBrands: [],
@@ -176,7 +176,7 @@ const reducer = (state = initialState, action) => {
                     ...state.stockHistoryPaginationParams,
                     filters: {
                         ...state.stockHistoryPaginationParams.filters,
-                        product: action.payload._id
+                        product: action.payload
                     }
                 }
             }

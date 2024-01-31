@@ -135,18 +135,6 @@ const Header = () => {
     )
 
     // --------------------------- Select options to export Excel ---------------------------- //
-    const changeExcelOptions = (e) => {
-        let selectedOptions
-        if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
-        else selectedOptions = e
-        outputs_dispatch({ type: 'SET_EXCEL_OPTIONS', payload: selectedOptions })
-    }
-
-    const selectExcelOptions = (e) => {
-        if (e.value === 'todas') outputs_dispatch({ type: 'SELECT_ALL_EXCEL_OPTIONS' })
-        else outputs_dispatch({ type: 'DESELECT_ALL_EXCEL_OPTIONS' })
-    }
-
     const selectOptions = [
         { disabled: false, label: 'Todas', value: 'todas' },
         { disabled: false, label: 'Usuario', value: 'usuario' },
@@ -155,6 +143,24 @@ const Header = () => {
         { disabled: false, label: 'Productos', value: 'productos' },
         { disabled: false, label: 'Ganancia Neta', value: 'gananciaNeta' },
     ]
+
+    const changeExcelOptions = (e) => {
+        let selectedOptions
+        if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
+        else {
+            selectedOptions = selectOptions.map(option => {
+                const eventValues = e.map(eventOption => eventOption.value)
+                if (eventValues.includes(option.value)) return option
+                else return null
+            }).filter(option => option)
+        }
+        outputs_dispatch({ type: 'SET_EXCEL_OPTIONS', payload: selectedOptions })
+    }
+
+    const selectExcelOptions = (e) => {
+        if (e.value === 'todas') outputs_dispatch({ type: 'SELECT_ALL_EXCEL_OPTIONS' })
+        else outputs_dispatch({ type: 'DESELECT_ALL_EXCEL_OPTIONS' })
+    }
 
     const selectOptionsToExportExcel = (
         <Select
