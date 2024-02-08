@@ -1,6 +1,5 @@
 import axios from 'axios'
 import FormData from 'form-data'
-// var FormData = require('form-data')
 
 const checkStorageStatus = (err) => {
     if (err.status === 401 || err.status === 403) {

@@ -16,6 +16,7 @@ const ExportExcelOptions = () => {
 
     const selectOptions = [
         { disabled: false, label: 'Todas', value: 'todas' },
+        // { disabled: false, label: 'Ilustración', value: 'imagenes' },
         { disabled: true, label: 'Producto', value: 'producto' },
         { disabled: false, label: 'Rubro', value: 'rubro' },
         { disabled: false, label: 'Marca', value: 'marca' },

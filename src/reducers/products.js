@@ -1,12 +1,20 @@
 const actions = {
     CLEAR_FILTERS: 'CLEAR_FILTERS',
+    DESELECT_ALL_BRANDS: 'DESELECT_ALL_BRANDS',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
+    DESELECT_ALL_TYPES: 'DESELECT_ALL_TYPES',
+    HIDE_PRICE_MODIFICATOR_MODAL: 'HIDE_PRICE_MODIFICATOR_MODAL',
     HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
     HIDE_PRODUCT_STOCK_HISTORY_MODAL: 'HIDE_PRODUCT_STOCK_HISTORY_MODAL',
+    SELECT_ALL_BRANDS: 'SELECT_ALL_BRANDS',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
+    SELECT_ALL_TYPES: 'SELECT_ALL_TYPES',
+    SELECT_BRANDS: 'SELECT_BRANDS',
+    SELECT_TYPES: 'SELECT_TYPES',
     SET_ACTIVE_BRAND: 'SET_ACTIVE_BRAND',
     SET_ACTIVE_TYPE: 'SET_ACTIVE_TYPE',
     SET_BRANDS_AND_TYPES: 'SET_BRANDS_AND_TYPES',
+    SET_BRANDS_FOR_EXCEL_REPORT: 'SET_BRANDS_FOR_EXCEL_REPORT',
     SET_EXCEL_OPTIONS: 'SET_EXCEL_OPTIONS',
     SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
@@ -14,12 +22,15 @@ const actions = {
     SET_PRODUCT_FOR_STOCK_HISTORY_MODAL: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL',
     SET_PRODUCTS_FOR_RENDER: 'SET_PRODUCTS_FOR_RENDER',
     SET_STOCK_HISTORY_FOR_RENDER: 'SET_STOCK_HISTORY_FOR_RENDER',
-    SET_STOCK_HISTORY_PAGINATION_PARAMS: 'SET_STOCK_HISTORY_PAGINATION_PARAMS'
+    SET_STOCK_HISTORY_PAGINATION_PARAMS: 'SET_STOCK_HISTORY_PAGINATION_PARAMS',
+    SET_TYPES_FOR_EXCEL_REPORT: 'SET_TYPES_FOR_EXCEL_REPORT',
+    SHOW_PRICE_MODIFICATOR_MODAL: 'SHOW_PRICE_MODIFICATOR_MODAL'
 }
 
 const initialState = {
     activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }],
     allExcelTitles: [
+        // 'Ilustración',
         'Producto',
         'Rubro',
         'Marca',
@@ -43,9 +54,11 @@ const initialState = {
         'Unidad de medida',
         'Fraccionamiento'
     ],
-    brandsForSelectOptions: {
+    brandsForSelect: {
         allBrands: [],
-        selectedBrand: null
+        allBrandsNames: [],
+        selectedBrand: [],
+        selectedBrandsNames: [{ value: 'Todas las marcas' }]
     },
     loading: true,
     paginationParams: {
@@ -53,12 +66,13 @@ const initialState = {
             nombre: null,
             codigoBarras: null,
             codigoProducto: null,
-            marca: null,
-            rubro: null
+            marca: [],
+            rubro: []
         },
         limit: 10,
         page: 1
     },
+    priceModificatorModalVisibility: false,
     productDetailsModalVisibility: false,
     productForDetailsModal: null,
     productForStockHistoryModal: [],
@@ -77,10 +91,12 @@ const initialState = {
         page: 1
     },
     stockHistoryTotalRecords: 0,
-    typesForSelectOptions: {
+    typesForSelect: {
         allTypes: [],
-        selectedType: null
-    },
+        allTypesNames: [],
+        selectedTypes: [],
+        selectedTypesNames: [{ value: 'Todos los rubros' }],
+    }
 }
 
 const reducer = (state = initialState, action) => {
@@ -91,6 +107,16 @@ const reducer = (state = initialState, action) => {
                 productDetailsModalVisibility: false,
                 productForDetailsModal: null
             }
+        case actions.DESELECT_ALL_BRANDS:
+            const notAllBrandsNames = state.brandsForSelect.selectedBrandsNames
+                .filter(brandName => brandName.value !== 'Todas las marcas')
+            return {
+                ...state,
+                brandsForSelect: {
+                    ...state.brandsForSelect,
+                    selectedBrandsNames: notAllBrandsNames
+                }
+            }
         case actions.DESELECT_ALL_EXCEL_OPTIONS:
             const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
             const optionsValues = notAllOptions.map(option => option.value)
@@ -100,6 +126,21 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 activeExcelOptions: fixedOptions
+            }
+        case actions.DESELECT_ALL_TYPES:
+            const notAllTypesNames = state.typesForSelect.selectedTypesNames
+                .filter(typeName => typeName.value !== 'Todos los rubros')
+            return {
+                ...state,
+                typesForSelect: {
+                    ...state.typesForSelect,
+                    selectedTypesNames: notAllTypesNames
+                }
+            }
+        case actions.HIDE_PRICE_MODIFICATOR_MODAL:
+            return {
+                ...state,
+                priceModificatorModalVisibility: false
             }
         case actions.HIDE_PRODUCT_DETAILS_MODAL:
             return {
@@ -113,38 +154,98 @@ const reducer = (state = initialState, action) => {
                 productStockHistoryModalVisibility: false,
                 productForStockHistoryModal: null
             }
+        case actions.SELECT_ALL_BRANDS:
+            return {
+                ...state,
+                brandsForSelect: {
+                    ...state.brandsForSelect,
+                    selectedBrands: state.brandsForSelect.allBrands,
+                    selectedBrandsNames: [{ value: 'Todas las marcas' }]
+                }
+            }
         case actions.SELECT_ALL_EXCEL_OPTIONS:
             return {
                 ...state,
                 activeExcelOptions: [{ disabled: false, label: 'Todas', value: 'todas' }]
             }
+        case actions.SELECT_ALL_TYPES:
+            return {
+                ...state,
+                typesForSelect: {
+                    ...state.typesForSelect,
+                    selectedTypes: state.typesForSelect.allTypes,
+                    selectedTypesNames: [{ value: 'Todos los rubros' }]
+                }
+            }
         case actions.SET_ACTIVE_BRAND:
             return {
                 ...state,
-                brandsForSelectOptions: {
-                    ...state.brandsForSelectOptions,
+                brandsForSelect: {
+                    ...state.brandsForSelect,
                     selectedBrand: action.payload
                 }
             }
         case actions.SET_ACTIVE_TYPE:
             return {
                 ...state,
-                typesForSelectOptions: {
-                    ...state.typesForSelectOptions,
-                    selectedType: action.payload
+                typesForSelect: {
+                    ...state.typesForSelect,
+                    selectedTypes: action.payload
                 }
             }
         case actions.SET_BRANDS_AND_TYPES:
-            const allBrands = action.payload.allBrands.map(brand => {
-                return { value: brand.nombre }
-            })
-            const allTypes = action.payload.allTypes.map(type => {
-                return { value: type.nombre }
-            })
             return {
                 ...state,
-                brandsForSelectOptions: { ...state.brandsForSelectOptions, allBrands },
-                typesForSelectOptions: { ...state.typesForSelectOptions, allTypes }
+                brandsForSelect: {
+                    ...state.brandsForSelect,
+                    allBrands: action.payload.allBrands,
+                    allBrandsNames: action.payload.allBrandsNames
+                },
+                typesForSelect: {
+                    ...state.typesForSelect,
+                    allTypes: action.payload.allTypes,
+                    allTypesNames: action.payload.allTypesNames
+                }
+            }
+        case actions.SET_BRANDS_FOR_EXCEL_REPORT:
+            return {
+                ...state,
+                brandsForSelect: {
+                    ...state.brandsForSelect,
+                    selectedBrandsNames: action.payload
+                }
+            }
+        case actions.SELECT_BRANDS:
+            return {
+                ...state,
+                paginationParams: {
+                    ...state.paginationParams,
+                    filters: {
+                        ...state.paginationParams.filters,
+                        marca: action.payload.selectedBrands
+                    }
+                },
+                brandsForSelect: {
+                    ...state.brandsForSelect,
+                    selectedBrands: action.payload.selectedBrands,
+                    selectedBrandsNames: action.payload.selectedBrandsNames
+                }
+            }
+        case actions.SELECT_TYPES:
+            return {
+                ...state,
+                paginationParams: {
+                    ...state.paginationParams,
+                    filters: {
+                        ...state.paginationParams.filters,
+                        rubro: action.payload.selectedTypes
+                    }
+                },
+                typesForSelect: {
+                    ...state.typesForSelect,
+                    selectedTypes: action.payload.selectedTypes,
+                    selectedTypesNames: action.payload.selectedTypesNames
+                }
             }
         case actions.SET_EXCEL_OPTIONS:
             return {
@@ -198,6 +299,19 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 stockHistoryPaginationParams: action.payload
+            }
+        case actions.SET_TYPES_FOR_EXCEL_REPORT:
+            return {
+                ...state,
+                typesForSelect: {
+                    ...state.typesForSelect,
+                    selectedTypesNames: action.payload
+                }
+            }
+        case actions.SHOW_PRICE_MODIFICATOR_MODAL:
+            return {
+                ...state,
+                priceModificatorModalVisibility: true
             }
         default:
             return state

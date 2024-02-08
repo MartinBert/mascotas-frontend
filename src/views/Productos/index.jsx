@@ -23,8 +23,10 @@ import Header from './Header'
 
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
+const { formatFindParams } = actions.paginationParams
 const { useAuthContext } = contexts.Auth
 const { useDeleteModalContext } = contexts.DeleteModal
+const { useProductsContext } = contexts.Products
 const { Details, Edit, Delete } = icons
 
 
@@ -32,14 +34,27 @@ const Productos = () => {
     const navigate = useNavigate()
     const [, auth_dispatch] = useAuthContext()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
-    const [loading, setLoading] = useState(true)
-    const [products, setProducts] = useState(null)
-    const [page, setPage] = useState(1)
-    const [totalDocs, setTotalDocs] = useState(null)
-    const [limit, setLimit] = useState(6)
-    const [filters, setFilters] = useState(null)
+    const [products_state, products_dispatch] = useProductsContext()
+
     const [detailsVisible, setDetailsVisible] = useState(false)
     const [detailsData, setDetailsData] = useState(null)
+
+    // --------------------- Actions --------------------- //
+    const setLimit = (val) => {
+        const paginationParams = {
+            ...products_state.paginationParams,
+            limit: parseInt(val)
+        }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const setPage = (e) => {
+        const paginationParams = {
+            ...products_state.paginationParams,
+            page: parseInt(e)
+        }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
 
     // ------------------ Fetch Logged User ------------------ //
     useEffect(() => {
@@ -54,19 +69,13 @@ const Productos = () => {
     // ------------------ Fetch Products ------------------ //
     useEffect(() => {
         const fetchProducts = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.productos.findPaginated({ page, limit, filters: stringFilters })
-            setProducts(data.docs)
-            setTotalDocs(data.totalDocs)
+            const findParams = formatFindParams(products_state.paginationParams)
+            const data = await api.productos.findPaginated(findParams)
+            products_dispatch({ type: 'SET_PRODUCTS_FOR_RENDER', payload: data })
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchProducts()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+    }, [deleteModal_state.loading, products_state.paginationParams])
 
     // ------------------ Products Deletion ------------------ //
     const productDeletion = (productID) => {
@@ -88,10 +97,7 @@ const Productos = () => {
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteProduct()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Products Edition ------------------ //
     const productEdition = (id) => {
@@ -133,12 +139,8 @@ const Productos = () => {
         {
             dataIndex: 'product_details',
             render: (_, product) => (
-                <div
-                    onClick={() => seeDetails(product)}
-                >
-                    <Details
-                        title='Ver detalle'
-                    />
+                <div onClick={() => seeDetails(product)}>
+                    <Details title='Ver detalle' />
                 </div>
             ),
             open: true,
@@ -162,9 +164,7 @@ const Productos = () => {
         {
             dataIndex: 'product_actions',
             render: (_, product) => (
-                <Row
-                    justify='start'
-                >
+                <Row justify='start'>
                     <Col
                         onClick={() => productEdition(product._id)}
                         span={12}
@@ -186,31 +186,19 @@ const Productos = () => {
         .filter(item => item.open)
 
     return (
-        <Row
-            gutter={[0, 16]}
-        >
-            <Col
-                span={24}
-            >
-                <Header
-                    products={products}
-                    setFilters={setFilters}
-                    filters={filters}
-                    setLoading={setLoading}
-                    detailsData={detailsData}
-                />
+        <Row gutter={[0, 16]}>
+            <Col span={24}>
+                <Header />
             </Col>
-            <Col
-                span={24}
-            >
+            <Col span={24}>
                 <Table
                     width={'100%'}
-                    dataSource={products}
+                    dataSource={products_state.productsForRender}
                     columns={columnsForTable}
                     pagination={{
-                        defaultCurrent: page,
-                        limit: limit,
-                        total: totalDocs,
+                        defaultCurrent: products_state.paginationParams.page,
+                        limit: products_state.paginationParams.limit,
+                        total: products_state.productsTotalRecords,
                         showSizeChanger: true,
                         defaultPageSize: 7,
                         pageSizeOptions: [7, 14, 28, 56],
@@ -234,11 +222,8 @@ const Productos = () => {
                         />
                     )
             }
-            <DeleteModal
-                title='Eliminar producto'
-            />
+            <DeleteModal title='Eliminar producto' />
         </Row>
-
     )
 }
 

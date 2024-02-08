@@ -10,6 +10,9 @@ import { Button } from 'antd'
 // Helpers
 import helpers from '../../../helpers'
 
+// Services
+import api from '../../../services'
+
 // Imports Destructuring
 const { useProductsContext } = contexts.Products
 const { useSalesAreasContext } = contexts.SalesAreas
@@ -17,7 +20,7 @@ const { exportSimpleExcel } = helpers.excel
 const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 
 
-const ExportExcel = ({ productosToReport }) => {
+const ExportExcel = () => {
     const [products_state] = useProductsContext()
     const [salesAreas_state] = useSalesAreasContext()
 
@@ -66,10 +69,21 @@ const ExportExcel = ({ productosToReport }) => {
         return saleProfitPerUnitFixed
     }
 
-    const processExcelLines = async (columnHeaders, productosToReport) => {
+    const processExcelLines = async (columnHeaders) => {
         const processedLines = []
-        for await (let product of productosToReport) {
+        for await (let product of products_state.productsForRender) {
             const activeOptions = []
+
+            // if (columnHeaders.includes('Ilustración')) {
+            //     const imageID = product.imagenes.length > 0 ? product.imagenes[0]._id : null
+            //     if (imageID) {
+            //         const image = await api.uploader.getImageUrl(imageID)
+            //         activeOptions.push(image)
+            //         console.log('supImage:  ' + image)
+            //         console.log(product.imagenes[0])
+            //     } else activeOptions.push('-')
+            // }
+            
             if (columnHeaders.includes('Producto')) activeOptions.push(product.nombre ? product.nombre : '-')
             if (columnHeaders.includes('Rubro')) activeOptions.push(product.rubro ? product.rubro.nombre : '-')
             if (columnHeaders.includes('Marca')) activeOptions.push(product.marca ? product.marca.nombre : '-')
@@ -102,7 +116,7 @@ const ExportExcel = ({ productosToReport }) => {
         const nameOfSheet = 'Hoja de productos'
         const selectedHeaders = products_state.activeExcelOptions.map(option => option.label)
         const columnHeaders = selectedHeaders.includes('Todas') ? products_state.allExcelTitles : selectedHeaders
-        const lines = await processExcelLines(columnHeaders, productosToReport)
+        const lines = await processExcelLines(columnHeaders)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
     }
 

@@ -6,6 +6,9 @@ import { GenericAutocomplete } from '../../components/generics'
 import { errorAlert, successAlert } from '../../components/alerts'
 import icons from '../../components/icons'
 
+// Custom Contexts
+import contexts from '../../contexts'
+
 // Design Components
 import { Modal, Row, Col, Select, Input, Table, Checkbox } from 'antd'
 
@@ -16,16 +19,15 @@ import helper from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
+const { useProductsContext } = contexts.Products
 const { decimalPercent, roundToMultiple, roundTwoDecimals } = helper.mathHelper
 const { Delete } = icons
 const { Option } = Select
 
 
-const PriceModificatorModal = ({
-    priceModalVisible,
-    setPriceModalVisible,
-    setLoading,
-}) => {
+const PriceModificatorModal = () => {
+    const [products_state, products_dispatch] = useProductsContext()
+    
     const [brands, setBrands] = useState(null)
     const [headings, setHeadings] = useState(null)
     const [selectedBrand, setSelectedBrand] = useState(null)
@@ -95,7 +97,7 @@ const PriceModificatorModal = ({
     ])
 
     const handleOk = () => {
-        setLoading(true)
+        products_dispatch({ type: 'SET_LOADING', payload: true })
         if (!selectedModificationType)
             return errorAlert(
                 'Debe seleccionar el tipo de modificación a aplicar en el precio de los productos...'
@@ -135,7 +137,7 @@ const PriceModificatorModal = ({
             product.precioVentaFraccionado = newPrecioVentaFraccionado
             api.productos.edit(product)
         }
-        setPriceModalVisible(false)
+        products_dispatch({ type: 'HIDE_PRICE_MODIFICATOR_MODAL' })
         cleanModificator()
         successAlert('Los precios fueron modificados!').then(() => {
             window.location.reload()
@@ -233,7 +235,7 @@ const PriceModificatorModal = ({
     return (
         <Modal
             header={false}
-            open={priceModalVisible}
+            open={products_state.priceModificatorModalVisibility}
             footer={null}
             width={1200}
             closable={false}
@@ -387,7 +389,7 @@ const PriceModificatorModal = ({
                     <button
                         className='btn-secondary'
                         onClick={() => {
-                            setPriceModalVisible(false)
+                            products_dispatch({ type: 'HIDE_PRICE_MODIFICATOR_MODAL' })
                         }}
                     >
                         Cancelar

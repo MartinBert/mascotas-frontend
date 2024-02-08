@@ -110,10 +110,10 @@ const Header = () => {
             onClear={onClearBrand}
             onChange={onChangeBrand}
             onSelect={onSelectBrand}
-            options={products_state.brandsForSelectOptions.allBrands}
+            options={products_state.brandsForSelect.allBrands}
             placeholder='Buscar por marca'
             style={{ width: '100%' }}
-            value={products_state.brandsForSelectOptions.selectedBrand}
+            value={products_state.brandsForSelect.selectedBrand}
         />
     )
 
@@ -165,7 +165,7 @@ const Header = () => {
     }
 
     const onChangeType = (e) => {
-        products_dispatch({ type: 'SET_ACTIVE_TYPE', payload: { value: e } })
+        products_dispatch({ type: 'SELECT_TYPES', payload: { value: e } })
     }
 
     const onSelectType = async (e) => {
@@ -183,10 +183,10 @@ const Header = () => {
             onClear={onClearType}
             onChange={onChangeType}
             onSelect={onSelectType}
-            options={products_state.typesForSelectOptions.allTypes}
+            options={products_state.typesForSelect.allTypesNames}
             placeholder='Buscar por rubro'
             style={{ width: '100%' }}
-            value={products_state.typesForSelectOptions.selectedType}
+            value={products_state.typesForSelect.selectedTypes}
         />
     )
 

@@ -1,6 +1,9 @@
 // React Components and Hooks
 import React, { useEffect, useState } from 'react'
 
+// Custom Constexts
+import contexts from '../../contexts'
+
 // Design Components
 import { Col, Row } from 'antd'
 
@@ -12,6 +15,7 @@ import ProductElements from './elements'
 import PriceModificatorModal from './PriceModificatorModal'
 
 // Imports Destructuring
+const { useProductsContext } = contexts.Products
 const {
     CleanFilters,
     ExportExcel,
@@ -28,57 +32,41 @@ const {
 } = ProductElements
 
 
-const Header = ({ products, setFilters, filters, setLoading, detailsData }) => {
-    const [productosToReport, setProductosToReport] = useState(null)
-    const [selectedBrand, setSelectedBrand] = useState(null)
-    const [selectedCategory, setSelectedCategory] = useState(null)
-    const [priceModalVisible, setPriceModalVisible] = useState(false)
+const Header = () => {
+    const [products_state, products_dispatch] = useProductsContext()
 
-    useEffect(() => {
-        if (!selectedBrand) return
-        setFilters({
-            ...filters,
-            marca: selectedBrand
-        })
-    }, [selectedBrand])
-
-    useEffect(() => {
-        if (!selectedCategory) return
-        setFilters({
-            ...filters,
-            rubro: selectedCategory
-        })
-    }, [selectedCategory])
-
-    useEffect(() => {
-        const findProductos = async () => {
-            const data = await api.productos.findAll()
-            setProductosToReport(data.docs)
-        }
-        findProductos()
-    }, [selectedBrand, selectedCategory])
-
-    const cleanFilters = () => {
-        setSelectedBrand(null)
-        setSelectedCategory(null)
-        setFilters(null)
-    }
-
-    const updateFilters = (e) => {
-        setFilters({
-            ...filters,
-            [e.target.name]: e.target.value
+    const loadBrandsAndTypes = async () => {
+        const findBrands = await api.marcas.findAll()
+        const findTypes = await api.rubros.findAll()
+        const allBrands = findBrands.docs
+        const allBrandsNames = allBrands.length < 0
+            ? []
+            : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
+                return { value: brand.nombre }
+            }))
+        const allTypes = findTypes.docs
+        const allTypesNames = allTypes.length < 0
+            ? []
+            : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
+                return { value: type.nombre }
+            }))
+        products_dispatch({
+            type: 'SET_BRANDS_AND_TYPES',
+            payload: { allBrands, allBrandsNames, allTypes, allTypesNames }
         })
     }
+
+    useEffect(() => { loadBrandsAndTypes() }, [])
+
 
     const productsRender = [
         {
-            element: <CleanFilters cleanFilters={cleanFilters} />,
+            element: <CleanFilters />,
             name: 'product_cleanFilters',
             order: { lg: 12, md: 12, sm: 12, xl: 12, xs: 12, xxl: 12 }
         },
         {
-            element: <ExportExcel productosToReport={products} />,
+            element: <ExportExcel />,
             name: 'product_exportExcel',
             order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
@@ -97,37 +85,27 @@ const Header = ({ products, setFilters, filters, setLoading, detailsData }) => {
             order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
         },
         {
-            element: <FilterByBarcode updateFilters={updateFilters} />,
+            element: <FilterByBarcode />,
             name: 'product_filterByBarcode',
             order: { lg: 4, md: 4, sm: 8, xl: 4, xs: 8, xxl: 4 }
         },
         {
-            element: (
-                <FilterByBrand
-                    selectedBrand={selectedBrand}
-                    setSelectedBrand={setSelectedBrand}
-                />
-            ),
+            element: <FilterByBrand />,
             name: 'product_filterByBrand',
             order: { lg: 8, md: 8, sm: 10, xl: 8, xs: 10, xxl: 8 }
         },
         {
-            element: (
-                <FilterByCategory
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
-                />
-            ),
+            element: <FilterByCategory />,
             name: 'product_filterByCategory',
             order: { lg: 10, md: 10, sm: 11, xl: 10, xs: 11, xxl: 10 }
         },
         {
-            element: <FilterByName updateFilters={updateFilters} />,
+            element: <FilterByName />,
             name: 'product_filterByName',
             order: { lg: 2, md: 2, sm: 7, xl: 2, xs: 7, xxl: 2 }
         },
         {
-            element: <FilterByProductcode updateFilters={updateFilters} />,
+            element: <FilterByProductcode />,
             name: 'product_filterByProductcode',
             order: { lg: 6, md: 6, sm: 9, xl: 6, xs: 9, xxl: 6 }
         },
@@ -137,7 +115,7 @@ const Header = ({ products, setFilters, filters, setLoading, detailsData }) => {
             order: { lg: 11, md: 11, sm: 6, xl: 11, xs: 6, xxl: 11 }
         },
         {
-            element: <ModifyPrices setPriceModalVisible={setPriceModalVisible} />,
+            element: <ModifyPrices />,
             name: 'product_modifyPrices',
             order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
@@ -189,11 +167,7 @@ const Header = ({ products, setFilters, filters, setLoading, detailsData }) => {
                     )
                 })
             }
-            <PriceModificatorModal
-                priceModalVisible={priceModalVisible}
-                setPriceModalVisible={setPriceModalVisible}
-                setLoading={setLoading}
-            />
+            <PriceModificatorModal />
         </Row>
     )
 }

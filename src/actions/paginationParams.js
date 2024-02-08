@@ -8,7 +8,9 @@ const formatFindFilters = (filters) => {
         for (let index = 0; index < currentFiltersKeys.length; index++) {
             const key = currentFiltersKeys[index]
             const value = currentFiltersValues[index]
-            if (value) filtersWithoutNulls[key] = value
+            const valueIsArray = Array.isArray(value)
+            const valueIsNotEmptyArray = valueIsArray ? value.length > 0 : true
+            if (value && valueIsNotEmptyArray) filtersWithoutNulls[key] = value
         }
         formattedFilters = Object.keys(filtersWithoutNulls).length === 0
             ? null
