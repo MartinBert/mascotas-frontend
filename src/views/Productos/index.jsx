@@ -70,6 +70,7 @@ const Productos = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             const findParams = formatFindParams(products_state.paginationParams)
+            console.log(findParams)
             const data = await api.productos.findPaginated(findParams)
             products_dispatch({ type: 'SET_PRODUCTS_FOR_RENDER', payload: data })
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -200,8 +201,8 @@ const Productos = () => {
                         limit: products_state.paginationParams.limit,
                         total: products_state.productsTotalRecords,
                         showSizeChanger: true,
-                        defaultPageSize: 7,
-                        pageSizeOptions: [7, 14, 28, 56],
+                        // defaultPageSize: 7,
+                        // pageSizeOptions: [7, 14, 28, 56],
                         onChange: e => setPage(e),
                         onShowSizeChange: (e, val) => setLimit(val)
                     }}

@@ -19,7 +19,7 @@ const FilterByBrand = () => {
         let selectedBrands
         let selectedBrandsNames
         if (e.length === 0) {
-            selectedBrands = products_state.brandsForSelect.allBrands
+            selectedBrands = []
             selectedBrandsNames = [{ value: 'Todas las marcas' }]
         }
         else {

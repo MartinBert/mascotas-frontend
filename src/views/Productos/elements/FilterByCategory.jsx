@@ -19,7 +19,7 @@ const FilterByCategory = () => {
         let selectedTypes
         let selectedTypesNames
         if (e.length === 0) {
-            selectedTypes = products_state.typesForSelect.allTypes
+            selectedTypes = []
             selectedTypesNames = [{ value: 'Todos los rubros' }]
         }
         else {
