@@ -77,13 +77,18 @@ const ExportExcel = () => {
             // if (columnHeaders.includes('Ilustración')) {
             //     const imageID = product.imagenes.length > 0 ? product.imagenes[0]._id : null
             //     if (imageID) {
-            //         const image = await api.uploader.getImageUrl(imageID)
-            //         activeOptions.push(image)
-            //         console.log('supImage:  ' + image)
-            //         console.log(product.imagenes[0])
+            //         const imageUrl = await api.uploader.getImageUrl(imageID)
+            //         activeOptions.push(
+            //             <img
+            //                 crossOrigin='anonymous'
+            //                 height='70'
+            //                 src={imageUrl}
+            //                 width='70'
+            //             />
+            //         )
             //     } else activeOptions.push('-')
             // }
-            
+
             if (columnHeaders.includes('Producto')) activeOptions.push(product.nombre ? product.nombre : '-')
             if (columnHeaders.includes('Rubro')) activeOptions.push(product.rubro ? product.rubro.nombre : '-')
             if (columnHeaders.includes('Marca')) activeOptions.push(product.marca ? product.marca.nombre : '-')

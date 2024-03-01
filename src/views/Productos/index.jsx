@@ -36,10 +36,11 @@ const Productos = () => {
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [products_state, products_dispatch] = useProductsContext()
 
-    const [detailsVisible, setDetailsVisible] = useState(false)
-    const [detailsData, setDetailsData] = useState(null)
-
     // --------------------- Actions --------------------- //
+    const openDetailsModal = (productData) => {
+        products_dispatch({ type: 'SET_PRODUCT_FOR_DETAILS_MODAL', payload: productData })
+    }
+
     const setLimit = (val) => {
         const paginationParams = {
             ...products_state.paginationParams,
@@ -56,6 +57,30 @@ const Productos = () => {
         products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
+    // --------------- Fetch Brands and Types ---------------- //
+    const loadBrandsAndTypes = async () => {
+        const findBrands = await api.marcas.findAll()
+        const findTypes = await api.rubros.findAll()
+        const allBrands = findBrands.docs
+        const allBrandsNames = allBrands.length < 0
+            ? []
+            : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
+                return { value: brand.nombre }
+            }))
+        const allTypes = findTypes.docs
+        const allTypesNames = allTypes.length < 0
+            ? []
+            : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
+                return { value: type.nombre }
+            }))
+        products_dispatch({
+            type: 'SET_BRANDS_AND_TYPES',
+            payload: { allBrands, allBrandsNames, allTypes, allTypesNames }
+        })
+    }
+
+    useEffect(() => { loadBrandsAndTypes() }, [])
+
     // ------------------ Fetch Logged User ------------------ //
     useEffect(() => {
         const fetchUser = async () => {
@@ -69,10 +94,11 @@ const Productos = () => {
     // ------------------ Fetch Products ------------------ //
     useEffect(() => {
         const fetchProducts = async () => {
-            const findParams = formatFindParams(products_state.paginationParams)
-            console.log(findParams)
-            const data = await api.productos.findPaginated(findParams)
-            products_dispatch({ type: 'SET_PRODUCTS_FOR_RENDER', payload: data })
+            const findParamsForRender = formatFindParams(products_state.paginationParams)
+            const dataForRender = await api.productos.findPaginated(findParamsForRender)
+            const dataForExcelReport = await api.productos.findAllFiltered(findParamsForRender.filters)
+            products_dispatch({ type: 'SET_PRODUCTS_FOR_RENDER', payload: dataForRender })
+            products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExcelReport.docs })
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchProducts()
@@ -105,12 +131,6 @@ const Productos = () => {
         navigate(`/productos/${id}`)
     }
 
-    // ------------------ Products Details ------------------ //
-    const seeDetails = (data) => {
-        setDetailsData(data)
-        setDetailsVisible(true)
-    }
-
 
     const columnsForTable = [
         {
@@ -140,7 +160,7 @@ const Productos = () => {
         {
             dataIndex: 'product_details',
             render: (_, product) => (
-                <div onClick={() => seeDetails(product)}>
+                <div onClick={() => openDetailsModal(product)}>
                     <Details title='Ver detalle' />
                 </div>
             ),
@@ -213,15 +233,9 @@ const Productos = () => {
                 />
             </Col>
             {
-                !detailsData
+                !products_state.productForDetailsModal
                     ? null
-                    : (
-                        <GiselaDetailsModal
-                            detailsVisible={detailsVisible}
-                            setDetailsVisible={setDetailsVisible}
-                            detailsData={detailsData}
-                        />
-                    )
+                    : <GiselaDetailsModal />
             }
             <DeleteModal title='Eliminar producto' />
         </Row>

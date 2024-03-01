@@ -21,6 +21,7 @@ const actions = {
     SET_PRODUCT_FOR_DETAILS_MODAL: 'SET_PRODUCT_FOR_DETAILS_MODAL',
     SET_PRODUCT_FOR_STOCK_HISTORY_MODAL: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL',
     SET_PRODUCTS_FOR_RENDER: 'SET_PRODUCTS_FOR_RENDER',
+    SET_PRODUCTS_FOR_EXCEL_REPORT: 'SET_PRODUCTS_FOR_EXCEL_REPORT',
     SET_STOCK_HISTORY_FOR_RENDER: 'SET_STOCK_HISTORY_FOR_RENDER',
     SET_STOCK_HISTORY_PAGINATION_PARAMS: 'SET_STOCK_HISTORY_PAGINATION_PARAMS',
     SET_TYPES_FOR_EXCEL_REPORT: 'SET_TYPES_FOR_EXCEL_REPORT',
@@ -77,6 +78,7 @@ const initialState = {
     productForDetailsModal: null,
     productForStockHistoryModal: [],
     productStockHistoryModalVisibility: false,
+    productsForExcelReport: [],
     productsForRender: [],
     productsTotalRecords: 0,
     productsStockHistoryTotalRecords: 0,
@@ -171,6 +173,9 @@ const reducer = (state = initialState, action) => {
         case actions.SELECT_ALL_TYPES:
             return {
                 ...state,
+                paginationParams: {
+                    ...state.paginationParams,
+                },
                 typesForSelect: {
                     ...state.typesForSelect,
                     selectedTypes: state.typesForSelect.allTypes,
@@ -280,6 +285,11 @@ const reducer = (state = initialState, action) => {
                         product: action.payload
                     }
                 }
+            }
+        case actions.SET_PRODUCTS_FOR_EXCEL_REPORT:
+            return {
+                ...state,
+                productsForExcelReport: action.payload
             }
         case actions.SET_PRODUCTS_FOR_RENDER:
             return {

@@ -41,6 +41,17 @@ const findAll = async () => {
     }
 }
 
+const findAllFiltered = async (filters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos?filters=${filters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -121,6 +132,7 @@ const productos = {
     deleteById,
     edit,
     findAll,
+    findAllFiltered,
     findById,
     findMultipleIds,
     findPaginated,
