@@ -3,8 +3,8 @@ import dayjs from 'dayjs'
 
 
 const actions = {
-    CLEAR_STATE: 'CLEAR_STATE',
     CLEAR_INPUTS: 'CLEAR_INPUTS',
+    CLEAR_STATE: 'CLEAR_STATE',
     HIDE_FIX_STATISTICS_MODAL: 'HIDE_FIX_STATISTICS_MODAL',
     HIDE_NULL_RECORDS: 'HIDE_NULL_RECORDS',
     SAVE_DAILY_STATISTICS: 'SAVE_DAILY_STATISTICS',
@@ -20,8 +20,6 @@ const actions = {
 }
 
 const initialState = {
-    dailyStatistics_paginatedList: null,
-    dailyStatistics_totalRecords: 0,
     datePickersValues: {
         day_datePicker: null,
         day_rangePicker: null,
@@ -49,18 +47,18 @@ const initialState = {
         date: null,
         dateString: null
     },
+    recordsToRender: null,
     referenceStatistics: {
         concept: '',
         dailyProfit: 0,
         dateString: null
     },
-    showNullRecords: false
+    showNullRecords: false,
+    totalRecords: 0
 }
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case actions.CLEAR_STATE:
-            return initialState
         case actions.CLEAR_INPUTS:
             return {
                 ...state,
@@ -72,6 +70,8 @@ const reducer = (state = initialState, action) => {
                     dailyProfit: 0
                 }
             }
+        case actions.CLEAR_STATE:
+            return initialState
         case actions.HIDE_FIX_STATISTICS_MODAL:
             return {
                 ...state,
@@ -96,8 +96,8 @@ const reducer = (state = initialState, action) => {
         case actions.SET_DAILY_STATISTICS_RECORDS:
             return {
                 ...state,
-                dailyStatistics_paginatedList: action.payload.docs,
-                dailyStatistics_totalRecords: parseInt(action.payload.totalDocs),
+                recordsToRender: action.payload.docs,
+                totalRecords: parseInt(action.payload.totalDocs),
                 loading: false
             }
         case actions.SET_LOADING:

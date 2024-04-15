@@ -31,31 +31,25 @@ const ProductStockHistory = () => {
 		products_dispatch({ type: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL', payload: product })
 	}
 
-	const setLimit = (val) => {
-		const paginationParams = {
-			...products_state.paginationParams,
-			limit: parseInt(val)
-		}
-		products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-	}
-
-	const setPage = (e) => {
-		const paginationParams = {
-			...products_state.paginationParams,
-			page: parseInt(e)
-		}
-		products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-	}
+	const setPageAndLimit = (page, limit) => {
+		console.log((page, limit))
+        const paginationParams = {
+            ...products_state.stockHistory.paginationParams,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS_IN_STOCK_HISTORY', payload: paginationParams })
+    }
 
 	// ------------------ Fetch Products ------------------ //
 	useEffect(() => {
 		const fetchProducts = async () => {
-			const findParams = formatFindParams(products_state.paginationParams)
+			const findParams = formatFindParams(products_state.stockHistory.paginationParams)
 			const data = await api.productos.findPaginated(findParams)
-			products_dispatch({ type: 'SET_PRODUCTS_FOR_RENDER', payload: data })
+			products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
 		}
 		fetchProducts()
-	}, [products_state.loading, products_state.paginationParams])
+	}, [products_state.stockHistory.loading, products_state.stockHistory.paginationParams])
 
 
 	const columnsForTable = [
@@ -114,25 +108,25 @@ const ProductStockHistory = () => {
 			<Col span={24}>
 				<Table
 					width={'100%'}
-					dataSource={products_state.productsForRender}
+					dataSource={products_state.stockHistory.productsToRender}
 					columns={columnsForTable}
 					pagination={{
-						current: products_state.paginationParams.page,
-						limit: products_state.paginationParams.limit,
-						total: products_state.productsTotalRecords,
+						defaultCurrent: products_state.stockHistory.paginationParams.page,
+						defaultPageSize: products_state.stockHistory.paginationParams.limit,
+						limit: products_state.stockHistory.paginationParams.limit,
+						onChange: (page, limit) => setPageAndLimit(page, limit),
 						showSizeChanger: true,
-						onChange: e => setPage(e),
-						onShowSizeChange: (e, val) => setLimit(val)
+						total: products_state.stockHistory.totalRecords
 					}}
 					rowKey='_id'
 					tableLayout='auto'
 					size='small'
-					loading={products_state.loading}
+					loading={products_state.stockHistory.loading}
 				/>
 			</Col>
 			<Col span={24}>
 				{
-					!products_state.productForStockHistoryModal
+					!products_state.stockHistory.product
 						? null
 						: <ProductStockHistoryModal />
 				}

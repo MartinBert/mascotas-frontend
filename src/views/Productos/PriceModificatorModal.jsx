@@ -624,7 +624,7 @@ const PriceModificatorModal = () => {
     const titleOfModifies = <h3>Modificaciones</h3>
 
 
-    const productsRender = [
+    const itemsToRender = [
         {
             element: buttonToCancelModifies,
             name: 'product_buttonToCancelModifies',
@@ -731,7 +731,7 @@ const PriceModificatorModal = () => {
         >
             <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>
                 {
-                    productsRender.map(item => {
+                    itemsToRender.map(item => {
                         return (
                             <Col
                                 key={item.name}

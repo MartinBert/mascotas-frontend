@@ -28,7 +28,7 @@ const ProductStockHistoryModal = () => {
 
     const setLimit = (val) => {
         const stockHistoryPaginationParams = {
-            ...products_state.stockHistoryPaginationParams,
+            ...products_state.stockHistory.paginationParams,
             limit: parseInt(val)
         }
         products_dispatch({
@@ -39,7 +39,7 @@ const ProductStockHistoryModal = () => {
 
     const setPage = (e) => {
         const stockHistoryPaginationParams = {
-            ...products_state.stockHistoryPaginationParams,
+            ...products_state.stockHistory.paginationParams,
             page: parseInt(e)
         }
         products_dispatch({
@@ -50,14 +50,14 @@ const ProductStockHistoryModal = () => {
 
     // --------------- Fetch stock history --------------- //
     const fetchStockHistory = async () => {
-        const findStockHistory = formatFindParams(products_state.stockHistoryPaginationParams)
+        const findStockHistory = formatFindParams(products_state.stockHistory.paginationParams)
         const data = await api.stockHistory.findPaginated(findStockHistory)
         products_dispatch({ type: 'SET_STOCK_HISTORY_FOR_RENDER', payload: data })
     }
 
     useEffect(() => { fetchStockHistory() }, [
-        products_state.stockHistoryLoading,
-        products_state.stockHistoryPaginationParams
+        products_state.stockHistory.loading,
+        products_state.stockHistory.paginationParams
     ])
 
 
@@ -89,14 +89,14 @@ const ProductStockHistoryModal = () => {
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={products_state.productStockHistoryModalVisibility}
+            open={products_state.stockHistory.modalVisibility}
             width={1200}
         >
             <Row>
                 <Col span={24}>
                     <Row>
                         <Col span={8}>
-                            <h1>{products_state.productForStockHistoryModal.nombre}</h1>
+                            <h1>{products_state.stockHistory.product.nombre}</h1>
                         </Col>
                         <Col span={8}>
                             <Row>
@@ -123,12 +123,12 @@ const ProductStockHistoryModal = () => {
                 <Col span={24}>
                     <Table
                         columns={columnsForTable}
-                        dataSource={products_state.stockHistoryForRender}
-                        loading={products_state.stockHistoryLoading}
+                        dataSource={products_state.stockHistory.recordsForRender}
+                        loading={products_state.stockHistory.loading}
                         pagination={{
-                            current: products_state.stockHistoryPaginationParams.page,
-                            limit: products_state.stockHistoryPaginationParams.limit,
-                            total: products_state.stockHistoryTotalRecords,
+                            current: products_state.stockHistory.paginationParams.page,
+                            limit: products_state.stockHistory.paginationParams.limit,
+                            total: products_state.stockHistory.totalRecords,
                             showSizeChanger: true,
                             onChange: e => setPage(e),
                             onShowSizeChange: (e, val) => setLimit(val)

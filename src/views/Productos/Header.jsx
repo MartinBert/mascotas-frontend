@@ -3,7 +3,6 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
-import { GenericAutocomplete } from '../../components/generics'
 import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Constexts
@@ -62,23 +61,7 @@ const Header = () => {
 
     // ------------------ Clear Filters ------------------ //
     const clearFilters = () => {
-        const filters = {
-            nombre: null,
-            codigoBarras: null,
-            codigoProducto: null,
-            marca: [],
-            rubro: []
-        }
-        const paginationParams = { ...products_state.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-        products_dispatch({
-            type: 'SET_BRANDS_FOR_EXCEL_REPORT',
-            payload: [{ value: 'Todas las marcas' }]
-        })
-        products_dispatch({
-            type: 'SET_TYPES_FOR_EXCEL_REPORT',
-            payload: [{ value: 'Todos los rubros' }]
-        })
+        products_dispatch({ type: 'CLEAR_FILTERS' })
     }
 
     const buttonToClearFilters = (
@@ -95,15 +78,15 @@ const Header = () => {
     // ------------------ Export Excel ------------------- //
     const sumSalesAreaPercentage = (param) => {
         const fixedParam = param
-            - salesAreas_state.currentSalesArea.discountPercentage
-            + salesAreas_state.currentSalesArea.surchargePercentage
+            - salesAreas_state.selectedSalesArea[0].discountPercentage
+            + salesAreas_state.selectedSalesArea[0].surchargePercentage
         return fixedParam
     }
 
     const addSalesAreaPercentage = (param) => {
         const fixedParam = param * (1
-            - salesAreas_state.currentSalesArea.discountDecimal
-            + salesAreas_state.currentSalesArea.surchargeDecimal
+            - salesAreas_state.selectedSalesArea[0].discountDecimal
+            + salesAreas_state.selectedSalesArea[0].surchargeDecimal
         )
         return roundToMultiple(fixedParam, 10)
     }
@@ -140,7 +123,7 @@ const Header = () => {
 
     const processExcelLines = async (columnHeaders) => {
         const processedLines = []
-        for await (let product of products_state.productsForExcelReport) {
+        for await (let product of products_state.exportExcel.products) {
             const activeOptions = []
 
             // if (columnHeaders.includes('Ilustración')) {
@@ -188,8 +171,10 @@ const Header = () => {
     const exportExcel = async () => {
         const nameOfDocument = 'Lista de productos'
         const nameOfSheet = 'Hoja de productos'
-        const selectedHeaders = products_state.activeExcelOptions.map(option => option.label)
-        const columnHeaders = selectedHeaders.includes('Todas') ? products_state.allExcelTitles : selectedHeaders
+        const selectedHeaders = products_state.exportExcel.activeOptions.map(option => option.label)
+        const columnHeaders = selectedHeaders.includes('Todas')
+            ? products_state.exportExcel.allOptions.map(option => option.label)
+            : selectedHeaders
         const lines = await processExcelLines(columnHeaders)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
     }
@@ -204,44 +189,17 @@ const Header = () => {
     )
 
     // -------------- Export Excel Options --------------- //
-    const selectOptions = [
-        { disabled: false, label: 'Todas', value: 'todas' },
-        // { disabled: false, label: 'Ilustración', value: 'imagenes' },
-        { disabled: true, label: 'Producto', value: 'producto' },
-        { disabled: false, label: 'Rubro', value: 'rubro' },
-        { disabled: false, label: 'Marca', value: 'marca' },
-        { disabled: false, label: 'Cód. producto', value: 'codigoProducto' },
-        { disabled: false, label: 'Cód. barras', value: 'codigoBarras' },
-        { disabled: false, label: '% IVA compra', value: 'porcentajeIvaCompra' },
-        { disabled: false, label: 'IVA compra ($)', value: 'ivaCompra' },
-        { disabled: false, label: 'Precio de lista ($)', value: 'precioUnitario' },
-        { disabled: false, label: '% IVA venta', value: 'porcentajeIvaVenta' },
-        { disabled: false, label: 'IVA venta ($)', value: 'ivaVenta' },
-        { disabled: false, label: '% Ganancia', value: 'margenGanancia' },
-        { disabled: false, label: 'Precio de venta ($)', value: 'precioVenta' },
-        { disabled: false, label: 'Ganancia por venta ($)', value: 'gananciaNeta' },
-        { disabled: false, label: '% Ganancia fraccionada', value: 'margenGananciaFraccionado' },
-        { disabled: false, label: 'Precio de venta fraccionada ($)', value: 'precioVentaFraccionado' },
-        { disabled: false, label: 'Ganancia venta fraccionada ($)', value: 'gananciaNetaFraccionado' },
-        { disabled: false, label: 'Precio de venta por unidad fraccionada ($)', value: 'precioVentaUnitarioFraccionado' },
-        { disabled: false, label: 'Ganancia venta por unidad fraccionada ($)', value: 'gananciaNetaUnitarioFraccionado' },
-        { disabled: false, label: 'Stock', value: 'cantidadStock' },
-        { disabled: false, label: 'Stock fraccionado', value: 'cantidadFraccionadaStock' },
-        { disabled: false, label: 'Unidad de medida', value: 'unidadMedida' },
-        { disabled: false, label: 'Fraccionamiento', value: 'fraccionamiento' }
-    ]
-
     const changeExcelOptions = (e) => {
         let selectedOptions
         if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
         else {
-            selectedOptions = selectOptions.map(option => {
+            selectedOptions = products_state.exportExcel.allOptions.map(option => {
                 const eventValues = e.map(eventOption => eventOption.value)
                 if (eventValues.includes(option.value)) return option
                 else return null
             }).filter(option => option)
         }
-        products_dispatch({ type: 'SET_EXCEL_OPTIONS', payload: selectedOptions })
+        products_dispatch({ type: 'SELECT_ACTIVE_EXCEL_OPTIONS', payload: selectedOptions })
     }
 
     const selectExcelOptions = (e) => {
@@ -261,10 +219,10 @@ const Header = () => {
                     mode='multiple'
                     onChange={changeExcelOptions}
                     onSelect={selectExcelOptions}
-                    options={selectOptions}
+                    options={products_state.exportExcel.allOptions}
                     placeholder='Elige una opción'
                     style={{ width: '100%' }}
-                    value={products_state.activeExcelOptions}
+                    value={products_state.exportExcel.activeOptions}
                 />
             </Col>
         </Row>
@@ -273,10 +231,10 @@ const Header = () => {
     // --------------- Filter By Barcode ----------------- //
     const onChangeBarCode = (e) => {
         const filters = {
-            ...products_state.paginationParams.filters,
+            ...products_state.index.paginationParams.filters,
             codigoBarras: e.target.value
         }
-        const paginationParams = { ...products_state.paginationParams, filters, page: 1 }
+        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
         products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
@@ -287,13 +245,13 @@ const Header = () => {
             onChange={onChangeBarCode}
             placeholder='Buscar por código de barras'
             style={{ width: '100%' }}
-            value={products_state.paginationParams.filters.codigoBarras}
+            value={products_state.index.paginationParams.filters.codigoBarras}
         />
     )
 
     // ---------------- Filter By Brand ------------------ //
     const changeBrands = (e) => {
-        const brands = products_state.brandsForSelect.allBrandsNames
+        const brands = products_state.index.brandsForSelect.allBrandsNames
         let selectedBrands
         let selectedBrandsNames
         if (e.length === 0) {
@@ -302,7 +260,7 @@ const Header = () => {
         }
         else {
             const eventValues = e.map(eventOption => eventOption.value)
-            selectedBrands = products_state.brandsForSelect.allBrands
+            selectedBrands = products_state.index.brandsForSelect.allBrands
                 .filter(brand => eventValues.includes(brand.nombre))
             selectedBrandsNames = brands.map(option => {
                 if (eventValues.includes(option.value)) return option
@@ -327,15 +285,57 @@ const Header = () => {
             mode='multiple'
             onChange={changeBrands}
             onSelect={selectBrands}
-            options={products_state.brandsForSelect.allBrandsNames}
+            options={products_state.index.brandsForSelect.allBrandsNames}
             style={{ width: '100%' }}
-            value={products_state.brandsForSelect.selectedBrandsNames}
+            value={products_state.index.brandsForSelect.selectedBrandsNames}
+        />
+    )
+
+    // ---------------- Filter By Name ------------------- //
+    const onChangeName = (e) => {
+        const filters = {
+            ...products_state.index.paginationParams.filters,
+            nombre: e.target.value
+        }
+        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByName = (
+        <Input
+            color='primary'
+            name='nombre'
+            onChange={onChangeName}
+            placeholder='Buscar por nombre'
+            style={{ width: '100%' }}
+            value={products_state.index.paginationParams.filters.nombre}
+        />
+    )
+
+    // ------------ Filter By Product Code --------------- //
+    const onChangeProductCode = (e) => {
+        const filters = {
+            ...products_state.index.paginationParams.filters,
+            codigoProducto: e.target.value
+        }
+        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByProductCode = (
+        <Input
+            color='primary'
+            name='codigoProducto'
+            onChange={onChangeProductCode}
+            placeholder='Buscar por código de producto'
+            style={{ width: '100%' }}
+            value={products_state.index.paginationParams.filters.codigoProducto}
         />
     )
 
     // ----------------- Filter By Type ------------------ //
     const changeTypes = (e) => {
-        const types = products_state.typesForSelect.allTypesNames
+        const types = products_state.index.typesForSelect.allTypesNames
         let selectedTypes
         let selectedTypesNames
         if (e.length === 0) {
@@ -344,7 +344,7 @@ const Header = () => {
         }
         else {
             const eventValues = e.map(eventOption => eventOption.value)
-            selectedTypes = products_state.typesForSelect.allTypes
+            selectedTypes = products_state.index.typesForSelect.allTypes
                 .filter(type => eventValues.includes(type.nombre))
             selectedTypesNames = types.map(option => {
                 if (eventValues.includes(option.value)) return option
@@ -369,62 +369,24 @@ const Header = () => {
             mode='multiple'
             onChange={changeTypes}
             onSelect={selectTypes}
-            options={products_state.typesForSelect.allTypesNames}
+            options={products_state.index.typesForSelect.allTypesNames}
             style={{ width: '100%' }}
-            value={products_state.typesForSelect.selectedTypesNames}
+            value={products_state.index.typesForSelect.selectedTypesNames}
         />
     )
-
-    // ---------------- Filter By Name ------------------- //
-    const onChangeName = (e) => {
-        const filters = {
-            ...products_state.paginationParams.filters,
-            nombre: e.target.value
-        }
-        const paginationParams = { ...products_state.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
-    const inputToFilterByName = (
-        <Input
-            color='primary'
-            name='nombre'
-            onChange={onChangeName}
-            placeholder='Buscar por nombre'
-            style={{ width: '100%' }}
-            value={products_state.paginationParams.filters.nombre}
-        />
-    )
-
-    // ------------ Filter By Product Code --------------- //
-    const onChangeProductCode = (e) => {
-        const filters = {
-            ...products_state.paginationParams.filters,
-            codigoProducto: e.target.value
-        }
-        const paginationParams = { ...products_state.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
-    const inputToFilterByProductCode = (
-        <Input
-            color='primary'
-            name='codigoProducto'
-            onChange={onChangeProductCode}
-            placeholder='Buscar por código de producto'
-            style={{ width: '100%' }}
-            value={products_state.paginationParams.filters.codigoProducto}
-        />
-    )
-
+    
     // ------------ Select to Sales Areas ---------------- //
-    useEffect(() => {
-        const findSalesAreas = async () => {
-            const salesAreas = await api.zonasdeventas.findByName('Default')
-            salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: salesAreas.docs[0] })
-        }
-        findSalesAreas()
-    }, [])
+    const loadSalesAreas = async () => {
+        const findSalesAreas = await api.zonasdeventas.findAll()
+        salesAreas_dispatch({ type: 'SET_ALL_SALES_AREAS', payload: findSalesAreas.docs })
+    }
+
+    useEffect(() => { loadSalesAreas() }, [])
+
+    const changeSalesArea = async (e) => {
+        const findSalesArea = await api.zonasdeventas.findByName(e)
+        salesAreas_dispatch({ type: 'SET_SELECTED_SALES_AREA', payload: findSalesArea.docs })
+    }
 
     const selectToSalesAreas = (
         <Row align='middle' gutter={8}>
@@ -432,16 +394,11 @@ const Header = () => {
                 Zona de venta
             </Col>
             <Col span={16}>
-                <GenericAutocomplete
-                    action={'EDIT_SALES_AREA'}
-                    label='Seleccionar Zona de ventas'
-                    modelToFind='zonadeventa'
-                    keyToCompare='name'
-                    controller='zonasdeventas'
-                    dispatch={salesAreas_dispatch}
-                    selectedSearch={salesAreas_state.currentSalesArea}
-                    returnCompleteModel={true}
-                    styles={{ backgroundColor: '#fff' }}
+                <Select
+                    onChange={changeSalesArea}
+                    options={salesAreas_state.allSalesAreasNames}
+                    style={{ width: '100%' }}
+                    value={salesAreas_state.selectedSalesAreaName}
                 />
             </Col>
         </Row>

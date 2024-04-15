@@ -153,6 +153,13 @@ const EntradasForm = () => {
     const saveNew = async () => {
         const result = validateEntrySave()
         if (result === 'FAIL') return
+
+        // Datos necesarios para corregir el stock y las estadísticas diarias
+        const filters = JSON.stringify({ dateString: entries_state.params.fechaString.substring(0, 10) })
+        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+        const statisticToEdit = findStatisticToEdit.docs[0] || null
+
+        // Corregir stock de productos pertenecientes a la entrada
         for (const product of entries_state.params.productos) {
             await api.productos.modifyStock({
                 product,
@@ -160,6 +167,22 @@ const EntradasForm = () => {
                 quantity: product.cantidadesEntrantes
             })
         }
+
+        // Corregir la estadística diaria correspondiente a la fecha de la entrada
+        if (statisticToEdit) {
+            const currentExpense = statisticToEdit.dailyExpense
+            const newExpense = entries_state.params.costoTotal
+            const updatedExpense = currentExpense + newExpense
+            const updatedProfit = statisticToEdit.dailyIncome - updatedExpense
+            const updatedStatistic = {
+                ...statisticToEdit,
+                dailyExpense: updatedExpense,
+                dailyProfit: updatedProfit
+            }
+            await api.dailyBusinessStatistics.edit(updatedStatistic)
+        }
+
+        // Guardar la entrada nueva
         const response = await api.entradas.save(entries_state.params)
         if (response.code === 200) {
             successAlert('El registro se guardó correctamente')
@@ -169,9 +192,15 @@ const EntradasForm = () => {
     }
 
     const saveEdit = async () => {
+        // Datos necesarios para corregir el stock y las estadísticas diarias
+        const findEntryToEdit = await api.entradas.findById(entryID)
+        const entryToEdit = findEntryToEdit.data
+        const filters = JSON.stringify({ dateString: entryToEdit.fechaString.substring(0, 10) })
+        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+        const statisticToEdit = findStatisticToEdit.docs[0]
+
+        // Corregir stock de productos pertenecientes a la entrada
         for (let product of entries_state.params.productos) {
-            const findEntryToEdit = await api.entradas.findById(entryID)
-            const entryToEdit = findEntryToEdit.data
             const productOfEntryToEdit = entryToEdit.productos.find(el => el._id === product._id)
             if (productOfEntryToEdit && productOfEntryToEdit.cantidadesEntrantes !== product.cantidadesEntrantes) {
                 const findProductToModifyStock = await api.productos.findById(product._id)
@@ -187,8 +216,24 @@ const EntradasForm = () => {
                 })
             }
         }
-        const entryToEdit = { ...entries_state.params, id: entryID }
-        const response = await api.entradas.edit(entryToEdit)
+
+        // Corregir la estadística diaria correspondiente a la fecha de la entrada
+        const currentStatisticExpense = statisticToEdit.dailyExpense
+        const currentStatisticIncome = statisticToEdit.dailyIncome
+        const currentExpenseOfEntry = entryToEdit.costoTotal
+        const newExpenseOfEntry = entries_state.params.costoTotal
+        const newStatisticDailyExpense = currentStatisticExpense - currentExpenseOfEntry + newExpenseOfEntry
+        const newStatisticDailyProfit = currentStatisticIncome - newStatisticDailyExpense
+        const newStatisticToSave = {
+            ...statisticToEdit,
+            dailyExpense: newStatisticDailyExpense,
+            dailyProfit: newStatisticDailyProfit
+        }
+        await api.dailyBusinessStatistics.edit(newStatisticToSave)
+
+        // Guardar la entrada editada
+        const recordToEdit = { ...entries_state.params, id: entryID }
+        const response = await api.entradas.edit(recordToEdit)
         if (response.code === 200) {
             successAlert('El registro se editó correctamente')
             entries_dispatch({ type: 'CLEAN_STATE' })
@@ -256,20 +301,17 @@ const EntradasForm = () => {
 
     // ------------------------- Table of selected products -------------------------- //
     const deleteProduct = (product) => {
-        entries_dispatch({ type: 'DELETE_PRODUCT', payload: product._id })
+        const remainingProducts = entries_state.params.productos
+            .filter(currentProduct => currentProduct._id !== product._id)
+        entries_dispatch({ type: 'SET_PRODUCTS', payload: remainingProducts })
     }
 
     const changeQuantity = (e, product) => {
         const productsEditted = entries_state.params.productos.map(productInState => {
-            if (productInState._id === product._id) {
-                productInState.cantidadesEntrantes = e
-            }
+            if (productInState._id === product._id) productInState.cantidadesEntrantes = e
             return productInState
         })
-        const newParams = {
-            targets: ['productos'],
-            values: [productsEditted]
-        }
+        const newParams = { targets: ['productos'], values: [productsEditted] }
         dispatchParams(newParams)
     }
 

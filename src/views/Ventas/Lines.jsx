@@ -24,36 +24,103 @@ const Lines = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
     const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
 
-    const deleteProduct = (productID) => {
-        saleProducts_dispatch({ type: 'DELETE_PRODUCT', payload: productID })
+    const deleteProduct = (line) => {
+        saleProducts_dispatch({ type: 'DELETE_PRODUCTS', payload: [line] })
+    }
+
+    const onChangeDiscountPercent = (e, line) => {
+        sale_dispatch({
+            type: 'SET_LINE_DISCOUNT_PERCENT',
+            payload: {
+                _id: line._id,
+                porcentajeDescuentoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
+            }
+        })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const onChangeFixedNetPriceCheckbox = (e, line) => {
+        line.precioNetoFijo = e.target.checked
+        sale_dispatch({ type: 'SET_NET_PRICE_FIXED', payload: line })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const onChangeFractionateCheckbox = (e, line) => {
+        line.fraccionar = e.target.checked
+        sale_dispatch({ type: 'SET_FRACTIONED', payload: line })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const onChangeLineQuantity = (e, line) => {
+        sale_dispatch({
+            type: 'SET_LINE_QUANTITY',
+            payload: {
+                _id: line._id,
+                cantidadUnidades: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
+            }
+        })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const onChangeNetPrice = (e, line) => {
+        sale_dispatch({
+            type: 'SET_NET_PRICE',
+            payload: {
+                _id: line._id,
+                precioNeto: e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
+            }
+        })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const onChangeSurchargePercent = (e, line) => {
+        sale_dispatch({
+            type: 'SET_LINE_SURCHARGE_PERCENT',
+            payload: {
+                _id: line._id,
+                porcentajeRecargoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
+            }
+        })
+        sale_dispatch({ type: 'SET_TOTAL' })
+    }
+
+    const setNote = (value, lineID) => {
+        sale_dispatch({
+            type: 'SET_LINE_NOTE',
+            payload: { lineID: lineID, note: value }
+        })
+    }
+
+    const hideSpanOfMeasureUnity = (line) => {
+        if (!line.unidadMedida) return true
+        if (
+            line.unidadMedida.toLowerCase().includes('kilo')
+            || line.unidadMedida.toLowerCase().includes('gramo')
+        ) return false
+        else return true
     }
 
     const columns = [
         {
-            key: 'columna_fraccionar',
-            title: 'Fracc.',
-            render: (product) => (
+            dataIndex: 'saleProducts_fractionate',
+            render: (_, line) => (
                 <Checkbox
-                    checked={product.fraccionar === true ? true : false}
-                    disabled={product._id.startsWith('customProduct_')}
-                    onChange={e => {
-                        product.fraccionar = e.target.checked
-                        sale_dispatch({ type: 'SET_FRACTIONED', payload: product })
-                        sale_dispatch({ type: 'SET_TOTAL' })
-                    }}
+                    checked={line.fraccionar === true ? true : false}
+                    disabled={line._id.startsWith('customProduct_')}
+                    onChange={e => onChangeFractionateCheckbox(e, line)}
                 />
             ),
+            title: 'Fracc.'
         },
         {
-            key: 'columna_producto',
+            dataIndex: 'saleProducts_name',
+            render: (_, line) => line.nombre,
             title: 'Producto',
-            dataIndex: 'nombre',
             width: 300
         },
         {
-            key: 'columna_cantidad',
-            title: 'Cantidad',
-            render: (product) => (
+            dataIndex: 'saleProducts_quantity',
+            render: (_, line) => (
                 <>
                     <Row gutter={8}>
                         <Col span={16}>
@@ -61,181 +128,121 @@ const Lines = () => {
                                 color='primary'
                                 type='number'
                                 placeholder='Cantidad'
-                                disabled={product.precioNetoFijo === true ? true : false}
-                                value={product.fraccionar === true ? round(product.cantidadUnidades) : roundTwoDecimals(product.cantidadUnidades)}
-                                onChange={(e) => {
-                                    sale_dispatch({
-                                        type: 'SET_LINE_QUANTITY',
-                                        payload: {
-                                            _id: product._id,
-                                            cantidadUnidades: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
-                                        },
-                                    })
-                                    sale_dispatch({ type: 'SET_TOTAL' })
-                                }}
+                                disabled={line.precioNetoFijo === true ? true : false}
+                                value={line.fraccionar === true ? round(line.cantidadUnidades) : roundTwoDecimals(line.cantidadUnidades)}
+                                onChange={e => onChangeLineQuantity(e, line)}
                             />
                         </Col>
                         {
-                            (product.fraccionar)
-                                ?
-                                <Col span={8}>
-                                    <p>/ {product.fraccionamiento}</p>
-                                </Col>
+                            line.fraccionar
+                                ? <Col span={8}><p>/ {line.fraccionamiento}</p></Col>
                                 : null
                         }
                     </Row>
                     <Row
                         align='middle'
-                        hidden={
-                            (!product.unidadMedida)
-                                ? true
-                                : (
-                                    ((product.unidadMedida).toLowerCase()).includes('kilo')
-                                    || ((product.unidadMedida).toLowerCase()).includes('gramo')
-                                )
-                                    ? false
-                                    : true
-                        }
+                        hidden={hideSpanOfMeasureUnity(line)}
                     >
-                        <span>{product.cantidadKg} kg {round(product.cantidadg)} g</span>
+                        <span>{line.cantidadKg} kg {round(line.cantidadg)} g</span>
                     </Row>
                 </>
             ),
+            title: 'Cantidad'
         },
         {
-            key: 'columna_preciounitario',
-            title: 'Prec. U.',
-            render: (product) => (
+            dataIndex: 'saleProducts_unitPrice',
+            render: (_, line) => (
                 <Input
                     color='primary'
                     type='number'
                     placeholder='Prec. U.'
-                    value={product.cantidadUnidades > 0 ? product.precioUnitario : 0}
+                    value={line.cantidadUnidades > 0 ? line.precioUnitario : 0}
                     disabled={true}
                 />
             ),
+            title: 'Prec. U.'
         },
         {
-            key: 'columna_porcentajedescuento',
-            title: '% Descuento',
-            render: (product) => (
+            dataIndex: 'saleProducts_discountPercentage',
+            render: (_, line) => (
                 <Input
                     color='primary'
                     type='number'
                     placeholder='Porc. descuento'
-                    value={product.porcentajeDescuentoRenglon}
-                    disabled={product.porcentajeRecargoRenglon > 0}
-                    onChange={(e) => {
-                        sale_dispatch({
-                            type: 'SET_LINE_DISCOUNT_PERCENT',
-                            payload: {
-                                _id: product._id,
-                                porcentajeDescuentoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
-                            },
-                        })
-                        sale_dispatch({ type: 'SET_TOTAL' })
-                    }}
+                    value={line.porcentajeDescuentoRenglon}
+                    disabled={line.porcentajeRecargoRenglon > 0}
+                    onChange={e => onChangeDiscountPercent(e, line)}
                 />
             ),
+            title: '% Descuento'
         },
         {
-            key: 'columna_porcentajerecargo',
-            title: '% Recargo',
-            render: (product) => (
+            dataIndex: 'saleProducts_surchargePercentage',
+            render: (_, line) => (
                 <Input
                     color='primary'
                     type='number'
                     placeholder='Porc. recargo'
-                    value={product.porcentajeRecargoRenglon}
-                    disabled={product.porcentajeDescuentoRenglon > 0}
-                    onChange={(e) => {
-                        sale_dispatch({
-                            type: 'SET_LINE_SURCHARGE_PERCENT',
-                            payload: {
-                                _id: product._id,
-                                porcentajeRecargoRenglon: e.target.value.length > 0 ? parseFloat(e.target.value) : 0
-                            },
-                        })
-                        sale_dispatch({ type: 'SET_TOTAL' })
-                    }}
+                    value={line.porcentajeRecargoRenglon}
+                    disabled={line.porcentajeDescuentoRenglon > 0}
+                    onChange={e => onChangeSurchargePercent(e, line)}
                 />
             ),
+            title: '% Recargo'
         },
         {
-            key: 'columna_preciobruto',
-            title: 'Precio bruto',
-            render: (product) => (
+            dataIndex: 'saleProducts_grossPrice',
+            render: (_, line) => (
                 <Input
                     color='primary'
-                    type='number'
-                    placeholder='Precio bruto'
-                    value={roundTwoDecimals(product.precioBruto)}
                     disabled={true}
+                    placeholder='Precio bruto'
+                    value={roundTwoDecimals(line.precioBruto)}
+                    type='number'
                 />
             ),
+            title: 'Precio bruto'
         },
         {
-            key: 'columna_precioneto',
-            title: 'Precio neto',
-            render: (product) => (
+            dataIndex: 'saleProducts_netPrice',
+            render: (_, line) => (
                 <Row align='middle'>
                     <Col span={3}>
-                        <Checkbox onChange={(e) => {
-                            product.precioNetoFijo = e.target.checked
-                            sale_dispatch({ type: 'SET_NET_PRICE_FIXED', payload: product })
-                            sale_dispatch({ type: 'SET_TOTAL' })
-                        }} />
+                        <Checkbox onChange={e => onChangeFixedNetPriceCheckbox(e, line)} />
                     </Col>
                     <Col span={21}>
                         <Input
                             color='primary'
                             type='number'
                             placeholder='Total'
-                            disabled={product.precioNetoFijo === true ? true : false}
-                            value={product.precioNeto}
-                            onChange={(e) => {
-                                sale_dispatch({
-                                    type: 'SET_NET_PRICE',
-                                    payload: {
-                                        _id: product._id,
-                                        precioNeto: e.target.value.length > 0 ? parseFloat(e.target.value) : 0,
-                                    },
-                                })
-                                sale_dispatch({ type: 'SET_TOTAL' })
-                            }} />
+                            disabled={line.precioNetoFijo === true ? true : false}
+                            value={line.precioNeto}
+                            onChange={e => onChangeNetPrice(e, line)} />
                     </Col>
                 </Row>
-            )
+            ),
+            title: 'Precio neto'
         },
         {
-            key: 'columna_quitar',
-            title: 'Quitar',
-            render: (product) => (
-                <Col
+            dataIndex: 'saleProducts_actions',
+            render: (_, line) => (
+                <div
                     align='middle'
-                    onClick={() => deleteProduct(product._id)}
+                    onClick={e => deleteProduct(line)}
                 >
                     <Delete />
-                </Col>
+                </div>
             ),
-        },
+            title: 'Quitar'
+        }
     ]
 
     useEffect(() => {
         sale_dispatch({ type: 'SET_LINES', payload: saleProducts_state.params.productos })
         sale_dispatch({ type: 'SET_PRODUCTS', payload: saleProducts_state.params.productos })
         sale_dispatch({ type: 'SET_TOTAL' })
-    }, [sale_dispatch, saleProducts_state.params.productos])
+    }, [saleProducts_state.params.productos])
 
-    const setNote = (value, lineID) => {
-        sale_dispatch({
-            type: 'SET_LINE_NOTE',
-            payload: {
-                note: value,
-                lineID: lineID
-            }
-        })
-    }
 
     return (
         <Table

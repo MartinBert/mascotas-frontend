@@ -12,7 +12,6 @@ const actions = {
     CLEAR_INPUTS: 'CLEAR_INPUTS',
     CLEAN_STATE: 'CLEAN_STATE',
     DELETE_ALL_PRODUCTS: 'DELETE_ALL_PRODUCTS',
-    DELETE_PRODUCT: 'DELETE_PRODUCT',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
     HIDE_DETAILS_MODAL: 'HIDE_DETAILS_MODAL',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
@@ -23,7 +22,7 @@ const actions = {
     SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PARAMS: 'SET_PARAMS',
-    SET_PRODUCT: 'SET_PRODUCT'
+    SET_PRODUCTS: 'SET_PRODUCTS'
 }
 
 const formatDate = (dateToFormat) => {
@@ -106,16 +105,6 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 params: { ...state.params, productos: [] }
             }
-        case actions.DELETE_PRODUCT:
-            return {
-                ...state,
-                params: {
-                    ...state.params,
-                    productos: state.params.productos.filter(
-                        product => product._id !== action.payload
-                    )
-                }
-            }
         case actions.DESELECT_ALL_EXCEL_OPTIONS:
             const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
             const optionsValues = notAllOptions.map(option => option.value)
@@ -179,14 +168,16 @@ const reducer = (state = initialState, action) => {
                 datePickerValue: formatDate(action.payload.fecha),
                 params: action.payload
             }
-        case actions.SET_PRODUCT:
-            if (state.params.productos.find(product => product._id === action.payload._id)) return state
-            action.payload.cantidadesSalientes = 0
+        case actions.SET_PRODUCTS:
+            const productos = action.payload.map(product => {
+                if (product.cantidadesSalientes) return product
+                else return { ...product, cantidadesSalientes: 0 }
+            })
             return {
                 ...state,
                 params: {
                     ...state.params,
-                    productos: [...state.params.productos, action.payload]
+                    productos
                 }
             }
         default:

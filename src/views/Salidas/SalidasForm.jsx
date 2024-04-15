@@ -153,6 +153,13 @@ const SalidasForm = () => {
     const saveNew = async () => {
         const result = validateOutputSave()
         if (result === 'FAIL') return
+
+        // Datos necesarios para corregir el stock y las estadísticas diarias
+        const filters = JSON.stringify({ dateString: outputs_state.params.fechaString.substring(0, 10) })
+        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+        const statisticToEdit = findStatisticToEdit.docs[0] || null
+
+        // Corregir stock de productos pertenecientes a la salida
         for (const product of outputs_state.params.productos) {
             await api.productos.modifyStock({
                 product,
@@ -160,6 +167,22 @@ const SalidasForm = () => {
                 quantity: product.cantidadesSalientes
             })
         }
+
+        // Corregir la estadística diaria correspondiente a la fecha de la salida
+        if (statisticToEdit) {
+            const currentIncome = statisticToEdit.dailyIncome
+            const newIncome = outputs_state.params.gananciaNeta
+            const updatedIncome = currentIncome + newIncome
+            const updatedProfit = updatedIncome - statisticToEdit.dailyExpense
+            const updatedStatistic = {
+                ...statisticToEdit,
+                dailyIncome: updatedIncome,
+                dailyProfit: updatedProfit
+            }
+            await api.dailyBusinessStatistics.edit(updatedStatistic)
+        }
+
+        // Guardar la salida nueva
         const response = await api.salidas.save(outputs_state.params)
         if (response.code === 200) {
             successAlert('El registro se guardó correctamente')
@@ -169,9 +192,15 @@ const SalidasForm = () => {
     }
 
     const saveEdit = async () => {
+        // Datos necesarios para corregir el stock y las estadísticas diarias
+        const findOutputToEdit = await api.salidas.findById(outputID)
+        const outputToEdit = findOutputToEdit.data
+        const filters = JSON.stringify({ dateString: outputToEdit.fechaString.substring(0, 10) })
+        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+        const statisticToEdit = findStatisticToEdit.docs[0]
+
+        // Corregir stock de productos pertenecientes a la salida
         for (let product of outputs_state.params.productos) {
-            const findOutputToEdit = await api.salidas.findById(outputID)
-            const outputToEdit = findOutputToEdit.data
             const productOfOutputToEdit = outputToEdit.productos.find(el => el._id === product._id)
             if (productOfOutputToEdit && productOfOutputToEdit.cantidadesSalientes !== product.cantidadesSalientes) {
                 const findProductToModifyStock = await api.productos.findById(product._id)
@@ -187,8 +216,24 @@ const SalidasForm = () => {
                 })
             }
         }
-        const outputToEdit = { ...outputs_state.params, id: outputID }
-        const response = await api.salidas.edit(outputToEdit)
+
+        // Corregir la estadística diaria correspondiente a la fecha de la salida
+        const currentStatisticExpense = statisticToEdit.dailyExpense
+        const currentStatisticIncome = statisticToEdit.dailyIncome
+        const currentIncomeOfOutput = outputToEdit.gananciaNeta
+        const newIncomeOfOutput = outputs_state.params.gananciaNeta
+        const newStatisticDailyIncome = currentStatisticIncome - currentIncomeOfOutput + newIncomeOfOutput
+        const newStatisticDailyProfit = newStatisticDailyIncome - currentStatisticExpense
+        const newStatisticToSave = {
+            ...statisticToEdit,
+            dailyIncome: newStatisticDailyIncome,
+            dailyProfit: newStatisticDailyProfit
+        }
+        await api.dailyBusinessStatistics.edit(newStatisticToSave)
+
+        // Guardar la salida editada
+        const recordToEdit = { ...outputs_state.params, id: outputID }
+        const response = await api.salidas.edit(recordToEdit)
         if (response.code === 200) {
             successAlert('El registro se editó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
@@ -256,20 +301,17 @@ const SalidasForm = () => {
 
     // ------------------------- Table of selected products -------------------------- //
     const deleteProduct = (product) => {
-        outputs_dispatch({ type: 'DELETE_PRODUCT', payload: product._id })
+        const remainingProducts = outputs_state.params.productos
+            .filter(currentProduct => currentProduct._id !== product._id)
+        outputs_dispatch({ type: 'SET_PRODUCTS', payload: remainingProducts })
     }
 
     const changeQuantity = (e, product) => {
         const productsEditted = outputs_state.params.productos.map(productInState => {
-            if (productInState._id === product._id) {
-                productInState.cantidadesSalientes = e
-            }
+            if (productInState._id === product._id) productInState.cantidadesSalientes = e
             return productInState
         })
-        const newParams = {
-            targets: ['productos'],
-            values: [productsEditted]
-        }
+        const newParams = { targets: ['productos'], values: [productsEditted] }
         dispatchParams(newParams)
     }
 

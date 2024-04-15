@@ -434,8 +434,10 @@ const reducer = (state = initialState, action) => {
                 renglones: action.payload.map(line => {
                     const unitMeasure_gramsToGrams = (!line.unidadMedida)
                         ? false
-                        : (!(((line.unidadMedida.nombre).toLowerCase()).includes('kilo'))
-                            && ((line.unidadMedida.nombre).toLowerCase()).includes(' gramo'))
+                        : (
+                            !(((line.unidadMedida.nombre).toLowerCase()).includes('kilo'))
+                            && ((line.unidadMedida.nombre).toLowerCase()).includes(' gramo')
+                        )
                             ? true
                             : false
                     const fractionament = (!line.unidadMedida)

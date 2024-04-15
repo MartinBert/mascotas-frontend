@@ -1,5 +1,5 @@
 // React Components and Hooks
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
@@ -22,6 +22,7 @@ import Header from './Header'
 
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
+const { formatFindParams } = actions.paginationParams
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useSalesAreasContext } = contexts.SalesAreas
 const { Edit, Delete } = icons
@@ -31,28 +32,28 @@ const ZonasDeVentas = () => {
     const navigate = useNavigate()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [salesAreas_state, salesAreas_dispatch] = useSalesAreasContext()
-    const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(10)
-    const [filters, setFilters] = useState(null)
 
-    // ------------------ Fetch Users ------------------ //
+    // -------------------- Actions -------------------- //
+    const setPageAndLimit = (page, limit) => {
+        const paginationParams = {
+            ...salesAreas_state.paginationParams,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        }
+        salesAreas_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    // --------------- Fetch Sales Areas --------------- //
     useEffect(() => {
         const fetchZonasDeVentas = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.zonasdeventas.findPaginated({ page, limit, filters: stringFilters })
-            salesAreas_dispatch({ type: 'SET_PAGINATED_SALES_AREAS', payload: data.docs })
-            salesAreas_dispatch({ type: 'TOTAL_QUANTITY_OF_SALES_AREAS', payload: data.totalDocs })
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+            const findParams = formatFindParams(salesAreas_state.paginationParams)
+            const data = await api.zonasdeventas.findPaginated(findParams)
+            salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: data })
         }
         fetchZonasDeVentas()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+    }, [deleteModal_state.loading, salesAreas_state.paginationParams])
 
-    // ------------------ User Deletion ------------------ //
+    // -------------- Sales Area Deletion -------------- //
     const salesAreaDeletion = (salesAreaID) => {
         deleteModal_dispatch({ type: 'SET_ENTITY_ID', payload: salesAreaID })
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
@@ -77,7 +78,7 @@ const ZonasDeVentas = () => {
         deleteModal_state.entityID
     ])
 
-    // ------------------ User Edition ------------------ //
+    // --------------- Sales Area Edition -------------- //
     const salesAreaEdition = (salesAreaID) => {
         navigate(`/zonasdeventas/${salesAreaID}`)
     }
@@ -140,9 +141,7 @@ const ZonasDeVentas = () => {
                 salesArea.name === 'Default'
                     ? null
                     : (
-                        <Row
-                            justify='start'
-                        >
+                        <Row justify='start'>
                             <Col
                                 onClick={() => salesAreaEdition(salesArea._id)}
                                 span={12}
@@ -163,40 +162,29 @@ const ZonasDeVentas = () => {
     ]
 
     return (
-        <Row
-            gutter={[0, 16]}
-        >
-            <Col
-                span={24}
-            >
-                <Header
-                    filters={filters}
-                    setFilters={setFilters}
-                />
+        <Row gutter={[0, 16]}>
+            <Col span={24}>
+                <Header />
             </Col>
-            <Col
-                span={24}
-            >
+            <Col span={24}>
                 <Table
                     width={'100%'}
                     dataSource={salesAreas_state.paginatedSalesAreas}
                     columns={columnsForTable}
                     pagination={{
-                        defaultCurrent: page,
-                        limit: limit,
-                        total: salesAreas_state.totalQuantityOfSalesAreas,
+                        defaultCurrent: salesAreas_state.paginationParams.page,
+                        defaultPageSize: salesAreas_state.paginationParams.limit,
+                        limit: salesAreas_state.paginationParams.limit,
+                        onChange: (page, limit) => setPageAndLimit(page, limit),
                         showSizeChanger: true,
-                        onChange: e => setPage(e),
-                        onShowSizeChange: (e, val) => setLimit(val)
+                        total: salesAreas_state.totalQuantityOfSalesAreas
                     }}
-                    loading={deleteModal_state.loading}
+                    loading={salesAreas_state.loading}
                     rowKey='_id'
                     tableLayout='auto'
                     size='small'
                 />
-                <DeleteModal
-                    title='Eliminar zona de venta'
-                />
+                <DeleteModal title='Eliminar zona de venta' />
             </Col>
         </Row>
     )

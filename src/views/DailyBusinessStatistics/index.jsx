@@ -63,21 +63,15 @@ const DailyBusinessStatistics = () => {
         dailyBusinessStatistics_dispatch({ type: 'SET_REFERENCE_STATISTICS', payload: referenceData })
     }
 
-    const setLimit = (val) => {
+    const setPageAndLimit = async (page, limit) => {
         const paginationParams = {
             ...dailyBusinessStatistics_state.paginationParams,
-            limit: parseInt(val)
+            page: parseInt(page),
+            limit: parseInt(limit)
         }
         dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
-    const setPage = (e) => {
-        const paginationParams = {
-            ...dailyBusinessStatistics_state.paginationParams,
-            page: parseInt(e)
-        }
-        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
 
     const columnsForTable = [
         {
@@ -131,24 +125,24 @@ const DailyBusinessStatistics = () => {
             </Col>
             <Col span={24}>
                 <Table
-                    width={'100%'}
-                    dataSource={dailyBusinessStatistics_state.dailyStatistics_paginatedList}
                     columns={columnsForTable}
-                    pagination={{
-                        current: dailyBusinessStatistics_state.paginationParams.page,
-                        limit: dailyBusinessStatistics_state.paginationParams.limit,
-                        total: dailyBusinessStatistics_state.dailyStatistics_totalRecords,
-                        showSizeChanger: true,
-                        onChange: e => setPage(e),
-                        onShowSizeChange: (e, val) => setLimit(val)
-                    }}
-                    rowKey='_id'
-                    tableLayout='auto'
-                    size='small'
+                    dataSource={dailyBusinessStatistics_state.recordsToRender}
                     loading={
                         dailyBusinessStatistics_state.loading
                         || dailyBusinessStatistics_state.loadingUpdatingRecords
                     }
+                    pagination={{
+                        defaultCurrent: dailyBusinessStatistics_state.paginationParams.page,
+                        defaultPageSize: dailyBusinessStatistics_state.paginationParams.limit,
+                        limit: dailyBusinessStatistics_state.paginationParams.limit,
+                        onChange: (page, limit) => setPageAndLimit(page, limit),
+                        showSizeChanger: true,
+                        total: dailyBusinessStatistics_state.totalRecords
+                    }}
+                    rowKey='_id'
+                    size='small'
+                    tableLayout='auto'
+                    width={'100%'}
                 />
                 <FixStatisticsModal />
             </Col>

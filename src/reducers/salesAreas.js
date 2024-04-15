@@ -10,12 +10,14 @@ const actions = {
     EDIT_SALES_AREA: 'EDIT_SALES_AREA',
     SET_ALL_SALES_AREAS: 'SET_ALL_SALES_AREAS',
     SET_LOADING: 'SET_LOADING',
-    SET_PAGINATED_SALES_AREAS: 'SET_PAGINATED_SALES_AREAS',
-    TOTAL_QUANTITY_OF_SALES_AREAS: 'TOTAL_QUANTITY_OF_SALES_AREAS'
+    SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
+    SET_SALES_AREAS_TO_RENDER: 'SET_SALES_AREAS_TO_RENDER',
+    SET_SELECTED_SALES_AREA: 'SET_SELECTED_SALES_AREA',
 }
 
 const initialState = {
-    allSalesAreas: null,
+    allSalesAreas: [],
+    allSalesAreasNames: [],
     currentSalesArea: {
         description: null,
         discountDecimal: 0,
@@ -25,7 +27,16 @@ const initialState = {
         surchargePercentage: 0
     },
     loading: true,
-    paginatedSalesAreas: null,
+    paginatedSalesAreas: [],
+    paginationParams: {
+        filters: {
+            name: null
+        },
+        limit: 10,
+        page: 1
+    },
+    selectedSalesArea: [],
+    selectedSalesAreaName: [],
     totalQuantityOfSalesAreas: 0
 }
 
@@ -50,24 +61,38 @@ const reducer = (state = initialState, action) => {
                 loading: true
             }
         case actions.SET_ALL_SALES_AREAS:
+            const defaultSalesArea = action.payload.filter(salesArea => salesArea.name === 'Default')
+            const defaultSalesAreaName = { value: defaultSalesArea[0].name }
             return {
                 ...state,
-                allSalesAreas: action.payload
+                allSalesAreas: action.payload,
+                allSalesAreasNames: action.payload.map(salesArea => { return { value: salesArea.name } }),
+                selectedSalesArea: defaultSalesArea,
+                selectedSalesAreaName: defaultSalesAreaName
             }
         case actions.SET_LOADING:
             return {
                 ...state,
                 loading: action.payload
             }
-        case actions.SET_PAGINATED_SALES_AREAS:
+        case actions.SET_PAGINATION_PARAMS:
             return {
                 ...state,
-                paginatedSalesAreas: action.payload
+                paginationParams: action.payload
             }
-        case actions.TOTAL_QUANTITY_OF_SALES_AREAS:
+        case actions.SET_SALES_AREAS_TO_RENDER:
             return {
                 ...state,
-                totalQuantityOfSalesAreas: action.payload
+                loading: false,
+                paginatedSalesAreas: action.payload.docs,
+                totalQuantityOfSalesAreas: action.payload.totalDocs
+            }
+        case actions.SET_SELECTED_SALES_AREA:
+            const selectedSalesAreaName = { value: action.payload[0].name }
+            return {
+                ...state,
+                selectedSalesArea: action.payload,
+                selectedSalesAreaName
             }
         default:
             return state

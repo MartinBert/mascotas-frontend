@@ -1,5 +1,5 @@
 // React Components and Hooks
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Custom Components
@@ -41,18 +41,11 @@ const Productos = () => {
         products_dispatch({ type: 'SET_PRODUCT_FOR_DETAILS_MODAL', payload: productData })
     }
 
-    const setLimit = (val) => {
+    const setPageAndLimit = (page, limit) => {
         const paginationParams = {
-            ...products_state.paginationParams,
-            limit: parseInt(val)
-        }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
-    const setPage = (e) => {
-        const paginationParams = {
-            ...products_state.paginationParams,
-            page: parseInt(e)
+            ...products_state.index.paginationParams,
+            page: parseInt(page),
+            limit: parseInt(limit)
         }
         products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
@@ -62,13 +55,13 @@ const Productos = () => {
         const findBrands = await api.marcas.findAll()
         const findTypes = await api.rubros.findAll()
         const allBrands = findBrands.docs
-        const allBrandsNames = allBrands.length < 0
+        const allBrandsNames = allBrands.length < 1
             ? []
             : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
                 return { value: brand.nombre }
             }))
         const allTypes = findTypes.docs
-        const allTypesNames = allTypes.length < 0
+        const allTypesNames = allTypes.length < 1
             ? []
             : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
                 return { value: type.nombre }
@@ -94,15 +87,15 @@ const Productos = () => {
     // ------------------ Fetch Products ------------------ //
     useEffect(() => {
         const fetchProducts = async () => {
-            const findParamsForRender = formatFindParams(products_state.paginationParams)
+            const findParamsForRender = formatFindParams(products_state.index.paginationParams)
             const dataForRender = await api.productos.findPaginated(findParamsForRender)
             const dataForExcelReport = await api.productos.findAllFiltered(findParamsForRender.filters)
-            products_dispatch({ type: 'SET_PRODUCTS_FOR_RENDER', payload: dataForRender })
+            products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
             products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExcelReport.docs })
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchProducts()
-    }, [deleteModal_state.loading, products_state.paginationParams])
+    }, [deleteModal_state.loading, products_state.index.paginationParams])
 
     // ------------------ Products Deletion ------------------ //
     const productDeletion = (productID) => {
@@ -214,17 +207,16 @@ const Productos = () => {
             <Col span={24}>
                 <Table
                     width={'100%'}
-                    dataSource={products_state.productsForRender}
+                    dataSource={products_state.index.productsToRender}
                     columns={columnsForTable}
                     pagination={{
-                        defaultCurrent: products_state.paginationParams.page,
-                        limit: products_state.paginationParams.limit,
-                        total: products_state.productsTotalRecords,
+                        defaultCurrent: products_state.index.paginationParams.page,
+                        defaultPageSize: products_state.index.paginationParams.limit,
+                        limit: products_state.index.paginationParams.limit,
+                        onChange: (page, limit) => setPageAndLimit(page, limit),
+                        pageSizeOptions: [7, 14, 28, 56],
                         showSizeChanger: true,
-                        // defaultPageSize: 7,
-                        // pageSizeOptions: [7, 14, 28, 56],
-                        onChange: e => setPage(e),
-                        onShowSizeChange: (e, val) => setLimit(val)
+                        total: products_state.index.productsTotalRecords
                     }}
                     loading={deleteModal_state.loading}
                     rowKey='_id'
@@ -233,7 +225,7 @@ const Productos = () => {
                 />
             </Col>
             {
-                !products_state.productForDetailsModal
+                !products_state.detailsModal.product
                     ? null
                     : <GiselaDetailsModal />
             }

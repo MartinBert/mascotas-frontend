@@ -59,10 +59,7 @@ const ZonasDeVentasForm = () => {
     }
 
     const updateValues = (e) => {
-        const convertToNumberTargets = [
-            'discountPercentage',
-            'surchargePercentage'
-        ]
+        const convertToNumberTargets = ['discountPercentage', 'surchargePercentage']
         const updatedValues = {
             ...salesAreas_state.currentSalesArea,
             [e.target.id]: convertToNumberTargets.includes(e.target.id)
@@ -77,7 +74,7 @@ const ZonasDeVentasForm = () => {
             element: (
                 <Button
                     danger
-                    onClick={() => cancel()}
+                    onClick={cancel}
                     style={{ width: '100%' }}
                     type='primary'
                 >

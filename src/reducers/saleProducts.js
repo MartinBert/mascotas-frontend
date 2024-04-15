@@ -6,8 +6,8 @@ const initialState = {
 
 const actions = {
     DELETE_ALL_PRODUCTS: 'DELETE_ALL_PRODUCTS',
-    DELETE_PRODUCT: 'DELETE_PRODUCT',
-    SET_PRODUCT: 'SET_PRODUCT',
+    DELETE_PRODUCTS: 'DELETE_PRODUCTS',
+    SET_PRODUCTS: 'SET_PRODUCTS',
     UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS: 'UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS'
 }
 
@@ -18,13 +18,13 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 params: { ...state.params, productos: [] }
             }
-        case actions.DELETE_PRODUCT:
-            const productsRemaining = state.params.productos
-                .filter(product => product._id !== action.payload)
-                .filter(product => !(product._id.startsWith('customProduct_')))
-
-            const customProductsRemaining = state.params.productos
-                .filter(product => product._id !== action.payload)
+        case actions.DELETE_PRODUCTS:
+            const productsToDeleteIDs = action.payload.map(product => product._id)
+            const currentProducts = state.params.productos
+                .filter(product => !productsToDeleteIDs.includes(product._id))
+                .filter(product => !product._id.startsWith('customProduct_'))
+            const currentCustomProducts = state.params.productos
+                .filter(product => !productsToDeleteIDs.includes(product._id))
                 .filter(product => product._id.startsWith('customProduct_'))
                 .map((customProduct, index) => {
                     customProduct = {
@@ -35,24 +35,25 @@ const reducer = (state = initialState, action) => {
                     }
                     return customProduct
                 })
-
-            return {
-                ...state,
-                params: { 
-                    ...state.params,
-                    productos: productsRemaining.concat(customProductsRemaining)
-                }
-            }
-        case actions.SET_PRODUCT:
-            if (state.params.productos.find(product => product._id === action.payload._id)) return state;
             return {
                 ...state,
                 params: {
                     ...state.params,
-                    productos: [
-                        ...state.params.productos,
-                        action.payload
-                    ]
+                    productos: currentProducts.concat(currentCustomProducts)
+                }
+            }
+        case actions.SET_PRODUCTS:
+            const currentSelectedProducts = state.params.productos
+            const currentSelectedProductsIDs = state.params.productos.map(product => product._id)
+            const newSelectedProducts = action.payload.filter(
+                product => !currentSelectedProductsIDs.includes(product._id)
+            )
+            const selectedProducts = currentSelectedProducts.concat(newSelectedProducts)
+            return {
+                ...state,
+                params: {
+                    ...state.params,
+                    productos: selectedProducts
                 }
             }
         case actions.UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS:

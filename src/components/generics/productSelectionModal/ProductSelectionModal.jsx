@@ -1,20 +1,22 @@
 // React Components and Hooks
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 // Custom Components
-import { GenericAutocomplete } from '../'
+import InputHidden from '../InputHidden'
 
 // Custom Context Providers
+import actions from '../../../actions'
 import contexts from '../../../contexts'
+
+// Design Components
+import { Button, Checkbox, Col, Input, Modal, Row, Select, Table } from 'antd'
 
 // Services
 import api from '../../../services'
 
-// Design Components
-import { Modal, Row, Col, Input, Button, Table, Checkbox } from 'antd'
-
 // Imports Destructurings
+const { formatFindParams } = actions.paginationParams
 const { useEntriesContext } = contexts.Entries
 const { useOutputsContext } = contexts.Outputs
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
@@ -28,67 +30,347 @@ const ProductSelectionModal = () => {
     const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
     const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
 
-    const [productsForTable, setProductsForTable] = useState(null)
-    const [limit, setLimit] = useState(10)
-    const [page, setPage] = useState(1)
-    const [totalDocs, setTotalDocs] = useState(0)
-    const [selectedBrand, setSelectedBrand] = useState(null)
-    const [selectedHeading, setSelectedHeading] = useState(null)
-    const [filters, setFilters] = useState(null)
-    const [loading, setLoading] = useState(true)
+    // ----------- Redirect to correct state ------------- //
+    const product_dispatch = (action) => {
+        if (location.pathname.includes('entradas')) return entries_dispatch(action)
+        if (location.pathname.includes('salidas')) return outputs_dispatch(action)
+        if (location.pathname.includes('venta')) return saleProducts_dispatch(action)
+    }
 
     const product_state = () => {
-        if (location.pathname === '/entradas/nuevo') return entries_state
-        if (location.pathname === '/salidas/nuevo') return outputs_state
-        if (location.pathname === '/venta') return saleProducts_state
+        if (location.pathname.includes('entradas')) return entries_state
+        if (location.pathname.includes('salidas')) return outputs_state
+        if (location.pathname.includes('venta')) return saleProducts_state
     }
 
-    // ------------ Products load ------------ //
-    useEffect(() => {
-        const fetchProducts = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.productos.findPaginated({ page, limit, filters: stringFilters })
-            setProductsForTable(data.docs)
-            setTotalDocs(data.totalDocs)
-            setLoading(false)
-        }
-        fetchProducts()
-    }, [page, limit, filters])
-
-    // ------------ Set product brand ------------ //
-    useEffect(() => {
-        if (selectedBrand) {
-            setFilters(filters => ({ ...filters, marca: selectedBrand }))
-        }
-    }, [selectedBrand])
-
-    // ------------ Set product heading ------------ //
-    useEffect(() => {
-        if (selectedHeading) {
-            setFilters(filters => ({ ...filters, rubro: selectedHeading }))
-        }
-    }, [selectedHeading])
-
-    const product_dispatch = (action) => {
-        if (location.pathname === '/entradas/nuevo') return entries_dispatch(action)
-        if (location.pathname === '/salidas/nuevo') return outputs_dispatch(action)
-        if (location.pathname === '/venta') return saleProducts_dispatch(action)
+    // ----------- Button to cancel modifies ------------- //
+    const cancelModifies = () => {
+        productSelectionModal_dispatch({ type: 'CLEAR_MODIFIES' })
     }
+
+    const buttonToCancelModifies = (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+                className='btn-secondary'
+                onClick={cancelModifies}
+                style={{ width: '50%' }}
+            >
+                Cancelar
+            </Button>
+        </div>
+    )
+
+    // -------------- Button to check page --------------- //
+    const checkPage = () => {
+        const productsToRender = productSelectionModal_state.productsToRender
+        const currentProductsToSelect = productSelectionModal_state.productsToSelect
+        const currentProductsToSelectIDs = productSelectionModal_state.productsToSelect
+            .map(product => product._id)
+        const newProductsToSelect = productsToRender
+            .filter(product => !currentProductsToSelectIDs.includes(product._id))
+            .concat(currentProductsToSelect)
+        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: newProductsToSelect })
+    }
+
+    const buttonToCheckPage = (
+        <Button
+            className='btn-primary'
+            onClick={checkPage}
+            style={{ width: '100%' }}
+        >
+            Marcar página
+        </Button>
+    )
+
+    // ------------- Button to clear filters ------------- //
+    const clearFilters = () => {
+        productSelectionModal_dispatch({ type: 'CLEAR_FILTERS' })
+    }
+
+    const buttonToClearFilters = (
+        <Button
+            danger
+            onClick={clearFilters}
+            style={{ width: '100%' }}
+            type='primary'
+        >
+            Limpiar filtros
+        </Button>
+    )
+
+    // ------------ Button to save products -------------- //
+    const saveProducts = () => {
+        const productsToSave = productSelectionModal_state.productsToSelect
+        product_dispatch({ type: 'SET_PRODUCTS', payload: productsToSave })
+        productSelectionModal_dispatch({ type: 'CLEAR_MODIFIES' })
+    }
+
+    const buttonToSaveProducts = (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+                className='btn-primary'
+                onClick={saveProducts}
+                style={{ width: '50%' }}
+            >
+                Aceptar
+            </Button>
+        </div>
+    )
+
+    // ------------- Button to uncheck page -------------- //
+    const uncheckPage = () => {
+         const productsToUncheckIDs = productSelectionModal_state.productsToRender
+            .map(product => product._id)
+        const remainingProducts = productSelectionModal_state.productsToSelect
+            .filter(product => !productsToUncheckIDs.includes(product._id))
+        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: remainingProducts })
+    }
+
+    const buttonToUncheckPage = (
+        <Button
+            className='btn-secondary'
+            onClick={uncheckPage}
+            style={{ width: '100%' }}
+        >
+            Desmarcar página
+        </Button>
+    )
+
+    // --------------- Fetch Brands and Types ---------------- //
+    const loadBrandsAndTypes = async () => {
+        const findBrands = await api.marcas.findAll()
+        const findTypes = await api.rubros.findAll()
+        const allBrands = findBrands.docs
+        const allBrandsNames = allBrands.length < 1
+            ? []
+            : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
+                return { value: brand.nombre }
+            }))
+        const allTypes = findTypes.docs
+        const allTypesNames = allTypes.length < 1
+            ? []
+            : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
+                return { value: type.nombre }
+            }))
+        productSelectionModal_dispatch({
+            type: 'SET_BRANDS_AND_TYPES',
+            payload: { allBrands, allBrandsNames, allTypes, allTypesNames }
+        })
+    }
+
+    useEffect(() => { loadBrandsAndTypes() }, [])
+
+    // ------------------ Fetch Products ------------------ //
+    const fetchProducts = async () => {
+        const findParams = formatFindParams(productSelectionModal_state.paginationParams)
+        const data = await api.productos.findPaginated(findParams)
+        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_RENDER', payload: data })
+    }
+
+    useEffect(() => { fetchProducts() }, [productSelectionModal_state.paginationParams])
+
+    // --------------- Filter By Barcode ----------------- //
+    const onChangeBarCode = (e) => {
+        const filters = {
+            ...productSelectionModal_state.paginationParams.filters,
+            codigoBarras: e.target.value
+        }
+        const paginationParams = { ...productSelectionModal_state.paginationParams, filters, page: 1 }
+        productSelectionModal_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByBarcode = (
+        <Input
+            color='primary'
+            name='codigoBarras'
+            onChange={onChangeBarCode}
+            placeholder='Buscar por código de barras'
+            style={{ width: '100%' }}
+            value={productSelectionModal_state.paginationParams.filters.codigoBarras}
+        />
+    )
+
+    // ---------------- Filter By Brand ------------------ //
+    const changeBrands = (e) => {
+        const brands = productSelectionModal_state.brandsForSelect.allBrandsNames
+        let selectedBrands
+        let selectedBrandsNames
+        if (e.length === 0) {
+            selectedBrands = []
+            selectedBrandsNames = [{ value: 'Todas las marcas' }]
+        }
+        else {
+            const eventValues = e.map(eventOption => eventOption.value)
+            selectedBrands = productSelectionModal_state.brandsForSelect.allBrands
+                .filter(brand => eventValues.includes(brand.nombre))
+            selectedBrandsNames = brands.map(option => {
+                if (eventValues.includes(option.value)) return option
+                else return null
+            }).filter(option => option)
+        }
+        productSelectionModal_dispatch({
+            type: 'SELECT_BRANDS',
+            payload: { selectedBrands, selectedBrandsNames }
+        })
+    }
+
+    const selectBrands = (e) => {
+        if (e.value === 'Todas las marcas') productSelectionModal_dispatch({ type: 'SELECT_ALL_BRANDS' })
+        else productSelectionModal_dispatch({ type: 'DESELECT_ALL_BRANDS' })
+    }
+
+    const selectToFilterByBrand = (
+        <Select
+            allowClear
+            labelInValue
+            mode='multiple'
+            onChange={changeBrands}
+            onSelect={selectBrands}
+            options={productSelectionModal_state.brandsForSelect.allBrandsNames}
+            style={{ width: '100%' }}
+            value={productSelectionModal_state.brandsForSelect.selectedBrandsNames}
+        />
+    )
+
+    // ---------------- Filter By Name ------------------- //
+    const onChangeName = (e) => {
+        const filters = {
+            ...productSelectionModal_state.paginationParams.filters,
+            nombre: e.target.value
+        }
+        const paginationParams = { ...productSelectionModal_state.paginationParams, filters, page: 1 }
+        productSelectionModal_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByName = (
+        <Input
+            color='primary'
+            name='nombre'
+            onChange={onChangeName}
+            placeholder='Buscar por nombre'
+            style={{ width: '100%' }}
+            value={productSelectionModal_state.paginationParams.filters.nombre}
+        />
+    )
+
+    // ------------ Filter By Product Code --------------- //
+    const onChangeProductCode = (e) => {
+        const filters = {
+            ...productSelectionModal_state.paginationParams.filters,
+            codigoProducto: e.target.value
+        }
+        const paginationParams = { ...productSelectionModal_state.paginationParams, filters, page: 1 }
+        productSelectionModal_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByProductCode = (
+        <Input
+            color='primary'
+            name='codigoProducto'
+            onChange={onChangeProductCode}
+            placeholder='Buscar por código de producto'
+            style={{ width: '100%' }}
+            value={productSelectionModal_state.paginationParams.filters.codigoProducto}
+        />
+    )
+
+    // ----------------- Filter By Type ------------------ //
+    const changeTypes = (e) => {
+        const types = productSelectionModal_state.typesForSelect.allTypesNames
+        let selectedTypes
+        let selectedTypesNames
+        if (e.length === 0) {
+            selectedTypes = []
+            selectedTypesNames = [{ value: 'Todos los rubros' }]
+        }
+        else {
+            const eventValues = e.map(eventOption => eventOption.value)
+            selectedTypes = productSelectionModal_state.typesForSelect.allTypes
+                .filter(type => eventValues.includes(type.nombre))
+            selectedTypesNames = types.map(option => {
+                if (eventValues.includes(option.value)) return option
+                else return null
+            }).filter(option => option)
+        }
+        productSelectionModal_dispatch({
+            type: 'SELECT_TYPES',
+            payload: { selectedTypes, selectedTypesNames }
+        })
+    }
+
+    const selectTypes = (e) => {
+        if (e.value === 'Todos los rubros') productSelectionModal_dispatch({ type: 'SELECT_ALL_TYPES' })
+        else productSelectionModal_dispatch({ type: 'DESELECT_ALL_TYPES' })
+    }
+
+    const selectToFilterByType = (
+        <Select
+            allowClear
+            labelInValue
+            mode='multiple'
+            onChange={changeTypes}
+            onSelect={selectTypes}
+            options={productSelectionModal_state.typesForSelect.allTypesNames}
+            style={{ width: '100%' }}
+            value={productSelectionModal_state.typesForSelect.selectedTypesNames}
+        />
+    )
+
+    // ---------- Table of selected products ------------- //
+    const loadCheckedStateOfProducts = () => {
+        const currentSelectedProducts = product_state().params.productos
+        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: currentSelectedProducts })
+    }
+
+    useEffect(() => {
+        loadCheckedStateOfProducts()
+    }, [productSelectionModal_state.visibility])
 
     const checkProduct = (e, product) => {
-        if (productSelectionModal_state.selectionLimit <= 1) product_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
-        if (e.target.checked) product_dispatch({ type: 'SET_PRODUCT', payload: product })
-        else product_dispatch({ type: 'DELETE_PRODUCT', payload: product._id })
+        let newSelectedProducts
+        if (e.target.checked) {
+            newSelectedProducts = [...productSelectionModal_state.productsToSelect, product]
+        }
+        else {
+            newSelectedProducts = productSelectionModal_state.productsToSelect
+                .filter(currentProduct => currentProduct._id !== product._id)
+        }
+        const savedProducts = product_state().params.productos
+        newSelectedProducts.map(product => {
+            for (let index = 0; index < savedProducts.length; index++) {
+                const savedProduct = savedProducts[index]
+                if (product._id === savedProduct._id) {
+                    if (savedProduct.cantidadesEntrantes) {
+                        product.cantidadesEntrantes = savedProduct.cantidadesEntrantes
+                    }
+                    if (savedProduct.cantidadesSalientes) {
+                        product.cantidadesSalientes = savedProduct.cantidadesSalientes
+                    }
+                }
+            }
+            return product
+        })
+        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: newSelectedProducts })
     }
 
-    const cleanFilters = () => {
-        setSelectedBrand(null)
-        setSelectedHeading(null)
-        setFilters(null)
+    const setPageAndLimit = (page, limit) => {
+        const paginationParams = {
+            ...productSelectionModal_state.paginationParams,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        }
+        productSelectionModal_dispatch({
+            type: 'SET_PAGINATION_PARAMS',
+            payload: paginationParams
+        })
     }
 
-    const closeModal = () => {
-        productSelectionModal_dispatch({ type: 'HIDE_PRODUCT_MODAL' })
+    const verifyChecked = (product) => {
+        const currentSelectedProductsIDs = productSelectionModal_state.productsToSelect
+            .map(product => product._id)
+        const isChecked = currentSelectedProductsIDs.includes(product._id)
+        if (isChecked) return true
+        else return false
     }
 
     const columns = [
@@ -111,7 +393,7 @@ const ProductSelectionModal = () => {
             dataIndex: 'productSelectionModal_actions',
             render: (_, product) => (
                 <Checkbox
-                    checked={product_state().params.productos.includes(product) ? true : false}
+                    checked={verifyChecked(product)}
                     onChange={e => checkProduct(e, product)}
                 />
             ),
@@ -119,119 +401,147 @@ const ProductSelectionModal = () => {
         }
     ]
 
+    const tableOfSelectedProducts = (
+        <Table
+            width={'100%'}
+            dataSource={productSelectionModal_state.productsToRender}
+            columns={columns}
+            pagination={{
+                defaultCurrent: productSelectionModal_state.paginationParams.page,
+                defaultPageSize: productSelectionModal_state.paginationParams.limit,
+                limit: productSelectionModal_state.paginationParams.limit,
+                onChange: (page, limit) => setPageAndLimit(page, limit),
+                pageSizeOptions: [5, 10, 15, 20],
+                showSizeChanger: true,
+                total: productSelectionModal_state.totalProducts
+            }}
+            loading={productSelectionModal_state.loading}
+            rowKey='_id'
+            tableLayout='auto'
+            size='small'
+        />
+    )
+
+    // --------------- Title of actions ------------------ //
+    const titleOfActions = <h3>Acciones</h3>
+
+    // --------------- Title of filters ------------------ //
+    const titleOfFilters = <h3>Filtrar productos</h3>
+
+
+    const itemsToRender = [
+        {
+            element: buttonToCheckPage,
+            name: 'productSelectionModal_buttonToCheckPage',
+            order: { lg: 11, md: 11, sm: 12, xl: 11, xs: 12, xxl: 11 }
+        },
+        {
+            element: buttonToClearFilters,
+            name: 'productSelectionModal_buttonToClearFilters',
+            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
+        },
+        {
+            element: buttonToUncheckPage,
+            name: 'productSelectionModal_buttonToUncheckPage',
+            order: { lg: 9, md: 9, sm: 11, xl: 9, xs: 11, xxl: 9 }
+        },
+        {
+            element: <InputHidden />,
+            name: 'productSelectionModal_inputHidden1',
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
+        },
+        {
+            element: <InputHidden />,
+            name: 'productSelectionModal_inputHidden2',
+            order: { lg: 7, md: 7, sm: 10, xl: 7, xs: 10, xxl: 7 }
+        },
+        {
+            element: inputToFilterByBarcode,
+            name: 'productSelectionModal_inputToFilterByBarcode',
+            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
+        },
+        {
+            element: inputToFilterByName,
+            name: 'productSelectionModal_inputToFilterByName',
+            order: { lg: 4, md: 4, sm: 5, xl: 4, xs: 5, xxl: 4 }
+        },
+        {
+            element: inputToFilterByProductCode,
+            name: 'productSelectionModal_inputToFilterByProductCode',
+            order: { lg: 8, md: 8, sm: 7, xl: 8, xs: 7, xxl: 8 }
+        },
+        {
+            element: selectToFilterByBrand,
+            name: 'productSelectionModal_selectToFilterByBrand',
+            order: { lg: 10, md: 10, sm: 8, xl: 10, xs: 8, xxl: 10 }
+        },
+        {
+            element: selectToFilterByType,
+            name: 'productSelectionModal_selectToFilterByType',
+            order: { lg: 12, md: 12, sm: 9, xl: 12, xs: 9, xxl: 12 }
+        },
+        {
+            element: titleOfActions,
+            name: 'productSelectionModal_titleOfActions',
+            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+        },
+        {
+            element: titleOfFilters,
+            name: 'productSelectionModal_titleOfFilters',
+            order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 }
+        }
+    ]
+
+    const responsiveGrid = {
+        gutter: { horizontal: 8, vertical: 8 },
+        span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
+    }
+
     return (
         <Modal
-            title={'Seleccionar producto' + ((productSelectionModal_state.selectionLimit > 1) ? 's' : '')}
-            open={productSelectionModal_state.productModalIsVisible}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
-            onOk={() => closeModal()}
+            okButtonProps={{ style: { display: 'none' } }}
+            open={productSelectionModal_state.visibility}
             width={1200}
         >
-            <Row>
-                <Col span={24} style={{ marginBottom: '10px' }}>
-                    <Row justify='space between' gutter={16}>
-                        <Col span={6}>
-                            <Input
-                                color='primary'
-                                style={{ width: 200, marginBottom: '10px' }}
-                                placeholder='Buscar por nombre'
-                                onChange={(e) => {
-                                    setFilters(
-                                        {
-                                            ...filters,
-                                            nombre: e.target.value
-                                        }
-                                    )
-                                }}
-                                value={(filters) ? filters.nombre : null}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input
-                                color='primary'
-                                style={{ width: 200, marginBottom: '10px' }}
-                                placeholder='Buscar por codigo de barras'
-                                onChange={(e) => {
-                                    setFilters(
-                                        {
-                                            ...filters,
-                                            codigoBarras: e.target.value
-                                        }
-                                    )
-                                }}
-                                value={(filters) ? filters.codigoBarras : null}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input
-                                color='primary'
-                                style={{ width: 200, marginBottom: '10px' }}
-                                placeholder='Buscar por codigo de producto'
-                                onChange={(e) => {
-                                    setFilters(
-                                        {
-                                            ...filters,
-                                            codigoProducto: e.target.value
-                                        }
-                                    )
-                                }}
-                                value={(filters) ? filters.codigoProducto : null}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Button
-                                danger
-                                onClick={() => cleanFilters()}
-                                type='primary'
+            <Row
+                gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}
+                justify='space-around'
+            >
+                {
+                    itemsToRender.map(item => {
+                        return (
+                            <Col
+                                key={item.name}
+                                lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
+                                md={{ order: item.order.md, span: responsiveGrid.span.md }}
+                                sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
+                                xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
+                                xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
+                                xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
                             >
-                                Limpiar filtros
-                            </Button>
-                        </Col>
-                        <Col span={8}>
-                            <GenericAutocomplete
-                                label='Filtrar por marcas'
-                                modelToFind='marca'
-                                keyToCompare='nombre'
-                                controller='marcas'
-                                returnCompleteModel={true}
-                                setResultSearch={setSelectedBrand}
-                                selectedSearch={selectedBrand}
-                                styles={{ backgroundColor: '#fff' }}
-                            />
-                        </Col>
-                        <Col span={8}>
-                            <GenericAutocomplete
-                                label='Filtrar por rubros'
-                                modelToFind='rubro'
-                                keyToCompare='nombre'
-                                controller='rubros'
-                                returnCompleteModel={true}
-                                setResultSearch={setSelectedHeading}
-                                selectedSearch={selectedHeading}
-                                styles={{ backgroundColor: '#fff' }}
-                            />
-                        </Col>
-                    </Row>
-                </Col>
+                                {item.element}
+                            </Col>
+                        )
+                    })
+                }
+            </Row>
+            <br />
+            <Row>
                 <Col span={24}>
-                    <Table
-                        width={'100%'}
-                        dataSource={productsForTable}
-                        columns={columns}
-                        pagination={{
-                            defaultCurrent: page,
-                            limit: limit,
-                            total: totalDocs,
-                            showSizeChanger: true,
-                            onChange: (e) => setPage(e),
-                            onShowSizeChange: (e, val) => setLimit(val)
-                        }}
-                        loading={loading}
-                        rowKey='_id'
-                        tableLayout='auto'
-                        size='small'
-                    />
+                    {tableOfSelectedProducts}
+                </Col>
+            </Row>
+            <Row
+                gutter={8}
+                justify='space-around'
+            >
+                <Col span={8}>
+                    {buttonToCancelModifies}
+                </Col>
+                <Col span={8}>
+                    {buttonToSaveProducts}
                 </Col>
             </Row>
         </Modal>

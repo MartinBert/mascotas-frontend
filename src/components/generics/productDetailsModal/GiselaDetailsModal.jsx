@@ -43,8 +43,8 @@ const GiselaDetailsModal = () => {
             value: (
                 <h3 style={margin0}>
                     {
-                        products_state.productForDetailsModal
-                            ? products_state.productForDetailsModal.nombre
+                        products_state.detailsModal.product
+                            ? products_state.detailsModal.product.nombre
                             : '-'
                     }
                 </h3>
@@ -56,8 +56,8 @@ const GiselaDetailsModal = () => {
             value: (
                 <h3 style={margin0}>
                     {
-                        products_state.productForDetailsModal
-                            ? products_state.productForDetailsModal.precioVenta
+                        products_state.detailsModal.product
+                            ? products_state.detailsModal.product.precioVenta
                             : '-'
                     }
                 </h3>
@@ -70,14 +70,14 @@ const GiselaDetailsModal = () => {
                 <h3 style={margin0}>
                     {
                         (
-                            products_state.productForDetailsModal.precioVentaFraccionado
-                            && products_state.productForDetailsModal.unidadMedida.fraccionamiento !== 1
+                            products_state.detailsModal.product.precioVentaFraccionado
+                            && products_state.detailsModal.product.unidadMedida.fraccionamiento !== 1
                         )
                             ? roundToMultiple(calculateSalePricePerUnit(
-                                products_state.productForDetailsModal.unidadMedida.fraccionamiento,
-                                products_state.productForDetailsModal.precioVentaFraccionado
+                                products_state.detailsModal.product.unidadMedida.fraccionamiento,
+                                products_state.detailsModal.product.precioVentaFraccionado
                             ), 10)
-                            : products_state.productForDetailsModal.precioVenta
+                            : products_state.detailsModal.product.precioVenta
                     }
                 </h3>
             )
@@ -88,7 +88,7 @@ const GiselaDetailsModal = () => {
         <Modal
             footer={false}
             onCancel={onCancel}
-            open={products_state.productDetailsModalVisibility}
+            open={products_state.detailsModal.visibility}
             width={1000}
         >
             <div justify='center'>

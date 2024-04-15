@@ -29,7 +29,7 @@ const DetailsModal = () => {
         outputs_dispatch({ type: 'HIDE_DETAILS_MODAL' })
     }
 
-    const setProductForDetailsModal = (product) => {
+    const setdetailsModal = (product) => {
         products_dispatch({ type: 'SET_PRODUCT_FOR_DETAILS_MODAL', payload: product })
     }
 
@@ -75,7 +75,7 @@ const DetailsModal = () => {
         {
             title: 'Detalles',
             render: (_, product) => (
-                <div onClick={() => setProductForDetailsModal(product)}>
+                <div onClick={() => setdetailsModal.product(product)}>
                     <Details title='Ver detalle' />
                 </div>
             )

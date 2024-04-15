@@ -19,7 +19,7 @@ const margin0 = { margin: 0 }
 
 const ProductDetailsModal = () => {
     const [products_state, products_dispatch] = useProductsContext()
-    const productData = products_state.productForDetailsModal
+    const productData = products_state.detailsModal.product
 
     const onCancel = () => {
         products_dispatch({ type: 'HIDE_PRODUCT_DETAILS_MODAL' })
@@ -61,7 +61,7 @@ const ProductDetailsModal = () => {
 
     return (
         <Modal
-            open={products_state.productDetailsModalVisibility}
+            open={products_state.detailsModal.visibility}
             onCancel={onCancel}
             footer={false}
             width={1000}
