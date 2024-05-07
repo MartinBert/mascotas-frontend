@@ -23,7 +23,7 @@ import api from '../../services'
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
-const { simpleDateWithHours } = helpers.dateHelper
+const { resetDate, simpleDateWithHours } = helpers.dateHelper
 const { Delete } = icons
 
 
@@ -150,6 +150,40 @@ const EntradasForm = () => {
         return 'OK'
     }
 
+    const generateStockHistory = async () => {
+        for (const product of entries_state.params.productos) {
+            const dateString = entries_state.params.fechaString.substring(0, 10)
+            const filters = JSON.stringify({ dateString, product })
+            const findStockHistory = await api.stockHistory.findAllByFilters(filters)
+            const stockHistory = findStockHistory.docs
+            let saveResponseCode
+            const data = {
+                date: resetDate(entries_state.params.fecha),
+                dateString,
+                itIsAManualCorrection: false,
+                product: product._id
+            }
+            if (stockHistory.length < 1) {
+                data.entries = entries_state.params.cantidad
+                data.outputs = 0
+                const saveNewRecord = await api.stockHistory.save(data)
+                saveResponseCode = saveNewRecord.code
+            } else {
+                data._id = stockHistory[0]._id
+                data.entries = stockHistory[0].entries + entries_state.params.cantidad
+                if (entryID !== 'nuevo') {
+                    const entryToEdit = await api.entradas.findById(entryID)
+                    const previousQuantity = entryToEdit.data.cantidad
+                    data.entries -= previousQuantity
+                }
+                data.outputs = stockHistory[0].outputs
+                const editRecord = await api.stockHistory.edit(data)
+                saveResponseCode = editRecord.code
+            }
+            if (saveResponseCode !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock".`)
+        }
+    }
+
     const saveNew = async () => {
         const result = validateEntrySave()
         if (result === 'FAIL') return
@@ -158,6 +192,9 @@ const EntradasForm = () => {
         const filters = JSON.stringify({ dateString: entries_state.params.fechaString.substring(0, 10) })
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
         const statisticToEdit = findStatisticToEdit.docs[0] || null
+
+        // Corregir historial de stock de productos pertenecientes a la salida
+        generateStockHistory()
 
         // Corregir stock de productos pertenecientes a la entrada
         for (const product of entries_state.params.productos) {
@@ -197,7 +234,10 @@ const EntradasForm = () => {
         const entryToEdit = findEntryToEdit.data
         const filters = JSON.stringify({ dateString: entryToEdit.fechaString.substring(0, 10) })
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
-        const statisticToEdit = findStatisticToEdit.docs[0]
+        const statisticToEdit = findStatisticToEdit.docs[0] || null
+
+        // Corregir historial de stock de productos pertenecientes a la salida
+        generateStockHistory()
 
         // Corregir stock de productos pertenecientes a la entrada
         for (let product of entries_state.params.productos) {
@@ -218,18 +258,20 @@ const EntradasForm = () => {
         }
 
         // Corregir la estadística diaria correspondiente a la fecha de la entrada
-        const currentStatisticExpense = statisticToEdit.dailyExpense
-        const currentStatisticIncome = statisticToEdit.dailyIncome
-        const currentExpenseOfEntry = entryToEdit.costoTotal
-        const newExpenseOfEntry = entries_state.params.costoTotal
-        const newStatisticDailyExpense = currentStatisticExpense - currentExpenseOfEntry + newExpenseOfEntry
-        const newStatisticDailyProfit = currentStatisticIncome - newStatisticDailyExpense
-        const newStatisticToSave = {
-            ...statisticToEdit,
-            dailyExpense: newStatisticDailyExpense,
-            dailyProfit: newStatisticDailyProfit
+        if (statisticToEdit) {
+            const currentStatisticExpense = statisticToEdit.dailyExpense
+            const currentStatisticIncome = statisticToEdit.dailyIncome
+            const currentExpenseOfEntry = entryToEdit.costoTotal
+            const newExpenseOfEntry = entries_state.params.costoTotal
+            const newStatisticDailyExpense = currentStatisticExpense - currentExpenseOfEntry + newExpenseOfEntry
+            const newStatisticDailyProfit = currentStatisticIncome - newStatisticDailyExpense
+            const newStatisticToSave = {
+                ...statisticToEdit,
+                dailyExpense: newStatisticDailyExpense,
+                dailyProfit: newStatisticDailyProfit
+            }
+            await api.dailyBusinessStatistics.edit(newStatisticToSave)
         }
-        await api.dailyBusinessStatistics.edit(newStatisticToSave)
 
         // Guardar la entrada editada
         const recordToEdit = { ...entries_state.params, id: entryID }

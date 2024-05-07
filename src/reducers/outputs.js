@@ -61,6 +61,7 @@ const initialState = {
         fecha: new Date(),
         fechaString: simpleDateWithHours(new Date()),
         cantidad: 0,
+        ganancia: 0,
         gananciaNeta: 0,
         productos: [],
         usuario: null
@@ -73,19 +74,29 @@ const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actions.CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY:
             const cantidad = state.params.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0)
+            const ganancia = roundTwoDecimals(
+                state.params.productos.reduce(
+                    (acc, item) =>
+                        acc + (
+                            item.cantidadesSalientes
+                                ? item.precioVenta * item.cantidadesSalientes
+                                : 0
+                        ), 0
+                )
+            )
             const gananciaNeta = roundTwoDecimals(
                 state.params.productos.reduce(
                     (acc, item) =>
                         acc + (
                             item.cantidadesSalientes
-                                ? item.precioUnitario * item.cantidadesSalientes
+                                ? (item.precioVenta - item.precioUnitario) * item.cantidadesSalientes
                                 : 0
                         ), 0
                 )
             )
             return {
                 ...state,
-                params: { ...state.params, cantidad, gananciaNeta }
+                params: { ...state.params, cantidad, ganancia, gananciaNeta }
             }
         case actions.CLEAR_INPUTS:
             return {

@@ -1,4 +1,10 @@
 // -------------------------------------- Base functions -------------------------------------- //
+// Reset date to 00:00 hs
+const resetDate = (date) => {
+    const resetedDate = new Date(Date.parse(date) - Date.parse(date) % 86400000 + 10800000)
+    return resetedDate
+}
+
 const twoCharsPattern = (value) => {
     return (value.length === 1) ? '0' + value : value
 }
@@ -31,6 +37,30 @@ const dateToQrAfip = (unformattedDate) => {
     const month = (parseInt(date.getMonth()) + 1).toString()
     const day = date.getDate().toString()
     return year + '-' + twoCharsPattern(month) + '-' + twoCharsPattern(day)
+}
+
+const getLastFortnight = () => {
+    const resetTodayDateInMs = Date.parse(resetDate(new Date()))
+    const today = resetTodayDateInMs + 85399999
+    const initDateOfLastFortnight = resetTodayDateInMs - 14 * 86400000
+    const lastFortnight = [new Date(initDateOfLastFortnight), new Date(today)]
+    return lastFortnight
+}
+
+const getLastMonth = () => {
+    const resetTodayDateInMs = Date.parse(resetDate(new Date()))
+    const today = resetTodayDateInMs + 85399999
+    const initDateOfLastMonth = resetTodayDateInMs - 30 * 86400000
+    const lastMonth = [new Date(initDateOfLastMonth), new Date(today)]
+    return lastMonth
+}
+
+const getLastWeek = () => {
+    const resetTodayDateInMs = Date.parse(resetDate(new Date()))
+    const today = resetTodayDateInMs + 85399999
+    const initDateOfLastWeek = resetTodayDateInMs - 7 * 86400000
+    const lastWeek = [new Date(initDateOfLastWeek), new Date(today)]
+    return lastWeek
 }
 
 const getTomorrowDate = () => {
@@ -69,12 +99,6 @@ const localFormat = (unformattedDate) => {
     return fixedDay + '/' + fixedMonth + '/' + year
 }
 
-// Reset date to 00:00 hs
-const resetDate = (date) => {
-    const resetedDate = new Date(Date.parse(date) - Date.parse(date) % 86400000 + 10800000)
-    return resetedDate
-}
-
 const simpleDateWithHours = (unformattedDate) => {
     const date = new Date(unformattedDate)
     const year = date.getFullYear().toString()
@@ -91,6 +115,9 @@ const dateHelper = {
     addDays,
     dateToAfip,
     dateToQrAfip,
+    getLastFortnight,
+    getLastMonth,
+    getLastWeek,
     getTomorrowDate,
     getYesterdayDate,
     isItLater,

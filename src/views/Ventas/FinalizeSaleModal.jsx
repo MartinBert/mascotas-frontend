@@ -5,7 +5,7 @@ import React, { useEffect } from 'react'
 import { errorAlert, successAlert } from '../../components/alerts'
 
 // Design Components
-import { Modal, Row, Col } from 'antd'
+import { Button, Col, Modal, Row } from 'antd'
 
 // Custom Context Providers
 import contexts from '../../contexts'
@@ -20,17 +20,19 @@ import api from '../../services'
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalVouchersCodes, formatBody } = helpers.afipHelper
-const { createBudgetPdf, createRemittancePdf, createVoucherPdf, createTicketPdf } = helpers.pdfHelper.commercialDocumentsPDF
+const { resetDate } = helpers.dateHelper
+const {
+    createBudgetPdf,
+    createRemittancePdf,
+    createVoucherPdf,
+    createTicketPdf
+} = helpers.pdfHelper.commercialDocumentsPDF
 
 const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
 
 const FinalizeSaleModal = () => {
     const [auth_state, auth_dispatch] = useAuthContext()
     const [sale_state, sale_dispatch] = useSaleContext()
-
-    const reload = () => {
-        return window.location.reload()
-    }
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -41,6 +43,25 @@ const FinalizeSaleModal = () => {
         fetchUser()
     }, [auth_dispatch])
 
+    // --------------------- Actions --------------------- //
+    const reload = () => { return window.location.reload() }
+
+    // ----------------- Button to cancel ---------------- //
+    const cancelSale = () => {
+        sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
+    }
+
+    const buttonToCancel = (
+        <Button
+            onClick={cancelSale}
+            style={{ width: '100%' }}
+            className='btn-secondary'
+        >
+            Cancelar
+        </Button>
+    )
+
+    // ------------------ Button to save ----------------- //
     const closeFiscalOperation = async () => {
         const bodyToAfip = formatBody(sale_state)
         const responseOfAfip = await api.afip.generateVoucher(auth_state.user.empresa.cuit, bodyToAfip)
@@ -59,126 +80,145 @@ const FinalizeSaleModal = () => {
     const startCloseSale = async () => {
         sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
         sale_dispatch({ type: 'LOADING_VIEW' })
-        sale_state.documentoFiscal ? closeFiscalOperation() : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
+        sale_state.documentoFiscal
+            ? closeFiscalOperation()
+            : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
     }
 
     const applyStockModification = async () => {
-        const processStock = async () => {
-            try {
-                for (const product of sale_state.productos) {
-                    const noCustomProduct = sale_state.renglones
-                        .filter(renglon => !(renglon._id.startsWith('customProduct_')))
-
-                    const lineOfProduct = (noCustomProduct.length === 0)
-                        ? null
-                        : noCustomProduct.find(renglon => renglon._id === product._id)
-
-                    const productToModifyInStock = (!lineOfProduct)
-                        ? null
-                        : {
-                            product,
-                            [
-                                lineOfProduct.fraccionar
-                                    ? 'fractionedQuantity'
-                                    : 'quantity'
-                            ]: lineOfProduct.cantidadUnidades
-                        }
-
-                    await api.productos.modifyStock(productToModifyInStock)
+        for (const product of sale_state.productos) {
+            const noCustomProduct = sale_state.renglones
+                .filter(renglon => !renglon._id.startsWith('customProduct_'))
+            const lineOfProduct = noCustomProduct.length === 0
+                ? null
+                : noCustomProduct.find(renglon => renglon._id === product._id)
+            const productToModifyInStock = !lineOfProduct
+                ? null
+                : {
+                    product,
+                    [
+                        lineOfProduct.fraccionar
+                            ? 'fractionedQuantity'
+                            : 'quantity'
+                    ]: lineOfProduct.cantidadUnidades
                 }
-                return true
-            } catch (err) {
-                console.error(err)
-                return false
-            }
+            const response = await api.productos.modifyStock(productToModifyInStock)
+            if (response.code !== 200) errorAlert(`No se pudo modificar el stock del producto "${product.nombre}". Modifíquelo manualmente en la sección "Productos" / "Editar".`)
         }
-        return { isModified: await processStock() }
+    }
+
+    const createSaleDocument = async () => {
+        let isCreated
+        if (sale_state.documento.codigoUnico === '000') { // No fiscal
+            if (sale_state.documento.nombre === 'PRESUPUESTO') isCreated = await createBudgetPdf(sale_state)
+            else if (sale_state.documento.nombre === 'REMITO') isCreated = await createRemittancePdf(sale_state)
+            else if (sale_state.documento.nombre === 'TICKET') isCreated = await createTicketPdf(sale_state)
+        } else { // Fiscal
+            if (billCodes.includes(sale_state.documento.codigoUnico)) isCreated = await createVoucherPdf(sale_state)
+        }
+        if (!isCreated) return errorAlert('No se pudo generar el comprobante de la operación. Recupérelo desde la página de AFIP.')
     }
 
     const saveSaleData = async () => {
-        try {
-            sale_state.renglones = sale_state.renglones.map(renglon => {
-                delete renglon._id
-                return renglon
-            })
+        sale_state.renglones = sale_state.renglones.map(renglon => {
+            delete renglon._id
+            return renglon
+        })
+        sale_state.productos = sale_state.productos
+            .filter(product => !(product._id.startsWith('customProduct_')))
+        const response = await api.ventas.save(sale_state)
+        if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
+    }
 
-            sale_state.productos = sale_state.productos
-                .filter(product => !(product._id.startsWith('customProduct_')))
-
-            const result = await api.ventas.save(sale_state)
-            return { isSaved: (result.code === 200) }
-        } catch (err) {
-            console.error(err)
-            return { isSaved: false }
+    const saveStockHistoryOfProducts = async () => {
+        const dateString = sale_state.fechaEmisionString.substring(0, 10)
+        for (let index = 0; index < sale_state.productos.length; index++) {
+            const product = sale_state.productos[index]
+            const [productLine] = sale_state.renglones.filter(line => line._id === product._id)
+            const productOutputs = productLine.fraccionar
+                ? productLine.cantidadUnidades / productLine.fraccionamiento
+                : productLine.cantidadUnidades
+            const filters = JSON.stringify({ dateString, product })
+            const findStockHistory = await api.stockHistory.findAllByFilters(filters)
+            const stockHistory = findStockHistory.docs
+            let saveResponse
+            const data = {
+                date: resetDate(sale_state.fechaEmision),
+                dateString,
+                itIsAManualCorrection: false,
+                product: product._id
+            }
+            if (stockHistory.length < 1) {
+                data.entries = 0
+                data.outputs = productOutputs
+                saveResponse = await api.stockHistory.save(data)
+            } else {
+                data._id = stockHistory[0]._id
+                data.entries = stockHistory[0].entries
+                data.outputs = stockHistory[0].outputs + productOutputs
+                saveResponse = await api.stockHistory.edit(data)
+            }
+            if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)
         }
     }
 
     const save = async () => {
+        //Modify stock history of products
+        saveStockHistoryOfProducts()
+
         //Modify stock of products
         const noModifyStock = ['REMITO']
-        if(!noModifyStock.includes(sale_state.documento.nombre)) {
-            const stock = await applyStockModification()
-            if (!stock.isModified) return errorAlert('Error al modificar stock.').then(() => reload())
-        }
+        if (!noModifyStock.includes(sale_state.documento.nombre)) applyStockModification()
 
-        //Save sale data
-        const saleData = await saveSaleData()
-        if (!saleData.isSaved) return errorAlert('No se pudo guardar la venta.').then(() => reload())
+        //Save sale data in sales list
+        saveSaleData()
 
         //Create document
-        let isCreated
-        // No fiscal
-        if (sale_state.documento.codigoUnico === '000') {
-            if (sale_state.documento.nombre === 'PRESUPUESTO') isCreated = await createBudgetPdf(sale_state)
-            else if (sale_state.documento.nombre === 'REMITO') isCreated = await createRemittancePdf(sale_state)
-            else if (sale_state.documento.nombre === 'TICKET') isCreated = await createTicketPdf(sale_state)
-        // Fiscal
-        } else {
-            if (billCodes.includes(sale_state.documento.codigoUnico)) isCreated = await createVoucherPdf(sale_state)
-        }
+        createSaleDocument()
 
-        if (!isCreated) return errorAlert('No se pudo generar el comprobante de la operación.').then(() => reload())
-        return successAlert('Venta realizada').then(() => reload())
+        return successAlert('Venta realizada con éxito').then(reload)
     }
 
     useEffect(() => {
         if (!sale_state.closedSale) return
         save()
-    },
-        //eslint-disable-next-line
-        [sale_state.closedSale])
+    }, [sale_state.closedSale])
+
+    const buttonToSave = (
+        <Button
+            onClick={startCloseSale}
+            style={{ width: '100%' }}
+            className='btn-primary'
+        >
+            Aceptar
+        </Button>
+    )
+
+    // ------------------ Title of modal ----------------- //
+    const titleOfModal = <h3><b>¡Atencion!</b>, esta acción finalizará la venta, ¿desea continuar?</h3>
+
 
     return (
         <Modal
-            title={(<h3>Finalizar venta</h3>)}
-            open={sale_state.finalizeSaleModalIsVisible}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
-            footer={[
-                <Row gutter={8} align='end' key='1'>
-                    <Col span={6}>
-                        <button
-                            className='btn-secondary'
-                            onClick={() => { sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' }) }}
-                        >
-                            Cancelar
-                        </button>
-                    </Col>
-                    <Col span={6}>
-                        <button
-                            className='btn-primary'
-                            onClick={() => { startCloseSale() }}
-                        >
-                            Aceptar
-                        </button>
-                    </Col>
-                </Row>
-            ]}
+            okButtonProps={{ style: { display: 'none' } }}
+            open={sale_state.finalizeSaleModalIsVisible}
             width={600}
         >
-            <Row justify='space between' gutter={16}>
+            <Row gutter={[0, 16]}>
                 <Col span={24}>
-                    <h3><b>¡Atencion!</b>, esta acción finalizará la venta, ¿desea continuar?</h3>
+                    {titleOfModal}
+                </Col>
+                <Col span={24}>
+                    <Row gutter={[8, 8]}>
+                        <Col span={12}>
+                            {buttonToCancel}
+                        </Col>
+                        <Col span={12}>
+                            {buttonToSave}
+                        </Col>
+                    </Row>
                 </Col>
             </Row>
         </Modal>

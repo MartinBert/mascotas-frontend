@@ -1,5 +1,5 @@
 // React Components and Hooks
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 
 // Custom Routers
@@ -24,63 +24,52 @@ const { usePrivateRouteContext } = contexts.PrivateRoute
 
 const AppRouter = () => {
     const navigate = useNavigate()
-    const loggedUserContext = useAuthContext()
-    const [auth_state, auth_dispatch] = loggedUserContext
-    const privateRouteContext = usePrivateRouteContext()
-    const [privateRoute_state, privateRoute_dispatch] = privateRouteContext
+    const [auth_state, auth_dispatch] = useAuthContext()
+    const [privateRoute_state, privateRoute_dispatch] = usePrivateRouteContext()
 
-    const redirectToLogin = useCallback(() => {
-        localStorage.clear()
-        navigate('/login')
-    }, [navigate])
-
-    useEffect(() => {
-        const accessToPrivateRoutes = async () => {
-            const token = localStorage.getItem('token')
-            const userId = localStorage.getItem('userId')
-            if (!token || !userId || token === undefined || userId === undefined) {
-                auth_dispatch({ type: 'SET_LOADING', payload: true })
-                return redirectToLogin()
-            }
-            const loggedUser = await api.usuarios.findById(userId)
-            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
-            auth_dispatch({ type: 'SET_LOADING', payload: false })
-            if (privateRoute_state.openKey.length === 0)
-                privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
-            else redirectToLogin()
+    const accessToPrivateRoutes = async () => {
+        const token = localStorage.getItem('token')
+        const userId = localStorage.getItem('userId')
+        if (!token || !userId || privateRoute_state.openKey.length !== 0) {
+            auth_dispatch({ type: 'SET_LOADING', payload: true })
+            localStorage.clear()
+            navigate('/login')
+            return
         }
-        accessToPrivateRoutes()
-    }, [
-        privateRoute_state.openKey.length,
-        privateRoute_dispatch,
-        auth_dispatch,
-        redirectToLogin
-    ])
+        const loggedUser = await api.usuarios.findById(userId)
+        auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+        auth_dispatch({ type: 'SET_LOADING', payload: false })
+        privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
+    }
+
+    useEffect(() => { accessToPrivateRoutes() }, [privateRoute_state.openKey.length])
 
     const publicRoutes = publicRoutesData.map(route => (
         <Route
-            exact
-            path={route.path}
-            element={route.element}
-            key={route.key}
             activeKey={route.activeKey}
+            element={route.element}
+            exact
+            key={route.key}
+            path={route.path}
             private={route.private}
         />
     ))
 
+    const getElementOfPrivateRoute = (route) => {
+        if (auth_state.loading || !auth_state.user) return <Spin />
+        else if (auth_state.user.perfil === false && route.onlySuperadmin === true) {
+            return navigate('/ventas')
+        }
+        else return route.element
+    }
+
     const privateRoutes = privateRoutesData.map(route => (
         <Route
-            exact
-            path={route.path}
-            element={
-                (auth_state.loading || !auth_state.user)
-                ? <Spin />
-                : (auth_state.user.perfil === false && route.onlySuperadmin === true)
-                    ? <Navigate to={'/ventas'} />
-                    : route.element
-            }
-            key={route.key}
             activeKey={route.activeKey}
+            element={getElementOfPrivateRoute(route)}
+            exact
+            key={route.key}
+            path={route.path}
             private={route.private}
         />
     ))

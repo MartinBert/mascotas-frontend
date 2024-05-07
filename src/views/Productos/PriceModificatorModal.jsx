@@ -92,21 +92,7 @@ const PriceModificatorModal = () => {
 
     // ------------- Button to clear filters ------------- //
     const clearFilters = () => {
-        const paginationParams = {
-            ...products_state.priceModificatorModal.productsToRender.paginationParams,
-            filters: {
-                codigoBarras: null,
-                codigoProducto: null,
-                marca: [],
-                nombre: null,
-                rubro: []
-            },
-            page: 1
-        }
-        products_dispatch({
-            type: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
-            payload: paginationParams
-        })
+        products_dispatch({ type: 'CLEAR_FILTERS_IN_PRICE_MODIFICATOR_MODAL' })
     }
 
     const buttonToClearFilters = (
@@ -213,7 +199,7 @@ const PriceModificatorModal = () => {
             page: 1
         }
         products_dispatch({
-            type: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
             payload: paginationParams
         })
     }
@@ -241,7 +227,7 @@ const PriceModificatorModal = () => {
             page: 1
         }
         products_dispatch({
-            type: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
             payload: paginationParams
         })
     }
@@ -269,7 +255,7 @@ const PriceModificatorModal = () => {
             page: 1
         }
         products_dispatch({
-            type: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
             payload: paginationParams
         })
     }
@@ -550,7 +536,7 @@ const PriceModificatorModal = () => {
             limit: parseInt(val)
         }
         products_dispatch({
-            type: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
             payload: paginationParams
         })
     }
@@ -561,7 +547,7 @@ const PriceModificatorModal = () => {
             page: parseInt(e)
         }
         products_dispatch({
-            type: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
             payload: paginationParams
         })
     }

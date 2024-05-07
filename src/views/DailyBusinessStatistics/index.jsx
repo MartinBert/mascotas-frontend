@@ -19,6 +19,7 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Views
+import DetailsModal from './DetailsModal'
 import FixStatisticsModal from './FixStatisticsModal'
 import Header from './Header'
 
@@ -26,7 +27,7 @@ import Header from './Header'
 const { formatFindParams } = actions.paginationParams
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { roundTwoDecimals } = helpers.mathHelper
-const { Edit } = icons
+const { Edit, Details } = icons
 
 const profitColorCss = (profit) => {
     if (profit >= 0) return '#15DC24'
@@ -50,7 +51,11 @@ const DailyBusinessStatistics = () => {
         dailyBusinessStatistics_state.paginationParams
     ])
 
-    const openModal = async (dailyBusinessStatisticsID) => {
+    const openDetailsStatisticModal = (dailyBusinessStatistics) => {
+        dailyBusinessStatistics_dispatch({ type: 'SET_STATISTIC_TO_VIEW_DETAILS', payload: dailyBusinessStatistics })
+    }
+
+    const openFixStatisticModal = async (dailyBusinessStatisticsID) => {
         dailyBusinessStatistics_dispatch({ type: 'SHOW_FIX_STATISTICS_MODAL' })
         const response = await api.dailyBusinessStatistics.findById(dailyBusinessStatisticsID)
         if (!response) errorAlert('No se pudo recuperar las estadìsticas diarias de referencia para realizar la corrección. Recargue la página para volver a intentar.')
@@ -109,8 +114,17 @@ const DailyBusinessStatistics = () => {
             dataIndex: 'dailyBusinessStatistics_actions',
             render: (_, dailyBusinessStatistics) => (
                 <Row justify='start'>
-                    <Col onClick={() => openModal(dailyBusinessStatistics._id)}>
+                    <Col
+                        onClick={() => openFixStatisticModal(dailyBusinessStatistics._id)}
+                        span={12}
+                    >
                         <Edit />
+                    </Col>
+                    <Col
+                        onClick={() => openDetailsStatisticModal(dailyBusinessStatistics)}
+                        span={12}
+                    >
+                        <Details />
                     </Col>
                 </Row>
             ),
@@ -144,6 +158,11 @@ const DailyBusinessStatistics = () => {
                     tableLayout='auto'
                     width={'100%'}
                 />
+                {
+                    dailyBusinessStatistics_state.detailsModal.statisticToViewDetails
+                        ? <DetailsModal />
+                        : null
+                }
                 <FixStatisticsModal />
             </Col>
         </Row>

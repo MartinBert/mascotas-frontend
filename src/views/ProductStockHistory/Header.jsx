@@ -1,12 +1,14 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
 
+// Custom Components
+import InputHidden from '../../components/generics/InputHidden'
+
 // Custom Contexts
-import actions from '../../actions'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, Input, Row, AutoComplete } from 'antd'
+import { Button, Col, Input, Row, Select } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -15,7 +17,6 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructurings
-const { nullifyFilters } = actions.paginationParams
 const { useProductsContext } = contexts.Products
 const { regExp } = helpers.stringHelper
 const { ifSpecialCharacter } = regExp
@@ -28,22 +29,29 @@ const Header = () => {
     const loadBrandsAndTypes = async () => {
         const findBrands = await api.marcas.findAll()
         const findTypes = await api.rubros.findAll()
+        const allBrands = findBrands.docs
+        const allBrandsNames = allBrands.length < 0
+            ? []
+            : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
+                return { value: brand.nombre }
+            }))
+        const allTypes = findTypes.docs
+        const allTypesNames = allTypes.length < 0
+            ? []
+            : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
+                return { value: type.nombre }
+            }))
         products_dispatch({
-            type: 'SET_BRANDS_AND_TYPES',
-            payload: { allBrands: findBrands.docs, allTypes: findTypes.docs }
+            type: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+            payload: { allBrands, allBrandsNames, allTypes, allTypesNames }
         })
     }
+
     useEffect(() => { loadBrandsAndTypes() }, [])
 
-    // ---------------------------------- Set filters ----------------------------------- //
-
-    // ---------- Button to clear filters ---------- //
+    // ------------- Button to clear filters ------------- //
     const clearFilters = () => {
-        const filters = nullifyFilters(products_state.paginationParams.filters)
-        const paginationParams = { ...products_state.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-        products_dispatch({ type: 'SET_ACTIVE_BRAND', payload: { value: null } })
-        products_dispatch({ type: 'SET_ACTIVE_TYPE', payload: { value: null } })
+        products_dispatch({ type: 'CLEAR_FILTERS_IN_STOCK_HISTORY' })
     }
 
     const buttonToClearFilters = (
@@ -57,210 +65,245 @@ const Header = () => {
         </Button>
     )
 
-    const dispatchFilters = (newFilters) => {
-        const filters = { ...products_state.paginationParams.filters, ...newFilters }
-        const paginationParams = { ...products_state.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    // ----------- Input to filter by Barcode ------------ //
+    const onChangeBarcode = (e) => {
+        const filters = {
+            ...products_state.stockHistory.productsToRender.paginationParams.filters,
+            codigoBarras: e.target.value.replace(ifSpecialCharacter, '')
+        }
+        const paginationParams = {
+            ...products_state.stockHistory.productsToRender.paginationParams,
+            filters,
+            page: 1
+        }
+        products_dispatch({
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+            payload: paginationParams
+        })
     }
 
-    // -------- Filter products by BAR CODE -------- //
-    const onChangeBarCode = (e) => {
-        const barCodeFilter = e.target.value === ''
-            ? null
-            : e.target.value.replace(ifSpecialCharacter, '')
-        const filters = { codigoBarras: barCodeFilter }
-        dispatchFilters(filters)
-    }
-
-    const filterByBarCode = (
+    const inputToFilterByBarcode = (
         <Input
             color='primary'
-            onChange={onChangeBarCode}
+            name='codigoBarras'
+            onChange={onChangeBarcode}
             placeholder='Buscar por código de barras'
             style={{ width: '100%' }}
-            value={products_state.paginationParams.filters.codigoBarras}
+            value={products_state.stockHistory.productsToRender.paginationParams.filters.codigoBarras}
         />
     )
 
-    // --------- Filter products by BRAND ---------- //
-    const filterBrandOption = (inputValue, option) =>
-        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-
-    const onClearBrand = () => {
-        const filters = { marca: null }
-        dispatchFilters(filters)
-    }
-
-    const onChangeBrand = (e) => {
-        products_dispatch({ type: 'SET_ACTIVE_BRAND', payload: { value: e } })
-    }
-
-    const onSelectBrand = async (e) => {
-        const findBrand = await api.marcas.findByName(e)
-        const brand = findBrand.docs[0]
-        const brandFilter = brand ?? null
-        const filters = { marca: brandFilter }
-        dispatchFilters(filters)
-    }
-
-    const filterByBrand = (
-        <AutoComplete
-            allowClear
-            filterOption={filterBrandOption}
-            onClear={onClearBrand}
-            onChange={onChangeBrand}
-            onSelect={onSelectBrand}
-            options={products_state.brandsForSelect.allBrands}
-            placeholder='Buscar por marca'
-            style={{ width: '100%' }}
-            value={products_state.brandsForSelect.selectedBrand}
-        />
-    )
-
-    // ---------- Filter products by NAME ---------- //
+    // ------------ Input to filter by Name -------------- //
     const onChangeName = (e) => {
-        const nameFilter = e.target.value === ''
-            ? null
-            : e.target.value.replace(ifSpecialCharacter, '')
-        const filters = { nombre: nameFilter }
-        dispatchFilters(filters)
+        const filters = {
+            ...products_state.stockHistory.productsToRender.paginationParams.filters,
+            nombre: e.target.value
+        }
+        const paginationParams = {
+            ...products_state.stockHistory.productsToRender.paginationParams,
+            filters,
+            page: 1
+        }
+        products_dispatch({
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+            payload: paginationParams
+        })
     }
 
-    const filterByName = (
+    const inputToFilterByName = (
         <Input
             color='primary'
+            name='nombre'
             onChange={onChangeName}
             placeholder='Buscar por nombre'
             style={{ width: '100%' }}
-            value={products_state.paginationParams.filters.nombre}
+            value={products_state.stockHistory.productsToRender.paginationParams.filters.nombre}
         />
     )
 
-    // ------ Filter products by PRODUCT CODE ------ //
+    // --------- Input to filter by Product code --------- //
     const onChangeProductCode = (e) => {
-        const productCodeFilter = e.target.value === ''
-            ? null
-            : e.target.value.replace(ifSpecialCharacter, '')
-        const filters = { codigoProducto: productCodeFilter }
-        dispatchFilters(filters)
+        const filters = {
+            ...products_state.stockHistory.productsToRender.paginationParams.filters,
+            codigoProducto: e.target.value.replace(ifSpecialCharacter, '')
+        }
+        const paginationParams = {
+            ...products_state.stockHistory.productsToRender.paginationParams,
+            filters,
+            page: 1
+        }
+        products_dispatch({
+            type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+            payload: paginationParams
+        })
     }
 
-    const filterByProductCode = (
+    const inputToFilterByProductCode = (
         <Input
             color='primary'
+            name='codigoProducto'
             onChange={onChangeProductCode}
             placeholder='Buscar por código de producto'
             style={{ width: '100%' }}
-            value={products_state.paginationParams.filters.codigoProducto}
+            value={products_state.stockHistory.productsToRender.paginationParams.filters.codigoProducto}
         />
     )
 
-    // ---------- Filter products by TYPE ---------- //
-    const filterTypeOption = (inputValue, option) =>
-        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-
-    const onClearType = () => {
-        const filters = { rubro: null }
-        dispatchFilters(filters)
+    // ------------ Select to filter By Brand ------------ //
+    const changeBrands = (e) => {
+        const brands = products_state.stockHistory.productsToRender.brandsForSelect.allBrandsNames
+        let selectedBrands
+        let selectedBrandsNames
+        if (e.length === 0) {
+            selectedBrands = []
+            selectedBrandsNames = [{ value: 'Todas las marcas' }]
+        }
+        else {
+            const eventValues = e.map(eventOption => eventOption.value)
+            selectedBrands = products_state.stockHistory.productsToRender.brandsForSelect.allBrands
+                .filter(brand => eventValues.includes(brand.nombre))
+            selectedBrandsNames = brands.map(option => {
+                if (eventValues.includes(option.value)) return option
+                else return null
+            }).filter(option => option)
+        }
+        products_dispatch({
+            type: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+            payload: { selectedBrands, selectedBrandsNames }
+        })
     }
 
-    const onChangeType = (e) => {
-        products_dispatch({ type: 'SELECT_TYPES', payload: { value: e } })
+    const selectBrands = (e) => {
+        if (e.value === 'Todas las marcas') products_dispatch({
+            type: 'SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY'
+        })
+        else products_dispatch({
+            type: 'DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY'
+        })
     }
 
-    const onSelectType = async (e) => {
-        const findType = await api.rubros.findByName(e)
-        const type = findType.docs[0]
-        const typeFilter = type ?? null
-        const filters = { rubro: typeFilter }
-        dispatchFilters(filters)
-    }
-
-    const filterByType = (
-        <AutoComplete
+    const selectToFilterByBrand = (
+        <Select
             allowClear
-            filterOption={filterTypeOption}
-            onClear={onClearType}
-            onChange={onChangeType}
-            onSelect={onSelectType}
-            options={products_state.typesForSelect.allTypesNames}
-            placeholder='Buscar por rubro'
+            labelInValue
+            mode='multiple'
+            onChange={changeBrands}
+            onSelect={selectBrands}
+            options={products_state.stockHistory.productsToRender.brandsForSelect.allBrandsNames}
             style={{ width: '100%' }}
-            value={products_state.typesForSelect.selectedTypes}
+            value={products_state.stockHistory.productsToRender.brandsForSelect.selectedBrandsNames}
         />
     )
+
+    // ------------ Select to filter by type ------------- //
+    const changeTypes = (e) => {
+        const types = products_state.stockHistory.productsToRender.typesForSelect.allTypesNames
+        let selectedTypes
+        let selectedTypesNames
+        if (e.length === 0) {
+            selectedTypes = []
+            selectedTypesNames = [{ value: 'Todos los rubros' }]
+        }
+        else {
+            const eventValues = e.map(eventOption => eventOption.value)
+            selectedTypes = products_state.stockHistory.productsToRender.typesForSelect.allTypes
+                .filter(type => eventValues.includes(type.nombre))
+            selectedTypesNames = types.map(option => {
+                if (eventValues.includes(option.value)) return option
+                else return null
+            }).filter(option => option)
+        }
+        products_dispatch({
+            type: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+            payload: { selectedTypes, selectedTypesNames }
+        })
+    }
+
+    const selectTypes = (e) => {
+        if (e.value === 'Todos los rubros') products_dispatch({
+            type: 'SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY'
+        })
+        else products_dispatch({
+            type: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY'
+        })
+    }
+
+    const selectToFilterByType = (
+        <Select
+            allowClear
+            labelInValue
+            mode='multiple'
+            onChange={changeTypes}
+            onSelect={selectTypes}
+            options={products_state.stockHistory.productsToRender.typesForSelect.allTypesNames}
+            style={{ width: '100%' }}
+            value={products_state.stockHistory.productsToRender.typesForSelect.selectedTypesNames}
+        />
+    )
+
+    const titleOfHeader = <h2>Historial de stock de productos</h2>
 
 
     const header = [
         {
-            element: filterByName,
-            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+            element: buttonToClearFilters,
+            order: { lg: 8, md: 8, sm: 2, xl: 8, xs: 2, xxl: 8 }
         },
         {
-            element: filterByBrand,
-            order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 }
+            element: <InputHidden />,
+            order: { lg: 2, md: 2, sm: 8, xl: 2, xs: 8, xxl: 2 }
         },
         {
-            element: filterByBarCode,
+            element: inputToFilterByBarcode,
+            order: { lg: 5, md: 5, sm: 4, xl: 5, xs: 4, xxl: 5 }
+        },
+        {
+            element: inputToFilterByName,
             order: { lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 3 }
         },
         {
-            element: filterByType,
-            order: { lg: 4, md: 4, sm: 5, xl: 4, xs: 5, xxl: 4 }
+            element: inputToFilterByProductCode,
+            order: { lg: 7, md: 7, sm: 5, xl: 7, xs: 5, xxl: 7 }
         },
         {
-            element: filterByProductCode,
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
+            element: selectToFilterByBrand,
+            order: { lg: 4, md: 4, sm: 6, xl: 4, xs: 6, xxl: 4 }
         },
         {
-            element: buttonToClearFilters,
-            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
+            element: selectToFilterByType,
+            order: { lg: 6, md: 6, sm: 7, xl: 6, xs: 7, xxl: 6 }
+        },
+        {
+            element: titleOfHeader,
+            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
         }
     ]
 
     const responsiveGrid = {
-        elementsGutter: { horizontal: 24, vertical: 8 },
-        headGutter: { horizontal: 8, vertical: 8 },
+        gutter: { horizontal: 8, vertical: 8 },
         span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
     }
 
 
     return (
-        <Row
-            gutter={[
-                responsiveGrid.headGutter.horizontal,
-                responsiveGrid.headGutter.vertical
-            ]}
-        >
-            <Col span={24}>
-                <h2>Historial de Stock de productos</h2>
-            </Col>
-            <Col span={24}>
-                <Row
-                    gutter={[
-                        responsiveGrid.elementsGutter.horizontal,
-                        responsiveGrid.elementsGutter.vertical
-                    ]}
-                >
-                    {
-                        header.map((item, index) => {
-                            return (
-                                <Col
-                                    key={'productStockHistory_header_' + index}
-                                    lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
-                                    md={{ order: item.order.md, span: responsiveGrid.span.md }}
-                                    sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
-                                    xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
-                                    xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
-                                    xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
-                                >
-                                    {item.element}
-                                </Col>
-                            )
-                        })
-                    }
-                </Row>
-            </Col>
+        <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]} >
+            {
+                header.map((item, index) => {
+                    return (
+                        <Col
+                            key={'productStockHistory_header_' + index}
+                            lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
+                            md={{ order: item.order.md, span: responsiveGrid.span.md }}
+                            sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
+                            xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
+                            xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
+                            xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
+                        >
+                            {item.element}
+                        </Col>
+                    )
+                })
+            }
         </Row>
     )
 }

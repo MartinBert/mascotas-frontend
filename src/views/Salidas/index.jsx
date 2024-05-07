@@ -142,13 +142,11 @@ const Salidas = () => {
             dataIndex: 'output_description',
             render: (_, output) => output.descripcion,
             title: 'Descripción'
-
         },
         {
             dataIndex: 'output_netProfit',
-            render: (_, output) => output.gananciaNeta,
-            title: 'Ganancia'
-
+            render: (_, output) => output.ganancia,
+            title: 'Ingreso'
         },
         {
             dataIndex: 'output_actions',
@@ -169,7 +167,7 @@ const Salidas = () => {
                 </Row>
             ),
             title: 'Acciones'
-        },
+        }
     ]
 
     return (

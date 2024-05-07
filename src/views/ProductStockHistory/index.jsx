@@ -9,13 +9,14 @@ import actions from '../../actions'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, Row, Spin, Table } from 'antd'
+import { Button, Col, Row, Table } from 'antd'
 
 // Services
 import api from '../../services'
 
 // Views
 import Header from './Header'
+import FixStockHistoryModal from './FixStockHistoryModal'
 import ProductStockHistoryModal from './ProductStockHistoryModal'
 
 // Imports Destructurings
@@ -27,29 +28,36 @@ const ProductStockHistory = () => {
 	const [products_state, products_dispatch] = useProductsContext()
 
 	// --------------------- Actions --------------------- //
+	const getImageUrl = (product) => {
+		if (!product.imagenes) return '/no-image.png'
+		if (product.imagenes.length < 1) return '/no-image.png'
+		return product.imagenes[product.imagenes.length - 1].url
+	}
+
 	const openProductStockHistory = (product) => {
-		products_dispatch({ type: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL', payload: product })
+		products_dispatch({ type: 'SET_PRODUCT_IN_PRODUCT_STOCK_HISTORY_MODAL', payload: product })
 	}
 
 	const setPageAndLimit = (page, limit) => {
-		console.log((page, limit))
-        const paginationParams = {
-            ...products_state.stockHistory.paginationParams,
-            page: parseInt(page),
-            limit: parseInt(limit)
-        }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS_IN_STOCK_HISTORY', payload: paginationParams })
-    }
+		const paginationParams = {
+			...products_state.stockHistory.productsToRender.paginationParams,
+			page: parseInt(page),
+			limit: parseInt(limit)
+		}
+		products_dispatch({
+			type: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+			payload: paginationParams
+		})
+	}
 
 	// ------------------ Fetch Products ------------------ //
-	useEffect(() => {
-		const fetchProducts = async () => {
-			const findParams = formatFindParams(products_state.stockHistory.paginationParams)
-			const data = await api.productos.findPaginated(findParams)
-			products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
-		}
-		fetchProducts()
-	}, [products_state.stockHistory.loading, products_state.stockHistory.paginationParams])
+	const fetchProducts = async () => {
+		const findParams = formatFindParams(products_state.stockHistory.productsToRender.paginationParams)
+		const data = await api.productos.findPaginated(findParams)
+		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
+	}
+
+	useEffect(() => { fetchProducts() }, [products_state.stockHistory.productsToRender.paginationParams])
 
 
 	const columnsForTable = [
@@ -73,11 +81,7 @@ const ProductStockHistory = () => {
 			render: (_, product) => (
 				<OpenImage
 					alt='Ver imagen'
-					imageUrl={
-						(product.imagenes && product.imagenes.length > 0)
-							? product.imagenes[product.imagenes.length - 1].url
-							: '/no-image.png'
-					}
+					imageUrl={getImageUrl(product)}
 				/>
 			),
 			title: 'Imagen'
@@ -87,7 +91,7 @@ const ProductStockHistory = () => {
 			render: (_, product) => {
 				return (
 					<Button
-						onClick={() => openProductStockHistory(product)}
+						onClick={e => openProductStockHistory(product)}
 						style={{ width: '100%' }}
 						type='primary'
 					>
@@ -108,29 +112,25 @@ const ProductStockHistory = () => {
 			<Col span={24}>
 				<Table
 					width={'100%'}
-					dataSource={products_state.stockHistory.productsToRender}
+					dataSource={products_state.stockHistory.productsToRender.products}
 					columns={columnsForTable}
 					pagination={{
-						defaultCurrent: products_state.stockHistory.paginationParams.page,
-						defaultPageSize: products_state.stockHistory.paginationParams.limit,
-						limit: products_state.stockHistory.paginationParams.limit,
+						defaultCurrent: products_state.stockHistory.productsToRender.paginationParams.page,
+						defaultPageSize: products_state.stockHistory.productsToRender.paginationParams.limit,
+						limit: products_state.stockHistory.productsToRender.paginationParams.limit,
 						onChange: (page, limit) => setPageAndLimit(page, limit),
+						pageSizeOptions: [5, 10, 15, 20],
 						showSizeChanger: true,
-						total: products_state.stockHistory.totalRecords
+						total: products_state.stockHistory.productsToRender.totalProducts
 					}}
 					rowKey='_id'
 					tableLayout='auto'
 					size='small'
-					loading={products_state.stockHistory.loading}
+					loading={products_state.stockHistory.productsToRender.loading}
 				/>
 			</Col>
-			<Col span={24}>
-				{
-					!products_state.stockHistory.product
-						? null
-						: <ProductStockHistoryModal />
-				}
-			</Col>
+			<FixStockHistoryModal />
+			<ProductStockHistoryModal />
 		</Row>
 	)
 }

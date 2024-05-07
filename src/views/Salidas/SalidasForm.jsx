@@ -23,7 +23,7 @@ import api from '../../services'
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
-const { simpleDateWithHours } = helpers.dateHelper
+const { resetDate, simpleDateWithHours } = helpers.dateHelper
 const { Delete } = icons
 
 
@@ -150,6 +150,40 @@ const SalidasForm = () => {
         return 'OK'
     }
 
+    const generateStockHistory = async () => {
+        for (const product of outputs_state.params.productos) {
+            const dateString = outputs_state.params.fechaString.substring(0, 10)
+            const filters = JSON.stringify({ dateString, product })
+            const findStockHistory = await api.stockHistory.findAllByFilters(filters)
+            const stockHistory = findStockHistory.docs
+            let saveResponseCode
+            const data = {
+                date: resetDate(outputs_state.params.fecha),
+                dateString,
+                itIsAManualCorrection: false,
+                product: product._id
+            }
+            if (stockHistory.length < 1) {
+                data.entries = 0
+                data.outputs = outputs_state.params.cantidad
+                const saveNewRecord = await api.stockHistory.save(data)
+                saveResponseCode = saveNewRecord.code
+            } else {
+                data._id = stockHistory[0]._id
+                data.entries = stockHistory[0].entries
+                data.outputs = stockHistory[0].outputs + outputs_state.params.cantidad
+                if (outputID !== 'nuevo') {
+                    const outputToEdit = await api.salidas.findById(outputID)
+                    const previousQuantity = outputToEdit.data.cantidad
+                    data.outputs -= previousQuantity
+                }
+                const editRecord = await api.stockHistory.edit(data)
+                saveResponseCode = editRecord.code
+            }
+            if (saveResponseCode !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock".`)
+        }
+    }
+
     const saveNew = async () => {
         const result = validateOutputSave()
         if (result === 'FAIL') return
@@ -158,6 +192,9 @@ const SalidasForm = () => {
         const filters = JSON.stringify({ dateString: outputs_state.params.fechaString.substring(0, 10) })
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
         const statisticToEdit = findStatisticToEdit.docs[0] || null
+
+        // Corregir historial de stock de productos pertenecientes a la salida
+        generateStockHistory()
 
         // Corregir stock de productos pertenecientes a la salida
         for (const product of outputs_state.params.productos) {
@@ -171,7 +208,7 @@ const SalidasForm = () => {
         // Corregir la estadística diaria correspondiente a la fecha de la salida
         if (statisticToEdit) {
             const currentIncome = statisticToEdit.dailyIncome
-            const newIncome = outputs_state.params.gananciaNeta
+            const newIncome = outputs_state.params.ganancia
             const updatedIncome = currentIncome + newIncome
             const updatedProfit = updatedIncome - statisticToEdit.dailyExpense
             const updatedStatistic = {
@@ -199,6 +236,9 @@ const SalidasForm = () => {
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
         const statisticToEdit = findStatisticToEdit.docs[0]
 
+        // Corregir historial de stock de productos pertenecientes a la salida
+        generateStockHistory()
+
         // Corregir stock de productos pertenecientes a la salida
         for (let product of outputs_state.params.productos) {
             const productOfOutputToEdit = outputToEdit.productos.find(el => el._id === product._id)
@@ -218,18 +258,20 @@ const SalidasForm = () => {
         }
 
         // Corregir la estadística diaria correspondiente a la fecha de la salida
-        const currentStatisticExpense = statisticToEdit.dailyExpense
-        const currentStatisticIncome = statisticToEdit.dailyIncome
-        const currentIncomeOfOutput = outputToEdit.gananciaNeta
-        const newIncomeOfOutput = outputs_state.params.gananciaNeta
-        const newStatisticDailyIncome = currentStatisticIncome - currentIncomeOfOutput + newIncomeOfOutput
-        const newStatisticDailyProfit = newStatisticDailyIncome - currentStatisticExpense
-        const newStatisticToSave = {
-            ...statisticToEdit,
-            dailyIncome: newStatisticDailyIncome,
-            dailyProfit: newStatisticDailyProfit
+        if (statisticToEdit) {
+            const currentStatisticExpense = statisticToEdit.dailyExpense
+            const currentStatisticIncome = statisticToEdit.dailyIncome
+            const currentIncomeOfOutput = outputToEdit.ganancia
+            const newIncomeOfOutput = outputs_state.params.ganancia
+            const newStatisticDailyIncome = currentStatisticIncome - currentIncomeOfOutput + newIncomeOfOutput
+            const newStatisticDailyProfit = newStatisticDailyIncome - currentStatisticExpense
+            const newStatisticToSave = {
+                ...statisticToEdit,
+                dailyIncome: newStatisticDailyIncome,
+                dailyProfit: newStatisticDailyProfit
+            }
+            await api.dailyBusinessStatistics.edit(newStatisticToSave)
         }
-        await api.dailyBusinessStatistics.edit(newStatisticToSave)
 
         // Guardar la salida editada
         const recordToEdit = { ...outputs_state.params, id: outputID }
@@ -363,12 +405,12 @@ const SalidasForm = () => {
         />
     )
 
-    // -------------------------- Title of total cost of output --------------------------- //
+    // ------------------------- Title of total income of output -------------------------- //
     useEffect(() => {
         outputs_dispatch({ type: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY' })
     }, [outputs_state.params.cantidad, outputs_state.params.productos])
 
-    const title_netProfit = <h1>Neto Total: {outputs_state.params.gananciaNeta}</h1>
+    const title_netProfit = <h1>Ingreso Total: {outputs_state.params.ganancia}</h1>
 
 
     const outputsRender = [

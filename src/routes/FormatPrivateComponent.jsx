@@ -1,5 +1,5 @@
 // React Components
-import { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     FaAddressBook,
@@ -37,30 +37,28 @@ import contexts from '../contexts'
 
 // Imports Destructurings
 const { useAuthContext } = contexts.Auth
+const { usePrivateRouteContext } = contexts.PrivateRoute
+const { Header, Sider, Content } = Layout
 
 
 const FormatPrivateComponent = ({ children, activeKey }) => {
-    const [auth_state] = useAuthContext()
     const navigate = useNavigate()
-    const [collapsed, setCollapsed] = useState(false)
-    const { Header, Sider, Content } = Layout
+    const [auth_state] = useAuthContext()
+    const [privateRoute_state, privateRoute_dispatch] = usePrivateRouteContext()
 
     const redirectToPath = (e) => {
         navigate(e.item.props.routepath)
     }
 
     const toggle = () => {
-        setCollapsed(!collapsed)
+        privateRoute_dispatch({
+            type: 'SET_COLLAPSED',
+            payload: !privateRoute_state.collapsed
+        })
     }
 
     const getItem = (key, label, icon, routepath, children) => {
-        return {
-            key,
-            label,
-            icon,
-            routepath,
-            children,
-        }
+        return { key, label, icon, routepath, children }
     }
 
     const saleMenu = [
@@ -84,8 +82,8 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const businessStatisticsMenu = [
         auth_state.user.perfil ? getItem('13', 'Balance diario', <FaChartLine />, '/daily_business_statistics/daily_balance') : null,
         auth_state.user.perfil ? getItem('14', 'Gráficos de balance diario', <FaChartPie />, '/daily_business_statistics/graphics') : null,
-        // auth_state.user.perfil ? getItem('15', 'Historial de stock de productos', <FaBalanceScale />, '/stock_history/history') : null,
-        // auth_state.user.perfil ? getItem('16', 'Gráficos de historial de stock', <FaChartPie />, '/stock_history/graphics') : null,
+        auth_state.user.perfil ? getItem('15', 'Historial de stock de productos', <FaBalanceScale />, '/stock_history/history') : null,
+        auth_state.user.perfil ? getItem('16', 'Gráficos de historial de stock', <FaChartPie />, '/stock_history/graphics') : null,
     ]
 
     const configurationMenu = [
@@ -115,7 +113,7 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
             <Sider
                 trigger={null}
                 collapsible
-                collapsed={collapsed}
+                collapsed={privateRoute_state.collapsed}
                 style={{ background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)' }}
             >
                 <div style={{ height: '57px', background: 'transparent', marginTop: '3px', marginLeft: '3px' }}></div>

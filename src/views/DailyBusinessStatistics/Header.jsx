@@ -52,12 +52,56 @@ const generateFilters_sales = (date) => {
 
 
 const Header = () => {
-    const [
-        dailyBusinessStatistics_state,
-        dailyBusinessStatistics_dispatch
-    ] = useDailyBusinessStatisticsContext()
+    const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
 
-    // --------------------------------- Update Records --------------------------------- //
+    // --------------------- Actions ------------------------ //
+    const dispatchDateParams = ({ dateFilter, pickerValue, pickerType }) => {
+        const { date, dateString } = dateFilter
+        const filters = { ...dailyBusinessStatistics_state.paginationParams.filters, date, dateString }
+        const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
+        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+        dailyBusinessStatistics_dispatch({ type: 'UPDATE_DATE_PICKERS_VALUES', payload: { pickerType, pickerValue } })
+    }
+
+    // -------------- Button to clear filters --------------- //
+    const clearFilters = () => {
+        dailyBusinessStatistics_dispatch({ type: 'CLEAR_FILTERS' })
+    }
+
+    const buttonToClearFilters = (
+        <Button
+            danger
+            onClick={clearFilters}
+            style={{ width: '100%' }}
+            type='primary'
+        >
+            Limpiar filtros
+        </Button>
+    )
+
+    // -------- Button to show or hide null records --------- //
+    const setNullRecordsVisibility = () => {
+        const currentFilters = dailyBusinessStatistics_state.paginationParams.filters
+        const filters = { ...currentFilters, dailyProfit: currentFilters.dailyProfit ? null : { $ne: 0 } }
+        const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
+        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const buttonToShowOrHideNullRecords = (
+        <Button
+            className='btn-primary'
+            disabled={dailyBusinessStatistics_state.loading}
+            onClick={setNullRecordsVisibility}
+        >
+            {
+                dailyBusinessStatistics_state.paginationParams.filters.dailyProfit
+                    ? 'Mostrar fechas con balance cero'
+                    : 'Ocultar fechas con balance cero'
+            }
+        </Button>
+    )
+
+    // ------------- Button to update records --------------- //
     const generateDates = (referenceDate_ms) => {
         const dates = []
         const dates_ms = []
@@ -169,7 +213,7 @@ const Header = () => {
 
             const dailyOutputs = dailyData.records.map(record => {
                 if (record.documento) return 0
-                if (record.gananciaNeta) return record.gananciaNeta
+                if (record.ganancia) return record.ganancia
                 else return 0
             }).reduce((acc, value) => acc + value, 0)
 
@@ -237,16 +281,16 @@ const Header = () => {
         }
     }
 
-    // ---------------------------------- Set filters ----------------------------------- //
-    const dispatchDateParams = ({ dateFilter, pickerValue, pickerType }) => {
-        const { date, dateString } = dateFilter
-        const filters = { ...dailyBusinessStatistics_state.paginationParams.filters, date, dateString }
-        const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
-        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-        dailyBusinessStatistics_dispatch({ type: 'UPDATE_DATE_PICKERS_VALUES', payload: { pickerType, pickerValue } })
-    }
+    const buttonToUpdateRecords = (
+        <Button
+            className='btn-primary'
+            onClick={activateUpdate}
+        >
+            Actualizar registros
+        </Button>
+    )
 
-    // -------- Filter statistics by DAY -------- //
+    // ----------- DatePicker to filter by day -------------- //
     const setParams_day = (date, dateString) => {
         const dateFilter = {
             date: null,
@@ -256,16 +300,24 @@ const Header = () => {
         dispatchDateParams({ dateFilter, pickerValue, pickerType: 'day_datePicker' })
     }
 
-    const dayPicker =
-        <DatePicker
-            disabled={dailyBusinessStatistics_state.loading}
-            format={['DD-MM-YYYY']}
-            onChange={setParams_day}
-            style={{ width: '100%' }}
-            value={dailyBusinessStatistics_state.datePickersValues.day_datePicker}
-        />
+    const datePickerToFilterByDay = (
+        <Row align='middle' gutter={8}>
+            <Col span={8}>
+                Buscar día
+            </Col>
+            <Col span={16}>
+                <DatePicker
+                    disabled={dailyBusinessStatistics_state.loading}
+                    format={['DD-MM-YYYY']}
+                    onChange={setParams_day}
+                    style={{ width: '100%' }}
+                    value={dailyBusinessStatistics_state.datePickersValues.day_datePicker}
+                />
+            </Col>
+        </Row>
+    )
 
-    // -------- Filter statistics by DAY RANGE -------- //
+    // -------- DatePicker to filter by days range ---------- //
     const setParams_dayRange = (date, dateString) => {
         const dateFilter = {
             date: !date ? null : {
@@ -278,16 +330,24 @@ const Header = () => {
         dispatchDateParams({ dateFilter, pickerValue, pickerType: 'day_rangePicker' })
     }
 
-    const dayRange =
-        <RangePicker
-            disabled={dailyBusinessStatistics_state.loading}
-            format={['DD-MM-YYYY']}
-            onChange={setParams_dayRange}
-            style={{ width: '100%' }}
-            value={dailyBusinessStatistics_state.datePickersValues.day_rangePicker}
-        />
+    const rangePickerToFilterByDays = (
+        <Row align='middle' gutter={8}>
+            <Col span={8}>
+                Rango de días
+            </Col>
+            <Col span={16}>
+                <RangePicker
+                    disabled={dailyBusinessStatistics_state.loading}
+                    format={['DD-MM-YYYY']}
+                    onChange={setParams_dayRange}
+                    style={{ width: '100%' }}
+                    value={dailyBusinessStatistics_state.datePickersValues.day_rangePicker}
+                />
+            </Col>
+        </Row>
+    )
 
-    // -------- Filter statistics by MONTH -------- //
+    // ---------- DatePicker to filter by month ------------- //
     const setParams_month = (date, dateString) => {
         const dateFilter = {
             date: !date ? null : {
@@ -300,17 +360,25 @@ const Header = () => {
         dispatchDateParams({ dateFilter, pickerValue, pickerType: 'month_datePicker' })
     }
 
-    const monthPicker =
-        <DatePicker
-            disabled={dailyBusinessStatistics_state.loading}
-            format={['MM-YYYY']}
-            onChange={setParams_month}
-            picker='month'
-            style={{ width: '100%' }}
-            value={dailyBusinessStatistics_state.datePickersValues.month_datePicker}
-        />
+    const datePickerToFilterByMonth = (
+        <Row align='middle' gutter={8}>
+            <Col span={8}>
+                Buscar mes
+            </Col>
+            <Col span={16}>
+                <DatePicker
+                    disabled={dailyBusinessStatistics_state.loading}
+                    format={['MM-YYYY']}
+                    onChange={setParams_month}
+                    picker='month'
+                    style={{ width: '100%' }}
+                    value={dailyBusinessStatistics_state.datePickersValues.month_datePicker}
+                />
+            </Col>
+        </Row>
+    )
 
-    // -------- Filter statistics by MONTH RANGE -------- //
+    // ------ DatePicker to filter by months range ---------- //
     const setParams_monthRange = (date, dateString) => {
         const dateFilter = {
             date: !date ? null : {
@@ -323,108 +391,89 @@ const Header = () => {
         dispatchDateParams({ dateFilter, pickerValue, pickerType: 'month_rangePicker' })
     }
 
-    const monthRange =
-        <RangePicker
-            disabled={dailyBusinessStatistics_state.loading}
-            format={['MM-YYYY']}
-            onChange={setParams_monthRange}
-            picker='month'
-            style={{ width: '100%' }}
-            value={dailyBusinessStatistics_state.datePickersValues.month_rangePicker}
-        />
+    const rangePickerToFilterByMonths = (
+        <Row align='middle' gutter={8}>
+            <Col span={8}>
+                Rango de meses
+            </Col>
+            <Col span={16}>
+                <RangePicker
+                    disabled={dailyBusinessStatistics_state.loading}
+                    format={['MM-YYYY']}
+                    onChange={setParams_monthRange}
+                    picker='month'
+                    style={{ width: '100%' }}
+                    value={dailyBusinessStatistics_state.datePickersValues.month_rangePicker}
+                />
+            </Col>
+        </Row>
+    )
 
-    // -------- SHOW or HIDE button for null records -------- //
-    const setNullRecordsVisibility = () => {
-        const currentFilters = dailyBusinessStatistics_state.paginationParams.filters
-        const filters = { ...currentFilters, dailyProfit: currentFilters.dailyProfit ? null : { $ne: 0 } }
-        const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
-        dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
+    // ----------------- Title of actions ------------------- //
+    const titleOfActions = <h3>Acciones</h3>
 
-    const nullRecordsVisibilityButton =
-        <Button
-            className='btn-primary'
-            disabled={dailyBusinessStatistics_state.loading}
-            onClick={setNullRecordsVisibility}
-        >
-            {
-                dailyBusinessStatistics_state.paginationParams.filters.dailyProfit
-                    ? 'Mostrar fechas con balance cero'
-                    : 'Ocultar fechas con balance cero'
-            }
-        </Button>
+    // ----------------- Title of filters ------------------- //
+    const titleOfFilters = <h3>Filtrar registros</h3>
 
 
-    const header = [
+    const itemsToRender = [
         {
-            element: 'Buscar día',
-            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+            element: buttonToClearFilters,
+            order: { lg: 7, md: 7, sm: 10, xl: 7, xs: 10, xxl: 7 }
         },
         {
-            element: dayPicker,
-            order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
+            element: buttonToShowOrHideNullRecords,
+            order: { lg: 5, md: 5, sm: 9, xl: 5, xs: 9, xxl: 5 }
         },
         {
-            element: 'Rango de días',
-            order: { lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 3 }
+            element: buttonToUpdateRecords,
+            order: { lg: 3, md: 3, sm: 8, xl: 3, xs: 8, xxl: 3 }
         },
         {
-            element: dayRange,
-            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
+            element: datePickerToFilterByDay,
+            order: { lg: 4, md: 4, sm: 2, xl: 4, xs: 2, xxl: 4 }
         },
         {
-            element: 'Buscar mes',
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
-        },
-        {
-            element: monthPicker,
-            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
-        },
-        {
-            element: 'Rango de meses',
-            order: { lg: 7, md: 7, sm: 7, xl: 7, xs: 7, xxl: 7 }
-        },
-        {
-            element: monthRange,
-            order: { lg: 8, md: 8, sm: 8, xl: 8, xs: 8, xxl: 8 }
+            element: datePickerToFilterByMonth,
+            order: { lg: 8, md: 8, sm: 4, xl: 8, xs: 4, xxl: 8 }
         },
         {
             element: <InputHidden />,
-            order: { lg: 9, md: 9, sm: 9, xl: 9, xs: 9, xxl: 9 }
+            order: { lg: 9, md: 9, sm: 6, xl: 9, xs: 6, xxl: 9 }
         },
         {
-            element: nullRecordsVisibilityButton,
-            order: { lg: 10, md: 10, sm: 10, xl: 10, xs: 10, xxl: 10 }
+            element: rangePickerToFilterByDays,
+            order: { lg: 6, md: 6, sm: 3, xl: 6, xs: 3, xxl: 6 }
+        },
+        {
+            element: rangePickerToFilterByMonths,
+            order: { lg: 10, md: 10, sm: 5, xl: 10, xs: 5, xxl: 10 }
+        },
+        {
+            element: titleOfActions,
+            order: { lg: 1, md: 1, sm: 7, xl: 1, xs: 7, xxl: 1 }
+        },
+        {
+            element: titleOfFilters,
+            order: { lg: 2, md: 2, sm: 1, xl: 2, xs: 1, xxl: 2 }
         }
     ]
 
     const responsiveGrid = {
-        gutter: { horizontal: 24, vertical: 8 },
-        span: { lg: 12, md: 24, sm: 24, xl: 12, xs: 24, xxl: 12 }
+        gutter: { horizontal: 16, vertical: 8 },
+        span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
     }
 
 
     return (
         <Row gutter={[0, 8]}>
             <Col span={24}>
-                <Row gutter={24}>
-                    <Col span={12}>
-                        <h2>Estadísticas diarias de negocio</h2>
-                    </Col>
-                    <Col span={12}>
-                        <Button
-                            className='btn-primary'
-                            onClick={activateUpdate}
-                        >
-                            Actualizar registros
-                        </Button>
-                    </Col>
-                </Row>
+                <h2>Estadísticas diarias de negocio</h2>
             </Col>
             <Col span={24}>
                 <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>
                     {
-                        header.map((item, index) => {
+                        itemsToRender.map((item, index) => {
                             return (
                                 <Col
                                     key={'dalilyBusinessStatistics_header_' + index}

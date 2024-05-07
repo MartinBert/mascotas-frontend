@@ -67,15 +67,15 @@ const DetailsModal = () => {
             dataIndex: 'cantidadesSalientes',
         },
         {
-            title: 'Ganancia neta total',
+            title: 'Ingreso total',
             render: (_, product) => roundTwoDecimals(
-                product.cantidadesSalientes * product.precioUnitario
+                product.cantidadesSalientes * product.precioVenta
             )
         },
         {
             title: 'Detalles',
             render: (_, product) => (
-                <div onClick={() => setdetailsModal.product(product)}>
+                <div onClick={() => setdetailsModal(product)}>
                     <Details title='Ver detalle' />
                 </div>
             )

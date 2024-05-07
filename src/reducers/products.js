@@ -1,46 +1,59 @@
 const actions = {
     CLEAR_FILTERS: 'CLEAR_FILTERS',
+    CLEAR_FILTERS_IN_PRICE_MODIFICATOR_MODAL: 'CLEAR_FILTERS_IN_PRICE_MODIFICATOR_MODAL',
+    CLEAR_FILTERS_IN_STOCK_HISTORY: 'CLEAR_FILTERS_IN_STOCK_HISTORY',
     CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL: 'CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL',
     DESELECT_ALL_BRANDS: 'DESELECT_ALL_BRANDS',
     DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
     DESELECT_ALL_TYPES: 'DESELECT_ALL_TYPES',
     DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     HIDE_PRICE_MODIFICATOR_MODAL: 'HIDE_PRICE_MODIFICATOR_MODAL',
     HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
+    HIDE_FIX_STOCK_HISTORY_MODAL: 'HIDE_FIX_STOCK_HISTORY_MODAL',
     HIDE_PRODUCT_STOCK_HISTORY_MODAL: 'HIDE_PRODUCT_STOCK_HISTORY_MODAL',
     SELECT_ALL_BRANDS: 'SELECT_ALL_BRANDS',
     SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
     SELECT_ALL_TYPES: 'SELECT_ALL_TYPES',
     SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SELECT_BRANDS: 'SELECT_BRANDS',
     SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SELECT_TYPES: 'SELECT_TYPES',
     SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SET_ACTIVE_BRAND: 'SET_ACTIVE_BRAND',
     SET_ACTIVE_TYPE: 'SET_ACTIVE_TYPE',
     SET_BRANDS_AND_TYPES: 'SET_BRANDS_AND_TYPES',
     SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SELECT_ACTIVE_EXCEL_OPTIONS: 'SELECT_ACTIVE_EXCEL_OPTIONS',
     SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
-    SET_PAGINATION_PARAMS_IN_STOCK_HISTORY: 'SET_PAGINATION_PARAMS_IN_STOCK_HISTORY',
     SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_MODIFY_IN_PRICE_MODIFICATOR: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_MODIFY_IN_PRICE_MODIFICATOR',
-    SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
+    SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+    SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL',
+    SET_PARAMS_IN_FIX_STOCK_HISTORY_MODAL: 'SET_PARAMS_IN_FIX_STOCK_HISTORY_MODAL',
     SET_PRICE_MODIFICATION_QUANTITY: 'SET_PRICE_MODIFICATION_QUANTITY',
     SET_PRICE_MODIFICATION_SIGN: 'SET_PRICE_MODIFICATION_SIGN',
     SET_PRICE_MODIFICATION_TYPE: 'SET_PRICE_MODIFICATION_TYPE',
     SET_PRODUCT_FOR_DETAILS_MODAL: 'SET_PRODUCT_FOR_DETAILS_MODAL',
-    SET_PRODUCT_FOR_STOCK_HISTORY_MODAL: 'SET_PRODUCT_FOR_STOCK_HISTORY_MODAL',
+    SET_PRODUCT_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_PRODUCT_IN_PRODUCT_STOCK_HISTORY_MODAL',
     SET_PRODUCTS_FOR_PRICE_MODIFICATION: 'SET_PRODUCTS_FOR_PRICE_MODIFICATION',
     SET_PRODUCTS_FOR_EXCEL_REPORT: 'SET_PRODUCTS_FOR_EXCEL_REPORT',
     SET_PRODUCTS_TO_RENDER_IN_INDEX: 'SET_PRODUCTS_TO_RENDER_IN_INDEX',
     SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
-    SET_STOCK_HISTORY_FOR_RENDER: 'SET_STOCK_HISTORY_FOR_RENDER',
-    SET_STOCK_HISTORY_PAGINATION_PARAMS: 'SET_STOCK_HISTORY_PAGINATION_PARAMS',
-    SHOW_PRICE_MODIFICATOR_MODAL: 'SHOW_PRICE_MODIFICATOR_MODAL'
+    SET_STOCK_HISTORY_TO_FIX: 'SET_STOCK_HISTORY_TO_FIX',
+    SET_STOCK_HISTORY_TO_RENDER: 'SET_STOCK_HISTORY_TO_RENDER',
+    SET_TITLES_VALUES_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_TITLES_VALUES_IN_PRODUCT_STOCK_HISTORY_MODAL',
+    SHOW_PRICE_MODIFICATOR_MODAL: 'SHOW_PRICE_MODIFICATOR_MODAL',
 }
 
 const initialState = {
@@ -149,20 +162,70 @@ const initialState = {
         }
     },
     stockHistory: {
-        loading: true,
-        modalVisibility: false,
-        paginationParams: {
-            filters: {
+        fixStockHistoryModal: {
+            params: {
+                date: null,
                 dateString: null,
+                entries: null,
+                itIsAManualCorrection: true,
+                outputs: null,
                 product: null
             },
-            limit: 10,
-            page: 1
+            product: null,
+            stockHistoryToFix: null,
+            visibility: false
         },
-        product: [],
-        productsToRender: [],
-        recordsForRender: [],
-        totalRecords: 0
+        productStockHistoryModal: {
+            flowValues: {
+                entriesOfPreviousFortnight: 0,
+                entriesOfPreviousMonth: 0,
+                entriesOfPreviousWeek: 0,
+                outputsOfPreviousFortnight: 0,
+                outputsOfPreviousMonth: 0,
+                outputsOfPreviousWeek: 0,
+            },
+            loading: true,
+            paginationParams: {
+                filters: {
+                    dateString: null,
+                    product: null
+                },
+                limit: 5,
+                page: 1
+            },
+            product: null,
+            recordsForRender: [],
+            totalRecords: 0,
+            visibility: false
+        },
+        productsToRender: {
+            brandsForSelect: {
+                allBrands: [],
+                allBrandsNames: [],
+                selectedBrand: [],
+                selectedBrandsNames: [{ value: 'Todas las marcas' }]
+            },
+            loading: true,
+            paginationParams: {
+                filters: {
+                    codigoBarras: null,
+                    codigoProducto: null,
+                    marca: [],
+                    nombre: null,
+                    rubro: []
+                },
+                limit: 5,
+                page: 1
+            },
+            products: [],
+            totalProducts: 0,
+            typesForSelect: {
+                allTypes: [],
+                allTypesNames: [],
+                selectedTypes: [],
+                selectedTypesNames: [{ value: 'Todos los rubros' }],
+            }
+        }
     }
 }
 
@@ -193,6 +256,68 @@ const reducer = (state = initialState, action) => {
                         ...state.index.typesForSelect,
                         selectedType: [],
                         selectedTypesNames: [{ value: 'Todos los rubros' }]
+                    }
+                }
+            }
+        case actions.CLEAR_FILTERS_IN_PRICE_MODIFICATOR_MODAL:
+            return {
+                ...state,
+                priceModificatorModal: {
+                    ...state.priceModificatorModal,
+                    productsToRender: {
+                        ...state.priceModificatorModal.productsToRender,
+                        brandsForSelect: {
+                            ...state.priceModificatorModal.productsToRender.brandsForSelect,
+                            selectedBrand: [],
+                            selectedBrandsNames: [{ value: 'Todas las marcas' }]
+                        },
+                        paginationParams: {
+                            ...state.priceModificatorModal.productsToRender.paginationParams,
+                            filters: {
+                                codigoBarras: null,
+                                codigoProducto: null,
+                                marca: [],
+                                nombre: null,
+                                rubro: []
+                            },
+                            page: 1
+                        },
+                        typesForSelect: {
+                            ...state.priceModificatorModal.productsToRender.typesForSelect,
+                            selectedType: [],
+                            selectedTypesNames: [{ value: 'Todos los rubros' }]
+                        }
+                    }
+                }
+            }
+        case actions.CLEAR_FILTERS_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        brandsForSelect: {
+                            ...state.stockHistory.productsToRender.brandsForSelect,
+                            selectedBrand: [],
+                            selectedBrandsNames: [{ value: 'Todas las marcas' }]
+                        },
+                        paginationParams: {
+                            ...state.stockHistory.productsToRender.paginationParams,
+                            filters: {
+                                codigoBarras: null,
+                                codigoProducto: null,
+                                marca: [],
+                                nombre: null,
+                                rubro: []
+                            },
+                            page: 1
+                        },
+                        typesForSelect: {
+                            ...state.stockHistory.productsToRender.typesForSelect,
+                            selectedType: [],
+                            selectedTypesNames: [{ value: 'Todos los rubros' }]
+                        }
                     }
                 }
             }
@@ -227,6 +352,23 @@ const reducer = (state = initialState, action) => {
                         brandsForSelect: {
                             ...state.priceModificatorModal.productsToRender.brandsForSelect,
                             selectedBrandsNames: notAllBrandsNamesForProductsToRenderInPriceModificator
+                        }
+                    }
+                }
+            }
+        case actions.DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            const notAllBrandsNamesForProductsToRenderInStockHistory =
+                state.stockHistory.productsToRender.brandsForSelect.selectedBrandsNames
+                    .filter(brandName => brandName.value !== 'Todas las marcas')
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        brandsForSelect: {
+                            ...state.stockHistory.productsToRender.brandsForSelect,
+                            selectedBrandsNames: notAllBrandsNamesForProductsToRenderInStockHistory
                         }
                     }
                 }
@@ -274,6 +416,23 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            const notAllTypesNamesForProductsToRenderInStockHistory =
+                state.stockHistory.productsToRender.typesForSelect.selectedTypesNames
+                    .filter(typeName => typeName.value !== 'Todos los rubros')
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        typesForSelect: {
+                            ...state.stockHistory.productsToRender.typesForSelect,
+                            selectedTypesNames: notAllTypesNamesForProductsToRenderInStockHistory
+                        }
+                    }
+                }
+            }
         case actions.HIDE_PRICE_MODIFICATOR_MODAL:
             return {
                 ...state,
@@ -291,13 +450,44 @@ const reducer = (state = initialState, action) => {
                     product: null
                 }
             }
+        case actions.HIDE_FIX_STOCK_HISTORY_MODAL:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    fixStockHistoryModal: {
+                        ...state.stockHistory.fixStockHistoryModal,
+                        params: {
+                            date: null,
+                            dateString: null,
+                            entries: null,
+                            itIsAManualCorrection: true,
+                            outputs: null,
+                            product: null
+                        },
+                        product: null,
+                        stockHistoryToFix: null,
+                        visibility: false
+                    }
+                }
+            }
         case actions.HIDE_PRODUCT_STOCK_HISTORY_MODAL:
             return {
                 ...state,
                 stockHistory: {
                     ...state.stockHistory,
-                    modalVisibility: false,
-                    product: null
+                    productStockHistoryModal: {
+                        ...state.stockHistory.productStockHistoryModal,
+                        paginationParams: {
+                            ...state.stockHistory.productStockHistoryModal.paginationParams,
+                            filters: {
+                                ...state.stockHistory.productStockHistoryModal.paginationParams.filters,
+                                product: null
+                            }
+                        },
+                        product: null,
+                        visibility: false
+                    }
                 }
             }
         case actions.SELECT_ALL_BRANDS:
@@ -335,6 +525,28 @@ const reducer = (state = initialState, action) => {
                             ...state.priceModificatorModal.productsToRender.paginationParams,
                             filters: {
                                 ...state.priceModificatorModal.productsToRender.paginationParams.filters,
+                                marca: []
+                            }
+                        }
+                    }
+                }
+            }
+        case actions.SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        brandsForSelect: {
+                            ...state.stockHistory.productsToRender.brandsForSelect,
+                            selectedBrands: state.stockHistory.productsToRender.brandsForSelect.allBrands,
+                            selectedBrandsNames: [{ value: 'Todas las marcas' }]
+                        },
+                        paginationParams: {
+                            ...state.stockHistory.paginationParams,
+                            filters: {
+                                ...state.stockHistory.productsToRender.paginationParams.filters,
                                 marca: []
                             }
                         }
@@ -390,6 +602,28 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        paginationParams: {
+                            ...state.stockHistory.productsToRender.paginationParams,
+                            filters: {
+                                ...state.stockHistory.productsToRender.paginationParams.filters,
+                                rubro: []
+                            }
+                        },
+                        typesForSelect: {
+                            ...state.stockHistory.productsToRender.typesForSelect,
+                            selectedTypes: state.stockHistory.productsToRender.brandsForSelect.allTypes,
+                            selectedTypesNames: [{ value: 'Todos los rubros' }]
+                        }
+                    }
+                }
+            }
         case actions.SELECT_ACTIVE_EXCEL_OPTIONS:
             return {
                 ...state,
@@ -439,6 +673,28 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        brandsForSelect: {
+                            ...state.stockHistory.productsToRender.brandsForSelect,
+                            selectedBrands: action.payload.selectedBrands,
+                            selectedBrandsNames: action.payload.selectedBrandsNames
+                        },
+                        paginationParams: {
+                            ...state.stockHistory.productsToRender.paginationParams,
+                            filters: {
+                                ...state.stockHistory.productsToRender.paginationParams.filters,
+                                marca: action.payload.selectedBrands
+                            }
+                        }
+                    }
+                }
+            }
         case actions.SELECT_TYPES:
             return {
                 ...state,
@@ -474,6 +730,28 @@ const reducer = (state = initialState, action) => {
                             ...state.priceModificatorModal.productsToRender.paginationParams,
                             filters: {
                                 ...state.priceModificatorModal.productsToRender.paginationParams.filters,
+                                rubro: action.payload.selectedTypes
+                            }
+                        }
+                    }
+                }
+            }
+        case actions.SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        typesForSelect: {
+                            ...state.stockHistory.productsToRender.typesForSelect,
+                            selectedTypes: action.payload.selectedTypes,
+                            selectedTypesNames: action.payload.selectedTypesNames
+                        },
+                        paginationParams: {
+                            ...state.stockHistory.productsToRender.paginationParams,
+                            filters: {
+                                ...state.stockHistory.productsToRender.paginationParams.filters,
                                 rubro: action.payload.selectedTypes
                             }
                         }
@@ -533,6 +811,26 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        brandsForSelect: {
+                            ...state.stockHistory.productsToRender.brandsForSelect,
+                            allBrands: action.payload.allBrands,
+                            allBrandsNames: action.payload.allBrandsNames
+                        },
+                        typesForSelect: {
+                            ...state.stockHistory.productsToRender.typesForSelect,
+                            allTypes: action.payload.allTypes,
+                            allTypesNames: action.payload.allTypesNames
+                        }
+                    }
+                }
+            }
         case actions.SET_LOADING:
             return {
                 ...state,
@@ -549,14 +847,6 @@ const reducer = (state = initialState, action) => {
                     paginationParams: action.payload
                 }
             }
-        case actions.SET_PAGINATION_PARAMS_IN_STOCK_HISTORY:
-            return {
-                ...state,
-                stockHistory: {
-                    ...state.stockHistory,
-                    paginationParams: action.payload
-                }
-            }
         case actions.SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_MODIFY_IN_PRICE_MODIFICATOR:
             return {
                 ...state,
@@ -568,7 +858,7 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-        case actions.SET_PAGINATION_PARAMS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR:
+        case actions.SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR:
             return {
                 ...state,
                 priceModificatorModal: {
@@ -586,6 +876,39 @@ const reducer = (state = initialState, action) => {
                             selectedTypes: [],
                             selectedTypesNames: [{ value: 'Todos los rubros' }],
                         }
+                    }
+                }
+            }
+        case actions.SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        paginationParams: action.payload
+                    }
+                }
+            }
+        case actions.SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productStockHistoryModal: {
+                        ...state.stockHistory.productStockHistoryModal,
+                        paginationParams: action.payload
+                    }
+                }
+            }
+        case actions.SET_PARAMS_IN_FIX_STOCK_HISTORY_MODAL:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    fixStockHistoryModal: {
+                        ...state.stockHistory.fixStockHistoryModal,
+                        params: action.payload
                     }
                 }
             }
@@ -622,20 +945,23 @@ const reducer = (state = initialState, action) => {
                     product: action.payload
                 }
             }
-        case actions.SET_PRODUCT_FOR_STOCK_HISTORY_MODAL:
+        case actions.SET_PRODUCT_IN_PRODUCT_STOCK_HISTORY_MODAL:
             return {
                 ...state,
                 stockHistory: {
                     ...state.stockHistory,
-                    modalVisibility: true,
-                    paginationParams: {
-                        ...state.stockHistory.paginationParams,
-                        filters: {
-                            ...state.stockHistory.paginationParams.filters,
-                            product: action.payload
-                        }
-                    },
-                    product: action.payload
+                    productStockHistoryModal: {
+                        ...state.stockHistory.productStockHistoryModal,
+                        paginationParams: {
+                            ...state.stockHistory.productStockHistoryModal.paginationParams,
+                            filters: {
+                                ...state.stockHistory.productStockHistoryModal.paginationParams.filters,
+                                product: action.payload
+                            }
+                        },
+                        product: action.payload,
+                        visibility: true
+                    }
                 }
             }
         case actions.SET_PRODUCTS_FOR_EXCEL_REPORT:
@@ -697,32 +1023,53 @@ const reducer = (state = initialState, action) => {
                 }
             }
         case actions.SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY:
-            console.log(action.payload)
             return {
                 ...state,
                 stockHistory: {
                     ...state.stockHistory,
-                    loading: false,
-                    productsToRender: action.payload.docs,
-                    totalRecords: action.payload.totalDocs
+                    productsToRender: {
+                        ...state.stockHistory.productsToRender,
+                        loading: false,
+                        products: action.payload.docs,
+                        totalProducts: action.payload.totalDocs
+                    }
                 }
             }
-        case actions.SET_STOCK_HISTORY_FOR_RENDER:
+        case actions.SET_STOCK_HISTORY_TO_FIX:
             return {
                 ...state,
                 stockHistory: {
                     ...state.stockHistory,
-                    loading: false,
-                    recordsForRender: action.payload.docs,
-                    totalRecords: action.payload.totalDocs
+                    fixStockHistoryModal: {
+                        ...state.stockHistory.fixStockHistoryModal,
+                        product: state.stockHistory.productStockHistoryModal.product,
+                        stockHistoryToFix: action.payload,
+                        visibility: true
+                    }
                 }
             }
-        case actions.SET_STOCK_HISTORY_PAGINATION_PARAMS:
+        case actions.SET_STOCK_HISTORY_TO_RENDER:
             return {
                 ...state,
                 stockHistory: {
                     ...state.stockHistory,
-                    paginationParams: action.payload
+                    productStockHistoryModal: {
+                        ...state.stockHistory.productStockHistoryModal,
+                        loading: false,
+                        recordsForRender: action.payload.docs,
+                        totalRecords: action.payload.totalDocs
+                    }
+                }
+            }
+        case actions.SET_TITLES_VALUES_IN_PRODUCT_STOCK_HISTORY_MODAL:
+            return {
+                ...state,
+                stockHistory: {
+                    ...state.stockHistory,
+                    productStockHistoryModal: {
+                        ...state.stockHistory.productStockHistoryModal,
+                        flowValues: action.payload
+                    }
                 }
             }
         case actions.SHOW_PRICE_MODIFICATOR_MODAL:
