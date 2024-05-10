@@ -10,6 +10,7 @@ const actions = {
     DESELECT_ALL_TYPES: 'DESELECT_ALL_TYPES',
     DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+    DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT: 'DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT',
     HIDE_PRICE_MODIFICATOR_MODAL: 'HIDE_PRICE_MODIFICATOR_MODAL',
     HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
     HIDE_FIX_STOCK_HISTORY_MODAL: 'HIDE_FIX_STOCK_HISTORY_MODAL',
@@ -24,6 +25,7 @@ const actions = {
     SELECT_BRANDS: 'SELECT_BRANDS',
     SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
+    SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT: 'SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT',
     SELECT_TYPES: 'SELECT_TYPES',
     SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
@@ -65,7 +67,6 @@ const initialState = {
         activeOptions: [{ disabled: false, label: 'Todas', value: 'todas' }],
         allOptions: [
             { disabled: false, label: 'Todas', value: 'todas' },
-            // { disabled: false, label: 'Ilustración', value: 'imagenes' },
             { disabled: true, label: 'Producto', value: 'producto' },
             { disabled: false, label: 'Rubro', value: 'rubro' },
             { disabled: false, label: 'Marca', value: 'marca' },
@@ -89,6 +90,7 @@ const initialState = {
             { disabled: false, label: 'Unidad de medida', value: 'unidadMedida' },
             { disabled: false, label: 'Fraccionamiento', value: 'fraccionamiento' }
         ],
+        imageOptionIsChecked: false,
         products: []
     },
     index: {
@@ -433,6 +435,14 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT:
+            return {
+                ...state,
+                exportExcel: {
+                    ...state.exportExcel,
+                    imageOptionIsChecked: false
+                }
+            }
         case actions.HIDE_PRICE_MODIFICATOR_MODAL:
             return {
                 ...state,
@@ -693,6 +703,14 @@ const reducer = (state = initialState, action) => {
                             }
                         }
                     }
+                }
+            }
+        case actions.SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT:
+            return {
+                ...state,
+                exportExcel: {
+                    ...state.exportExcel,
+                    imageOptionIsChecked: true
                 }
             }
         case actions.SELECT_TYPES:

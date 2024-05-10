@@ -79,7 +79,7 @@ const Header = () => {
         const nameOfDocument = 'Lista de salidas'
         const nameOfSheet = 'Hoja de salidas'
         const selectedHeaders = outputs_state.activeExcelOptions.map(option => option.label)
-        const columnHeaders = selectedHeaders.includes('Todas') ? outputs_state.allExcelTitles : selectedHeaders
+        const columnHeaders = selectedHeaders.includes('Todas') ? outputs_state.allExcelTitles.filter(option => option !== 'Todas') : selectedHeaders
         const lines = await processExcelLines(columnHeaders)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
     }

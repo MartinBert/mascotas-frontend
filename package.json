@@ -19,7 +19,7 @@
         "antd": "^5.5.2",
         "axios": "^1.4.0",
         "buffer": "^6.0.3",
-        "file-saver": "^2.0.5",
+        "exceljs": "^4.4.0",
         "form-data": "^4.0.0",
         "html2canvas": "^1.4.1",
         "jspdf": "^2.5.1",
@@ -36,8 +36,7 @@
         "sass-loader": "^13.3.1",
         "shortid": "^2.2.16",
         "sweetalert2": "^11.7.10",
-        "web-vitals": "^3.3.2",
-        "xlsx": "^0.18.5"
+        "web-vitals": "^3.3.2"
     },
     "devDependencies": {
         "@types/react-router-dom": "^5.3.3"

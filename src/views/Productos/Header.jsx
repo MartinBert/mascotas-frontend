@@ -2,14 +2,11 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// Custom Components
-import InputHidden from '../../components/generics/InputHidden'
-
 // Custom Constexts
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, Input, Row, Select } from 'antd'
+import { Button, Checkbox, Col, Input, Row, Select } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -57,6 +54,28 @@ const Header = () => {
         >
             Nuevo
         </Button>
+    )
+
+    // ------ Checkbox to Export Excel With Images ------- //
+    const onChangeCheckbox = (e) => {
+        const isChecked = e.target.checked
+        if (isChecked) products_dispatch({ type: 'SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT' })
+        else products_dispatch({ type: 'DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT' })
+    }
+
+    const checkboxToExportExcelWithImages = (
+        <Row align='middle' gutter={8}>
+            <Col span={8}>
+                Exportar con ilustraciones
+            </Col>
+            <Col span={16}>
+                <Checkbox
+                    onChange={onChangeCheckbox}
+                    checked={products_state.exportExcel.imageOptionIsChecked}
+                >
+                </Checkbox>
+            </Col>
+        </Row>
     )
 
     // ------------------ Clear Filters ------------------ //
@@ -125,22 +144,13 @@ const Header = () => {
         const processedLines = []
         for await (let product of products_state.exportExcel.products) {
             const activeOptions = []
-
-            // if (columnHeaders.includes('Ilustración')) {
-            //     const imageID = product.imagenes.length > 0 ? product.imagenes[0]._id : null
-            //     if (imageID) {
-            //         const imageUrl = await api.uploader.getImageUrl(imageID)
-            //         activeOptions.push(
-            //             <img
-            //                 crossOrigin='anonymous'
-            //                 height='70'
-            //                 src={imageUrl}
-            //                 width='70'
-            //             />
-            //         )
-            //     } else activeOptions.push('-')
-            // }
-
+            if (columnHeaders.includes('Ilustración')) {
+                const imageID = product.imagenes.length > 0 ? product.imagenes[0]._id : null
+                if (imageID) {
+                    const imageUrl = await api.uploader.getImageUrl(imageID)
+                    activeOptions.push(imageUrl)
+                } else activeOptions.push('-')
+            }
             if (columnHeaders.includes('Producto')) activeOptions.push(product.nombre ? product.nombre : '-')
             if (columnHeaders.includes('Rubro')) activeOptions.push(product.rubro ? product.rubro.nombre : '-')
             if (columnHeaders.includes('Marca')) activeOptions.push(product.marca ? product.marca.nombre : '-')
@@ -171,10 +181,12 @@ const Header = () => {
     const exportExcel = async () => {
         const nameOfDocument = 'Lista de productos'
         const nameOfSheet = 'Hoja de productos'
+        const exportWithImages = products_state.exportExcel.imageOptionIsChecked
         const selectedHeaders = products_state.exportExcel.activeOptions.map(option => option.label)
-        const columnHeaders = selectedHeaders.includes('Todas')
-            ? products_state.exportExcel.allOptions.map(option => option.label)
+        let columnHeaders = selectedHeaders.includes('Todas')
+            ? products_state.exportExcel.allOptions.map(option => option.label).filter(option => option !== 'Todas')
             : selectedHeaders
+        if (exportWithImages) columnHeaders = ['Ilustración', ...columnHeaders]
         const lines = await processExcelLines(columnHeaders)
         return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
     }
@@ -188,16 +200,14 @@ const Header = () => {
         </Button>
     )
 
-    // -------------- Export Excel Options --------------- //
+    // --------- Select to Export Excel Options ---------- //
     const changeExcelOptions = (e) => {
+        const eventValues = e.map(eventOption => eventOption.value)
         let selectedOptions
         if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
         else {
-            selectedOptions = products_state.exportExcel.allOptions.map(option => {
-                const eventValues = e.map(eventOption => eventOption.value)
-                if (eventValues.includes(option.value)) return option
-                else return null
-            }).filter(option => option)
+            selectedOptions = products_state.exportExcel.allOptions
+                .filter(option => eventValues.includes(option.value))
         }
         products_dispatch({ type: 'SELECT_ACTIVE_EXCEL_OPTIONS', payload: selectedOptions })
     }
@@ -374,7 +384,7 @@ const Header = () => {
             value={products_state.index.typesForSelect.selectedTypesNames}
         />
     )
-    
+
     // ------------ Select to Sales Areas ---------------- //
     const loadSalesAreas = async () => {
         const findSalesAreas = await api.zonasdeventas.findAll()
@@ -417,11 +427,6 @@ const Header = () => {
             order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
-            element: selectToExportExcelOptions,
-            name: 'product_exportExcelOptions',
-            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
-        },
-        {
             element: buttonToModifyPrices,
             name: 'product_modifyPrices',
             order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
@@ -430,6 +435,11 @@ const Header = () => {
             element: buttonToNewProduct,
             name: 'product_newProduct',
             order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+        },
+        {
+            element: checkboxToExportExcelWithImages,
+            name: 'product_checkboxToExportExcelWithImages',
+            order: { lg: 11, md: 11, sm: 6, xl: 11, xs: 6, xxl: 11 }
         },
         {
             element: inputToFilterByBarcode,
@@ -447,9 +457,9 @@ const Header = () => {
             order: { lg: 6, md: 6, sm: 9, xl: 6, xs: 9, xxl: 6 }
         },
         {
-            element: <InputHidden />,
-            name: 'product_inputHidden_1',
-            order: { lg: 11, md: 11, sm: 6, xl: 11, xs: 6, xxl: 11 }
+            element: selectToExportExcelOptions,
+            name: 'product_exportExcelOptions',
+            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
         },
         {
             element: selectToFilterByBrand,

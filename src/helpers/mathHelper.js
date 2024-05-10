@@ -2,6 +2,11 @@ const decimalPercent = (value) => {
     return Number(value) / 100
 }
 
+const isPar = (value) => {
+    const verify = (value % 2) == 0
+    return verify
+}
+
 const nextInteger = (value) => {
     return Math.ceil(value)
 }
@@ -39,6 +44,7 @@ const roundTwoDecimals = (value) => {
 
 const mathHelper = {
     decimalPercent,
+    isPar,
     nextInteger,
     nextIntegerMultipleOf_10,
     previousInteger,
