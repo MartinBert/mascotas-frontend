@@ -38,7 +38,7 @@ const ProductStockHistoryModal = () => {
     }
 
     useEffect(() => { fetchStockHistory() }, [
-        products_state.stockHistory.fixStockHistoryModal.visibility,
+        products_state.stockHistory.fixStockHistoryModal.modalVisibility,
         products_state.stockHistory.productStockHistoryModal.paginationParams
     ])
 
@@ -209,7 +209,7 @@ const ProductStockHistoryModal = () => {
     }
 
     useEffect(() => { loadTitlesValues() }, [
-        products_state.stockHistory.fixStockHistoryModal.visibility,
+        products_state.stockHistory.fixStockHistoryModal.modalVisibility,
         products_state.stockHistory.productStockHistoryModal.paginationParams
     ])
 
@@ -313,7 +313,7 @@ const ProductStockHistoryModal = () => {
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={products_state.stockHistory.productStockHistoryModal.visibility}
+            open={products_state.stockHistory.productStockHistoryModal.modalVisibility}
             width={1200}
         >
             <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>

@@ -19,7 +19,9 @@ import contexts from '../../contexts'
 import api from '../../services'
 
 // Views
+import ExportProductListModal from './ExportProductListModal'
 import Header from './Header'
+import PriceModificatorModal from './PriceModificatorModal'
 
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
@@ -89,9 +91,9 @@ const Productos = () => {
         const fetchProducts = async () => {
             const findParamsForRender = formatFindParams(products_state.index.paginationParams)
             const dataForRender = await api.productos.findPaginated(findParamsForRender)
-            const dataForExcelReport = await api.productos.findAllFiltered(findParamsForRender.filters)
+            const dataForExport = await api.productos.findAllFiltered(findParamsForRender.filters)
             products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
-            products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExcelReport.docs })
+            products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExport.docs })
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchProducts()
@@ -230,6 +232,8 @@ const Productos = () => {
                     : <GiselaDetailsModal />
             }
             <DeleteModal title='Eliminar producto' />
+            <ExportProductListModal />
+            <PriceModificatorModal />
         </Row>
     )
 }

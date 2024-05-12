@@ -1,46 +1,54 @@
 const actions = {
     CLEAR_FILTERS: 'CLEAR_FILTERS',
+    CLEAR_FILTERS_IN_EXPORT_PRODUCT_LIST_MODAL: 'CLEAR_FILTERS_IN_EXPORT_PRODUCT_LIST_MODAL',
     CLEAR_FILTERS_IN_PRICE_MODIFICATOR_MODAL: 'CLEAR_FILTERS_IN_PRICE_MODIFICATOR_MODAL',
     CLEAR_FILTERS_IN_STOCK_HISTORY: 'CLEAR_FILTERS_IN_STOCK_HISTORY',
     CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL: 'CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL',
     DESELECT_ALL_BRANDS: 'DESELECT_ALL_BRANDS',
+    DESELECT_ALL_BRANDS_FOR_EXPORT_PRODUCT_LIST: 'DESELECT_ALL_BRANDS_FOR_EXPORT_PRODUCT_LIST',
     DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
     DESELECT_ALL_TYPES: 'DESELECT_ALL_TYPES',
+    DESELECT_ALL_TYPES_FOR_EXPORT_PRODUCT_LIST: 'DESELECT_ALL_TYPES_FOR_EXPORT_PRODUCT_LIST',
     DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'DESELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
-    DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT: 'DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT',
+    HIDE_EXPORT_PRODUCT_LIST_MODAL: 'HIDE_EXPORT_PRODUCT_LIST_MODAL',
     HIDE_PRICE_MODIFICATOR_MODAL: 'HIDE_PRICE_MODIFICATOR_MODAL',
     HIDE_PRODUCT_DETAILS_MODAL: 'HIDE_PRODUCT_DETAILS_MODAL',
     HIDE_FIX_STOCK_HISTORY_MODAL: 'HIDE_FIX_STOCK_HISTORY_MODAL',
     HIDE_PRODUCT_STOCK_HISTORY_MODAL: 'HIDE_PRODUCT_STOCK_HISTORY_MODAL',
+    SELECT_ACTIVE_EXCEL_OPTIONS: 'SELECT_ACTIVE_EXCEL_OPTIONS',
     SELECT_ALL_BRANDS: 'SELECT_ALL_BRANDS',
+    SELECT_ALL_BRANDS_FOR_EXPORT_PRODUCT_LIST: 'SELECT_ALL_BRANDS_FOR_EXPORT_PRODUCT_LIST',
     SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
     SELECT_ALL_TYPES: 'SELECT_ALL_TYPES',
+    SELECT_ALL_TYPES_FOR_EXPORT_PRODUCT_LIST: 'SELECT_ALL_TYPES_FOR_EXPORT_PRODUCT_LIST',
     SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_ALL_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SELECT_BRANDS: 'SELECT_BRANDS',
+    SELECT_BRANDS_FOR_EXPORT_PRODUCT_LIST: 'SELECT_BRANDS_FOR_EXPORT_PRODUCT_LIST',
     SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
-    SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT: 'SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT',
+    SELECT_DOCUMENT_OPTIONS_IN_EXPORT_PRODUCT_LIST: 'SELECT_DOCUMENT_OPTIONS_IN_EXPORT_PRODUCT_LIST',
+    SELECT_IMAGE_OPTION_FOR_EXPORT_PRODUCT_LIST: 'SELECT_IMAGE_OPTION_FOR_EXPORT_PRODUCT_LIST',
     SELECT_TYPES: 'SELECT_TYPES',
+    SELECT_TYPES_FOR_EXPORT_PRODUCT_LIST: 'SELECT_TYPES_FOR_EXPORT_PRODUCT_LIST',
     SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SELECT_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
-    SET_ACTIVE_BRAND: 'SET_ACTIVE_BRAND',
-    SET_ACTIVE_TYPE: 'SET_ACTIVE_TYPE',
     SET_BRANDS_AND_TYPES: 'SET_BRANDS_AND_TYPES',
+    SET_BRANDS_AND_TYPES_FOR_EXPORT_PRODUCT_LIST: 'SET_BRANDS_AND_TYPES_FOR_EXPORT_PRODUCT_LIST',
     SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
-    SELECT_ACTIVE_EXCEL_OPTIONS: 'SELECT_ACTIVE_EXCEL_OPTIONS',
     SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
+    SET_PAGINATION_PARAMS_IN_EXPORT_PRODUCT_LIST_MODAL: 'SET_PAGINATION_PARAMS_IN_EXPORT_PRODUCT_LIST_MODAL',
+    SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL',
     SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_MODIFY_IN_PRICE_MODIFICATOR: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_MODIFY_IN_PRICE_MODIFICATOR',
     SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_PAGINATION_PARAMS_OF_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
-    SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL',
     SET_PARAMS_IN_FIX_STOCK_HISTORY_MODAL: 'SET_PARAMS_IN_FIX_STOCK_HISTORY_MODAL',
     SET_PRICE_MODIFICATION_QUANTITY: 'SET_PRICE_MODIFICATION_QUANTITY',
     SET_PRICE_MODIFICATION_SIGN: 'SET_PRICE_MODIFICATION_SIGN',
@@ -48,24 +56,32 @@ const actions = {
     SET_PRODUCT_FOR_DETAILS_MODAL: 'SET_PRODUCT_FOR_DETAILS_MODAL',
     SET_PRODUCT_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_PRODUCT_IN_PRODUCT_STOCK_HISTORY_MODAL',
     SET_PRODUCTS_FOR_PRICE_MODIFICATION: 'SET_PRODUCTS_FOR_PRICE_MODIFICATION',
-    SET_PRODUCTS_FOR_EXCEL_REPORT: 'SET_PRODUCTS_FOR_EXCEL_REPORT',
+    SET_PRODUCTS_TO_EXPORT_PRODUCT_LIST_MODAL: 'SET_PRODUCTS_TO_EXPORT_PRODUCT_LIST_MODAL',
     SET_PRODUCTS_TO_RENDER_IN_INDEX: 'SET_PRODUCTS_TO_RENDER_IN_INDEX',
     SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SET_STOCK_HISTORY_TO_FIX: 'SET_STOCK_HISTORY_TO_FIX',
     SET_STOCK_HISTORY_TO_RENDER: 'SET_STOCK_HISTORY_TO_RENDER',
     SET_TITLES_VALUES_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_TITLES_VALUES_IN_PRODUCT_STOCK_HISTORY_MODAL',
+    SHOW_EXPORT_PRODUCT_LIST_MODAL: 'SHOW_EXPORT_PRODUCT_LIST_MODAL',
     SHOW_PRICE_MODIFICATOR_MODAL: 'SHOW_PRICE_MODIFICATOR_MODAL',
 }
 
 const initialState = {
     detailsModal: {
-        visibility: false,
+        modalVisibility: false,
         product: null,
     },
-    exportExcel: {
-        activeOptions: [{ disabled: false, label: 'Todas', value: 'todas' }],
-        allOptions: [
+    exportProductList: {
+        brandsForSelect: {
+            allBrands: [],
+            allBrandsNames: [],
+            selectedBrand: [],
+            selectedBrandsNames: [{ value: 'Todas las marcas' }]
+        },
+        documentOptions: [{ value: 'excel' }, { value: 'pdf' }],
+        documentOptionsSelected: ['pdf'],
+        exportOptions: [
             { disabled: false, label: 'Todas', value: 'todas' },
             { disabled: true, label: 'Producto', value: 'producto' },
             { disabled: false, label: 'Rubro', value: 'rubro' },
@@ -90,8 +106,30 @@ const initialState = {
             { disabled: false, label: 'Unidad de medida', value: 'unidadMedida' },
             { disabled: false, label: 'Fraccionamiento', value: 'fraccionamiento' }
         ],
+        exportOptionsSelected: [{ disabled: false, label: 'Todas', value: 'todas' }],
         imageOptionIsChecked: false,
-        products: []
+        loading: true,
+        modalVisibility: false,
+        paginationParams: {
+            filters: {
+                codigoBarras: null,
+                codigoProducto: null,
+                marca: [],
+                nombre: null,
+                rubro: []
+            },
+            limit: 5,
+            page: 1
+        },
+        productsToExport: [],
+        productsToRender: [],
+        quantityOfProducts: 0,
+        typesForSelect: {
+            allTypes: [],
+            allTypesNames: [],
+            selectedTypes: [],
+            selectedTypesNames: [{ value: 'Todos los rubros' }],
+        }
     },
     index: {
         brandsForSelect: {
@@ -175,7 +213,7 @@ const initialState = {
             },
             product: null,
             stockHistoryToFix: null,
-            visibility: false
+            modalVisibility: false
         },
         productStockHistoryModal: {
             flowValues: {
@@ -198,7 +236,7 @@ const initialState = {
             product: null,
             recordsForRender: [],
             totalRecords: 0,
-            visibility: false
+            modalVisibility: false
         },
         productsToRender: {
             brandsForSelect: {
@@ -256,6 +294,34 @@ const reducer = (state = initialState, action) => {
                     },
                     typesForSelect: {
                         ...state.index.typesForSelect,
+                        selectedType: [],
+                        selectedTypesNames: [{ value: 'Todos los rubros' }]
+                    }
+                }
+            }
+        case actions.CLEAR_FILTERS_IN_EXPORT_PRODUCT_LIST_MODAL:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    brandsForSelect: {
+                        ...state.priceModificatorModal.productsToRender.brandsForSelect,
+                        selectedBrand: [],
+                        selectedBrandsNames: [{ value: 'Todas las marcas' }]
+                    },
+                    paginationParams: {
+                        ...state.priceModificatorModal.productsToRender.paginationParams,
+                        filters: {
+                            codigoBarras: null,
+                            codigoProducto: null,
+                            marca: [],
+                            nombre: null,
+                            rubro: []
+                        },
+                        page: 1
+                    },
+                    typesForSelect: {
+                        ...state.priceModificatorModal.productsToRender.typesForSelect,
                         selectedType: [],
                         selectedTypesNames: [{ value: 'Todos los rubros' }]
                     }
@@ -341,6 +407,19 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.DESELECT_ALL_BRANDS_FOR_EXPORT_PRODUCT_LIST:
+            const notAllBrandsNamesForExportProductList = state.exportProductList.brandsForSelect.selectedBrandsNames
+                .filter(brandName => brandName.value !== 'Todas las marcas')
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    brandsForSelect: {
+                        ...state.exportProductList.brandsForSelect,
+                        selectedBrandsNames: notAllBrandsNamesForExportProductList
+                    }
+                }
+            }
         case actions.DESELECT_ALL_BRANDS_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR:
             const notAllBrandsNamesForProductsToRenderInPriceModificator =
                 state.priceModificatorModal.productsToRender.brandsForSelect.selectedBrandsNames
@@ -376,16 +455,16 @@ const reducer = (state = initialState, action) => {
                 }
             }
         case actions.DESELECT_ALL_EXCEL_OPTIONS:
-            const notAllOptions = state.exportExcel.activeOptions.filter(option => option.value !== 'todas')
+            const notAllOptions = state.exportProductList.exportOptionsSelected.filter(option => option.value !== 'todas')
             const optionsValues = notAllOptions.map(option => option.value)
             const fixedOptions = optionsValues.includes('producto')
                 ? notAllOptions
                 : [{ disabled: true, label: 'Producto', value: 'producto' }].concat(notAllOptions)
             return {
                 ...state,
-                exportExcel: {
-                    ...state.exportExcel,
-                    activeOptions: fixedOptions
+                exportProductList: {
+                    ...state.exportProductList,
+                    exportOptionsSelected: fixedOptions
                 }
             }
         case actions.DESELECT_ALL_TYPES:
@@ -398,6 +477,19 @@ const reducer = (state = initialState, action) => {
                     typesForSelect: {
                         ...state.index.typesForSelect,
                         selectedTypesNames: notAllTypesNames
+                    }
+                }
+            }
+        case actions.DESELECT_ALL_TYPES_FOR_EXPORT_PRODUCT_LIST:
+            const notAllTypesNamesForExportProductList = state.exportProductList.typesForSelect.selectedTypesNames
+                .filter(typeName => typeName.value !== 'Todos los rubros')
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    typesForSelect: {
+                        ...state.exportProductList.typesForSelect,
+                        selectedTypesNames: notAllTypesNamesForExportProductList
                     }
                 }
             }
@@ -435,12 +527,12 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-        case actions.DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT:
+        case actions.HIDE_EXPORT_PRODUCT_LIST_MODAL:
             return {
                 ...state,
-                exportExcel: {
-                    ...state.exportExcel,
-                    imageOptionIsChecked: false
+                exportProductList: {
+                    ...state.exportProductList,
+                    modalVisibility: false
                 }
             }
         case actions.HIDE_PRICE_MODIFICATOR_MODAL:
@@ -456,7 +548,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 detailsModal: {
                     ...state.detailsModal,
-                    visibility: false,
+                    modalVisibility: false,
                     product: null
                 }
             }
@@ -477,7 +569,7 @@ const reducer = (state = initialState, action) => {
                         },
                         product: null,
                         stockHistoryToFix: null,
-                        visibility: false
+                        modalVisibility: false
                     }
                 }
             }
@@ -496,7 +588,7 @@ const reducer = (state = initialState, action) => {
                             }
                         },
                         product: null,
-                        visibility: false
+                        modalVisibility: false
                     }
                 }
             }
@@ -515,6 +607,25 @@ const reducer = (state = initialState, action) => {
                     brandsForSelect: {
                         ...state.index.brandsForSelect,
                         selectedBrands: state.index.brandsForSelect.allBrands,
+                        selectedBrandsNames: [{ value: 'Todas las marcas' }]
+                    }
+                }
+            }
+        case actions.SELECT_ALL_BRANDS_FOR_EXPORT_PRODUCT_LIST:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    paginationParams: {
+                        ...state.exportProductList.paginationParams,
+                        filters: {
+                            ...state.exportProductList.paginationParams.filters,
+                            marca: []
+                        }
+                    },
+                    brandsForSelect: {
+                        ...state.exportProductList.brandsForSelect,
+                        selectedBrands: state.exportProductList.brandsForSelect.allBrands,
                         selectedBrandsNames: [{ value: 'Todas las marcas' }]
                     }
                 }
@@ -566,9 +677,9 @@ const reducer = (state = initialState, action) => {
         case actions.SELECT_ALL_EXCEL_OPTIONS:
             return {
                 ...state,
-                exportExcel: {
-                    ...state.exportExcel,
-                    activeOptions: [{ disabled: false, label: 'Todas', value: 'todas' }]
+                exportProductList: {
+                    ...state.exportProductList,
+                    exportOptionsSelected: [{ disabled: false, label: 'Todas', value: 'todas' }]
                 }
             }
         case actions.SELECT_ALL_TYPES:
@@ -586,6 +697,25 @@ const reducer = (state = initialState, action) => {
                     typesForSelect: {
                         ...state.index.typesForSelect,
                         selectedTypes: state.index.typesForSelect.allTypes,
+                        selectedTypesNames: [{ value: 'Todos los rubros' }]
+                    }
+                }
+            }
+        case actions.SELECT_ALL_TYPES_FOR_EXPORT_PRODUCT_LIST:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    paginationParams: {
+                        ...state.exportProductList.paginationParams,
+                        filters: {
+                            ...state.exportProductList.paginationParams.filters,
+                            rubro: []
+                        }
+                    },
+                    typesForSelect: {
+                        ...state.exportProductList.typesForSelect,
+                        selectedTypes: state.exportProductList.typesForSelect.allTypes,
                         selectedTypesNames: [{ value: 'Todos los rubros' }]
                     }
                 }
@@ -637,9 +767,9 @@ const reducer = (state = initialState, action) => {
         case actions.SELECT_ACTIVE_EXCEL_OPTIONS:
             return {
                 ...state,
-                exportExcel: {
-                    ...state.exportExcel,
-                    activeOptions: action.payload
+                exportProductList: {
+                    ...state.exportProductList,
+                    exportOptionsSelected: action.payload
                 }
             }
         case actions.SELECT_BRANDS:
@@ -656,6 +786,25 @@ const reducer = (state = initialState, action) => {
                     },
                     brandsForSelect: {
                         ...state.index.brandsForSelect,
+                        selectedBrands: action.payload.selectedBrands,
+                        selectedBrandsNames: action.payload.selectedBrandsNames
+                    }
+                }
+            }
+        case actions.SELECT_BRANDS_FOR_EXPORT_PRODUCT_LIST:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    paginationParams: {
+                        ...state.exportProductList.paginationParams,
+                        filters: {
+                            ...state.exportProductList.paginationParams.filters,
+                            marca: action.payload.selectedBrands
+                        }
+                    },
+                    brandsForSelect: {
+                        ...state.exportProductList.brandsForSelect,
                         selectedBrands: action.payload.selectedBrands,
                         selectedBrandsNames: action.payload.selectedBrandsNames
                     }
@@ -705,12 +854,20 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-        case actions.SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT:
+        case actions.SELECT_DOCUMENT_OPTIONS_IN_EXPORT_PRODUCT_LIST:
             return {
                 ...state,
-                exportExcel: {
-                    ...state.exportExcel,
-                    imageOptionIsChecked: true
+                exportProductList: {
+                    ...state.exportProductList,
+                    documentOptionsSelected: action.payload
+                }
+            }
+        case actions.SELECT_IMAGE_OPTION_FOR_EXPORT_PRODUCT_LIST:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    imageOptionIsChecked: action.payload
                 }
             }
         case actions.SELECT_TYPES:
@@ -727,6 +884,25 @@ const reducer = (state = initialState, action) => {
                     },
                     typesForSelect: {
                         ...state.index.typesForSelect,
+                        selectedTypes: action.payload.selectedTypes,
+                        selectedTypesNames: action.payload.selectedTypesNames
+                    }
+                }
+            }
+        case actions.SELECT_TYPES_FOR_EXPORT_PRODUCT_LIST:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    paginationParams: {
+                        ...state.exportProductList.paginationParams,
+                        filters: {
+                            ...state.exportProductList.paginationParams.filters,
+                            rubro: action.payload.selectedTypes
+                        }
+                    },
+                    typesForSelect: {
+                        ...state.exportProductList.typesForSelect,
                         selectedTypes: action.payload.selectedTypes,
                         selectedTypesNames: action.payload.selectedTypesNames
                     }
@@ -776,27 +952,28 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-        case actions.SET_ACTIVE_BRAND:
-            return {
-                ...state,
-                brandsForSelect: {
-                    ...state.brandsForSelect,
-                    selectedBrand: action.payload
-                }
-            }
-        case actions.SET_ACTIVE_TYPE:
-            return {
-                ...state,
-                typesForSelect: {
-                    ...state.typesForSelect,
-                    selectedTypes: action.payload
-                }
-            }
         case actions.SET_BRANDS_AND_TYPES:
             return {
                 ...state,
                 index: {
                     ...state.index,
+                    brandsForSelect: {
+                        ...state.index.brandsForSelect,
+                        allBrands: action.payload.allBrands,
+                        allBrandsNames: action.payload.allBrandsNames
+                    },
+                    typesForSelect: {
+                        ...state.index.typesForSelect,
+                        allTypes: action.payload.allTypes,
+                        allTypesNames: action.payload.allTypesNames
+                    }
+                }
+            }
+        case actions.SET_BRANDS_AND_TYPES_FOR_EXPORT_PRODUCT_LIST:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
                     brandsForSelect: {
                         ...state.index.brandsForSelect,
                         allBrands: action.payload.allBrands,
@@ -908,6 +1085,14 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.SET_PAGINATION_PARAMS_IN_EXPORT_PRODUCT_LIST_MODAL:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    paginationParams: action.payload
+                }
+            }
         case actions.SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL:
             return {
                 ...state,
@@ -959,7 +1144,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 detailsModal: {
                     ...state.detailsModal,
-                    visibility: true,
+                    modalVisibility: true,
                     product: action.payload
                 }
             }
@@ -978,16 +1163,19 @@ const reducer = (state = initialState, action) => {
                             }
                         },
                         product: action.payload,
-                        visibility: true
+                        modalVisibility: true
                     }
                 }
             }
-        case actions.SET_PRODUCTS_FOR_EXCEL_REPORT:
+        case actions.SET_PRODUCTS_TO_EXPORT_PRODUCT_LIST_MODAL:
             return {
                 ...state,
-                exportExcel: {
-                    ...state.exportExcel,
-                    products: action.payload
+                exportProductList: {
+                    ...state.exportProductList,
+                    loading: false,
+                    productsToExport: action.payload.productsToExport,
+                    productsToRender: action.payload.productsToRender,
+                    quantityOfProducts: action.payload.quantityOfProducts
                 }
             }
         case actions.SET_PRODUCTS_FOR_PRICE_MODIFICATION:
@@ -1062,7 +1250,7 @@ const reducer = (state = initialState, action) => {
                         ...state.stockHistory.fixStockHistoryModal,
                         product: state.stockHistory.productStockHistoryModal.product,
                         stockHistoryToFix: action.payload,
-                        visibility: true
+                        modalVisibility: true
                     }
                 }
             }
@@ -1088,6 +1276,14 @@ const reducer = (state = initialState, action) => {
                         ...state.stockHistory.productStockHistoryModal,
                         flowValues: action.payload
                     }
+                }
+            }
+        case actions.SHOW_EXPORT_PRODUCT_LIST_MODAL:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    modalVisibility: true
                 }
             }
         case actions.SHOW_PRICE_MODIFICATOR_MODAL:

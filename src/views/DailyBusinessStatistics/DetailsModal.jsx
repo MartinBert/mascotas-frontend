@@ -86,7 +86,7 @@ const DetailsModal = () => {
         dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_VIEW_DETAILS', payload: expensesData })
     }
 
-    useEffect(() => { loadExpenses() }, [dailyBusinessStatistics_state.detailsModal.visibility])
+    useEffect(() => { loadExpenses() }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
 
     const setPageAndLimitOfTableOfExpenses = (page, limit) => {
         const paginationParams = {
@@ -199,7 +199,7 @@ const DetailsModal = () => {
         dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_VIEW_DETAILS', payload: incomesData })
     }
 
-    useEffect(() => { loadIncomes() }, [dailyBusinessStatistics_state.detailsModal.visibility])
+    useEffect(() => { loadIncomes() }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
 
     const setPageAndLimitOfTableOfIncomes = (page, limit) => {
         const paginationParams = {
@@ -320,7 +320,7 @@ const DetailsModal = () => {
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={dailyBusinessStatistics_state.detailsModal.visibility}
+            open={dailyBusinessStatistics_state.detailsModal.modalVisibility}
             title={`Detalle de movimientos del ${dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString.substring(0, 10)}`}
             width={1200}
         >

@@ -88,7 +88,7 @@ const GiselaDetailsModal = () => {
         <Modal
             footer={false}
             onCancel={onCancel}
-            open={products_state.detailsModal.visibility}
+            open={products_state.detailsModal.modalVisibility}
             width={1000}
         >
             <div justify='center'>

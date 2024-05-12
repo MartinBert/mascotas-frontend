@@ -61,7 +61,7 @@ const ProductDetailsModal = () => {
 
     return (
         <Modal
-            open={products_state.detailsModal.visibility}
+            open={products_state.detailsModal.modalVisibility}
             onCancel={onCancel}
             footer={false}
             width={1000}

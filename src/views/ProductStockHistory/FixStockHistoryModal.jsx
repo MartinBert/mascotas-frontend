@@ -192,7 +192,7 @@ const FixStockHistoryModal = () => {
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={products_state.stockHistory.fixStockHistoryModal.visibility}
+            open={products_state.stockHistory.fixStockHistoryModal.modalVisibility}
             width={1200}
         >
             {titleOfModal}

@@ -53,7 +53,7 @@ const initialState = {
             totalIncomesRecord: 0
         },
         statisticToViewDetails: null,
-        visibility: false
+        modalVisibility: false
     },
     fixStatisticsModalIsVisible: false,
     loading: true,
@@ -126,7 +126,7 @@ const reducer = (state = initialState, action) => {
                 detailsModal: {
                     ...state.detailsModal,
                     statisticToViewDetails: null,
-                    visibility: false
+                    modalVisibility: false
                 }
             }
         case actions.HIDE_FIX_STATISTICS_MODAL:
@@ -246,7 +246,7 @@ const reducer = (state = initialState, action) => {
                 detailsModal: {
                     ...state.detailsModal,
                     statisticToViewDetails: action.payload,
-                    visibility: true
+                    modalVisibility: true
                 }
             }
         case actions.SHOW_FIX_STATISTICS_MODAL:

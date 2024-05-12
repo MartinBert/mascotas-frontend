@@ -1,34 +1,23 @@
 // React Components and Hooks
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
+
+// Custom Components
+import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Constexts
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Checkbox, Col, Input, Row, Select } from 'antd'
-
-// Helpers
-import helpers from '../../helpers'
-
-// Services
-import api from '../../services'
-
-// Views
-import PriceModificatorModal from './PriceModificatorModal'
+import { Button, Col, Input, Row, Select } from 'antd'
 
 // Imports Destructuring
 const { useProductsContext } = contexts.Products
-const { useSalesAreasContext } = contexts.SalesAreas
-const { exportSimpleExcel } = helpers.excel
-const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 
 
 const Header = () => {
     const navigate = useNavigate()
     const [products_state, products_dispatch] = useProductsContext()
-    const [salesAreas_state, salesAreas_dispatch] = useSalesAreasContext()
-
 
     // ------------ Button to Modify Prices -------------- //
     const openPriceModificatorModal = () => {
@@ -52,30 +41,8 @@ const Header = () => {
             className='btn-primary'
             onClick={redirectToForm}
         >
-            Nuevo
+            Nuevo Producto
         </Button>
-    )
-
-    // ------ Checkbox to Export Excel With Images ------- //
-    const onChangeCheckbox = (e) => {
-        const isChecked = e.target.checked
-        if (isChecked) products_dispatch({ type: 'SELECT_IMAGE_OPTION_FOR_EXCEL_REPORT' })
-        else products_dispatch({ type: 'DESELECT_IMAGE_OPTION_FOR_EXCEL_REPORT' })
-    }
-
-    const checkboxToExportExcelWithImages = (
-        <Row align='middle' gutter={8}>
-            <Col span={8}>
-                Exportar con ilustraciones
-            </Col>
-            <Col span={16}>
-                <Checkbox
-                    onChange={onChangeCheckbox}
-                    checked={products_state.exportExcel.imageOptionIsChecked}
-                >
-                </Checkbox>
-            </Col>
-        </Row>
     )
 
     // ------------------ Clear Filters ------------------ //
@@ -95,147 +62,17 @@ const Header = () => {
     )
 
     // ------------------ Export Excel ------------------- //
-    const sumSalesAreaPercentage = (param) => {
-        const fixedParam = param
-            - salesAreas_state.selectedSalesArea[0].discountPercentage
-            + salesAreas_state.selectedSalesArea[0].surchargePercentage
-        return fixedParam
-    }
-
-    const addSalesAreaPercentage = (param) => {
-        const fixedParam = param * (1
-            - salesAreas_state.selectedSalesArea[0].discountDecimal
-            + salesAreas_state.selectedSalesArea[0].surchargeDecimal
-        )
-        return roundToMultiple(fixedParam, 10)
-    }
-
-    const calculateSalePricePerUnit = (product) => {
-        const precioVentaFraccionado = addSalesAreaPercentage(product.precioVentaFraccionado)
-        const fraccionamiento = product.unidadMedida.fraccionamiento
-        const salePricePerUnit = (fraccionamiento < 1000)
-            ? precioVentaFraccionado / fraccionamiento
-            : precioVentaFraccionado * 1000 / fraccionamiento
-        const salePricePerUnitFixed = roundToMultiple(salePricePerUnit, 10)
-        return salePricePerUnitFixed
-    }
-
-    const calculateSaleProfit = (product) => {
-        const saleProfit = addSalesAreaPercentage(product.precioVenta)
-            - product.precioUnitario
-            - product.ivaVenta
-        const saleFractionedProfit = addSalesAreaPercentage(product.precioVentaFraccionado)
-            - product.precioUnitario
-            - product.ivaVenta
-        return { saleProfit, saleFractionedProfit }
-    }
-
-    const calculateSaleProfitPerUnit = (product) => {
-        const fraccionamiento = product.unidadMedida.fraccionamiento
-        const gananciaNetaFraccionado = calculateSaleProfit(product).saleFractionedProfit
-        const saleProfitPerUnit = (fraccionamiento < 1000)
-            ? gananciaNetaFraccionado / fraccionamiento
-            : gananciaNetaFraccionado * 1000 / fraccionamiento
-        const saleProfitPerUnitFixed = roundTwoDecimals(saleProfitPerUnit)
-        return saleProfitPerUnitFixed
-    }
-
-    const processExcelLines = async (columnHeaders) => {
-        const processedLines = []
-        for await (let product of products_state.exportExcel.products) {
-            const activeOptions = []
-            if (columnHeaders.includes('Ilustración')) {
-                const imageID = product.imagenes.length > 0 ? product.imagenes[0]._id : null
-                if (imageID) {
-                    const imageUrl = await api.uploader.getImageUrl(imageID)
-                    activeOptions.push(imageUrl)
-                } else activeOptions.push('-')
-            }
-            if (columnHeaders.includes('Producto')) activeOptions.push(product.nombre ? product.nombre : '-')
-            if (columnHeaders.includes('Rubro')) activeOptions.push(product.rubro ? product.rubro.nombre : '-')
-            if (columnHeaders.includes('Marca')) activeOptions.push(product.marca ? product.marca.nombre : '-')
-            if (columnHeaders.includes('Cód. producto')) activeOptions.push(product.codigoProducto ? product.codigoProducto : '-')
-            if (columnHeaders.includes('Cód. barras')) activeOptions.push(product.codigoBarras ? product.codigoBarras : '-')
-            if (columnHeaders.includes('% IVA compra')) activeOptions.push(product.porcentajeIvaCompra ? '% ' + product.porcentajeIvaCompra : '-')
-            if (columnHeaders.includes('IVA compra ($)')) activeOptions.push(product.ivaCompra ? product.ivaCompra : '-')
-            if (columnHeaders.includes('Precio de lista ($)')) activeOptions.push(product.precioUnitario ? product.precioUnitario : '-')
-            if (columnHeaders.includes('% IVA venta')) activeOptions.push(product.porcentajeIvaVenta ? '% ' + product.porcentajeIvaVenta : '-')
-            if (columnHeaders.includes('IVA venta ($)')) activeOptions.push(product.ivaVenta ? product.ivaVenta : '-')
-            if (columnHeaders.includes('% Ganancia')) activeOptions.push(product.margenGanancia ? '% ' + sumSalesAreaPercentage(product.margenGanancia) : '-')
-            if (columnHeaders.includes('Precio de venta ($)')) activeOptions.push(product.precioVenta ? addSalesAreaPercentage(product.precioVenta) : '-')
-            if (columnHeaders.includes('Ganancia por venta ($)')) activeOptions.push(product.gananciaNeta ? calculateSaleProfit(product).saleProfit : '-')
-            if (columnHeaders.includes('% Ganancia fraccionada')) activeOptions.push(product.margenGananciaFraccionado ? '% ' + sumSalesAreaPercentage(product.margenGananciaFraccionado) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Precio de venta fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado ? addSalesAreaPercentage(product.precioVentaFraccionado) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Ganancia venta fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado ? calculateSaleProfit(product).saleFractionedProfit : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Precio de venta por unidad fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado && product.unidadMedida ? calculateSalePricePerUnit(product) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Ganancia venta por unidad fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado && product.unidadMedida ? calculateSaleProfitPerUnit(product) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Stock')) activeOptions.push(product.cantidadStock ? product.cantidadStock : '-')
-            if (columnHeaders.includes('Stock fraccionado')) activeOptions.push(product.cantidadFraccionadaStock ? product.cantidadFraccionadaStock : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Unidad de medida')) activeOptions.push(product.unidadMedida ? product.unidadMedida.nombre : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Fraccionamiento')) activeOptions.push(product.unidadMedida ? product.unidadMedida.fraccionamiento : '-- Sin fraccionar --')
-            processedLines.push(activeOptions)
-        }
-        return processedLines
-    }
-
-    const exportExcel = async () => {
-        const nameOfDocument = 'Lista de productos'
-        const nameOfSheet = 'Hoja de productos'
-        const exportWithImages = products_state.exportExcel.imageOptionIsChecked
-        const selectedHeaders = products_state.exportExcel.activeOptions.map(option => option.label)
-        let columnHeaders = selectedHeaders.includes('Todas')
-            ? products_state.exportExcel.allOptions.map(option => option.label).filter(option => option !== 'Todas')
-            : selectedHeaders
-        if (exportWithImages) columnHeaders = ['Ilustración', ...columnHeaders]
-        const lines = await processExcelLines(columnHeaders)
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+    const openExportProductListModal = async () => {
+        products_dispatch({ type: 'SHOW_EXPORT_PRODUCT_LIST_MODAL' })
     }
 
     const buttonToExportExcel = (
         <Button
             className='btn-primary'
-            onClick={exportExcel}
+            onClick={openExportProductListModal}
         >
-            Exportar Excel
+            Exportar Lista de Productos
         </Button>
-    )
-
-    // --------- Select to Export Excel Options ---------- //
-    const changeExcelOptions = (e) => {
-        const eventValues = e.map(eventOption => eventOption.value)
-        let selectedOptions
-        if (e.length === 0) selectedOptions = [{ disabled: false, label: 'Todas', value: 'todas' }]
-        else {
-            selectedOptions = products_state.exportExcel.allOptions
-                .filter(option => eventValues.includes(option.value))
-        }
-        products_dispatch({ type: 'SELECT_ACTIVE_EXCEL_OPTIONS', payload: selectedOptions })
-    }
-
-    const selectExcelOptions = (e) => {
-        if (e.value === 'todas') products_dispatch({ type: 'SELECT_ALL_EXCEL_OPTIONS' })
-        else products_dispatch({ type: 'DESELECT_ALL_EXCEL_OPTIONS' })
-    }
-
-    const selectToExportExcelOptions = (
-        <Row align='middle' gutter={8}>
-            <Col span={8}>
-                Opciones a exportar
-            </Col>
-            <Col span={16}>
-                <Select
-                    allowClear
-                    labelInValue
-                    mode='multiple'
-                    onChange={changeExcelOptions}
-                    onSelect={selectExcelOptions}
-                    options={products_state.exportExcel.allOptions}
-                    placeholder='Elige una opción'
-                    style={{ width: '100%' }}
-                    value={products_state.exportExcel.activeOptions}
-                />
-            </Col>
-        </Row>
     )
 
     // --------------- Filter By Barcode ----------------- //
@@ -385,96 +222,61 @@ const Header = () => {
         />
     )
 
-    // ------------ Select to Sales Areas ---------------- //
-    const loadSalesAreas = async () => {
-        const findSalesAreas = await api.zonasdeventas.findAll()
-        salesAreas_dispatch({ type: 'SET_ALL_SALES_AREAS', payload: findSalesAreas.docs })
-    }
+    // ---------------- Title of actions ----------------- //
+    const titleOfActions = <h3>Acciones</h3>
 
-    useEffect(() => { loadSalesAreas() }, [])
-
-    const changeSalesArea = async (e) => {
-        const findSalesArea = await api.zonasdeventas.findByName(e)
-        salesAreas_dispatch({ type: 'SET_SELECTED_SALES_AREA', payload: findSalesArea.docs })
-    }
-
-    const selectToSalesAreas = (
-        <Row align='middle' gutter={8}>
-            <Col span={8}>
-                Zona de venta
-            </Col>
-            <Col span={16}>
-                <Select
-                    onChange={changeSalesArea}
-                    options={salesAreas_state.allSalesAreasNames}
-                    style={{ width: '100%' }}
-                    value={salesAreas_state.selectedSalesAreaName}
-                />
-            </Col>
-        </Row>
-    )
+    // ----------------- Title of filters ------------------ //
+    const titleOfFilters = <h3>Filtrar productos</h3>
 
 
-    const productsRender = [
+    const itemsToRender = [
         {
             element: buttonToClearFilters,
-            name: 'product_cleanFilters',
-            order: { lg: 12, md: 12, sm: 12, xl: 12, xs: 12, xxl: 12 }
+            order: { lg: 9, md: 9, sm: 9, xl: 9, xs: 9, xxl: 9 }
         },
         {
             element: buttonToExportExcel,
-            name: 'product_exportExcel',
-            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
+            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
         },
         {
             element: buttonToModifyPrices,
-            name: 'product_modifyPrices',
-            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
+            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
         },
         {
             element: buttonToNewProduct,
-            name: 'product_newProduct',
-            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+            order: { lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 3 }
         },
         {
-            element: checkboxToExportExcelWithImages,
-            name: 'product_checkboxToExportExcelWithImages',
-            order: { lg: 11, md: 11, sm: 6, xl: 11, xs: 6, xxl: 11 }
+            element: <InputHidden />,
+            order: { lg: 11, md: 11, sm: 11, xl: 11, xs: 11, xxl: 11 }
         },
         {
             element: inputToFilterByBarcode,
-            name: 'product_filterByBarcode',
-            order: { lg: 4, md: 4, sm: 8, xl: 4, xs: 8, xxl: 4 }
+            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
         },
         {
             element: inputToFilterByName,
-            name: 'product_filterByName',
-            order: { lg: 2, md: 2, sm: 7, xl: 2, xs: 7, xxl: 2 }
+            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
         },
         {
             element: inputToFilterByProductCode,
-            name: 'product_filterByProductcode',
-            order: { lg: 6, md: 6, sm: 9, xl: 6, xs: 9, xxl: 6 }
-        },
-        {
-            element: selectToExportExcelOptions,
-            name: 'product_exportExcelOptions',
-            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
+            order: { lg: 7, md: 7, sm: 7, xl: 7, xs: 7, xxl: 7 }
         },
         {
             element: selectToFilterByBrand,
-            name: 'product_filterByBrand',
-            order: { lg: 8, md: 8, sm: 10, xl: 8, xs: 10, xxl: 8 }
+            order: { lg: 10, md: 10, sm: 10, xl: 10, xs: 10, xxl: 10 }
         },
         {
             element: selectToFilterByType,
-            name: 'product_filterByCategory',
-            order: { lg: 10, md: 10, sm: 11, xl: 10, xs: 11, xxl: 10 }
+            order: { lg: 12, md: 12, sm: 12, xl: 12, xs: 12, xxl: 12 }
         },
         {
-            element: selectToSalesAreas,
-            name: 'product_selectSalesArea',
-            order: { lg: 7, md: 7, sm: 4, xl: 7, xs: 4, xxl: 7 }
+            element: titleOfActions,
+            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+        },
+        {
+            element: titleOfFilters,
+            order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
         }
     ]
 
@@ -489,10 +291,10 @@ const Header = () => {
             justify='space-around'
         >
             {
-                productsRender.map(item => {
+                itemsToRender.map((item, index) => {
                     return (
                         <Col
-                            key={item.name}
+                            key={'products_header_' + index}
                             lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
                             md={{ order: item.order.md, span: responsiveGrid.span.md }}
                             sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
@@ -505,7 +307,6 @@ const Header = () => {
                     )
                 })
             }
-            <PriceModificatorModal />
         </Row>
     )
 }
