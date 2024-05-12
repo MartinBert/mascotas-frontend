@@ -473,21 +473,23 @@ const ExportProductListModal = () => {
     const columnsForTableOfProductsToExport = [
         {
             dataIndex: 'product_name',
-            open: true,
             render: (_, product) => product.nombre,
             title: 'Nombre'
+        },        
+        {
+            dataIndex: 'product_barCode',
+            render: (_, product) => product.codigoBarras,
+            title: 'Codigo de barras'
         },
         {
             dataIndex: 'product_productCode',
-            open: true,
             render: (_, product) => product.codigoProducto,
             title: 'Codigo de producto'
         },
         {
-            dataIndex: 'product_barCode',
-            open: true,
-            render: (_, product) => product.codigoBarras,
-            title: 'Codigo de barras'
+            dataIndex: 'product_salePrice',
+            render: (_, product) => product.precioVenta,
+            title: 'Precio de venta'
         }
     ]
 
@@ -522,43 +524,43 @@ const ExportProductListModal = () => {
     const itemsToRender = [
         {
             element: buttonToClearFilters,
-            order: { lg: 14, md: 14, sm: 14, xl: 14, xs: 14, xxl: 14 }
+            order: { lg: 14, md: 14, sm: 13, xl: 14, xs: 13, xxl: 14 }
         },
         {
             element: checkboxToExportWithImages,
-            order: { lg: 7, md: 7, sm: 7, xl: 7, xs: 7, xxl: 7 }
+            order: { lg: 7, md: 7, sm: 4, xl: 7, xs: 4, xxl: 7 }
         },
         {
             element: < InputHidden />,
-            order: { lg: 11, md: 11, sm: 11, xl: 11, xs: 11, xxl: 11 }
+            order: { lg: 11, md: 11, sm: 6, xl: 11, xs: 6, xxl: 11 }
         },
         {
             element: < InputHidden />,
-            order: { lg: 13, md: 13, sm: 13, xl: 13, xs: 13, xxl: 13 }
+            order: { lg: 13, md: 13, sm: 14, xl: 13, xs: 14, xxl: 13 }
         },
         {
             element: inputToFilterByBarcode,
-            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
+            order: { lg: 6, md: 6, sm: 10, xl: 6, xs: 10, xxl: 6 }
         },
         {
             element: inputToFilterByName,
-            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
+            order: { lg: 4, md: 4, sm: 8, xl: 4, xs: 8, xxl: 4 }
         },
         {
             element: inputToFilterByProductCode,
-            order: { lg: 8, md: 8, sm: 8, xl: 8, xs: 8, xxl: 8 }
+            order: { lg: 8, md: 8, sm: 9, xl: 8, xs: 9, xxl: 8 }
         },
         {
             element: selectDocumentOptionsToExportProductList,
-            order: { lg: 9, md: 9, sm: 9, xl: 9, xs: 9, xxl: 9 }
+            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
         },
         {
             element: selectOptionsToExportProductList,
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
             element: selectToFilterByBrand,
-            order: { lg: 10, md: 10, sm: 10, xl: 10, xs: 10, xxl: 10 }
+            order: { lg: 10, md: 10, sm: 11, xl: 10, xs: 11, xxl: 10 }
         },
         {
             element: selectToFilterByType,
@@ -566,7 +568,7 @@ const ExportProductListModal = () => {
         },
         {
             element: selectToSalesAreas,
-            order: { lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 3 }
+            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
         {
             element: titleOfExportOptions,
@@ -574,7 +576,7 @@ const ExportProductListModal = () => {
         },
         {
             element: titleOfFilters,
-            order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
+            order: { lg: 2, md: 2, sm: 7, xl: 2, xs: 7, xxl: 2 }
         }
     ]
 

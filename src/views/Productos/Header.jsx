@@ -19,33 +19,7 @@ const Header = () => {
     const navigate = useNavigate()
     const [products_state, products_dispatch] = useProductsContext()
 
-    // ------------ Button to Modify Prices -------------- //
-    const openPriceModificatorModal = () => {
-        products_dispatch({ type: 'SHOW_PRICE_MODIFICATOR_MODAL' })
-    }
-
-    const buttonToModifyPrices = (
-        <Button
-            className='btn-primary'
-            onClick={openPriceModificatorModal}
-        >
-            Modificar precios
-        </Button>
-    )
-
-    // ------------- Button to New Product --------------- //
-    const redirectToForm = () => navigate('/productos/nuevo')
-
-    const buttonToNewProduct = (
-        <Button
-            className='btn-primary'
-            onClick={redirectToForm}
-        >
-            Nuevo Producto
-        </Button>
-    )
-
-    // ------------------ Clear Filters ------------------ //
+    // ------------- Button to clear filters ------------- //
     const clearFilters = () => {
         products_dispatch({ type: 'CLEAR_FILTERS' })
     }
@@ -61,12 +35,38 @@ const Header = () => {
         </Button>
     )
 
-    // ------------------ Export Excel ------------------- //
+    // --------- Button to create a new product ---------- //
+    const redirectToForm = () => navigate('/productos/nuevo')
+
+    const buttonToNewProduct = (
+        <Button
+            className='btn-primary'
+            onClick={redirectToForm}
+        >
+            Nuevo Producto
+        </Button>
+    )
+
+    // ------------ Button to modify prices -------------- //
+    const openPriceModificatorModal = () => {
+        products_dispatch({ type: 'SHOW_PRICE_MODIFICATOR_MODAL' })
+    }
+
+    const buttonToModifyPrices = (
+        <Button
+            className='btn-primary'
+            onClick={openPriceModificatorModal}
+        >
+            Modificar precios
+        </Button>
+    )
+
+    // --- Button to open modal to export product list --- //
     const openExportProductListModal = async () => {
         products_dispatch({ type: 'SHOW_EXPORT_PRODUCT_LIST_MODAL' })
     }
 
-    const buttonToExportExcel = (
+    const buttonToExportProductList = (
         <Button
             className='btn-primary'
             onClick={openExportProductListModal}
@@ -75,7 +75,7 @@ const Header = () => {
         </Button>
     )
 
-    // --------------- Filter By Barcode ----------------- //
+    // ----------- Input to filter by barcode ------------ //
     const onChangeBarCode = (e) => {
         const filters = {
             ...products_state.index.paginationParams.filters,
@@ -96,7 +96,49 @@ const Header = () => {
         />
     )
 
-    // ---------------- Filter By Brand ------------------ //
+    // ------------ Input to filter by name -------------- //
+    const onChangeName = (e) => {
+        const filters = {
+            ...products_state.index.paginationParams.filters,
+            nombre: e.target.value
+        }
+        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByName = (
+        <Input
+            color='primary'
+            name='nombre'
+            onChange={onChangeName}
+            placeholder='Buscar por nombre'
+            style={{ width: '100%' }}
+            value={products_state.index.paginationParams.filters.nombre}
+        />
+    )
+
+    // -------- Input to filter by product code ---------- //
+    const onChangeProductCode = (e) => {
+        const filters = {
+            ...products_state.index.paginationParams.filters,
+            codigoProducto: e.target.value
+        }
+        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
+        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const inputToFilterByProductCode = (
+        <Input
+            color='primary'
+            name='codigoProducto'
+            onChange={onChangeProductCode}
+            placeholder='Buscar por código de producto'
+            style={{ width: '100%' }}
+            value={products_state.index.paginationParams.filters.codigoProducto}
+        />
+    )
+
+    // ------------ Select to filter by brand ------------ //
     const changeBrands = (e) => {
         const brands = products_state.index.brandsForSelect.allBrandsNames
         let selectedBrands
@@ -138,49 +180,7 @@ const Header = () => {
         />
     )
 
-    // ---------------- Filter By Name ------------------- //
-    const onChangeName = (e) => {
-        const filters = {
-            ...products_state.index.paginationParams.filters,
-            nombre: e.target.value
-        }
-        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
-    const inputToFilterByName = (
-        <Input
-            color='primary'
-            name='nombre'
-            onChange={onChangeName}
-            placeholder='Buscar por nombre'
-            style={{ width: '100%' }}
-            value={products_state.index.paginationParams.filters.nombre}
-        />
-    )
-
-    // ------------ Filter By Product Code --------------- //
-    const onChangeProductCode = (e) => {
-        const filters = {
-            ...products_state.index.paginationParams.filters,
-            codigoProducto: e.target.value
-        }
-        const paginationParams = { ...products_state.index.paginationParams, filters, page: 1 }
-        products_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
-    const inputToFilterByProductCode = (
-        <Input
-            color='primary'
-            name='codigoProducto'
-            onChange={onChangeProductCode}
-            placeholder='Buscar por código de producto'
-            style={{ width: '100%' }}
-            value={products_state.index.paginationParams.filters.codigoProducto}
-        />
-    )
-
-    // ----------------- Filter By Type ------------------ //
+    // ------------- Select to filter by type ------------ //
     const changeTypes = (e) => {
         const types = products_state.index.typesForSelect.allTypesNames
         let selectedTypes
@@ -232,39 +232,39 @@ const Header = () => {
     const itemsToRender = [
         {
             element: buttonToClearFilters,
-            order: { lg: 9, md: 9, sm: 9, xl: 9, xs: 9, xxl: 9 }
+            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
         },
         {
-            element: buttonToExportExcel,
-            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
+            element: buttonToExportProductList,
+            order: { lg: 6, md: 6, sm: 4, xl: 6, xs: 4, xxl: 6 }
         },
         {
             element: buttonToModifyPrices,
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
             element: buttonToNewProduct,
-            order: { lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 3 }
+            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
         {
             element: <InputHidden />,
-            order: { lg: 11, md: 11, sm: 11, xl: 11, xs: 11, xxl: 11 }
+            order: { lg: 11, md: 11, sm: 6, xl: 11, xs: 6, xxl: 11 }
         },
         {
             element: inputToFilterByBarcode,
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
+            order: { lg: 5, md: 5, sm: 10, xl: 5, xs: 10, xxl: 5 }
         },
         {
             element: inputToFilterByName,
-            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
+            order: { lg: 4, md: 4, sm: 8, xl: 4, xs: 8, xxl: 4 }
         },
         {
             element: inputToFilterByProductCode,
-            order: { lg: 7, md: 7, sm: 7, xl: 7, xs: 7, xxl: 7 }
+            order: { lg: 7, md: 7, sm: 9, xl: 7, xs: 9, xxl: 7 }
         },
         {
             element: selectToFilterByBrand,
-            order: { lg: 10, md: 10, sm: 10, xl: 10, xs: 10, xxl: 10 }
+            order: { lg: 10, md: 10, sm: 11, xl: 10, xs: 11, xxl: 10 }
         },
         {
             element: selectToFilterByType,
@@ -276,7 +276,7 @@ const Header = () => {
         },
         {
             element: titleOfFilters,
-            order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
+            order: { lg: 2, md: 2, sm: 7, xl: 2, xs: 7, xxl: 2 }
         }
     ]
 
