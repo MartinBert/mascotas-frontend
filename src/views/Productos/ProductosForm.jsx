@@ -180,11 +180,8 @@ const ProductosForm = () => {
             }
         }
 
-        if (id === 'nuevo') {
-            saveProduct()
-        } else {
-            editProduct()
-        }
+        if (id === 'nuevo') saveProduct()
+        else editProduct()
     }
 
     const handleCancel = () => {
@@ -199,12 +196,8 @@ const ProductosForm = () => {
         name: 'file',
         accept: '.jpg,.png',
         multiple: false,
-        onChange: (info) => {
-            uploadImageToServer(info.file)
-        },
-        onRemove: () => {
-            removeImage(uploadedImages[0]._id)
-        },
+        onChange: (info) => uploadImageToServer(info.file),
+        onRemove: () => removeImage(uploadedImages[0]._id),
         beforeUpload: () => false
     }
 

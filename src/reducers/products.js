@@ -106,7 +106,14 @@ const initialState = {
             { disabled: false, label: 'Unidad de medida', value: 'unidadMedida' },
             { disabled: false, label: 'Fraccionamiento', value: 'fraccionamiento' }
         ],
-        exportOptionsSelected: [{ disabled: false, label: 'Todas', value: 'todas' }],
+        exportOptionsSelected: [
+            { disabled: false, label: 'Rubro', value: 'rubro' },
+            { disabled: false, label: 'Marca', value: 'marca' },
+            { disabled: false, label: 'Producto', value: 'producto' },
+            { disabled: false, label: 'Cód. producto', value: 'codigoProducto' },
+            { disabled: false, label: 'Cód. barras', value: 'codigoBarras' },
+            { disabled: false, label: 'Precio de venta ($)', value: 'precioVenta' }
+        ],
         imageOptionIsChecked: false,
         loading: true,
         modalVisibility: false,
@@ -855,11 +862,23 @@ const reducer = (state = initialState, action) => {
                 }
             }
         case actions.SELECT_DOCUMENT_OPTIONS_IN_EXPORT_PRODUCT_LIST:
+            const [typeDoc] = action.payload
+            const exportOptionsIfPdf = [
+                { disabled: false, label: 'Rubro', value: 'rubro' },
+                { disabled: false, label: 'Marca', value: 'marca' },
+                { disabled: false, label: 'Producto', value: 'producto' },
+                { disabled: false, label: 'Cód. producto', value: 'codigoProducto' },
+                { disabled: false, label: 'Cód. barras', value: 'codigoBarras' },
+                { disabled: false, label: 'Precio de venta ($)', value: 'precioVenta' },
+            ]
             return {
                 ...state,
                 exportProductList: {
                     ...state.exportProductList,
-                    documentOptionsSelected: action.payload
+                    documentOptionsSelected: action.payload,
+                    exportOptionsSelected: typeDoc === 'pdf'
+                        ? exportOptionsIfPdf
+                        : [{ disabled: false, label: 'Todas', value: 'todas' },]
                 }
             }
         case actions.SELECT_IMAGE_OPTION_FOR_EXPORT_PRODUCT_LIST:

@@ -133,20 +133,14 @@ const Empresas = () => {
     ]
 
     return (
-        <Row
-            gutter={[0, 16]}
-        >
-            <Col
-                span={24}
-            >
+        <Row gutter={[0, 16]}>
+            <Col span={24}>
                 <Header
                     filters={filters}
                     setFilters={setFilters}
                 />
             </Col>
-            <Col
-                span={24}
-            >
+            <Col span={24}>
                 <Table
                     width={'100%'}
                     dataSource={empresas}
@@ -164,9 +158,7 @@ const Empresas = () => {
                     size='small'
                     loading={deleteModal_state.loading}
                 />
-                <DeleteModal
-                    title='Eliminar empresa'
-                />
+                <DeleteModal title='Eliminar empresa'/>
             </Col>
         </Row>
     )

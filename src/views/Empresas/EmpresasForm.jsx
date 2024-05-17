@@ -75,36 +75,24 @@ const EmpresasForm = () => {
     }, [empresa.razonSocial, id])
 
     const save = () => {
-        if (!empresa.logo) {
-            empresa.logo = uploadedImages[0]
-        }
+        if (!empresa.logo) empresa.logo = uploadedImages[0]
 
         const saveBusiness = async () => {
             const response = await api.empresas.save(empresa)
             if (response.code === 200) {
-                successAlert('El registro fue grabado con exito').then(
-                    redirectToEmpresas()
-                )
-            } else {
-                errorAlert('Error al guardar el registro')
-            }
+                successAlert('El registro fue grabado con exito')
+                    .then(redirectToEmpresas())
+            } else errorAlert('Error al guardar el registro')
         }
 
         const editBusiness = async () => {
-            console.log(empresa)
             const response = await api.empresas.edit(empresa)
-            if (response.code === 200) {
-                success()
-            } else {
-                fail()
-            }
+            if (response.code === 200) success()
+            else fail()
         }
 
-        if (id === 'nuevo') {
-            saveBusiness()
-        } else {
-            editBusiness()
-        }
+        if (id === 'nuevo') saveBusiness()
+        else editBusiness()
     }
 
     const redirectToEmpresas = () => {
@@ -141,12 +129,8 @@ const EmpresasForm = () => {
         name: 'file',
         accept: '.jpg,.jpeg,.png',
         multiple: false,
-        onChange: (info) => {
-            uploadImageToServer(info.file)
-        },
-        onRemove: () => {
-            removeImage(uploadedImages[0]._id)
-        },
+        onChange: (info) => uploadImageToServer(info.file),
+        onRemove: () => removeImage(uploadedImages[0]._id),
         beforeUpload: () => false
     }
 

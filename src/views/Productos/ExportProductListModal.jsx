@@ -1,6 +1,9 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
 
+// Custom components
+import { errorAlert } from '../../components/alerts'
+
 // Custom Constexts
 import contexts from '../../contexts'
 
@@ -17,14 +20,16 @@ import InputHidden from '../../components/generics/InputHidden'
 
 // Imports Destructuring
 const { formatFindParams } = actions.paginationParams
+const { useAuthContext } = contexts.Auth
 const { useProductsContext } = contexts.Products
 const { useSalesAreasContext } = contexts.SalesAreas
 const { exportSimpleExcel } = helpers.excel
 const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
-const { productsCatalogue } = helpers.pdfHelper
+const { createProductsCataloguePdf } = helpers.pdfHelper.productsCatalogue
 
 
 const ExportProductListModal = () => {
+    const [auth_state, auth_dispatch] = useAuthContext()
     const [products_state, products_dispatch] = useProductsContext()
     const [salesAreas_state, salesAreas_dispatch] = useSalesAreasContext()
 
@@ -49,7 +54,16 @@ const ExportProductListModal = () => {
         })
     }
 
-    useEffect(() => { loadBrandsAndTypes() }, [])
+    const loadUserData = async () => {
+        const userId = localStorage.getItem('userId')
+        const loggedUser = await api.usuarios.findById(userId)
+        auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+    }
+
+    useEffect(() => {
+        loadBrandsAndTypes()
+        loadUserData()
+    }, [])
 
     // ---------------- Button to cancel ----------------- //
     const cancel = () => {
@@ -129,55 +143,79 @@ const ExportProductListModal = () => {
         return saleProfitPerUnitFixed
     }
 
-    const processExcelLines = async (columnHeaders) => {
+    const generateHeaders = () => {
+        const exportWithImages = products_state.exportProductList.imageOptionIsChecked
+        const selectedHeaders = products_state.exportProductList.exportOptionsSelected.map(option => option.label)
+        let headers = selectedHeaders.includes('Todas')
+            ? products_state.exportProductList.exportOptions.map(option => option.label).filter(option => option !== 'Todas')
+            : selectedHeaders
+        if (exportWithImages) headers = ['Ilustración', ...headers]
+        return headers
+    }
+
+    const processExcelLines = async (headers) => {
         const processedLines = []
         for await (let product of products_state.exportProductList.productsToExport) {
             const activeOptions = []
-            if (columnHeaders.includes('Ilustración')) {
+            if (headers.includes('Ilustración')) {
                 const imageID = product.imagenes.length > 0 ? product.imagenes[0]._id : null
                 if (imageID) {
                     const imageUrl = await api.uploader.getImageUrl(imageID)
                     activeOptions.push(imageUrl)
                 } else activeOptions.push('-')
             }
-            if (columnHeaders.includes('Producto')) activeOptions.push(product.nombre ? product.nombre : '-')
-            if (columnHeaders.includes('Rubro')) activeOptions.push(product.rubro ? product.rubro.nombre : '-')
-            if (columnHeaders.includes('Marca')) activeOptions.push(product.marca ? product.marca.nombre : '-')
-            if (columnHeaders.includes('Cód. producto')) activeOptions.push(product.codigoProducto ? product.codigoProducto : '-')
-            if (columnHeaders.includes('Cód. barras')) activeOptions.push(product.codigoBarras ? product.codigoBarras : '-')
-            if (columnHeaders.includes('% IVA compra')) activeOptions.push(product.porcentajeIvaCompra ? '% ' + product.porcentajeIvaCompra : '-')
-            if (columnHeaders.includes('IVA compra ($)')) activeOptions.push(product.ivaCompra ? product.ivaCompra : '-')
-            if (columnHeaders.includes('Precio de lista ($)')) activeOptions.push(product.precioUnitario ? product.precioUnitario : '-')
-            if (columnHeaders.includes('% IVA venta')) activeOptions.push(product.porcentajeIvaVenta ? '% ' + product.porcentajeIvaVenta : '-')
-            if (columnHeaders.includes('IVA venta ($)')) activeOptions.push(product.ivaVenta ? product.ivaVenta : '-')
-            if (columnHeaders.includes('% Ganancia')) activeOptions.push(product.margenGanancia ? '% ' + sumSalesAreaPercentage(product.margenGanancia) : '-')
-            if (columnHeaders.includes('Precio de venta ($)')) activeOptions.push(product.precioVenta ? addSalesAreaPercentage(product.precioVenta) : '-')
-            if (columnHeaders.includes('Ganancia por venta ($)')) activeOptions.push(product.gananciaNeta ? calculateSaleProfit(product).saleProfit : '-')
-            if (columnHeaders.includes('% Ganancia fraccionada')) activeOptions.push(product.margenGananciaFraccionado ? '% ' + sumSalesAreaPercentage(product.margenGananciaFraccionado) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Precio de venta fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado ? addSalesAreaPercentage(product.precioVentaFraccionado) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Ganancia venta fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado ? calculateSaleProfit(product).saleFractionedProfit : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Precio de venta por unidad fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado && product.unidadMedida ? calculateSalePricePerUnit(product) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Ganancia venta por unidad fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado && product.unidadMedida ? calculateSaleProfitPerUnit(product) : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Stock')) activeOptions.push(product.cantidadStock ? product.cantidadStock : '-')
-            if (columnHeaders.includes('Stock fraccionado')) activeOptions.push(product.cantidadFraccionadaStock ? product.cantidadFraccionadaStock : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Unidad de medida')) activeOptions.push(product.unidadMedida ? product.unidadMedida.nombre : '-- Sin fraccionar --')
-            if (columnHeaders.includes('Fraccionamiento')) activeOptions.push(product.unidadMedida ? product.unidadMedida.fraccionamiento : '-- Sin fraccionar --')
+            if (headers.includes('Producto')) activeOptions.push(product.nombre ? product.nombre : '-')
+            if (headers.includes('Rubro')) activeOptions.push(product.rubro ? product.rubro.nombre : '-')
+            if (headers.includes('Marca')) activeOptions.push(product.marca ? product.marca.nombre : '-')
+            if (headers.includes('Cód. producto')) activeOptions.push(product.codigoProducto ? product.codigoProducto : '-')
+            if (headers.includes('Cód. barras')) activeOptions.push(product.codigoBarras ? product.codigoBarras : '-')
+            if (headers.includes('% IVA compra')) activeOptions.push(product.porcentajeIvaCompra ? '% ' + product.porcentajeIvaCompra : '-')
+            if (headers.includes('IVA compra ($)')) activeOptions.push(product.ivaCompra ? product.ivaCompra : '-')
+            if (headers.includes('Precio de lista ($)')) activeOptions.push(product.precioUnitario ? product.precioUnitario : '-')
+            if (headers.includes('% IVA venta')) activeOptions.push(product.porcentajeIvaVenta ? '% ' + product.porcentajeIvaVenta : '-')
+            if (headers.includes('IVA venta ($)')) activeOptions.push(product.ivaVenta ? product.ivaVenta : '-')
+            if (headers.includes('% Ganancia')) activeOptions.push(product.margenGanancia ? '% ' + sumSalesAreaPercentage(product.margenGanancia) : '-')
+            if (headers.includes('Precio de venta ($)')) activeOptions.push(product.precioVenta ? addSalesAreaPercentage(product.precioVenta) : '-')
+            if (headers.includes('Ganancia por venta ($)')) activeOptions.push(product.gananciaNeta ? calculateSaleProfit(product).saleProfit : '-')
+            if (headers.includes('% Ganancia fraccionada')) activeOptions.push(product.margenGananciaFraccionado ? '% ' + sumSalesAreaPercentage(product.margenGananciaFraccionado) : '-- Sin fraccionar --')
+            if (headers.includes('Precio de venta fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado ? addSalesAreaPercentage(product.precioVentaFraccionado) : '-- Sin fraccionar --')
+            if (headers.includes('Ganancia venta fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado ? calculateSaleProfit(product).saleFractionedProfit : '-- Sin fraccionar --')
+            if (headers.includes('Precio de venta por unidad fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado && product.unidadMedida ? calculateSalePricePerUnit(product) : '-- Sin fraccionar --')
+            if (headers.includes('Ganancia venta por unidad fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado && product.unidadMedida ? calculateSaleProfitPerUnit(product) : '-- Sin fraccionar --')
+            if (headers.includes('Stock')) activeOptions.push(product.cantidadStock ? product.cantidadStock : '-')
+            if (headers.includes('Stock fraccionado')) activeOptions.push(product.cantidadFraccionadaStock ? product.cantidadFraccionadaStock : '-- Sin fraccionar --')
+            if (headers.includes('Unidad de medida')) activeOptions.push(product.unidadMedida ? product.unidadMedida.nombre : '-- Sin fraccionar --')
+            if (headers.includes('Fraccionamiento')) activeOptions.push(product.unidadMedida ? product.unidadMedida.fraccionamiento : '-- Sin fraccionar --')
             processedLines.push(activeOptions)
         }
         return processedLines
     }
 
-    const exportProductList = async () => {
+    const exportExcel = async () => {
+        const headers = generateHeaders()
+        const lines = await processExcelLines(headers)
         const nameOfDocument = 'Lista de productos'
         const nameOfSheet = 'Hoja de productos'
-        const exportWithImages = products_state.exportProductList.imageOptionIsChecked
-        const selectedHeaders = products_state.exportProductList.exportOptionsSelected.map(option => option.label)
-        let columnHeaders = selectedHeaders.includes('Todas')
-            ? products_state.exportProductList.exportOptions.map(option => option.label).filter(option => option !== 'Todas')
-            : selectedHeaders
-        if (exportWithImages) columnHeaders = ['Ilustración', ...columnHeaders]
-        const lines = await processExcelLines(columnHeaders)
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        return exportSimpleExcel(headers, lines, nameOfSheet, nameOfDocument)
+    }
+
+    const exportPdf = async () => {
+        const brands = products_state.exportProductList.brandsForSelect.selectedBrandsNames.map(brand => brand.value)
+        const enterprise = auth_state.user.empresa
+        const headers = generateHeaders()
+        const lines = await processExcelLines(headers)
+        const salesArea = salesAreas_state.selectedSalesAreaName.value
+        const types = products_state.exportProductList.typesForSelect.selectedTypesNames.map(type => type.value)
+        const data = { brands, enterprise, headers, lines, salesArea, types }
+        const isCreated = await createProductsCataloguePdf(data)
+        if (!isCreated) errorAlert('No se pudo generar el catálogo en formato "pdf" para exportar. Inténtelo de nuevo o utilice otro formato.')
+    }
+
+    const exportProductList = () => {
+        const [documentType] = products_state.exportProductList.documentOptionsSelected
+        if (documentType === 'excel') exportExcel()
+        else if (documentType === 'pdf') exportPdf()
+        else errorAlert('Seleccione el formato del documento a exportar (excel, pdf, etc...).')
     }
 
     const buttonToExportProductList = (
@@ -198,10 +236,10 @@ const ExportProductListModal = () => {
 
     const checkboxToExportWithImages = (
         <Row align='middle' gutter={8}>
-            <Col span={8}>
+            <Col span={20}>
                 Exportar con ilustraciones
             </Col>
-            <Col span={16}>
+            <Col span={4} style={{textAlign: 'end'}}>
                 <Checkbox
                     onChange={onChangeCheckbox}
                     checked={products_state.exportProductList.imageOptionIsChecked}
@@ -320,6 +358,7 @@ const ExportProductListModal = () => {
             <Col span={16}>
                 <Select
                     allowClear
+                    disabled={products_state.exportProductList.documentOptionsSelected[0] === 'pdf'}
                     labelInValue
                     mode='multiple'
                     onChange={changeExportOptions}
@@ -474,17 +513,17 @@ const ExportProductListModal = () => {
         {
             dataIndex: 'product_name',
             render: (_, product) => product.nombre,
-            title: 'Nombre'
-        },        
+            title: 'Producto'
+        },
         {
             dataIndex: 'product_barCode',
             render: (_, product) => product.codigoBarras,
-            title: 'Codigo de barras'
+            title: 'Código de barras'
         },
         {
             dataIndex: 'product_productCode',
             render: (_, product) => product.codigoProducto,
-            title: 'Codigo de producto'
+            title: 'Código de producto'
         },
         {
             dataIndex: 'product_salePrice',
@@ -528,7 +567,7 @@ const ExportProductListModal = () => {
         },
         {
             element: checkboxToExportWithImages,
-            order: { lg: 7, md: 7, sm: 4, xl: 7, xs: 4, xxl: 7 }
+            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
         },
         {
             element: < InputHidden />,
@@ -552,11 +591,11 @@ const ExportProductListModal = () => {
         },
         {
             element: selectDocumentOptionsToExportProductList,
-            order: { lg: 9, md: 9, sm: 5, xl: 9, xs: 5, xxl: 9 }
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
             element: selectOptionsToExportProductList,
-            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
+            order: { lg: 7, md: 7, sm: 4, xl: 7, xs: 4, xxl: 7 }
         },
         {
             element: selectToFilterByBrand,
@@ -623,6 +662,7 @@ const ExportProductListModal = () => {
                     {buttonToExportProductList}
                 </Col>
             </Row>
+            <div id='catalogue' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
         </Modal>
     )
 }

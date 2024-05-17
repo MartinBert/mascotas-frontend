@@ -32,11 +32,11 @@ const processCanvas = async (frameToCanvas, htmlObject, docName, size) => {
                 doc.addImage(img, 'JPEG', 0, 0)
                 doc.save(docName)
                 document.getElementById('voucher').innerHTML = ''
-                resolve({ isProcesseed: true })
+                resolve({ isProcessed: true })
             })
         } catch (err) {
             console.error(err)
-            resolve({ isProcesseed: false })
+            resolve({ isProcessed: false })
         }
     })
     return await canvasResult
@@ -49,7 +49,7 @@ const createBudgetPdf = async (budgetData) => {
     const size = [297, 210] // Expresed in mm
     htmlObject.innerHTML = budgetTemplate(budgetData)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
-    return { isCreated: doc.isProcesseed }
+    return { isCreated: doc.isProcessed }
 }
 
 const createCreditNotePdf = async (creditData) => {
@@ -61,7 +61,7 @@ const createCreditNotePdf = async (creditData) => {
     const size = [297, 210] // Expresed in mm
     htmlObject.innerHTML = creditNoteTemplate(creditData, qrImage)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
-    return { isCreated: doc.isProcesseed }
+    return { isCreated: doc.isProcessed }
 }
 
 const createDebitNotePdf = async (debitData) => {
@@ -73,7 +73,7 @@ const createDebitNotePdf = async (debitData) => {
     const size = [297, 210] // Expresed in mm
     htmlObject.innerHTML = debitNoteTemplate(debitData, qrImage)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
-    return { isCreated: doc.isProcesseed }
+    return { isCreated: doc.isProcessed }
 }
 
 const createRemittancePdf = async (remittanceData) => {
@@ -88,7 +88,7 @@ const createRemittancePdf = async (remittanceData) => {
     const size = [297, 210] // Expresed in mm
     htmlObject.innerHTML = remittanceTemplate(qrImage, remittanceData)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
-    return { isCreated: doc.isProcesseed }
+    return { isCreated: doc.isProcessed }
 }
 
 const createVoucherPdf = async (billData) => {
@@ -100,7 +100,7 @@ const createVoucherPdf = async (billData) => {
     const size = [297, 210] // Expresed in mm
     htmlObject.innerHTML = voucherTemplate(billData, qrImage)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
-    return { isCreated: doc.isProcesseed }
+    return { isCreated: doc.isProcessed }
 }
 
 const createTicketPdf = async (ticketData) => {
@@ -110,7 +110,7 @@ const createTicketPdf = async (ticketData) => {
     const size = [297, 80] // Expresed in mm
     htmlObject.innerHTML = ticketTemplate(ticketData)
     const doc = await processCanvas(frameToCanvas, htmlObject, docName, size)
-    return { isCreated: doc.isProcesseed }
+    return { isCreated: doc.isProcessed }
 }
 
 const commercialDocumentsPDF = {
