@@ -269,9 +269,9 @@ const DetailsModal = () => {
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{textAlign: 'center'}}>Gasto total: <b style={{ color: '#FF3C3C' }}>{dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{textAlign: 'center'}}>Ingreso total: <b style={{ color: '#15DC24' }}>{dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome}</b></h2>
-    const titleOfBalance = <h2 style={{textAlign: 'center'}}>Balance: <b style={getBalanceColor()}>{dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyProfit}</b></h2>
+    const titleOfTotalExpenses = <h2 style={{textAlign: 'center'}}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={{textAlign: 'center'}}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome)}</b></h2>
+    const titleOfBalance = <h2 style={{textAlign: 'center'}}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyProfit)}</b></h2>
 
 
     const tablesToRender = [

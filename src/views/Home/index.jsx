@@ -316,48 +316,49 @@ const Home = () => {
     }
 
 
+    const testRenderElementDisplay = 'none'
 
     return (
         <>
             <h1>Home</h1>
             <button
                 onClick={generateStockHistories}
-                style={{ display: 'block' }}
+                style={{ display: testRenderElementDisplay }}
             >
                 Actualizar registros
             </button>
-            <hr />
+            <hr style={{ display: testRenderElementDisplay }} />
             <button
                 onClick={fixOutputs}
-                style={{ display: 'block' }}
+                style={{ display: testRenderElementDisplay }}
             >
                 Actualizar salidas
             </button>
-            <hr />
+            <hr style={{ display: testRenderElementDisplay }} />
             <button
                 onClick={fixDailyStatistics}
-                style={{ display: 'block' }}
+                style={{ display: testRenderElementDisplay }}
             >
                 Actualizar estadísticas diarias
             </button>
-            <hr />
+            <hr style={{ display: testRenderElementDisplay }} />
             <button
                 onClick={deleteDailyStatistics}
-                style={{ display: 'block' }}
+                style={{ display: testRenderElementDisplay }}
             >
                 Borrar estadísticas diarias
             </button>
-            <hr />
+            <hr style={{ display: testRenderElementDisplay }} />
             <button
                 onClick={deleteStockHistory}
-                style={{ display: 'block' }}
+                style={{ display: testRenderElementDisplay }}
             >
                 Borrar historial de stock
             </button>
-            <hr />
+            <hr style={{ display: testRenderElementDisplay }} />
             <button
                 onClick={showData}
-                style={{ display: 'block' }}
+                style={{ display: testRenderElementDisplay }}
             >
                 Mostrar datos en consola
             </button>
