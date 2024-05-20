@@ -269,6 +269,53 @@ const Home = () => {
         console.log('listo')
     }
 
+    const deleteStockHistory = async () => {
+        const findStockHistories = await api.stockHistory.findAll()
+        const stockHistories = findStockHistories.docs
+        for (let index = 0; index < stockHistories.length; index++) {
+            const stockHistory = stockHistories[index]
+            await api.stockHistory.deleteStockHistory(stockHistory._id)
+        }
+
+        console.log('listo')
+    }
+
+    const showData = async () => {
+        const findAllEntries = await api.entradas.findAll()
+        const findAllOutputs = await api.salidas.findAll()
+        const findAllProducts = await api.productos.findAll()
+        const findAllSales = await api.ventas.findAll()
+        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const findStockHistory = await api.stockHistory.findAll()
+
+        const allEntries = findAllEntries.docs
+        const allOutputs = findAllOutputs.docs
+        const allProducts = findAllProducts.docs
+        const allSales = findAllSales.docs
+        const statistics = findDailyBusinessStatistics.docs
+        const stockHistory = findStockHistory.docs
+
+        console.log('ENTRADAS')
+        console.log('-------------------------------')
+        console.log(allEntries)
+        console.log('SALIDAS')
+        console.log('-------------------------------')
+        console.log(allOutputs)
+        console.log('PRODUCTOS')
+        console.log('-------------------------------')
+        console.log(allProducts)
+        console.log('VENTAS')
+        console.log('-------------------------------')
+        console.log(allSales)
+        console.log('ESTADISTICAS DIARIAS')
+        console.log('-------------------------------')
+        console.log(statistics)
+        console.log('HISTORIAL DE STOCK')
+        console.log('-------------------------------')
+        console.log(stockHistory)
+    }
+
+
 
     return (
         <>
@@ -279,23 +326,40 @@ const Home = () => {
             >
                 Actualizar registros
             </button>
+            <hr />
             <button
                 onClick={fixOutputs}
                 style={{ display: 'block' }}
             >
                 Actualizar salidas
             </button>
+            <hr />
             <button
                 onClick={fixDailyStatistics}
                 style={{ display: 'block' }}
             >
                 Actualizar estadísticas diarias
             </button>
+            <hr />
             <button
                 onClick={deleteDailyStatistics}
                 style={{ display: 'block' }}
             >
                 Borrar estadísticas diarias
+            </button>
+            <hr />
+            <button
+                onClick={deleteStockHistory}
+                style={{ display: 'block' }}
+            >
+                Borrar historial de stock
+            </button>
+            <hr />
+            <button
+                onClick={showData}
+                style={{ display: 'block' }}
+            >
+                Mostrar datos en consola
             </button>
         </>
     )

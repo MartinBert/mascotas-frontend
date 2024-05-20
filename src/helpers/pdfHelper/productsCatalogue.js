@@ -136,8 +136,8 @@ const generateBodyWithImages = (lines) => {
                             >
                                 <div style='${overflowEllipsis} width: 210px;'><b>${line[1]}</b></div>
                                 <div style='${overflowEllipsis} width: 210px;'><h2>$ ${line[6]}</h2></div>
-                                <div style='${overflowEllipsis} width: 210px;'>Cód. barras: ${line[4]}</div>
-                                <div style='${overflowEllipsis} width: 210px;'>Cód. producto: ${line[5]}</div>
+                                <div style='${overflowEllipsis} width: 210px;'>Cód. barras: ${line[5]}</div>
+                                <div style='${overflowEllipsis} width: 210px;'>Cód. producto: ${line[4]}</div>
                                 <div style='${overflowEllipsis} width: 210px;'>Marca: ${line[3].toUpperCase()}</div>
                                 <div style='${overflowEllipsis} width: 210px;'>Rubro: ${line[2].toUpperCase()}</div>
                             </div>

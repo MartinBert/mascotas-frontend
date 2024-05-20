@@ -33,6 +33,21 @@ const findEntry = async (entryID) => {
     return findEntry
 }
 
+const fixDailyBusinessStatistics = async (entryToDelete) => {
+    const filters = JSON.stringify({ concept: 'Generado automáticamente', dateString: entryToDelete.fechaString.substring(0, 10) })
+    const findStatisticToFix = await api.dailyBusinessStatistics.findAllByFilters(filters)
+    const [statisticToFix] = findStatisticToFix.docs
+    if (!statisticToFix) return
+    const fixedDailyExpense = statisticToFix.dailyExpense - entryToDelete.costoTotal
+    const fixedStatistic = {
+        ...statisticToFix,
+        dailyExpense: fixedDailyExpense,
+        dailyProfit: statisticToFix.dailyIncome - fixedDailyExpense
+    }
+    const result = await api.dailyBusinessStatistics.edit(fixedStatistic)
+    if (result.code !== 200) errorAlert('No se pudo corregir la estadística diaria. Hágalo manualmente en "Estadísticas de negocio" / "Balance diario" / "Acciones" / "Editar".')
+}
+
 const fixStock = async (entryToDelete) => {
     for (let productOfEntry of entryToDelete.productos) {
         const findProduct = await api.productos.findById(productOfEntry._id)
@@ -42,6 +57,27 @@ const fixStock = async (entryToDelete) => {
             isIncrement: false,
             quantity: productOfEntry.cantidadesEntrantes
         })
+    }
+}
+
+const fixStockHistory = async (entryToDelete) => {
+    for (let index = 0; index < entryToDelete.productos.length; index++) {
+        const product = entryToDelete.productos[index]
+        const filters = JSON.stringify({
+            dateString: entryToDelete.fechaString.substring(0, 10),
+            itIsAManualCorrection: false,
+            product
+        })
+        const findStockHistoryToFix = await api.stockHistory.findAllByFilters(filters)
+        const [stockHistoryToFix] = findStockHistoryToFix.docs
+        if (stockHistoryToFix) {
+            const fixedStockHistory = {
+                ...stockHistoryToFix,
+                entries: stockHistoryToFix.entries - product.cantidadesEntrantes
+            }
+            const result = await api.stockHistory.edit(fixedStockHistory)
+            if (result.code !== 200) errorAlert(`No se pudo corregir el historial de stock de "${product.nombre}". Hágalo manualmente en "Estadísticas de negocio" / "Historial de stock" / (Elegir producto) "Abrir historial" / (Elegir fecha) "Editar".`)
+        }
     }
 }
 
@@ -81,7 +117,9 @@ const Entradas = () => {
             deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
             const findEntryToDelete = await findEntry(deleteModal_state.entityID)
             if (findEntryToDelete.message !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
+            fixDailyBusinessStatistics(findEntryToDelete.data)
             fixStock(findEntryToDelete.data)
+            fixStockHistory(findEntryToDelete.data)
             const response = await api.entradas.deleteById(deleteModal_state.entityID)
             if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
             successAlert('El registro se eliminó correctamente.')

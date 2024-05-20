@@ -19,6 +19,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { fiscalVouchersCodes } = helpers.afipHelper
+const { roundTwoDecimals } = helpers.mathHelper
 
 const creditCodes = fiscalVouchersCodes
     .filter(item => typeof item !== 'string')
@@ -113,12 +114,12 @@ const DetailsModal = () => {
         },
         {
             dataIndex: 'columnsOfExpensesTable_productEntries',
-            render: (_, record) => record.quantity,
+            render: (_, record) => roundTwoDecimals(record.quantity),
             title: 'Cantidad'
         },
         {
             dataIndex: 'columnsOfExpensesTable_productExpense',
-            render: (_, record) => record.cost,
+            render: (_, record) => roundTwoDecimals(record.cost),
             title: 'Gasto'
         }
     ]
@@ -226,12 +227,12 @@ const DetailsModal = () => {
         },
         {
             dataIndex: 'columnsOfIncomesTable_productOutputs',
-            render: (_, record) => record.quantity,
+            render: (_, record) => roundTwoDecimals(record.quantity),
             title: 'Cantidad'
         },
         {
             dataIndex: 'columnsOfIncomesTable_productIncome',
-            render: (_, record) => record.profit,
+            render: (_, record) => roundTwoDecimals(record.profit),
             title: 'Ingreso'
         }
     ]
