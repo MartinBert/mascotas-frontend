@@ -197,7 +197,6 @@ const DetailsModal = () => {
         const preData = [...debitNotesData.flat(), ...outputsData.flat(), ...salesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'incomeItem' + i } })
         const incomesData = { incomes: data, totalIncomesRecord: data.length }
-        console.log(incomesData)
         dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_VIEW_DETAILS', payload: incomesData })
     }
 

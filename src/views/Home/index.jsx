@@ -214,43 +214,7 @@ const Home = () => {
         console.log('listo')
     }
 
-
-    const fixOutputs = async () => {
-        const findOutputs = await api.salidas.findAll()
-        const outputs = findOutputs.docs
-        const recordsToUpdate = outputs.map(output => {
-            const gananciaNeta = roundTwoDecimals(
-                output.productos.reduce(
-                    (acc, item) =>
-                        acc + (
-                            item.cantidadesSalientes
-                                ? (item.precioVenta - item.precioUnitario) * item.cantidadesSalientes
-                                : 0
-                        ), 0
-                )
-            )
-            const updatedRecord = { ...output, gananciaNeta }
-            return updatedRecord
-        })
-        for (let index = 0; index < recordsToUpdate.length; index++) {
-            const record = recordsToUpdate[index]
-            await api.salidas.edit(record)
-        }
-        console.log('listo')
-    }
-
-    const deleteDailyStatistics = async () => {
-        const findStatistics = await api.dailyBusinessStatistics.findAll()
-        const statistics = findStatistics.docs
-        for (let index = 0; index < statistics.length; index++) {
-            const statistic = statistics[index]
-            await api.dailyBusinessStatistics.deleteDailyBusinessStatistics(statistic._id)
-        }
-
-        console.log('listo')
-    }
-
-    const deleteStockHistory = async () => {
+    const deleteStockHistories = async () => {
         const findStockHistories = await api.stockHistory.findAll()
         const stockHistories = findStockHistories.docs
         for (let index = 0; index < stockHistories.length; index++) {
@@ -258,40 +222,6 @@ const Home = () => {
             await api.stockHistory.deleteStockHistory(stockHistory._id)
         }
 
-        console.log('listo')
-    }
-
-    const fixProducts = async () => {
-        const findProducts = await api.productos.findAll()
-        const products = findProducts.docs
-        const recordsToUpdate = products.map(product => {
-            const cantidadFraccionadaStock = roundTwoDecimals(product.cantidadFraccionadaStock)
-            const cantidadStock = roundTwoDecimals(product.cantidadStock)
-            const precioUnitario = roundTwoDecimals(product.precioUnitario)
-            const ivaCompra = roundTwoDecimals(product.ivaCompra)
-            const ivaVenta = roundTwoDecimals(product.ivaVenta)
-            const gananciaNeta = roundTwoDecimals(product.gananciaNeta)
-            const gananciaNetaFraccionado = roundTwoDecimals(product.gananciaNetaFraccionado)
-            const precioVenta = roundTwoDecimals(product.precioVenta)
-            const precioVentaFraccionado = roundTwoDecimals(product.precioVentaFraccionado)
-            const updatedRecord = {
-                ...product,
-                cantidadFraccionadaStock,
-                cantidadStock,
-                precioUnitario,
-                ivaCompra,
-                ivaVenta,
-                gananciaNeta,
-                gananciaNetaFraccionado,
-                precioVenta,
-                precioVentaFraccionado
-            }
-            return updatedRecord
-        })
-        for (let index = 0; index < recordsToUpdate.length; index++) {
-            const record = recordsToUpdate[index]
-            await api.productos.edit(record)
-        }
         console.log('listo')
     }
 
@@ -330,7 +260,7 @@ const Home = () => {
     }
 
 
-    const testRenderElementDisplay = 'block'
+    const testRenderElementDisplay = 'none'
 
     return (
         <>
@@ -343,31 +273,10 @@ const Home = () => {
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button
-                onClick={fixOutputs}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Actualizar salidas
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={deleteDailyStatistics}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Borrar estadísticas diarias
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={deleteStockHistory}
+                onClick={deleteStockHistories}
                 style={{ display: testRenderElementDisplay }}
             >
                 Borrar historial de stock
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={fixProducts}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Redondear valores de los productos
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button
