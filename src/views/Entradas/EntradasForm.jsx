@@ -24,6 +24,7 @@ const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { resetDate, simpleDateWithHours } = helpers.dateHelper
+const { roundTwoDecimals } = helpers.mathHelper
 const { Delete } = icons
 
 
@@ -164,19 +165,19 @@ const EntradasForm = () => {
                 product: product._id
             }
             if (stockHistory.length < 1) {
-                data.entries = entries_state.params.cantidad
+                data.entries = roundTwoDecimals(entries_state.params.cantidad)
                 data.outputs = 0
                 const saveNewRecord = await api.stockHistory.save(data)
                 saveResponseCode = saveNewRecord.code
             } else {
                 data._id = stockHistory[0]._id
-                data.entries = stockHistory[0].entries + entries_state.params.cantidad
+                data.entries = roundTwoDecimals(stockHistory[0].entries + entries_state.params.cantidad)
                 if (entryID !== 'nuevo') {
                     const entryToEdit = await api.entradas.findById(entryID)
-                    const previousQuantity = entryToEdit.data.cantidad
+                    const previousQuantity = roundTwoDecimals(entryToEdit.data.cantidad)
                     data.entries -= previousQuantity
                 }
-                data.outputs = stockHistory[0].outputs
+                data.outputs = roundTwoDecimals(stockHistory[0].outputs)
                 const editRecord = await api.stockHistory.edit(data)
                 saveResponseCode = editRecord.code
             }
@@ -201,7 +202,7 @@ const EntradasForm = () => {
             await api.productos.modifyStock({
                 product,
                 isIncrement: true,
-                quantity: product.cantidadesEntrantes
+                quantity: roundTwoDecimals(product.cantidadesEntrantes)
             })
         }
 
@@ -213,8 +214,8 @@ const EntradasForm = () => {
             const updatedProfit = statisticToEdit.dailyIncome - updatedExpense
             const updatedStatistic = {
                 ...statisticToEdit,
-                dailyExpense: updatedExpense,
-                dailyProfit: updatedProfit
+                dailyExpense: roundTwoDecimals(updatedExpense),
+                dailyProfit: roundTwoDecimals(updatedProfit)
             }
             await api.dailyBusinessStatistics.edit(updatedStatistic)
         }
@@ -252,7 +253,7 @@ const EntradasForm = () => {
                 await api.productos.modifyStock({
                     product,
                     isIncrement: true,
-                    quantity: product.cantidadesEntrantes
+                    quantity: roundTwoDecimals(product.cantidadesEntrantes)
                 })
             }
         }
@@ -267,8 +268,8 @@ const EntradasForm = () => {
             const newStatisticDailyProfit = currentStatisticIncome - newStatisticDailyExpense
             const newStatisticToSave = {
                 ...statisticToEdit,
-                dailyExpense: newStatisticDailyExpense,
-                dailyProfit: newStatisticDailyProfit
+                dailyExpense: roundTwoDecimals(newStatisticDailyExpense),
+                dailyProfit: roundTwoDecimals(newStatisticDailyProfit)
             }
             await api.dailyBusinessStatistics.edit(newStatisticToSave)
         }
@@ -410,7 +411,7 @@ const EntradasForm = () => {
         entries_dispatch({ type: 'CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY' })
     }, [entries_state.params.cantidad, entries_state.params.productos])
 
-    const title_totalCost = <h1>Neto Total: {entries_state.params.costoTotal}</h1>
+    const title_totalCost = <h1>Neto Total: {roundTwoDecimals(entries_state.params.costoTotal)}</h1>
 
 
     const entriesRender = [

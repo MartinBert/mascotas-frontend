@@ -21,6 +21,7 @@ const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalVouchersCodes, formatBody } = helpers.afipHelper
 const { resetDate } = helpers.dateHelper
+const { roundTwoDecimals } = helpers.mathHelper
 const {
     createBudgetPdf,
     createRemittancePdf,
@@ -105,7 +106,7 @@ const FinalizeSaleModal = () => {
                         lineOfProduct.fraccionar
                             ? 'fractionedQuantity'
                             : 'quantity'
-                    ]: lineOfProduct.cantidadUnidades
+                    ]: roundTwoDecimals(lineOfProduct.cantidadUnidades)
                 }
             const response = await api.productos.modifyStock(productToModifyInStock)
             if (response.code !== 200) errorAlert(`No se pudo modificar el stock del producto "${product.nombre}". Modifíquelo manualmente en la sección "Productos" / "Editar".`)
@@ -155,12 +156,12 @@ const FinalizeSaleModal = () => {
             }
             if (stockHistory.length < 1) {
                 data.entries = 0
-                data.outputs = productOutputs
+                data.outputs = roundTwoDecimals(productOutputs)
                 saveResponse = await api.stockHistory.save(data)
             } else {
                 data._id = stockHistory[0]._id
-                data.entries = stockHistory[0].entries
-                data.outputs = stockHistory[0].outputs + productOutputs
+                data.entries = roundTwoDecimals(stockHistory[0].entries)
+                data.outputs = roundTwoDecimals(stockHistory[0].outputs + productOutputs)
                 saveResponse = await api.stockHistory.edit(data)
             }
             if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)

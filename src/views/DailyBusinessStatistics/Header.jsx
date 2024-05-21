@@ -21,6 +21,7 @@ import api from '../../services'
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { getYesterdayDate, localFormat, resetDate, simpleDateWithHours } = helpers.dateHelper
 const { fiscalVouchersCodes } = helpers.afipHelper
+const { roundTwoDecimals } = helpers.mathHelper
 const { RangePicker } = DatePicker
 
 const creditCodes = fiscalVouchersCodes
@@ -244,13 +245,13 @@ const Header = () => {
                 }
             }).reduce((acc, value) => acc + value, 0)
 
-            const dailyExpense = dailySalesAndDebits_iva + dailyEntries + dailyCredits
-            const dailyIncome = dailySalesAndDebits_total + dailyOutputs
+            const dailyExpense = roundTwoDecimals(dailySalesAndDebits_iva + dailyEntries + dailyCredits)
+            const dailyIncome = roundTwoDecimals(dailySalesAndDebits_total + dailyOutputs)
             const dailyStatisticsToSave = {
                 concept: 'Generado automáticamente',
                 dailyExpense,
                 dailyIncome,
-                dailyProfit: dailyIncome - dailyExpense,
+                dailyProfit: roundTwoDecimals(dailyIncome - dailyExpense),
                 date: dailyData.date,
                 dateString: dailyData.dateString
             }

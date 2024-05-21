@@ -265,6 +265,8 @@ const Home = () => {
         const findProducts = await api.productos.findAll()
         const products = findProducts.docs
         const recordsToUpdate = products.map(product => {
+            const cantidadFraccionadaStock = roundTwoDecimals(product.cantidadFraccionadaStock)
+            const cantidadStock = roundTwoDecimals(product.cantidadStock)
             const precioUnitario = roundTwoDecimals(product.precioUnitario)
             const ivaCompra = roundTwoDecimals(product.ivaCompra)
             const ivaVenta = roundTwoDecimals(product.ivaVenta)
@@ -274,6 +276,8 @@ const Home = () => {
             const precioVentaFraccionado = roundTwoDecimals(product.precioVentaFraccionado)
             const updatedRecord = {
                 ...product,
+                cantidadFraccionadaStock,
+                cantidadStock,
                 precioUnitario,
                 ivaCompra,
                 ivaVenta,
@@ -286,7 +290,7 @@ const Home = () => {
         })
         for (let index = 0; index < recordsToUpdate.length; index++) {
             const record = recordsToUpdate[index]
-            await api.salidas.edit(record)
+            await api.productos.edit(record)
         }
         console.log('listo')
     }

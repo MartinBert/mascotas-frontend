@@ -24,6 +24,7 @@ const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { resetDate, simpleDateWithHours } = helpers.dateHelper
+const { roundTwoDecimals } = helpers.mathHelper
 const { Delete } = icons
 
 
@@ -165,16 +166,16 @@ const SalidasForm = () => {
             }
             if (stockHistory.length < 1) {
                 data.entries = 0
-                data.outputs = outputs_state.params.cantidad
+                data.outputs = roundTwoDecimals(outputs_state.params.cantidad)
                 const saveNewRecord = await api.stockHistory.save(data)
                 saveResponseCode = saveNewRecord.code
             } else {
                 data._id = stockHistory[0]._id
-                data.entries = stockHistory[0].entries
-                data.outputs = stockHistory[0].outputs + outputs_state.params.cantidad
+                data.entries = roundTwoDecimals(stockHistory[0].entries)
+                data.outputs = roundTwoDecimals(stockHistory[0].outputs + outputs_state.params.cantidad)
                 if (outputID !== 'nuevo') {
                     const outputToEdit = await api.salidas.findById(outputID)
-                    const previousQuantity = outputToEdit.data.cantidad
+                    const previousQuantity = roundTwoDecimals(outputToEdit.data.cantidad)
                     data.outputs -= previousQuantity
                 }
                 const editRecord = await api.stockHistory.edit(data)
@@ -201,7 +202,7 @@ const SalidasForm = () => {
             await api.productos.modifyStock({
                 product,
                 isIncrement: false,
-                quantity: product.cantidadesSalientes
+                quantity: roundTwoDecimals(product.cantidadesSalientes)
             })
         }
 
@@ -213,8 +214,8 @@ const SalidasForm = () => {
             const updatedProfit = updatedIncome - statisticToEdit.dailyExpense
             const updatedStatistic = {
                 ...statisticToEdit,
-                dailyIncome: updatedIncome,
-                dailyProfit: updatedProfit
+                dailyIncome: roundTwoDecimals(updatedIncome),
+                dailyProfit: roundTwoDecimals(updatedProfit)
             }
             await api.dailyBusinessStatistics.edit(updatedStatistic)
         }
@@ -252,7 +253,7 @@ const SalidasForm = () => {
                 await api.productos.modifyStock({
                     product,
                     isIncrement: false,
-                    quantity: product.cantidadesSalientes
+                    quantity: roundTwoDecimals(product.cantidadesSalientes)
                 })
             }
         }
@@ -267,8 +268,8 @@ const SalidasForm = () => {
             const newStatisticDailyProfit = newStatisticDailyIncome - currentStatisticExpense
             const newStatisticToSave = {
                 ...statisticToEdit,
-                dailyIncome: newStatisticDailyIncome,
-                dailyProfit: newStatisticDailyProfit
+                dailyIncome: roundTwoDecimals(newStatisticDailyIncome),
+                dailyProfit: roundTwoDecimals(newStatisticDailyProfit)
             }
             await api.dailyBusinessStatistics.edit(newStatisticToSave)
         }
@@ -410,7 +411,7 @@ const SalidasForm = () => {
         outputs_dispatch({ type: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY' })
     }, [outputs_state.params.cantidad, outputs_state.params.productos])
 
-    const title_netProfit = <h1>Ingreso Total: {outputs_state.params.ganancia}</h1>
+    const title_netProfit = <h1>Ingreso Total: {roundTwoDecimals(outputs_state.params.ganancia)}</h1>
 
 
     const outputsRender = [

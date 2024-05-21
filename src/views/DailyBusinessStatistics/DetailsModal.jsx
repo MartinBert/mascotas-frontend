@@ -83,7 +83,7 @@ const DetailsModal = () => {
         })
         const preData = [...entriesData.flat(), ...creditNotesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'expenseItem' + i } })
-        const expensesData = { expenses: data, totalExpensesRecord: creditNotes.length + entries.length }
+        const expensesData = { expenses: data, totalExpensesRecord: data.length }
         dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_VIEW_DETAILS', payload: expensesData })
     }
 
@@ -196,7 +196,8 @@ const DetailsModal = () => {
         })
         const preData = [...debitNotesData.flat(), ...outputsData.flat(), ...salesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'incomeItem' + i } })
-        const incomesData = { incomes: data, totalIncomesRecord: debitNotes.length + outputs.length + sales.length}
+        const incomesData = { incomes: data, totalIncomesRecord: data.length }
+        console.log(incomesData)
         dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_VIEW_DETAILS', payload: incomesData })
     }
 
@@ -269,9 +270,9 @@ const DetailsModal = () => {
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{textAlign: 'center'}}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{textAlign: 'center'}}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome)}</b></h2>
-    const titleOfBalance = <h2 style={{textAlign: 'center'}}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyProfit)}</b></h2>
+    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome)}</b></h2>
+    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyProfit)}</b></h2>
 
 
     const tablesToRender = [
