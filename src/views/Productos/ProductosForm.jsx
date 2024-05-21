@@ -113,8 +113,8 @@ const ProductosForm = () => {
             ...product,
             ivaCompra,
             ivaVenta,
-            gananciaNeta: gananciaNeta + diferenciaPrecioVenta,
-            gananciaNetaFraccionado: gananciaNetaFraccionado + diferenciaPrecioVentaFraccionado,
+            gananciaNeta: roundTwoDecimals(gananciaNeta + diferenciaPrecioVenta),
+            gananciaNetaFraccionado: roundTwoDecimals(gananciaNetaFraccionado + diferenciaPrecioVentaFraccionado),
             precioVenta,
             precioVentaFraccionado
         })

@@ -146,8 +146,8 @@ const PriceModificatorModal = () => {
             product.precioUnitario = newPrecioUnitario
             product.ivaCompra = newIvaCompra
             product.ivaVenta = newIvaVenta
-            product.gananciaNeta = newGananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear
-            product.gananciaNetaFraccionado = newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear
+            product.gananciaNeta = roundTwoDecimals(newGananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear)
+            product.gananciaNetaFraccionado = roundTwoDecimals(newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear)
             product.precioVenta = newPrecioVenta
             product.precioVentaFraccionado = newPrecioVentaFraccionado
             api.productos.edit(product)

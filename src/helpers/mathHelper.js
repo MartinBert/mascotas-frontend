@@ -21,7 +21,7 @@ const previousInteger = (value) => {
 }
 
 const randomFiveDecimals = () => {
-    return Math.floor(Math.random()*90000) + 10000
+    return Math.floor(Math.random() * 90000) + 10000
 }
 
 const round = (value) => {
@@ -38,8 +38,17 @@ const roundToMultiple = (value, multipleOf) => {
     return roundedValueFixed
 }
 
-const roundTwoDecimals = (value) => {
-    return Math.round(Number(value) * 100) / 100
+function roundTwoDecimals (num, decimals = 2) {
+    var signo = (num >= 0 ? 1 : -1)
+    num = num * signo
+    if (decimals === 0) //with 0 decimals
+        return signo * Math.round(num)
+    // round(x * 10 ^ decimals)
+    num = num.toString().split('e')
+    num = Math.round(+(num[0] + 'e' + (num[1] ? (+num[1] + decimals) : decimals)))
+    // x * 10 ^ (-decimals)
+    num = num.toString().split('e')
+    return signo * (num[0] + 'e' + (num[1] ? (+num[1] - decimals) : -decimals))
 }
 
 const mathHelper = {

@@ -43,6 +43,13 @@ const Home = () => {
         // Generación de registros
         const generateStockHistoryData = allProducts.map(product => {
 
+
+
+
+
+
+
+
             const productEntriesData = allEntries.map(entry => {
                 const productsOfEntryIDs = entry.productos.map(productOfEntry => productOfEntry._id)
                 if (productsOfEntryIDs.includes(product._id)) {
@@ -212,49 +219,23 @@ const Home = () => {
         const findOutputs = await api.salidas.findAll()
         const outputs = findOutputs.docs
         const recordsToUpdate = outputs.map(output => {
-            const ganancia = roundTwoDecimals(
+            const gananciaNeta = roundTwoDecimals(
                 output.productos.reduce(
                     (acc, item) =>
                         acc + (
                             item.cantidadesSalientes
-                                ? item.precioVenta * item.cantidadesSalientes
+                                ? (item.precioVenta - item.precioUnitario) * item.cantidadesSalientes
                                 : 0
                         ), 0
                 )
             )
-            const updatedRecord = { ...output, ganancia }
+            const updatedRecord = { ...output, gananciaNeta }
             return updatedRecord
         })
         for (let index = 0; index < recordsToUpdate.length; index++) {
             const record = recordsToUpdate[index]
             await api.salidas.edit(record)
         }
-        console.log('listo')
-    }
-
-
-    const fixDailyStatistics = async () => {
-        const findOutputs = await api.salidas.findAll()
-        const outputs = findOutputs.docs
-        for (let index = 0; index < outputs.length; index++) {
-            const output = outputs[index]
-            const incomeToFix = output.productos.reduce(
-                (acc, product) => acc + (product.cantidadesSalientes * product.precioUnitario), 0
-            )
-            const correctIncome = output.productos.reduce(
-                (acc, product) => acc + (product.cantidadesSalientes * product.precioVenta), 0
-            )
-
-            const filters = JSON.stringify({ dateString: output.fechaString.substring(0, 10) })
-            const findStatistics = await api.dailyBusinessStatistics.findAllByFilters(filters)
-            const statistic = findStatistics.docs[0]
-            if (statistic) {
-                statistic.dailyIncome -= incomeToFix
-                statistic.dailyIncome += correctIncome
-                await api.dailyBusinessStatistics.edit(statistic)
-            }
-        }
-
         console.log('listo')
     }
 
@@ -280,6 +261,36 @@ const Home = () => {
         console.log('listo')
     }
 
+    const fixProducts = async () => {
+        const findProducts = await api.productos.findAll()
+        const products = findProducts.docs
+        const recordsToUpdate = products.map(product => {
+            const precioUnitario = roundTwoDecimals(product.precioUnitario)
+            const ivaCompra = roundTwoDecimals(product.ivaCompra)
+            const ivaVenta = roundTwoDecimals(product.ivaVenta)
+            const gananciaNeta = roundTwoDecimals(product.gananciaNeta)
+            const gananciaNetaFraccionado = roundTwoDecimals(product.gananciaNetaFraccionado)
+            const precioVenta = roundTwoDecimals(product.precioVenta)
+            const precioVentaFraccionado = roundTwoDecimals(product.precioVentaFraccionado)
+            const updatedRecord = {
+                ...product,
+                precioUnitario,
+                ivaCompra,
+                ivaVenta,
+                gananciaNeta,
+                gananciaNetaFraccionado,
+                precioVenta,
+                precioVentaFraccionado
+            }
+            return updatedRecord
+        })
+        for (let index = 0; index < recordsToUpdate.length; index++) {
+            const record = recordsToUpdate[index]
+            await api.salidas.edit(record)
+        }
+        console.log('listo')
+    }
+
     const showData = async () => {
         const findAllEntries = await api.entradas.findAll()
         const findAllOutputs = await api.salidas.findAll()
@@ -296,27 +307,26 @@ const Home = () => {
         const stockHistory = findStockHistory.docs
 
         console.log('ENTRADAS')
-        console.log('-------------------------------')
         console.log(allEntries)
+        console.log('-------------------------------')
         console.log('SALIDAS')
-        console.log('-------------------------------')
         console.log(allOutputs)
+        console.log('-------------------------------')
         console.log('PRODUCTOS')
-        console.log('-------------------------------')
         console.log(allProducts)
+        console.log('-------------------------------')
         console.log('VENTAS')
-        console.log('-------------------------------')
         console.log(allSales)
+        console.log('-------------------------------')
         console.log('ESTADISTICAS DIARIAS')
-        console.log('-------------------------------')
         console.log(statistics)
-        console.log('HISTORIAL DE STOCK')
         console.log('-------------------------------')
+        console.log('HISTORIAL DE STOCK')
         console.log(stockHistory)
     }
 
 
-    const testRenderElementDisplay = 'none'
+    const testRenderElementDisplay = 'block'
 
     return (
         <>
@@ -325,7 +335,7 @@ const Home = () => {
                 onClick={generateStockHistories}
                 style={{ display: testRenderElementDisplay }}
             >
-                Actualizar registros
+                Generar historial de stock
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button
@@ -333,13 +343,6 @@ const Home = () => {
                 style={{ display: testRenderElementDisplay }}
             >
                 Actualizar salidas
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={fixDailyStatistics}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Actualizar estadísticas diarias
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button
@@ -354,6 +357,13 @@ const Home = () => {
                 style={{ display: testRenderElementDisplay }}
             >
                 Borrar historial de stock
+            </button>
+            <hr style={{ display: testRenderElementDisplay }} />
+            <button
+                onClick={fixProducts}
+                style={{ display: testRenderElementDisplay }}
+            >
+                Redondear valores de los productos
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button

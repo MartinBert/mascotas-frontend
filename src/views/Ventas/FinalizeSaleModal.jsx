@@ -29,6 +29,11 @@ const {
 } = helpers.pdfHelper.commercialDocumentsPDF
 
 const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
+const fiscalNotesCodes = fiscalVouchersCodes
+    .filter(item => typeof item !== 'string')
+    .map(code => [code.credit, code.debit])
+    .flat(1)
+    .filter(code => code !== null)
 
 const FinalizeSaleModal = () => {
     const [auth_state, auth_dispatch] = useAuthContext()
@@ -167,8 +172,8 @@ const FinalizeSaleModal = () => {
         saveStockHistoryOfProducts()
 
         //Modify stock of products
-        const noModifyStock = ['REMITO']
-        if (!noModifyStock.includes(sale_state.documento.nombre)) applyStockModification()
+        const modifyStock = sale_state.documento.cashRegister && !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
+        if (modifyStock) applyStockModification()
 
         //Save sale data in sales list
         saveSaleData()
