@@ -8,7 +8,7 @@ import { errorAlert } from '../../components/alerts'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Checkbox, Col, Input, Modal, Row, Select, Table } from 'antd'
+import { Button, Checkbox, Col, Input, Modal, Row, Select, Spin, Table } from 'antd'
 
 // Helpers
 import actions from '../../actions'
@@ -23,7 +23,7 @@ const { formatFindParams } = actions.paginationParams
 const { useAuthContext } = contexts.Auth
 const { useProductsContext } = contexts.Products
 const { useSalesAreasContext } = contexts.SalesAreas
-const { exportSimpleExcel } = helpers.excel
+const { generateExcel } = helpers.excel
 const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { createProductsCataloguePdf } = helpers.pdfHelper.productsCatalogue
 
@@ -196,7 +196,8 @@ const ExportProductListModal = () => {
         const lines = await processExcelLines(headers)
         const nameOfDocument = 'Lista de productos'
         const nameOfSheet = 'Hoja de productos'
-        return exportSimpleExcel(headers, lines, nameOfSheet, nameOfDocument)
+        const result = await generateExcel(headers, lines, nameOfSheet, nameOfDocument)
+        return {isCreated: result.isCreated, docType: 'excel'}
     }
 
     const exportPdf = async () => {
@@ -207,15 +208,20 @@ const ExportProductListModal = () => {
         const salesArea = salesAreas_state.selectedSalesAreaName.value
         const types = products_state.exportProductList.typesForSelect.selectedTypesNames.map(type => type.value)
         const data = { brands, enterprise, headers, lines, salesArea, types }
-        const isCreated = await createProductsCataloguePdf(data)
-        if (!isCreated) errorAlert('No se pudo generar el catálogo en formato "pdf" para exportar. Inténtelo de nuevo o utilice otro formato.')
+        const result = await createProductsCataloguePdf(data)
+        return {isCreated: result.isCreated, docType: 'pdf'}
     }
 
-    const exportProductList = () => {
-        const [documentType] = products_state.exportProductList.documentOptionsSelected
-        if (documentType === 'excel') exportExcel()
-        else if (documentType === 'pdf') exportPdf()
-        else errorAlert('Seleccione el formato del documento a exportar (excel, pdf, etc...).')
+    const exportProductList = async () => {
+        products_dispatch({ type: 'SET_LOADING_OF_MODAL_IN_EXPORT_PRODUCT_LIST_MODAL', payload: true })
+        const allDocumentsTypes = products_state.exportProductList.documentOptions.map(doc => doc.value)
+        const [documentTypeSelected] = products_state.exportProductList.documentOptionsSelected
+        if (!allDocumentsTypes.includes(documentTypeSelected)) return errorAlert('Seleccione el formato del documento a exportar (excel, pdf, etc...).')
+        let response
+        if (documentTypeSelected === 'excel') response = await exportExcel()
+        else response = await exportPdf()
+        if (!response.isCreated) return errorAlert(`No se pudo generar el catálogo en formato "${response.docType}". Inténtelo de nuevo o utilice otro formato.`)
+        products_dispatch({ type: 'SET_LOADING_OF_MODAL_IN_EXPORT_PRODUCT_LIST_MODAL', payload: false })
     }
 
     const buttonToExportProductList = (
@@ -239,7 +245,7 @@ const ExportProductListModal = () => {
             <Col span={20}>
                 Exportar con ilustraciones
             </Col>
-            <Col span={4} style={{textAlign: 'end'}}>
+            <Col span={4} style={{ textAlign: 'end' }}>
                 <Checkbox
                     onChange={onChangeCheckbox}
                     checked={products_state.exportProductList.imageOptionIsChecked}
@@ -624,6 +630,13 @@ const ExportProductListModal = () => {
         span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
     }
 
+    const spinStyle = {
+        height: document.getElementById('exportProductListModalRender')?.clientHeight ?? null,
+        alignItems: 'center',
+        display: 'flex',
+        justifyContent: 'center'
+    }
+
 
     return (
         <Modal
@@ -634,34 +647,42 @@ const ExportProductListModal = () => {
             title='Exportar lista de productos'
             width={1200}
         >
-            <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>
-                {
-                    itemsToRender.map((item, index) => {
-                        return (
-                            <Col
-                                key={'exportProductList_' + index}
-                                lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
-                                md={{ order: item.order.md, span: responsiveGrid.span.md }}
-                                sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
-                                xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
-                                xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
-                                xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
-                            >
-                                {item.element}
-                            </Col>
-                        )
-                    })
-                }
-            </Row>
-            {tableOfProductsToExport}
-            <Row gutter={8} justify='space-between'>
-                <Col span={12}>
-                    {buttonToCancel}
-                </Col>
-                <Col span={12}>
-                    {buttonToExportProductList}
-                </Col>
-            </Row>
+            {
+                products_state.exportProductList.loadingOfModal
+                    ? <div style={spinStyle}><Spin /></div>
+                    : (
+                        <div id='exportProductListModalRender'>
+                            <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>
+                                {
+                                    itemsToRender.map((item, index) => {
+                                        return (
+                                            <Col
+                                                key={'exportProductList_' + index}
+                                                lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
+                                                md={{ order: item.order.md, span: responsiveGrid.span.md }}
+                                                sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
+                                                xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
+                                                xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
+                                                xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
+                                            >
+                                                {item.element}
+                                            </Col>
+                                        )
+                                    })
+                                }
+                            </Row>
+                            {tableOfProductsToExport}
+                            <Row gutter={8} justify='space-between'>
+                                <Col span={12}>
+                                    {buttonToCancel}
+                                </Col>
+                                <Col span={12}>
+                                    {buttonToExportProductList}
+                                </Col>
+                            </Row>
+                        </div>
+                    )
+            }
             <div id='catalogue' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
         </Modal>
     )

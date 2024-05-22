@@ -1,6 +1,9 @@
 // React Components and Hooks
 import React, { useState, useEffect } from 'react'
 
+// Custom components
+import { errorAlert } from '../../../components/alerts'
+
 // Design Components
 import { Row, Col, Input, Select, DatePicker } from 'antd'
 
@@ -12,7 +15,7 @@ import api from '../../../services'
 
 // Imports Destructuring
 const { RangePicker } = DatePicker
-const { exportSimpleExcel } = helpers.excel
+const { generateExcel } = helpers.excel
 const { addDays } = helpers.dateHelper
 
 
@@ -47,13 +50,13 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
                 venta.clienteRazonSocial,
                 venta.total,
                 venta.documento.nombre,
-                venta.mediosPagoNombres,
+                venta.mediosPagoNombres.join(', ')
             ])
         })
         return processedLines
     }
 
-    const exportExcel = () => {
+    const exportExcel = async () => {
         const nameOfSheet = 'Hoja de ventas'
         const nameOfDocument = 'Lista de ventas'
         const columnHeaders = [
@@ -65,7 +68,9 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
             'Medio de pago'
         ]
         const lines = processLines(ventasToReport)
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        const result = await generateExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        if (!result.isCreated) return errorAlert('No se pudo exportar la lista de ventas. Inténtelo de nuevo.')
+        return { isCreated: result.isCreated, docType: 'excel' }
     }
 
     const clearInputs = () => {

@@ -2,6 +2,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+// Custom components
+import { errorAlert } from '../../components/alerts'
+
 // Custom Contexts
 import actions from '../../actions'
 import contexts from '../../contexts'
@@ -20,7 +23,7 @@ const { formatFindFilters, nullifyFilters } = actions.paginationParams
 const { useEntriesContext } = contexts.Entries
 const { RangePicker } = DatePicker
 const { addDays } = helpers.dateHelper
-const { exportSimpleExcel } = helpers.excel
+const { generateExcel } = helpers.excel
 const { simpleDateWithHours } = helpers.dateHelper
 const { existsProperty } = helpers.objHelper
 const { regExp } = helpers.stringHelper
@@ -81,7 +84,9 @@ const Header = () => {
         const selectedHeaders = entries_state.activeExcelOptions.map(option => option.label)
         const columnHeaders = selectedHeaders.includes('Todas') ? entries_state.allExcelTitles.filter(option => option !== 'Todas') : selectedHeaders
         const lines = await processExcelLines(columnHeaders)
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        const result = await generateExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        if (!result.isCreated) return errorAlert('No se pudo exportar la lista de entradas. Inténtelo de nuevo.')
+        return { isCreated: result.isCreated, docType: 'excel' }
     }
 
     const buttonToExportExcel = (

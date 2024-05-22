@@ -43,13 +43,6 @@ const Home = () => {
         // Generación de registros
         const generateStockHistoryData = allProducts.map(product => {
 
-
-
-
-
-
-
-
             const productEntriesData = allEntries.map(entry => {
                 const productsOfEntryIDs = entry.productos.map(productOfEntry => productOfEntry._id)
                 if (productsOfEntryIDs.includes(product._id)) {
@@ -113,7 +106,7 @@ const Home = () => {
             })
 
             const productSalesData = allSales.map(sale => {
-                const productsOfSaleIDs = sale.productos.map(productOfSale => productOfSale)
+                const productsOfSaleIDs = sale.productos.map(productOfSale => productOfSale._id)
                 if (productsOfSaleIDs.includes(product._id)) {
                     const [currentLineOfSale] = sale.renglones
                         .filter(lineOfSale => lineOfSale.nombre === product.nombre)
@@ -128,7 +121,7 @@ const Home = () => {
                     return productOfSale
                 } else return null
             }).filter(record => record)
-
+            
             const findSalesDates = productSalesData.map(itemData => itemData.dateString)
             const salesDates = findSalesDates.filter((item, index) => {
                 return findSalesDates.indexOf(item) === index
@@ -146,11 +139,14 @@ const Home = () => {
                 }
                 return reduceValues
             })
-
+            // Larga solo valores de ventas pero no de salidas ---- ACA
             const outputsPreData = reduceSalesData.map(saleRecord => {
                 const record = { dateString: saleRecord.dateString }
                 for (let index = 0; index < reduceOutputsData.length; index++) {
                     const outputRecord = reduceOutputsData[index]
+                    console.log('SALE', saleRecord)
+                    console.log('OUTPUT', outputRecord)
+                    console.log('------------------------------------------')
                     if (saleRecord.dateString === outputRecord.dateString) {
                         record.outputs = roundTwoDecimals(saleRecord.sales + outputRecord.outputs)
                     } else record.outputs = roundTwoDecimals(saleRecord.sales)
@@ -210,7 +206,7 @@ const Home = () => {
             const record = dataForSave[index]
             await api.stockHistory.save(record)
         }
-
+  
         console.log('listo')
     }
 
@@ -242,25 +238,25 @@ const Home = () => {
 
         console.log('ENTRADAS')
         console.log(allEntries)
-        console.log('-------------------------------')
+        console.log('--------------------------------------------------------------')
         console.log('SALIDAS')
         console.log(allOutputs)
-        console.log('-------------------------------')
+        console.log('--------------------------------------------------------------')
         console.log('PRODUCTOS')
         console.log(allProducts)
-        console.log('-------------------------------')
+        console.log('--------------------------------------------------------------')
         console.log('VENTAS')
         console.log(allSales)
-        console.log('-------------------------------')
+        console.log('--------------------------------------------------------------')
         console.log('ESTADISTICAS DIARIAS')
         console.log(statistics)
-        console.log('-------------------------------')
+        console.log('--------------------------------------------------------------')
         console.log('HISTORIAL DE STOCK')
         console.log(stockHistory)
     }
 
 
-    const testRenderElementDisplay = 'none'
+    const testRenderElementDisplay = 'block'
 
     return (
         <>

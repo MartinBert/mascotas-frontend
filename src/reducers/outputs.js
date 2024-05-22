@@ -37,6 +37,7 @@ const initialState = {
         'Fecha',
         'Descripción',
         'Productos',
+        'Ganancia',
         'Ganancia Neta'
     ],
     dataForDetailsModal: null,

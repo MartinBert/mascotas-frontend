@@ -94,10 +94,10 @@ const FinalizeSaleModal = () => {
     const applyStockModification = async () => {
         for (const product of sale_state.productos) {
             const noCustomProduct = sale_state.renglones
-                .filter(renglon => !renglon._id.startsWith('customProduct_'))
+                .filter(renglon => !renglon.key.startsWith('customProduct_'))
             const lineOfProduct = noCustomProduct.length === 0
                 ? null
-                : noCustomProduct.find(renglon => renglon._id === product._id)
+                : noCustomProduct.find(renglon => renglon.key === product._id)
             const productToModifyInStock = !lineOfProduct
                 ? null
                 : {
@@ -108,8 +108,10 @@ const FinalizeSaleModal = () => {
                             : 'quantity'
                     ]: roundTwoDecimals(lineOfProduct.cantidadUnidades)
                 }
-            const response = await api.productos.modifyStock(productToModifyInStock)
-            if (response.code !== 200) errorAlert(`No se pudo modificar el stock del producto "${product.nombre}". Modifíquelo manualmente en la sección "Productos" / "Editar".`)
+            if (productToModifyInStock) {
+                const response = await api.productos.modifyStock(productToModifyInStock)
+                if (response.code !== 200) errorAlert(`No se pudo modificar el stock del producto "${product.nombre}". Modifíquelo manualmente en la sección "Productos" / "Editar".`)
+            }
         }
     }
 
@@ -140,31 +142,33 @@ const FinalizeSaleModal = () => {
         const dateString = sale_state.fechaEmisionString.substring(0, 10)
         for (let index = 0; index < sale_state.productos.length; index++) {
             const product = sale_state.productos[index]
-            const [productLine] = sale_state.renglones.filter(line => line._id === product._id)
-            const productOutputs = productLine.fraccionar
-                ? productLine.cantidadUnidades / productLine.fraccionamiento
-                : productLine.cantidadUnidades
-            const filters = JSON.stringify({ dateString, product })
-            const findStockHistory = await api.stockHistory.findAllByFilters(filters)
-            const stockHistory = findStockHistory.docs
-            let saveResponse
-            const data = {
-                date: resetDate(sale_state.fechaEmision),
-                dateString,
-                itIsAManualCorrection: false,
-                product: product._id
+            if (!product._id.startsWith('customProduct_')) {
+                const [productLine] = sale_state.renglones.filter(line => line.key === product._id)
+                const productOutputs = productLine.fraccionar
+                    ? productLine.cantidadUnidades / productLine.fraccionamiento
+                    : productLine.cantidadUnidades
+                const filters = JSON.stringify({ dateString, product })
+                const findStockHistory = await api.stockHistory.findAllByFilters(filters)
+                const stockHistory = findStockHistory.docs
+                let saveResponse
+                const data = {
+                    date: resetDate(sale_state.fechaEmision),
+                    dateString,
+                    itIsAManualCorrection: false,
+                    product: product._id
+                }
+                if (stockHistory.length < 1) {
+                    data.entries = 0
+                    data.outputs = roundTwoDecimals(productOutputs)
+                    saveResponse = await api.stockHistory.save(data)
+                } else {
+                    data._id = stockHistory[0]._id
+                    data.entries = roundTwoDecimals(stockHistory[0].entries)
+                    data.outputs = roundTwoDecimals(stockHistory[0].outputs + productOutputs)
+                    saveResponse = await api.stockHistory.edit(data)
+                }
+                if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)
             }
-            if (stockHistory.length < 1) {
-                data.entries = 0
-                data.outputs = roundTwoDecimals(productOutputs)
-                saveResponse = await api.stockHistory.save(data)
-            } else {
-                data._id = stockHistory[0]._id
-                data.entries = roundTwoDecimals(stockHistory[0].entries)
-                data.outputs = roundTwoDecimals(stockHistory[0].outputs + productOutputs)
-                saveResponse = await api.stockHistory.edit(data)
-            }
-            if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)
         }
     }
 

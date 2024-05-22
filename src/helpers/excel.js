@@ -85,65 +85,71 @@ const toDataURL = (url) => {
 }
 
 
-const exportSimpleExcel = async (columnHeaders, lines, nameSheet, nameDocument) => {
-    const workbook = new ExcelJS.Workbook()
-    const sheet = workbook.addWorksheet(nameSheet)
+const generateExcel = async (columnHeaders, lines, nameSheet, nameDocument) => {
+    try {
+        const workbook = new ExcelJS.Workbook()
+        const sheet = workbook.addWorksheet(nameSheet)
 
-    // Columnas
-    const columns = columnHeaders.map(headerTitle => {
-        const column = {
-            header: headerTitle,
-            key: headerTitle.toLowerCase().trim()
-        }
-        return column
-    })
-    sheet.columns = columns
-
-    // Datos para exportar
-    for (let i = 0; i < lines.length; i++) {
-        const data = {}
-        const line = lines[i]
-        for (let index = 0; index < columns.length; index++) {
-            const header = columns[index]
-            if (header.key === 'ilustración' && line[index] !== '-') {
-                const result = await toDataURL(line[index])
-                const splitted = line[index].split('.')
-                const extName = splitted[splitted.length - 1]
-                const imageInWorkbook = workbook.addImage({
-                    base64: result.base64Url,
-                    extension: extName,
-                })
-                sheet.addImage(imageInWorkbook, {
-                    tl: { col: index, row: i + 1 },
-                    ext: { width: 80, height: 80 },
-                })
-            } else data[header.key] = line[index]
-        }
-        sheet.insertRow(i + 2, data)
-    }
-
-    // Estilizar Excel
-    const headersLength = columnHeaders.length
-    const linesLength = lines.length
-    const exportWithImages = columnHeaders.includes('Ilustración')
-    const stylizedSheet = stylizeSheet(sheet, headersLength, linesLength, exportWithImages)
-
-    // Generar Excel con imágenes
-    workbook.xlsx.writeBuffer().then(function (data) {
-        const blob = new Blob([data], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        // Columnas
+        const columns = columnHeaders.map(headerTitle => {
+            const column = {
+                header: headerTitle,
+                key: headerTitle.toLowerCase().trim()
+            }
+            return column
         })
-        const url = window.URL.createObjectURL(blob)
-        const anchor = document.createElement('a')
-        anchor.href = url
-        anchor.download = `${nameDocument}.xlsx`
-        anchor.click()
-        window.URL.revokeObjectURL(url)
-    })
+        sheet.columns = columns
+
+        // Datos para exportar
+        for (let i = 0; i < lines.length; i++) {
+            const data = {}
+            const line = lines[i]
+            for (let index = 0; index < columns.length; index++) {
+                const header = columns[index]
+                if (header.key === 'ilustración' && line[index] !== '-') {
+                    const result = await toDataURL(line[index])
+                    const splitted = line[index].split('.')
+                    const extName = splitted[splitted.length - 1]
+                    const imageInWorkbook = workbook.addImage({
+                        base64: result.base64Url,
+                        extension: extName,
+                    })
+                    sheet.addImage(imageInWorkbook, {
+                        tl: { col: index, row: i + 1 },
+                        ext: { width: 80, height: 80 },
+                    })
+                } else data[header.key] = line[index]
+            }
+            sheet.insertRow(i + 2, data)
+        }
+
+        // Estilizar Excel
+        const headersLength = columnHeaders.length
+        const linesLength = lines.length
+        const exportWithImages = columnHeaders.includes('Ilustración')
+        const stylizedSheet = stylizeSheet(sheet, headersLength, linesLength, exportWithImages)
+
+        // Generar Excel con imágenes
+        workbook.xlsx.writeBuffer().then(function (data) {
+            const blob = new Blob([data], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            })
+            const url = window.URL.createObjectURL(blob)
+            const anchor = document.createElement('a')
+            anchor.href = url
+            anchor.download = `${nameDocument}.xlsx`
+            anchor.click()
+            window.URL.revokeObjectURL(url)
+        })
+        return { isCreated: true }
+    } catch (error) {
+        console.log(error)
+        return { isCreated: false }
+    }
 }
 
 const excel = {
-    exportSimpleExcel
+    generateExcel
 }
 
 export default excel

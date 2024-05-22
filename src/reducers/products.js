@@ -43,6 +43,7 @@ const actions = {
     SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
     SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY: 'SET_BRANDS_AND_TYPES_FOR_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY',
     SET_LOADING: 'SET_LOADING',
+    SET_LOADING_OF_MODAL_IN_EXPORT_PRODUCT_LIST_MODAL: 'SET_LOADING_OF_MODAL_IN_EXPORT_PRODUCT_LIST_MODAL',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PAGINATION_PARAMS_IN_EXPORT_PRODUCT_LIST_MODAL: 'SET_PAGINATION_PARAMS_IN_EXPORT_PRODUCT_LIST_MODAL',
     SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL: 'SET_PAGINATION_PARAMS_IN_PRODUCT_STOCK_HISTORY_MODAL',
@@ -116,6 +117,7 @@ const initialState = {
         ],
         imageOptionIsChecked: false,
         loading: true,
+        loadingOfModal: false,
         modalVisibility: false,
         paginationParams: {
             filters: {
@@ -1051,6 +1053,14 @@ const reducer = (state = initialState, action) => {
                 index: {
                     ...state.index,
                     loading: action.payload
+                }
+            }
+        case actions.SET_LOADING_OF_MODAL_IN_EXPORT_PRODUCT_LIST_MODAL:
+            return {
+                ...state,
+                exportProductList: {
+                    ...state.exportProductList,
+                    loadingOfModal: action.payload
                 }
             }
         case actions.SET_PAGINATION_PARAMS:

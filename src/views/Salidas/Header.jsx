@@ -2,6 +2,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+// Custom components
+import { errorAlert } from '../../components/alerts'
+
 // Custom Contexts
 import actions from '../../actions'
 import contexts from '../../contexts'
@@ -20,7 +23,7 @@ const { formatFindFilters, nullifyFilters } = actions.paginationParams
 const { useOutputsContext } = contexts.Outputs
 const { RangePicker } = DatePicker
 const { addDays } = helpers.dateHelper
-const { exportSimpleExcel } = helpers.excel
+const { generateExcel } = helpers.excel
 const { simpleDateWithHours } = helpers.dateHelper
 const { existsProperty } = helpers.objHelper
 const { regExp } = helpers.stringHelper
@@ -69,6 +72,7 @@ const Header = () => {
             if (columnHeaders.includes('Fecha')) activeOptions.push(salida.fecha ? simpleDateWithHours(salida.fecha) : '-- Fecha no registrada --')
             if (columnHeaders.includes('Descripción')) activeOptions.push(salida.descripcion ? salida.descripcion : '-- Sin descripción --')
             if (columnHeaders.includes('Productos')) activeOptions.push(salida.productos ? productosString.substring(0, productosString.length - 2) : '-- Sin productos --')
+            if (columnHeaders.includes('Ganancia')) activeOptions.push(salida.ganancia ? salida.ganancia : '-- Ganancia no calculada --')
             if (columnHeaders.includes('Ganancia Neta')) activeOptions.push(salida.gananciaNeta ? salida.gananciaNeta : '-- Ganancia neta no calculada --')
             processedLines.push(activeOptions)
         }
@@ -81,7 +85,9 @@ const Header = () => {
         const selectedHeaders = outputs_state.activeExcelOptions.map(option => option.label)
         const columnHeaders = selectedHeaders.includes('Todas') ? outputs_state.allExcelTitles.filter(option => option !== 'Todas') : selectedHeaders
         const lines = await processExcelLines(columnHeaders)
-        return exportSimpleExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        const result = await generateExcel(columnHeaders, lines, nameOfSheet, nameOfDocument)
+        if (!result.isCreated) return errorAlert('No se pudo exportar la lista de salidas. Inténtelo de nuevo.')
+        return { isCreated: result.isCreated, docType: 'excel' }
     }
 
     const buttonToExportExcel = (
@@ -141,7 +147,8 @@ const Header = () => {
         { disabled: true, label: 'Fecha', value: 'fecha' },
         { disabled: false, label: 'Descripción', value: 'descripcion' },
         { disabled: false, label: 'Productos', value: 'productos' },
-        { disabled: false, label: 'Ganancia Neta', value: 'gananciaNeta' },
+        { disabled: false, label: 'Ganancia', value: 'ganancia' },
+        { disabled: false, label: 'Ganancia Neta', value: 'gananciaNeta' }
     ]
 
     const changeExcelOptions = (e) => {
