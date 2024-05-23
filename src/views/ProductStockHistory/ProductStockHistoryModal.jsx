@@ -22,6 +22,7 @@ import api from '../../services'
 const { formatFindParams } = actions.paginationParams
 const { useProductsContext } = contexts.Products
 const { getLastFortnight, getLastMonth, getLastWeek } = helpers.dateHelper
+const { roundTwoDecimals } = helpers.mathHelper
 const { Delete, Edit } = icons
 
 
@@ -216,32 +217,32 @@ const ProductStockHistoryModal = () => {
 
     const titlesOfLastEntriesAndOutputsData = [
         {
-            element: <h3>Entradas totales en la última quincena: <b>{products_state.stockHistory.productStockHistoryModal.flowValues.entriesOfPreviousFortnight}</b></h3>,
+            element: <h3>Entradas totales en la última quincena: <b>{roundTwoDecimals(products_state.stockHistory.productStockHistoryModal.flowValues.entriesOfPreviousFortnight)}</b></h3>,
             name: 'titlesOfLastEntriesAndOutputs_entriesOfLastFortnight',
             order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
         {
-            element: <h3>Entradas totales en el último mes: <b>{products_state.stockHistory.productStockHistoryModal.flowValues.entriesOfPreviousMonth}</b></h3>,
+            element: <h3>Entradas totales en el último mes: <b>{roundTwoDecimals(products_state.stockHistory.productStockHistoryModal.flowValues.entriesOfPreviousMonth)}</b></h3>,
             name: 'titlesOfLastEntriesAndOutputs_entriesOfLastMonth',
             order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
-            element: <h3>Entradas totales en la última semana: <b>{products_state.stockHistory.productStockHistoryModal.flowValues.entriesOfPreviousWeek}</b></h3>,
+            element: <h3>Entradas totales en la última semana: <b>{roundTwoDecimals(products_state.stockHistory.productStockHistoryModal.flowValues.entriesOfPreviousWeek)}</b></h3>,
             name: 'titlesOfLastEntriesAndOutputs_entriesOfLastWeek',
             order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
         },
         {
-            element: <h3>Salidas totales en la última quincena: <b>{products_state.stockHistory.productStockHistoryModal.flowValues.outputsOfPreviousFortnight}</b></h3>,
+            element: <h3>Salidas totales en la última quincena: <b>{roundTwoDecimals(products_state.stockHistory.productStockHistoryModal.flowValues.outputsOfPreviousFortnight)}</b></h3>,
             name: 'titlesOfLastEntriesAndOutputs_outputsOfLastFortnight',
             order: { lg: 4, md: 4, sm: 5, xl: 4, xs: 5, xxl: 4 }
         },
         {
-            element: <h3>Salidas totales en el último mes: <b>{products_state.stockHistory.productStockHistoryModal.flowValues.outputsOfPreviousMonth}</b></h3>,
+            element: <h3>Salidas totales en el último mes: <b>{roundTwoDecimals(products_state.stockHistory.productStockHistoryModal.flowValues.outputsOfPreviousMonth)}</b></h3>,
             name: 'titlesOfLastEntriesAndOutputs_outputsOfLastMonth',
             order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
         },
         {
-            element: <h3>Salidas totales en la última semana: <b>{products_state.stockHistory.productStockHistoryModal.flowValues.outputsOfPreviousWeek}</b></h3>,
+            element: <h3>Salidas totales en la última semana: <b>{roundTwoDecimals(products_state.stockHistory.productStockHistoryModal.flowValues.outputsOfPreviousWeek)}</b></h3>,
             name: 'titlesOfLastEntriesAndOutputs_outputsOfLastWeek',
             order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 }
         }
