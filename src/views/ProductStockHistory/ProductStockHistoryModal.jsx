@@ -98,12 +98,12 @@ const ProductStockHistoryModal = () => {
         },
         {
             dataIndex: 'stockHistoryModal_totalEntries',
-            render: (_, stockHistory) => stockHistory.entries,
+            render: (_, stockHistory) => roundTwoDecimals(stockHistory.entries),
             title: 'Cantidad entradas'
         },
         {
             dataIndex: 'stockHistoryModal_totalOutputs',
-            render: (_, stockHistory) => stockHistory.outputs,
+            render: (_, stockHistory) => roundTwoDecimals(stockHistory.outputs),
             title: 'Cantidad salidas'
         },
         {
