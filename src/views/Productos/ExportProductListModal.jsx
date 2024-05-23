@@ -471,7 +471,8 @@ const ExportProductListModal = () => {
     useEffect(() => { loadSalesAreas() }, [])
 
     const changeSalesArea = async (e) => {
-        const findSalesArea = await api.zonasdeventas.findByName(e)
+        const filters = JSON.stringify({ name: e })
+        const findSalesArea = await api.zonasdeventas.findAllByFilters(filters)
         salesAreas_dispatch({ type: 'SET_SELECTED_SALES_AREA', payload: findSalesArea.docs })
     }
 

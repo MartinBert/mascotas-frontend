@@ -228,7 +228,8 @@ const FiscalNoteModal = () => {
       if (debitCodes.includes(fiscalNoteModal_state.params.fiscalNote.codigoUnico)) return
       const amountGross = fiscalNoteModal_state.params.amountNet
       const amountRounded = roundToMultiple(amountGross, 10)
-      const findPaymentMethod = await api.mediospago.findByName('Efectivo')
+      const filters = JSON.stringify({ nombre: 'Efectivo' })
+      const findPaymentMethod = await api.mediospago.findAllByFilters(filters)
       const paymentMethod = findPaymentMethod.docs
       const [paymentPlan] = paymentMethod.map(method => method.planes)
       const propsForCreditNote = {
@@ -312,7 +313,8 @@ const FiscalNoteModal = () => {
       const paymentMethodName = fiscalNoteModal_state.params.paymentMethodName
       if (!paymentMethodName) return
       fiscalNoteModal_dispatch({ type: 'SET_LOADING_PAYMENT_METHOD', payload: true })
-      const findSelectedPaymentMethod = await api.mediospago.findByName(paymentMethodName)
+      const filters = JSON.stringify({ nombre: paymentMethodName })
+      const findSelectedPaymentMethod = await api.mediospago.findAllByFilters(filters)
       const [selectedPaymentMethod] = findSelectedPaymentMethod.docs
       const paymentPlans = selectedPaymentMethod.planes
       const paymentPlansNames = paymentPlans.map(plan => plan.nombre)

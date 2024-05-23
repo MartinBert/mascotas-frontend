@@ -39,6 +39,17 @@ const findAll = async() => {
     }
 }
 
+const findAllByFilters = async (filters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos?filters=${filters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findById = async(id) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
@@ -54,17 +65,6 @@ const findMultipleIds = async(ids) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findByName = async(name) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/rubros/name/${name}`, headers)
         return response.data
     }catch(err){
         checkStorageStatus(err)
@@ -99,8 +99,8 @@ const rubros = {
     deleteRubro,
     edit,
     findAll,
+    findAllByFilters,
     findById,
-    findByName,
     findMultipleIds,
     findPaginated,
     save

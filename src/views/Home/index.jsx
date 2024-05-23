@@ -121,7 +121,7 @@ const Home = () => {
                     return productOfSale
                 } else return null
             }).filter(record => record)
-            
+
             const findSalesDates = productSalesData.map(itemData => itemData.dateString)
             const salesDates = findSalesDates.filter((item, index) => {
                 return findSalesDates.indexOf(item) === index
@@ -139,35 +139,34 @@ const Home = () => {
                 }
                 return reduceValues
             })
-            // Larga solo valores de ventas pero no de salidas ---- ACA
-            const outputsPreData = reduceSalesData.map(saleRecord => {
-                const record = { dateString: saleRecord.dateString }
-                for (let index = 0; index < reduceOutputsData.length; index++) {
-                    const outputRecord = reduceOutputsData[index]
-                    console.log('SALE', saleRecord)
-                    console.log('OUTPUT', outputRecord)
-                    console.log('------------------------------------------')
-                    if (saleRecord.dateString === outputRecord.dateString) {
-                        record.outputs = roundTwoDecimals(saleRecord.sales + outputRecord.outputs)
-                    } else record.outputs = roundTwoDecimals(saleRecord.sales)
-                }
+
+            const outputsData = reduceSalesData.map(saleRecord => {
+                let record = {}
+                const outputsDates = reduceOutputsData.map(outputRecord => outputRecord.dateString)
+                if (!outputsDates.includes(saleRecord.dateString)) {
+                    record.dateString = saleRecord.dateString
+                    record.outputs = roundTwoDecimals(saleRecord.sales)
+                } else record = null
                 return record
-            })
-
-            const fixOutputPreData = reduceOutputsData.map(outputRecord => {
-                const record = {}
-                for (let index = 0; index < reduceSalesData.length; index++) {
-                    const saleRecord = reduceSalesData[index]
-                    if (outputRecord.dateString === saleRecord.dateString) {
-                        record.dateString = outputRecord.dateString
-                        record.outputs = outputRecord.outputs
-                    }
-                }
-                if (Object.entries(record).length === 0) return null
-                else return record
             }).filter(record => record)
-
-            const outputsData = [...outputsPreData, ...fixOutputPreData]
+                .concat(
+                    reduceOutputsData.map(outputRecord => {
+                        const record = {}
+                        const salesDates = reduceSalesData.map(saleRecord => saleRecord.dateString)
+                        if (salesDates.includes(outputRecord.dateString)) {
+                            const [salesOfRecordSales] = reduceSalesData.map(salesRecord => {
+                                if (salesRecord.dateString === outputRecord.dateString) return salesRecord.sales
+                                else return null
+                            }).filter(record => record)
+                            record.dateString = outputRecord.dateString
+                            record.outputs = roundTwoDecimals(salesOfRecordSales + outputRecord.outputs)
+                        } else {
+                            record.dateString = outputRecord.dateString
+                            record.outputs = roundTwoDecimals(outputRecord.outputs)
+                        }
+                        return record
+                    })
+                )
 
             const stockHistory = {
                 entriesData: entriesData,
@@ -206,8 +205,34 @@ const Home = () => {
             const record = dataForSave[index]
             await api.stockHistory.save(record)
         }
-  
+
         console.log('listo')
+
+        // VERIFY IN CONSOLE
+        // const quantityOfEntriesToSave = dataForSave.reduce((acc, val) => acc + val.entries, 0)
+        // const quantityOfOutputsToSave = dataForSave.reduce((acc, val) => acc + val.outputs, 0)
+        // const savedEntries = allEntries.reduce((acc, val) => acc + val.cantidad, 0)
+        // const savedOutputs = allOutputs.reduce((acc, val) => acc + val.cantidad, 0)
+        // const calcVal = (sale) => {
+        //     const prodIDs = sale.productos.map(prod => prod.nombre)
+        //     if (prodIDs.length === 0) return null
+        //     const valToReturnArray = sale.renglones.map(line => {
+        //         if(prodIDs.includes(line.nombre)) {
+        //             const quantity = line.fraccionar
+        //                 ? line.cantidadUnidades / line.fraccionamiento
+        //                 : line.cantidadUnidades
+        //             return quantity
+        //         }
+        //         else return null
+        //     }).filter(record => record)
+        //     const valToReturn = valToReturnArray.reduce((acc, rec) => acc + rec, 0)
+        //     return valToReturn
+        // }
+        // const savedSales = allSales.reduce((acc, sale) => acc + calcVal(sale), 0 )
+        // const fixedSavedOutputs = savedOutputs + savedSales
+
+        // console.log('VALORES A GUARDAR: ', quantityOfEntriesToSave + quantityOfOutputsToSave)
+        // console.log('VALORES GUARDADOS: ', savedEntries + fixedSavedOutputs)
     }
 
     const deleteStockHistories = async () => {
@@ -256,7 +281,7 @@ const Home = () => {
     }
 
 
-    const testRenderElementDisplay = 'none'
+    const testRenderElementDisplay = 'block'
 
     return (
         <>

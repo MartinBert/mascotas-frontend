@@ -39,6 +39,17 @@ const findAll = async () => {
     }
 }
 
+const findAllByFilters = async (filters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos?filters=${filters}`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findByCode = async (code) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -54,17 +65,6 @@ const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findByName = async (name) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/documentos/name/${name}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -110,9 +110,9 @@ const documentos = {
     deleteDocumento,
     edit,
     findAll,
+    findAllByFilters,
     findByCode,
     findById,
-    findByName,
     findMultipleIds,
     findPaginated,
     save

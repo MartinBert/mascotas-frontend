@@ -10,7 +10,6 @@ const { existIva } = validations
 
 
 const creditNoteTemplate = (creditData, qrImage) => {
-    console.log(creditData)
     return `
         <div style='width: 753px; height: 1082px; display: inline-block; line-height: 1; margin: 20px;'>
             <div style='display: flex; width: 100%; height: 180px; text-align: center; padding: 10px; padding-bot: 8px; border: solid 2px; border-radius: 5px; border-color: #C2BDBC'>

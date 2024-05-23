@@ -39,10 +39,10 @@ const findAll = async () => {
     }
 }
 
-const findById = async (id) => {
+const findAllByFilters = async (filters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/cuentas_corrientes/${id}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/cuentas_corrientes?filters=${filters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -50,10 +50,10 @@ const findById = async (id) => {
     }
 }
 
-const findByName = async (name) => {
+const findById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/cuentas_corrientes/name/${name}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/cuentas_corrientes/${id}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -99,8 +99,8 @@ const cuentascorrientes = {
     deleteCuentaCorriente,
     edit,
     findAll,
+    findAllByFilters,
     findById,
-    findByName,
     findMultipleIds,
     findPaginated,
     save

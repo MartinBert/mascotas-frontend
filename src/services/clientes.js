@@ -39,21 +39,21 @@ const findAll = async() => {
     }
 }
 
-const findById = async(id) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/clientes/${id}`, headers)
+const findAllByFilters = async (filters) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/clientes?filters=${filters}`, headers)
         return response.data
-    }catch(err){
+    } catch (err) {
         checkStorageStatus(err)
         console.error(err)
     }
 }
 
-const findByName = async(name) => {
+const findById = async(id) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/clientes/name/${name}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/clientes/${id}`, headers)
         return response.data
     }catch(err){
         checkStorageStatus(err)
@@ -99,8 +99,8 @@ const clientes = {
     deleteCliente,
     edit,
     findAll,
+    findAllByFilters,
     findById,
-    findByName,
     findMultipleIds,
     findPaginated,
     save,

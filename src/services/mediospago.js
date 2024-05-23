@@ -39,22 +39,22 @@ const findAll = async() => {
     }
 }
 
-const findById = async(id) => {
+const findAllByFilters = async (filters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers)
-        return response
-    }catch(err){
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago?filters=${filters}`, headers)
+        return response.data
+    } catch (err) {
         checkStorageStatus(err)
         console.error(err)
     }
 }
 
-const findByName = async(name) => {
+const findById = async(id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/name/${name}`, headers)
-        return response.data
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/mediospago/${id}`, headers)
+        return response
     }catch(err){
         checkStorageStatus(err)
         console.error(err)
@@ -99,8 +99,8 @@ const mediospago = {
     deleteMedioPago,
     edit,
     findAll,
+    findAllByFilters,
     findById,
-    findByName,
     findMultipleIds,
     findPaginated,
     save

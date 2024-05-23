@@ -176,7 +176,7 @@ const ZonasDeVentasForm = () => {
                         formRenderInputs.map((item, index) => {
                             return (
                                 <Row key={index}>
-                                    <Col span={8}>
+                                    <Col span={24}>
                                         <Form.Item
                                             initialValue={item.initialValue}
                                             label={item.label}
