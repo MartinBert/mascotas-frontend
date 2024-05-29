@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 
 // Custom Components
 import icons from '../../../components/icons'
+import { errorAlert } from '../../../components/alerts'
 
 // Custom Contexts
 import contexts from '../../../contexts'
@@ -24,7 +25,29 @@ import Header from './Header'
 const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
 const { EmitDocument, PrintPdf } = icons
 const { fiscalVouchersCodes } = helpers.afipHelper
-const { createVoucherPdf, createTicketPdf } = helpers.pdfHelper.commercialDocumentsPDF
+const {
+    createBudgetPdf,
+    createCreditNotePdf,
+    createDebitNotePdf,
+    createRemittancePdf,
+    createVoucherPdf,
+    createTicketPdf
+} = helpers.pdfHelper.commercialDocumentsPDF
+
+
+const creditCodes = fiscalVouchersCodes
+    .filter(item => typeof item !== 'string')
+    .map(code => code.credit)
+    .filter(code => code !== null)
+
+const debitCodes = fiscalVouchersCodes
+    .filter(item => typeof item !== 'string')
+    .map(code => code.debit)
+    .filter(code => code !== null)
+
+const voucherCodes = ['001', '016', '011', '051']
+
+const ticketCodes = ['081', '082', '083', '111', '118']
 
 
 const VentasList = () => {
@@ -78,9 +101,16 @@ const VentasList = () => {
     }
 
     const printVoucher = (venta) => {
-        venta.documentoFiscal
-            ? createVoucherPdf(venta)
-            : createTicketPdf(venta)
+        if (venta.documento.presupuesto) return createBudgetPdf(venta)
+        else if (venta.documento.remito) return createRemittancePdf(venta)
+        else if (
+            venta.documento.ticket
+            || ticketCodes.includes(venta.documento.codigoUnico)
+        ) return createTicketPdf(venta)
+        else if (creditCodes.includes(venta.documento.codigoUnico)) return createCreditNotePdf(venta)
+        else if (debitCodes.includes(venta.documento.codigoUnico)) return createDebitNotePdf(venta)
+        else if (voucherCodes.includes(venta.documento.codigoUnico)) return createVoucherPdf(venta)
+        else return errorAlert('El sistema no identificó el documento de la venta. Inténtelo de nuevo o contacte al proveedor del servicio.')
     }
 
     const columnsForTable = [

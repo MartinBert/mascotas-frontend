@@ -5,24 +5,12 @@ import html2canvas from 'html2canvas'
 // Helpers
 import dateHelper from '../dateHelper'
 import mathHelper from '../mathHelper'
+import objHelper from '../objHelper'
 
 // Imports destructuring
 const { localFormat } = dateHelper
 const { isPar, nextInteger } = mathHelper
-
-
-const orderLines = (lines) => {
-    const orderedLines = lines.sort((a, b) => {
-        if (a[1] > b[1]) return 1
-        if (a[1] < b[1]) return -1
-        else {
-            if (a[2] > b[2]) return 1
-            else if (a[2] < b[2]) return -1
-            return 0
-        }
-    })
-    return orderedLines
-}
+const { sortArray } = objHelper
 
 const pageMargins = 'margin-left: 20px; margin-right: 20px; padding: 10px;'
 const overflowEllipsis = 'display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'
@@ -87,7 +75,7 @@ const generateHeader = (enterprise, salesArea) => {
 }
 
 const generateBodyWithImages = (lines) => {
-    const orderedLines = orderLines(lines)
+    const orderedLines = sortArray(lines, [1, 2])
 
     const bodyWithImages = `
         <div
@@ -151,7 +139,7 @@ const generateBodyWithImages = (lines) => {
 }
 
 const generateBodyWithoutImages = (headers, lines) => {
-    const orderedLines = orderLines(lines)
+    const orderedLines = sortArray(lines, [1, 2])
 
     const bodyWithoutImages = `
         <div style='${pageMargins} display: block;'>

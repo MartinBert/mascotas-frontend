@@ -5,7 +5,7 @@ import stringHelper from '../../stringHelper'
 import validations from '../validations'
 
 // Imports Destruvturing
-const { simpleDateWithHours } = dateHelper
+const { localFormat, simpleDateWithHours } = dateHelper
 const { roundTwoDecimals } = mathHelper
 const { completeLengthWithZero } = stringHelper
 const { existIva } = validations
@@ -24,7 +24,7 @@ const voucherTemplate = (billData, qrImage) => {
                         <p style='margin: 0px; margin-top: 3px;'><i>Cond. IVA:</i> ${billData.empresaCondicionIva}</p>
                         <p style='margin: 0px; margin-top: 3px;'><i>CUIT:</i> ${billData.empresaCuit}</p>
                         <p style='margin: 0px; margin-top: 3px;'><i>Ing. brutos:</i> ${billData.empresaIngresosBrutos}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${simpleDateWithHours(billData.empresaInicioActividad)}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${localFormat(billData.empresaInicioActividad)}</p>
                     </div>
                 </div>
                 <div style='width: 20%; text-align: center;'>

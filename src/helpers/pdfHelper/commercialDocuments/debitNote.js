@@ -4,7 +4,7 @@ import stringHelper from '../../stringHelper'
 import validations from '../validations'
 
 // Imports Destruvturing
-const { simpleDateWithHours } = dateHelper
+const { localFormat, simpleDateWithHours } = dateHelper
 const { completeLengthWithZero } = stringHelper
 const { existIva } = validations
 
@@ -22,7 +22,7 @@ const debitNoteTemplate = (debitData, qrImage) => {
                         <p style='margin: 0px; margin-top: 3px;'><i>Cond. IVA:</i> ${debitData.referenceVoucher.empresaCondicionIva}</p>
                         <p style='margin: 0px; margin-top: 3px;'><i>CUIT:</i> ${debitData.referenceVoucher.empresaCuit}</p>
                         <p style='margin: 0px; margin-top: 3px;'><i>Ing. brutos:</i> ${debitData.referenceVoucher.empresaIngresosBrutos}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${simpleDateWithHours(debitData.referenceVoucher.empresaInicioActividad)}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${localFormat(debitData.referenceVoucher.empresaInicioActividad)}</p>
                     </div>
                 </div>
                 <div style='width: 20%; text-align: center;'>

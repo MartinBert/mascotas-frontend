@@ -10,6 +10,53 @@ const noEmptyKeys = (obj) => {
     return validation
 }
 
+// ------------------- Sort array -------------------- //
+const validateSort = (reversedKeysToCompare) => {
+    let keysToCompare
+    let validated
+    if (!reversedKeysToCompare) keysToCompare = []
+    else if (Array.isArray(reversedKeysToCompare)) keysToCompare = reversedKeysToCompare.reverse()
+    else if (typeof reversedKeysToCompare === 'object') {
+        const values = Object.values(reversedKeysToCompare)
+        keysToCompare = values.reverse()
+    } else keysToCompare = [reversedKeysToCompare]
+    validated = keysToCompare.length === 0 ? false : true
+    return { keysToCompare, validated }
+}
+
+const getTypeOfElements = (elements) => {
+    const arrayOfElementsTypes = elements.map(element => typeof element)
+    const [elementsTypes] = arrayOfElementsTypes.filter((item, index) => { return arrayOfElementsTypes.indexOf(item) === index })
+    const arrayOfAreElementsArrays = elements.map(element => Array.isArray(element))
+    const [areElementsArrays] = arrayOfAreElementsArrays.filter((item, index) => { return arrayOfAreElementsArrays.indexOf(item) === index })
+    if (areElementsArrays) return 'array'
+    else return elementsTypes
+}
+
+const sortArray = (elements, reversedKeysToCompare = null) => {
+    const { keysToCompare, validated } = validateSort(reversedKeysToCompare)
+    if (!validated) return elements
+    const typeOfElements = getTypeOfElements(elements)
+    if (!(typeof typeOfElements === 'string')) return elements
+
+    if (typeOfElements === 'string') {
+        const elementsWithLowerCaseInitial = elements.map(element => element.toLowerCase())
+        return elementsWithLowerCaseInitial.sort()
+    }
+    const typesForLoopSort = ['array', 'object']
+    if (typesForLoopSort.includes(typeOfElements)) {
+        for (let index = 0; index < keysToCompare.length; index++) {
+            const key = keysToCompare[index]
+            elements.sort((a, b) => {
+                if (a[key] > b[key]) return 1
+                else if (a[key] < b[key]) return -1
+                else return 0
+            })
+        }
+    } else if (typeOfElements === 'number') elements.sort((a, b) => a - b)
+    return elements
+}
+
 const spanishVoucherDataToSave = (data) => {
     const formattedData = {
         associatedVouchers: !data.associatedVouchers
@@ -71,6 +118,7 @@ const spanishVoucherDataToSave = (data) => {
         porcentajeDescuentoGlobal: data.discountGlobal ? parseFloat(data.discountGlobal) : 0,
         porcentajeRecargoGlobal: data.surchargeGlobal ? parseFloat(data.surchargeGlobal) : 0,
         productos: data.products ? data.products : [],
+        profit: data.profit ? parseFloat(data.profit) : 0,
         puntoVenta: data.salePoint,
         puntoVentaNumero: parseInt(data.salePointNumber),
         puntoVentaNombre: data.salePointName,
@@ -95,6 +143,7 @@ const spanishVoucherDataToSave = (data) => {
 const objHelper = {
     existsProperty,
     noEmptyKeys,
+    sortArray,
     spanishVoucherDataToSave
 }
 

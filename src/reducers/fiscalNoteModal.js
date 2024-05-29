@@ -63,6 +63,7 @@ const initialState = {
         paymentMethodName: null,
         paymentPlan: null,
         paymentPlanName: null,
+        profit: 0,
         referenceVoucher: {
             clienteRazonSocial: '',
             fechaEmisionString: '',

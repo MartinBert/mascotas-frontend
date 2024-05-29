@@ -256,12 +256,14 @@ const FiscalNoteModal = () => {
     const amountNet = e * planFactor
     const amountRounded = roundToMultiple(amountNet, 10)
     const amountDifference = amountRounded - amountNet
-    const target = ['amountDifference', 'amountGross', 'amountNet', 'amountRounded']
-    const value = [amountDifference, amountGross, amountNet, amountRounded]
+    const profit = amountNet
+    const target = ['amountDifference', 'amountGross', 'amountNet', 'amountRounded', 'profit']
+    const value = [amountDifference, amountGross, amountNet, amountRounded, profit]
     dispatchValues(target, value)
   }
 
   const inputAmountNet = (e) => {
+    const isCredit = creditCodes.includes(fiscalNoteModal_state.params.fiscalNote.codigoUnico)
     const planFactor = fiscalNoteModal_state.params.paymentPlan
       ? 1 + decimalPercent(fiscalNoteModal_state.params.paymentPlan[0].porcentaje)
       : 1
@@ -269,8 +271,9 @@ const FiscalNoteModal = () => {
     const amountNet = e
     const amountRounded = roundToMultiple(amountNet, 10)
     const amountDifference = amountRounded - amountNet
-    const target = ['amountDifference', 'amountGross', 'amountNet', 'amountRounded']
-    const value = [amountDifference, amountGross, amountNet, amountRounded]
+    const profit = isCredit ? - amountNet : amountNet
+    const target = ['amountDifference', 'amountGross', 'amountNet', 'amountRounded', 'profit']
+    const value = [amountDifference, amountGross, amountNet, amountRounded, profit]
     dispatchValues(target, value)
   }
 

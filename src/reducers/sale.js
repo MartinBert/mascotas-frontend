@@ -1,16 +1,23 @@
+// Design Components
+import dayjs from 'dayjs'
+
+// Helpers
 import helpers from '../helpers'
 
 const { decimalPercent, previousInteger, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { formatToCompleteVoucherNumber } = helpers.afipHelper
-const { simpleDateWithHours } = helpers.dateHelper
+const { localFormat, simpleDateWithHours } = helpers.dateHelper
 
 const initialState = {
     //----------------------------------------------- Generics state of view -----------------------------------------------------------/
+    allClients: [],
+    allDocuments: [],
     discountSurchargeModalOperation: 'discount',
     discountSurchargeModalVisible: false,
     finalizeSaleModalIsVisible: false,
     loadingDocumentIndex: false,
     loadingView: false,
+    valueForDatePicker: null,
 
     //------------------------------------------------- State of sale data -------------------------------------------------------------/
     baseImponible10: 0,
@@ -45,12 +52,13 @@ const initialState = {
     iva10: 0,
     iva27: 0,
     mediosPago: [],
-    mediosPagoNombres: [],
+    mediosPagoNombres: null,
+    mediosPagoToAutocomplete: [],
     numeroFactura: null,
     numeroCompletoFactura: null,
     planesPago: [],
-    planesPagoNombres: [],
-    planesPagoToSelect: [],
+    planesPagoNombres: null,
+    planesPagoToAutocomplete: [],
     porcentajeRecargoGlobal: 0,
     porcentajeDescuentoGlobal: 0,
     productos: [],
@@ -69,6 +77,10 @@ const initialState = {
 
 const actions = {
     //---------------------------------------------- Generics actions of view ----------------------------------------------------------/
+    SET_ALL_CLIENTS: 'SET_ALL_CLIENTS',
+    SET_ALL_DOCUMENTS: 'SET_ALL_DOCUMENTS',
+    SET_ALL_PAYMENT_METHODS: 'SET_ALL_PAYMENT_METHODS',
+    SET_ALL_PAYMENT_PLANS: 'SET_ALL_PAYMENT_PLANS',
     CLOSE_FISCAL_OPERATION: 'CLOSE_FISCAL_OPERATION',
     CLOSE_NO_FISCAL_OPERATION: 'CLOSE_NO_FISCAL_OPERATION',
     HIDE_DISCOUNT_SURCHARGE_MODAL: 'HIDE_DISCOUNT_SURCHARGE_MODAL',
@@ -96,8 +108,8 @@ const actions = {
     SET_LINES: 'SET_LINES',
     SET_NET_PRICE: 'SET_NET_PRICE',
     SET_NET_PRICE_FIXED: 'SET_NET_PRICE_FIXED',
-    SET_PAYMENT_METHODS: 'SET_PAYMENT_METHODS',
-    SET_PAYMENT_PLANS: 'SET_PAYMENT_PLANS',
+    SET_PAYMENT_METHOD: 'SET_PAYMENT_METHOD',
+    SET_PAYMENT_PLAN: 'SET_PAYMENT_PLAN',
     SET_PRODUCTS: 'SET_PRODUCTS',
     SET_SALE_POINT: 'SET_SALE_POINT',
     SET_TOTAL: 'SET_TOTAL',
@@ -243,15 +255,35 @@ const updateValues = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         //-------------------------------------------- Generic reducers of view -------------------------------------------------------/
+        case actions.SET_ALL_PAYMENT_METHODS:
+            return {
+                ...state,
+                mediosPagoToAutocomplete: action.payload ?? []
+            }
+        case actions.SET_ALL_PAYMENT_PLANS:
+            return {
+                ...state,
+                planesPagoToAutocomplete: action.payload ?? []
+            }
+        case actions.SET_ALL_CLIENTS:
+            return {
+                ...state,
+                allClients: action.payload
+            }
+        case actions.SET_ALL_DOCUMENTS:
+            return {
+                ...state,
+                allDocuments: action.payload
+            }
         case actions.SHOW_DISCOUNT_SURCHARGE_MODAL:
             return {
                 ...state,
-                discountSurchargeModalVisible: true,
+                discountSurchargeModalVisible: true
             }
         case actions.HIDE_DISCOUNT_SURCHARGE_MODAL:
             return {
                 ...state,
-                discountSurchargeModalVisible: false,
+                discountSurchargeModalVisible: false
             }
         case actions.SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION:
             const refreshLinesValues = (percentageType, productos) => {
@@ -577,6 +609,7 @@ const reducer = (state = initialState, action) => {
         case actions.SET_DATES:
             return {
                 ...state,
+                valueForDatePicker: dayjs(localFormat(action.payload), 'DD/MM/YYYY'),
                 fechaEmision: action.payload,
                 fechaEmisionString: simpleDateWithHours(action.payload)
             }
@@ -586,58 +619,24 @@ const reducer = (state = initialState, action) => {
                 numeroFactura: action.payload,
                 numeroCompletoFactura: formatToCompleteVoucherNumber(state.puntoVentaNumero, action.payload)
             }
-        case actions.SET_PAYMENT_METHODS:
-            if (!action.payload) {
-                return {
-                    ...state,
-                    mediosPago: [],
-                    mediosPagoNombres: [],
-                    planesPagoToSelect: [],
-                }
-            } else {
-                const paymentMethodNames = [action.payload.data].map(paymentMethod => paymentMethod.nombre)
-                const paymentPlansMapping = [action.payload.data].map(paymentMethod => paymentMethod.planes)
-                const paymentPlans = []
-                paymentPlansMapping.forEach(paymentPlanMapping => {
-                    paymentPlanMapping.forEach(plan => {
-                        paymentPlans.push(plan)
-                    })
-                })
-                return {
-                    ...state,
-                    mediosPago: [action.payload.data],
-                    mediosPagoNombres: paymentMethodNames,
-                    planesPagoToSelect: paymentPlans,
-                }
+        case actions.SET_PAYMENT_METHOD:
+            return {
+                ...state,
+                mediosPago: action.payload.map(paymentMethod => paymentMethod._id),
+                mediosPagoNombres: action.payload.map(paymentMethod => paymentMethod.nombre)
             }
-        case actions.SET_PAYMENT_PLANS:
-            if (!action.payload) {
-                return {
-                    ...state,
-                    planesPago: [],
-                    planesPagoNombres: [],
-                    renglones: state.renglones.map(line => {
-                        const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
-                        const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, 0, productUnfractionedPrice, productFractionedPrice)
-                        return line
-                    })
-                }
-            } else {
-                const plans = action.payload.map(item => item)
-                const planNames = plans.map(item => item.nombre)
-                const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent((action.payload[0]).porcentaje) : 0
-                return {
-                    ...state,
-                    planesPago: plans,
-                    planesPagoNombres: planNames,
-                    renglones: state.renglones.map(line => {
-                        const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
-                        const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado, productUnfractionedPrice, productFractionedPrice)
-                        return line
-                    })
-                }
+        case actions.SET_PAYMENT_PLAN:
+            const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent(action.payload[0].porcentaje) : 0
+            return {
+                ...state,
+                planesPago: action.payload,
+                planesPagoNombres: action.payload.map(paymentPlan => paymentPlan.nombre),
+                renglones: state.renglones.map(line => {
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                    updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado, productUnfractionedPrice, productFractionedPrice)
+                    return line
+                })
             }
         case actions.SET_TOTAL:
             if (state.renglones.length === 0) {

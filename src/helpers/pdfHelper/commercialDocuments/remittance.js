@@ -5,7 +5,7 @@ import stringHelper from '../../stringHelper'
 import validations from '../validations'
 
 // Imports Destruvturing
-const { simpleDateWithHours } = dateHelper
+const { localFormat, simpleDateWithHours } = dateHelper
 const { roundTwoDecimals } = mathHelper
 const { completeLengthWithZero } = stringHelper
 const { existIva } = validations
@@ -25,7 +25,7 @@ const remittanceTemplate = (qrImage = null, remittanceData) => {
                         <p style='margin: 0px; margin-top: 3px;'><i>Cond. IVA:</i> ${remittanceData.empresaCondicionIva}</p>
                         <p style='margin: 0px; margin-top: 3px;'><i>CUIT:</i> ${remittanceData.empresaCuit}</p>
                         <p style='margin: 0px; margin-top: 3px;'><i>Ing. brutos:</i> ${remittanceData.empresaIngresosBrutos}</p>
-                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${simpleDateWithHours(remittanceData.empresaInicioActividad)}</p>
+                        <p style='margin: 0px; margin-top: 3px;'><i>Inicio act.:</i> ${localFormat(remittanceData.empresaInicioActividad)}</p>
                     </div>
                 </div>
                 <div style='width: 20%; text-align: center;'>
