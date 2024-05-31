@@ -104,15 +104,6 @@ const reducer = (state = initialState, action) => {
                     selectedTypesNames: [{ value: 'Todos los rubros' }]
                 }
             }
-        case actions.DELETE_PRODUCTS_TO_SELECT:
-            // const productsToDeleteIDs = action.payload.map(product => product._id)
-            // const remainingProducts = state.productsToSelect.filter(
-            //     product => !productsToDeleteIDs.includes(product._id)
-            // )
-            return {
-                ...state,
-                productsToSelect: action.payload,
-            }
         case actions.DESELECT_ALL_BRANDS:
             const notAllBrandsNames = state.brandsForSelect.selectedBrandsNames
                 .filter(brandName => brandName.value !== 'Todas las marcas')

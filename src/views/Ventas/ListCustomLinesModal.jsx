@@ -11,12 +11,14 @@ import { Button, Col, Modal, Row, Table } from 'antd'
 import contexts from '../../contexts'
 
 // Imports Destructurings
+const { useSaleContext } = contexts.Sale
 const { useSaleCustomProductsContext } = contexts.SaleCustomProducts
 const { useSaleProductsContext } = contexts.SaleProducts
 const { Delete } = icons
 
 
 const ListCustomLinesModal = () => {
+    const [sale_state, sale_dispatch] = useSaleContext()
     const [customProducts_state, customProducts_dispatch] = useSaleCustomProductsContext()
     const [, saleProducts_dispatch] = useSaleProductsContext()
 
@@ -26,6 +28,21 @@ const ListCustomLinesModal = () => {
 
     const openCustomProductModal = () => {
         customProducts_dispatch({ type: 'SHOW_CUSTOM_PRODUCT_MODAL' })
+    }
+
+    const redirectFocus = () => {
+        const clientField = sale_state.saleRefs.ref_autocompleteClient
+        const documentField = sale_state.saleRefs.ref_autocompleteDocument
+        const finalizeButton = sale_state.saleRefs.ref_buttonToFinalizeSale
+        const paymentMethodField = sale_state.saleRefs.ref_autocompletePaymentMethod
+        const paymentPlanField = sale_state.saleRefs.ref_autocompletePaymentPlan
+        let unfilledField
+        if (clientField.value === '') unfilledField = clientField
+        else if (documentField.value === '') unfilledField = documentField
+        else if (paymentMethodField.value === '') unfilledField = paymentMethodField
+        else if (paymentPlanField.value === '') unfilledField = paymentPlanField
+        else unfilledField = finalizeButton
+        unfilledField.focus()
     }
 
     const removeAllCustomProducts = () => {
@@ -90,6 +107,7 @@ const ListCustomLinesModal = () => {
 
     return (
         <Modal
+            afterClose={redirectFocus}
             open={customProducts_state.listOfCustomProductModalIsVisible}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}

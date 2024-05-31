@@ -43,6 +43,22 @@ const Header = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
     const [, saleProducts_dispatch] = useSaleProductsContext()
 
+    // --------------------- Actions --------------------- //
+    const unfilledAutocomplete = () => {
+        const clientField = sale_state.saleRefs.ref_autocompleteClient
+        const documentField = sale_state.saleRefs.ref_autocompleteDocument
+        const finalizeButton = sale_state.saleRefs.ref_buttonToFinalizeSale
+        const paymentMethodField = sale_state.saleRefs.ref_autocompletePaymentMethod
+        const paymentPlanField = sale_state.saleRefs.ref_autocompletePaymentPlan
+        let unfilledField
+        if (clientField.value === '') unfilledField = clientField
+        else if (documentField.value === '') unfilledField = documentField
+        else if (paymentMethodField.value === '') unfilledField = paymentMethodField
+        else if (paymentPlanField.value === '') unfilledField = paymentPlanField
+        else unfilledField = finalizeButton
+        return unfilledField
+    }
+
     useEffect(() => {
         const loadNextVoucherNumber = async () => {
             if (!sale_state.documento) return
@@ -80,6 +96,10 @@ const Header = () => {
 
     useEffect(() => { loadClients() }, [])
 
+    const onChangeClient = (e) => {
+        sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: e })
+    }
+
     const onClearClient = () => {
         sale_dispatch({ type: 'SET_CLIENT', payload: null })
     }
@@ -89,18 +109,24 @@ const Header = () => {
         const findClient = await api.clientes.findAllByFilters(filters)
         const [client] = findClient.docs
         sale_dispatch({ type: 'SET_CLIENT', payload: client })
+        sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: client.razonSocial })
+        unfilledAutocomplete().focus()
     }
 
     const autocompleteClient = (
         <AutoComplete
             allowClear
+            autoFocus
+            defaultActiveFirstOption
             filterOption={nonCaseSensitive}
+            id='autocompleteClient'
+            onChange={onChangeClient}
             onClear={onClearClient}
             onSelect={onSelectClient}
             options={sale_state.allClients}
             placeholder='Cliente'
             style={{ width: '100%' }}
-            value={sale_state.clienteRazonSocial}
+            value={sale_state.clientInput}
         />
     )
 
@@ -116,6 +142,10 @@ const Header = () => {
 
     useEffect(() => { loadDocuments() }, [])
 
+    const onChangeDocument = (e) => {
+        sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: e })
+    }
+
     const onClearDoument = () => {
         sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
     }
@@ -125,18 +155,23 @@ const Header = () => {
         const findDocument = await api.documentos.findAllByFilters(filters)
         const [document] = findDocument.docs
         sale_dispatch({ type: 'SET_DOCUMENT', payload: document })
+        sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: document.nombre })
+        unfilledAutocomplete().focus()
     }
 
     const autocompleteDocument = (
         <AutoComplete
             allowClear
+            defaultActiveFirstOption
             filterOption={nonCaseSensitive}
+            id='autocompleteDocument'
+            onChange={onChangeDocument}
             onClear={onClearDoument}
             onSelect={onSelectDocument}
             options={sale_state.allDocuments}
             placeholder='Documento'
             style={{ width: '100%' }}
-            value={sale_state.documento?.nombre}
+            value={sale_state.documentInput}
         />
     )
 
@@ -151,6 +186,10 @@ const Header = () => {
 
     useEffect(() => { loadPaymentMethods() }, [])
 
+    const onChangePaymentMethod = (e) => {
+        sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: e })
+    }
+
     const onClearPaymentMethods = () => {
         sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: [] })
         sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
@@ -162,19 +201,24 @@ const Header = () => {
         const findPaymentMethod = await api.mediospago.findAllByFilters(filters)
         const paymentMethod = findPaymentMethod.docs
         sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: paymentMethod })
+        sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: paymentMethod[0].nombre })
         sale_dispatch({ type: 'SET_TOTAL' })
+        unfilledAutocomplete().focus()
     }
 
     const autocompletePaymentMethod = (
         <AutoComplete
             allowClear
+            defaultActiveFirstOption
             filterOption={nonCaseSensitive}
+            id='autocompletePaymentMethod'
+            onChange={onChangePaymentMethod}
             onClear={onClearPaymentMethods}
             onSelect={onSelectPaymentMethods}
             options={sale_state.mediosPagoToAutocomplete}
             placeholder='Medio de pago'
             style={{ width: '100%' }}
-            value={sale_state.mediosPagoNombres}
+            value={sale_state.mediosPagoInput}
         />
     )
 
@@ -192,6 +236,10 @@ const Header = () => {
 
     useEffect(() => { loadPaymentPlans() }, [sale_state.mediosPagoNombres])
 
+    const onChangePaymentPlan = (e) => {
+        sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: e })
+    }
+
     const onClearPaymentPlans = () => {
         sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
         sale_dispatch({ type: 'SET_TOTAL' })
@@ -204,30 +252,40 @@ const Header = () => {
         const paymentPlans = findPaymentMethodSelected?.data?.planes ?? []
         const paymentPlan = paymentPlans.filter(paymentPlan => paymentPlan.nombre === e)
         sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: paymentPlan })
+        sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: paymentPlan[0].nombre })
         sale_dispatch({ type: 'SET_TOTAL' })
+        unfilledAutocomplete().focus()
     }
 
     const autocompletePaymentPlan = (
         <AutoComplete
             allowClear
+            defaultActiveFirstOption
             filterOption={nonCaseSensitive}
+            id='autocompletePaymentPlan'
+            onChange={onChangePaymentPlan}
             onClear={onClearPaymentPlans}
             onSelect={onSelectPaymentPlans}
             options={sale_state.planesPagoToAutocomplete}
             placeholder='Plan de pago'
             style={{ width: '100%' }}
-            value={sale_state.planesPagoNombres}
+            value={sale_state.planesPagoInput}
         />
     )
 
     // ------------- Button to clear fields -------------- //
     const onClearFields = () => {
         sale_dispatch({ type: 'SET_CLIENT', payload: null })
+        sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: null })
         sale_dispatch({ type: 'SET_DATES', payload: new Date() })
         sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
+        sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: null })
         sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: [] })
+        sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: null })
         sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
+        sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: null })
         sale_dispatch({ type: 'SET_TOTAL' })
+        sale_state.saleRefs.ref_autocompleteClient.focus()
     }
 
     const buttonToClearFields = (
@@ -246,6 +304,7 @@ const Header = () => {
         sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_PERCENT', payload: 0 })
         sale_dispatch({ type: 'SET_GLOBAL_SURCHARGE_PERCENT', payload: 0 })
         sale_dispatch({ type: 'SET_TOTAL' })
+        unfilledAutocomplete().focus()
     }
 
     const buttonToClearGlobalPercentage = (
@@ -262,6 +321,7 @@ const Header = () => {
     // ------------ Button to clear products ------------- //
     const onClearProducts = () => {
         saleProducts_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
+        unfilledAutocomplete().focus()
     }
 
     const buttonToClearProducts = (
@@ -325,12 +385,17 @@ const Header = () => {
     useEffect(() => { loadTodayDate() }, [])
 
     const changeDate = (e) => {
-        if (!e) return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-        if (isItLater(new Date(), e.$d)) {
-            errorAlert('No es conveniente facturar con fecha posterior a hoy.')
+        if (!e) {
             sale_dispatch({ type: 'SET_DATES', payload: new Date() })
+            unfilledAutocomplete().focus()
+        } else {
+            if (isItLater(new Date(), e.$d)) {
+                errorAlert('No es conveniente facturar con fecha posterior a hoy.')
+                sale_dispatch({ type: 'SET_DATES', payload: new Date() })
+            }
+            else sale_dispatch({ type: 'SET_DATES', payload: e.$d })
+            unfilledAutocomplete().focus()
         }
-        else sale_dispatch({ type: 'SET_DATES', payload: e.$d })
     }
 
     const datePickerForBillingDate = (

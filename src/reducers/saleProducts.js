@@ -1,15 +1,21 @@
-const initialState = {
-    params: {
-        productos: []
-    }
-}
-
 const actions = {
     DELETE_ALL_PRODUCTS: 'DELETE_ALL_PRODUCTS',
     DELETE_PRODUCTS: 'DELETE_PRODUCTS',
     SET_PRODUCTS: 'SET_PRODUCTS',
     UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS: 'UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS'
 }
+
+const initialState = {
+    params: {
+        productos: []
+    }
+}
+
+const getCustomProducts = (allProducts) => {
+    const customProducts = allProducts.filter(product => product._id.startsWith('customProduct_'))
+    return customProducts
+}
+
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
@@ -43,17 +49,13 @@ const reducer = (state = initialState, action) => {
                 }
             }
         case actions.SET_PRODUCTS:
-            const currentSelectedProducts = state.params.productos
-            const currentSelectedProductsIDs = state.params.productos.map(product => product._id)
-            const newSelectedProducts = action.payload.filter(
-                product => !currentSelectedProductsIDs.includes(product._id)
-            )
-            const selectedProducts = currentSelectedProducts.concat(newSelectedProducts)
+            const customProducts = getCustomProducts(state.params.productos)
+            const productsToSet = [...action.payload, ...customProducts]
             return {
                 ...state,
                 params: {
                     ...state.params,
-                    productos: selectedProducts
+                    productos: productsToSet
                 }
             }
         case actions.UNIFY_PRODUCTS_WITH_CUSTOM_PRODUCTS:

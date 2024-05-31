@@ -11,6 +11,7 @@ import contexts from '../../../contexts'
 
 // Design Components
 import { Button, Checkbox, Col, Input, Modal, Row, Select, Table } from 'antd'
+import './productSelectionModal.css'
 
 // Services
 import api from '../../../services'
@@ -20,6 +21,7 @@ const { formatFindParams } = actions.paginationParams
 const { useEntriesContext } = contexts.Entries
 const { useOutputsContext } = contexts.Outputs
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
+const { useSaleContext } = contexts.Sale
 const { useSaleProductsContext } = contexts.SaleProducts
 
 
@@ -28,6 +30,7 @@ const ProductSelectionModal = () => {
     const [entries_state, entries_dispatch] = useEntriesContext()
     const [outputs_state, outputs_dispatch] = useOutputsContext()
     const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
+    const [sale_state, sale_dispatch] = useSaleContext()
     const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
 
     // ----------- Redirect to correct state ------------- //
@@ -41,6 +44,25 @@ const ProductSelectionModal = () => {
         if (location.pathname.includes('entradas')) return entries_state
         if (location.pathname.includes('salidas')) return outputs_state
         if (location.pathname.includes('venta')) return saleProducts_state
+    }
+
+    // ----------------- Redirect focus ------------------ //
+    const redirectFocus = () => {
+        if (location.pathname.includes('entradas')) return
+        if (location.pathname.includes('salidas')) return
+        if (!location.pathname.includes('venta')) return
+        const clientField = sale_state.saleRefs.ref_autocompleteClient
+        const documentField = sale_state.saleRefs.ref_autocompleteDocument
+        const finalizeButton = sale_state.saleRefs.ref_buttonToFinalizeSale
+        const paymentMethodField = sale_state.saleRefs.ref_autocompletePaymentMethod
+        const paymentPlanField = sale_state.saleRefs.ref_autocompletePaymentPlan
+        let unfilledField
+        if (clientField.value === '') unfilledField = clientField
+        else if (documentField.value === '') unfilledField = documentField
+        else if (paymentMethodField.value === '') unfilledField = paymentMethodField
+        else if (paymentPlanField.value === '') unfilledField = paymentPlanField
+        else unfilledField = finalizeButton
+        unfilledField.focus()
     }
 
     // ----------- Button to cancel modifies ------------- //
@@ -63,12 +85,10 @@ const ProductSelectionModal = () => {
     // -------------- Button to check page --------------- //
     const checkPage = () => {
         const productsToRender = productSelectionModal_state.productsToRender
-        const currentProductsToSelect = productSelectionModal_state.productsToSelect
-        const currentProductsToSelectIDs = productSelectionModal_state.productsToSelect
-            .map(product => product._id)
-        const newProductsToSelect = productsToRender
-            .filter(product => !currentProductsToSelectIDs.includes(product._id))
-            .concat(currentProductsToSelect)
+        const productsToSelect = productSelectionModal_state.productsToSelect
+        const productsToSelectIDs = productsToSelect.map(product => product._id)
+        const productsToAdd = productsToRender.filter(product => !productsToSelectIDs.includes(product._id))
+        const newProductsToSelect = [...productsToAdd, ...productsToSelect]
         productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: newProductsToSelect })
     }
 
@@ -119,10 +139,10 @@ const ProductSelectionModal = () => {
 
     // ------------- Button to uncheck page -------------- //
     const uncheckPage = () => {
-         const productsToUncheckIDs = productSelectionModal_state.productsToRender
-            .map(product => product._id)
-        const remainingProducts = productSelectionModal_state.productsToSelect
-            .filter(product => !productsToUncheckIDs.includes(product._id))
+        const productsToRender = productSelectionModal_state.productsToRender
+        const productsToSelect = productSelectionModal_state.productsToSelect
+        const productsToUncheckIDs = productsToRender.map(product => product._id)
+        const remainingProducts = productsToSelect.filter(product => !productsToUncheckIDs.includes(product._id))
         productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: remainingProducts })
     }
 
@@ -319,22 +339,20 @@ const ProductSelectionModal = () => {
     // ---------- Table of selected products ------------- //
     const loadCheckedStateOfProducts = () => {
         const currentSelectedProducts = product_state().params.productos
-        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: currentSelectedProducts })
+        const noCustomProducts = currentSelectedProducts.filter(product => !product._id.startsWith('customProduct_'))
+        productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: noCustomProducts })
     }
 
-    useEffect(() => {
-        loadCheckedStateOfProducts()
-    }, [productSelectionModal_state.visibility])
+    useEffect(() => { loadCheckedStateOfProducts() }, [productSelectionModal_state.visibility])
 
-    const checkProduct = (e, product) => {
+
+    const checkProduct = (product) => {
+        const previousProducts = productSelectionModal_state.productsToSelect
+        const previousProductsIDs = previousProducts.map(previousProduct => previousProduct._id)
+        const newProductWasSelected = previousProductsIDs.includes(product._id)
         let newSelectedProducts
-        if (e.target.checked) {
-            newSelectedProducts = [...productSelectionModal_state.productsToSelect, product]
-        }
-        else {
-            newSelectedProducts = productSelectionModal_state.productsToSelect
-                .filter(currentProduct => currentProduct._id !== product._id)
-        }
+        if (!newProductWasSelected) newSelectedProducts = [...previousProducts, product]
+        else newSelectedProducts = previousProducts.filter(previousProduct => previousProduct._id !== product._id)
         const savedProducts = product_state().params.productos
         newSelectedProducts.map(product => {
             for (let index = 0; index < savedProducts.length; index++) {
@@ -353,6 +371,13 @@ const ProductSelectionModal = () => {
         productSelectionModal_dispatch({ type: 'SET_PRODUCTS_TO_SELECT', payload: newSelectedProducts })
     }
 
+    const onLoadRows = (product) => {
+        const rowsProps = {
+            onClick: e => checkProduct(product)
+        }
+        return rowsProps
+    }
+
     const setPageAndLimit = (page, limit) => {
         const paginationParams = {
             ...productSelectionModal_state.paginationParams,
@@ -365,12 +390,14 @@ const ProductSelectionModal = () => {
         })
     }
 
-    const verifyChecked = (product) => {
-        const currentSelectedProductsIDs = productSelectionModal_state.productsToSelect
-            .map(product => product._id)
-        const isChecked = currentSelectedProductsIDs.includes(product._id)
-        if (isChecked) return true
-        else return false
+    const setClassName = (product) => {
+        const previousProducts = productSelectionModal_state.productsToSelect
+        const previousProductsIDs = previousProducts.map(previousProduct => previousProduct._id)
+        const productIsSelected = previousProductsIDs.includes(product._id)
+        let className
+        if (productIsSelected) className = 'productSelected'
+        else className = 'productNotSelected'
+        return className
     }
 
     const columns = [
@@ -388,24 +415,15 @@ const ProductSelectionModal = () => {
             dataIndex: 'productSelectionModal_barCode',
             render: (_, product) => product.codigoBarras,
             title: 'Codigo de barras'
-        },
-        {
-            dataIndex: 'productSelectionModal_actions',
-            render: (_, product) => (
-                <Checkbox
-                    checked={verifyChecked(product)}
-                    onChange={e => checkProduct(e, product)}
-                />
-            ),
-            title: 'Marcar'
         }
     ]
 
     const tableOfSelectedProducts = (
         <Table
-            width={'100%'}
-            dataSource={productSelectionModal_state.productsToRender}
             columns={columns}
+            dataSource={productSelectionModal_state.productsToRender}
+            loading={productSelectionModal_state.loading}
+            onRow={product => onLoadRows(product)}
             pagination={{
                 defaultCurrent: productSelectionModal_state.paginationParams.page,
                 defaultPageSize: productSelectionModal_state.paginationParams.limit,
@@ -415,10 +433,11 @@ const ProductSelectionModal = () => {
                 showSizeChanger: true,
                 total: productSelectionModal_state.totalProducts
             }}
-            loading={productSelectionModal_state.loading}
+            rowClassName={product => setClassName(product)}
             rowKey='_id'
-            tableLayout='auto'
             size='small'
+            tableLayout='auto'
+            width={'100%'}
         />
     )
 
@@ -432,62 +451,50 @@ const ProductSelectionModal = () => {
     const itemsToRender = [
         {
             element: buttonToCheckPage,
-            name: 'productSelectionModal_buttonToCheckPage',
             order: { lg: 11, md: 11, sm: 12, xl: 11, xs: 12, xxl: 11 }
         },
         {
             element: buttonToClearFilters,
-            name: 'productSelectionModal_buttonToClearFilters',
             order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
         {
             element: buttonToUncheckPage,
-            name: 'productSelectionModal_buttonToUncheckPage',
             order: { lg: 9, md: 9, sm: 11, xl: 9, xs: 11, xxl: 9 }
         },
         {
             element: <InputHidden />,
-            name: 'productSelectionModal_inputHidden1',
             order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
         },
         {
             element: <InputHidden />,
-            name: 'productSelectionModal_inputHidden2',
             order: { lg: 7, md: 7, sm: 10, xl: 7, xs: 10, xxl: 7 }
         },
         {
             element: inputToFilterByBarcode,
-            name: 'productSelectionModal_inputToFilterByBarcode',
             order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
         },
         {
             element: inputToFilterByName,
-            name: 'productSelectionModal_inputToFilterByName',
             order: { lg: 4, md: 4, sm: 5, xl: 4, xs: 5, xxl: 4 }
         },
         {
             element: inputToFilterByProductCode,
-            name: 'productSelectionModal_inputToFilterByProductCode',
             order: { lg: 8, md: 8, sm: 7, xl: 8, xs: 7, xxl: 8 }
         },
         {
             element: selectToFilterByBrand,
-            name: 'productSelectionModal_selectToFilterByBrand',
             order: { lg: 10, md: 10, sm: 8, xl: 10, xs: 8, xxl: 10 }
         },
         {
             element: selectToFilterByType,
-            name: 'productSelectionModal_selectToFilterByType',
             order: { lg: 12, md: 12, sm: 9, xl: 12, xs: 9, xxl: 12 }
         },
         {
             element: titleOfActions,
-            name: 'productSelectionModal_titleOfActions',
             order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
         },
         {
             element: titleOfFilters,
-            name: 'productSelectionModal_titleOfFilters',
             order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 }
         }
     ]
@@ -499,6 +506,7 @@ const ProductSelectionModal = () => {
 
     return (
         <Modal
+            afterClose={redirectFocus}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
@@ -510,10 +518,10 @@ const ProductSelectionModal = () => {
                 justify='space-around'
             >
                 {
-                    itemsToRender.map(item => {
+                    itemsToRender.map((item, index) => {
                         return (
                             <Col
-                                key={item.name}
+                                key={'productSelectionModal_item_' + index}
                                 lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
                                 md={{ order: item.order.md, span: responsiveGrid.span.md }}
                                 sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}

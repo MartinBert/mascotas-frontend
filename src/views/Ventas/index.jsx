@@ -6,7 +6,7 @@ import { errorAlert } from '../../components/alerts'
 import { ProductSelectionModal } from '../../components/generics'
 
 // Design Components
-import { Row, Col, Spin } from 'antd'
+import { Button, Col, Row, Spin } from 'antd'
 
 // Custom Context Providers
 import contexts from '../../contexts'
@@ -28,24 +28,33 @@ const { useSaleContext } = contexts.Sale
 
 const Ventas = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
-    
-    useEffect(() => {
-        const fetchUser = async () => {
-            const userId = localStorage.getItem('userId')
-            const loggedUser = await api.usuarios.findById(userId)
-            sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.empresa })
-            sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.puntoVenta })
-            sale_dispatch({ type: 'SET_USER', payload: loggedUser })
-        }
 
-        const fetchLastVoucherIndex = async () => {
-            const lastIndex = await api.ventas.findLastIndex()
-            sale_dispatch({ type: 'SET_INDEX', payload: lastIndex + 1 })
-        }
+    const loadData = async () => {
 
-        fetchUser()
-        fetchLastVoucherIndex()
-    }, [])
+        // Refs data
+        const refs = {
+            ref_autocompleteClient: sale_state.loadingView ? null : document.getElementById('autocompleteClient'),
+            ref_autocompleteDocument: sale_state.loadingView ? null : document.getElementById('autocompleteDocument'),
+            ref_autocompletePaymentMethod: sale_state.loadingView ? null : document.getElementById('autocompletePaymentMethod'),
+            ref_autocompletePaymentPlan: sale_state.loadingView ? null : document.getElementById('autocompletePaymentPlan'),
+            ref_buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToFinalizeSale')
+        }
+        sale_dispatch({ type: 'SET_REFS', payload: refs })
+
+        // User data
+        const userId = localStorage.getItem('userId')
+        const loggedUser = await api.usuarios.findById(userId)
+        sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.empresa })
+        sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.puntoVenta })
+        sale_dispatch({ type: 'SET_USER', payload: loggedUser })
+
+        // Voucher data
+        const lastIndex = await api.ventas.findLastIndex()
+        sale_dispatch({ type: 'SET_INDEX', payload: lastIndex + 1 })
+
+    }
+
+    useEffect(() => { loadData() }, [])
 
     const checkState = async () => {
         const result = new Promise(resolve => {
@@ -57,6 +66,14 @@ const Ventas = () => {
             resolve('OK')
         })
         return await result
+    }
+
+    const openFinalizeSaleModal = () => {
+        checkState()
+            .then(result => {
+                if (result === 'OK') return sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
+                return errorAlert(result)
+            })
     }
 
     return (
@@ -75,18 +92,13 @@ const Ventas = () => {
                             <Col span={24} style={{ marginTop: '1%' }}>
                                 <Row>
                                     <Col span={6}>
-                                        <button
+                                        <Button
                                             className='btn-primary'
-                                            onClick={() => {
-                                                checkState()
-                                                    .then(result => {
-                                                        if (result === 'OK') return sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
-                                                        return errorAlert(result)
-                                                    })
-                                            }}
+                                            id='buttonToFinalizeSale'
+                                            onClick={openFinalizeSaleModal}
                                         >
                                             Finalizar venta
-                                        </button>
+                                        </Button>
                                     </Col>
                                 </Row>
                             </Col>

@@ -8,15 +8,76 @@ const { decimalPercent, previousInteger, roundToMultiple, roundTwoDecimals } = h
 const { formatToCompleteVoucherNumber } = helpers.afipHelper
 const { localFormat, simpleDateWithHours } = helpers.dateHelper
 
+
+const actions = {
+    //---------------------------------------------- Generics actions of view ----------------------------------------------------------/
+    CLOSE_FISCAL_OPERATION: 'CLOSE_FISCAL_OPERATION',
+    CLOSE_NO_FISCAL_OPERATION: 'CLOSE_NO_FISCAL_OPERATION',
+    HIDE_DISCOUNT_SURCHARGE_MODAL: 'HIDE_DISCOUNT_SURCHARGE_MODAL',
+    HIDE_FINALIZE_SALE_MODAL: 'HIDE_FINALIZE_SALE_MODAL',
+    LOADING_DOCUMENT_INDEX: 'LOADING_DOCUMENT_INDEX',
+    LOADING_VIEW: 'LOADING_VIEW',
+    RESET_STATE: 'RESET_STATE',
+    SET_ALL_CLIENTS: 'SET_ALL_CLIENTS',
+    SET_ALL_DOCUMENTS: 'SET_ALL_DOCUMENTS',
+    SET_ALL_PAYMENT_METHODS: 'SET_ALL_PAYMENT_METHODS',
+    SET_ALL_PAYMENT_PLANS: 'SET_ALL_PAYMENT_PLANS',
+    SET_CLIENT_INPUT: 'SET_CLIENT_INPUT',
+    SET_DOCUMENT_INPUT: 'SET_DOCUMENT_INPUT',
+    SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION',
+    SET_PAYMENT_METHOD_INPUT: 'SET_PAYMENT_METHOD_INPUT',
+    SET_PAYMENT_PLAN_INPUT: 'SET_PAYMENT_PLAN_INPUT',
+    SET_REFS: 'SET_REFS',
+    SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
+    SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
+
+    //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
+    SET_CLIENT: 'SET_CLIENT',
+    SET_COMPANY: 'SET_COMPANY',
+    SET_DATES: 'SET_DATES',
+    SET_DOCUMENT: 'SET_DOCUMENT',
+    SET_FRACTIONED: 'SET_FRACTIONED',
+    SET_GLOBAL_DISCOUNT_PERCENT: 'SET_GLOBAL_DISCOUNT_PERCENT',
+    SET_GLOBAL_SURCHARGE_PERCENT: 'SET_GLOBAL_SURCHARGE_PERCENT',
+    SET_INDEX: 'SET_INDEX',
+    SET_LINE_DISCOUNT_PERCENT: 'SET_LINE_DISCOUNT_PERCENT',
+    SET_LINE_NOTE: 'SET_LINE_NOTE',
+    SET_LINE_QUANTITY: 'SET_LINE_QUANTITY',
+    SET_LINE_SURCHARGE_PERCENT: 'SET_LINE_SURCHARGE_PERCENT',
+    SET_LINES: 'SET_LINES',
+    SET_NET_PRICE: 'SET_NET_PRICE',
+    SET_NET_PRICE_FIXED: 'SET_NET_PRICE_FIXED',
+    SET_PAYMENT_METHOD: 'SET_PAYMENT_METHOD',
+    SET_PAYMENT_PLAN: 'SET_PAYMENT_PLAN',
+    SET_PRODUCTS: 'SET_PRODUCTS',
+    SET_SALE_POINT: 'SET_SALE_POINT',
+    SET_TOTAL: 'SET_TOTAL',
+    SET_USER: 'SET_USER',
+    SET_VOUCHER_NUMBERS: 'SET_VOUCHER_NUMBERS'
+}
+
 const initialState = {
     //----------------------------------------------- Generics state of view -----------------------------------------------------------/
     allClients: [],
     allDocuments: [],
+    clientInput: null,
     discountSurchargeModalOperation: 'discount',
     discountSurchargeModalVisible: false,
+    documentInput: null,
     finalizeSaleModalIsVisible: false,
     loadingDocumentIndex: false,
     loadingView: false,
+    mediosPagoInput: null,
+    mediosPagoToAutocomplete: [],
+    planesPagoInput: null,
+    planesPagoToAutocomplete: [],
+    saleRefs: {
+        ref_autocompleteClient: null,
+        ref_autocompleteDocument: null,
+        ref_autocompletePaymentMethod: null,
+        ref_autocompletePaymentPlan: null,
+        ref_buttonToFinalizeSale: null
+    },
     valueForDatePicker: null,
 
     //------------------------------------------------- State of sale data -------------------------------------------------------------/
@@ -52,13 +113,11 @@ const initialState = {
     iva10: 0,
     iva27: 0,
     mediosPago: [],
-    mediosPagoNombres: null,
-    mediosPagoToAutocomplete: [],
+    mediosPagoNombres: [],
     numeroFactura: null,
     numeroCompletoFactura: null,
     planesPago: [],
-    planesPagoNombres: null,
-    planesPagoToAutocomplete: [],
+    planesPagoNombres: [],
     porcentajeRecargoGlobal: 0,
     porcentajeDescuentoGlobal: 0,
     productos: [],
@@ -73,48 +132,6 @@ const initialState = {
     totalRecargo: 0,
     usuario: null,
     vencimientoCae: null,
-}
-
-const actions = {
-    //---------------------------------------------- Generics actions of view ----------------------------------------------------------/
-    SET_ALL_CLIENTS: 'SET_ALL_CLIENTS',
-    SET_ALL_DOCUMENTS: 'SET_ALL_DOCUMENTS',
-    SET_ALL_PAYMENT_METHODS: 'SET_ALL_PAYMENT_METHODS',
-    SET_ALL_PAYMENT_PLANS: 'SET_ALL_PAYMENT_PLANS',
-    CLOSE_FISCAL_OPERATION: 'CLOSE_FISCAL_OPERATION',
-    CLOSE_NO_FISCAL_OPERATION: 'CLOSE_NO_FISCAL_OPERATION',
-    HIDE_DISCOUNT_SURCHARGE_MODAL: 'HIDE_DISCOUNT_SURCHARGE_MODAL',
-    HIDE_FINALIZE_SALE_MODAL: 'HIDE_FINALIZE_SALE_MODAL',
-    LOADING_DOCUMENT_INDEX: 'LOADING_DOCUMENT_INDEX',
-    LOADING_VIEW: 'LOADING_VIEW',
-    RESET_STATE: 'RESET_STATE',
-    SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION',
-    SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
-    SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
-
-    //------------------------------------------------ Actions of sale data ------------------------------------------------------------/
-    SET_CLIENT: 'SET_CLIENT',
-    SET_COMPANY: 'SET_COMPANY',
-    SET_DATES: 'SET_DATES',
-    SET_DOCUMENT: 'SET_DOCUMENT',
-    SET_FRACTIONED: 'SET_FRACTIONED',
-    SET_GLOBAL_DISCOUNT_PERCENT: 'SET_GLOBAL_DISCOUNT_PERCENT',
-    SET_GLOBAL_SURCHARGE_PERCENT: 'SET_GLOBAL_SURCHARGE_PERCENT',
-    SET_INDEX: 'SET_INDEX',
-    SET_LINE_DISCOUNT_PERCENT: 'SET_LINE_DISCOUNT_PERCENT',
-    SET_LINE_NOTE: 'SET_LINE_NOTE',
-    SET_LINE_SURCHARGE_PERCENT: 'SET_LINE_SURCHARGE_PERCENT',
-    SET_LINE_QUANTITY: 'SET_LINE_QUANTITY',
-    SET_LINES: 'SET_LINES',
-    SET_NET_PRICE: 'SET_NET_PRICE',
-    SET_NET_PRICE_FIXED: 'SET_NET_PRICE_FIXED',
-    SET_PAYMENT_METHOD: 'SET_PAYMENT_METHOD',
-    SET_PAYMENT_PLAN: 'SET_PAYMENT_PLAN',
-    SET_PRODUCTS: 'SET_PRODUCTS',
-    SET_SALE_POINT: 'SET_SALE_POINT',
-    SET_TOTAL: 'SET_TOTAL',
-    SET_USER: 'SET_USER',
-    SET_VOUCHER_NUMBERS: 'SET_VOUCHER_NUMBERS'
 }
 
 const calculateGrossPrice = (line) => {
@@ -238,16 +255,16 @@ const spanQuantity = (line) => {
 
 const updateValues = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice) => {
     if (line.precioNetoFijo) {
-        line.precioUnitario = (line.fraccionar) ? productFractionedPrice : productUnfractionedPrice
+        line.precioUnitario = line.fraccionar ? roundToMultiple(productFractionedPrice, 10) : roundToMultiple(productUnfractionedPrice, 10)
         line.cantidadUnidades = calculateQuantity(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
-        line.precioBruto = calculateGrossPrice(line)
+        line.precioBruto = roundToMultiple(calculateGrossPrice(line), 10)
     } else {
-        line.precioUnitario = (line.fraccionar) ? productFractionedPrice : productUnfractionedPrice
-        line.precioBruto = calculateGrossPrice(line)
-        line.precioNeto = calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago)
+        line.precioUnitario = line.fraccionar ? roundToMultiple(productFractionedPrice, 10) : roundToMultiple(productUnfractionedPrice, 10)
+        line.precioBruto = roundToMultiple(calculateGrossPrice(line), 10)
+        line.precioNeto = roundToMultiple(calculateNetPrice(line, recargoGlobal, descuentoGlobal, porcentajePlanDePago), 10)
     }
-    line.recargo = calculateLineSurcharge(line, recargoGlobal, porcentajePlanDePago)
-    line.descuento = calculateLineDiscount(line, descuentoGlobal, porcentajePlanDePago)
+    line.recargo = roundToMultiple(calculateLineSurcharge(line, recargoGlobal, porcentajePlanDePago), 10)
+    line.descuento = roundToMultiple(calculateLineDiscount(line, descuentoGlobal, porcentajePlanDePago), 10)
     spanQuantity(line)
     return line
 }
@@ -255,6 +272,38 @@ const updateValues = (line, recargoGlobal, descuentoGlobal, porcentajePlanDePago
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         //-------------------------------------------- Generic reducers of view -------------------------------------------------------/
+        case actions.CLOSE_FISCAL_OPERATION:
+            return {
+                ...state,
+                cae: action.payload.CAE,
+                vencimientoCae: action.payload.CAEFchVto,
+                closedSale: true
+            }
+        case actions.CLOSE_NO_FISCAL_OPERATION:
+            return {
+                ...state,
+                closedSale: true
+            }
+        case actions.HIDE_DISCOUNT_SURCHARGE_MODAL:
+            return {
+                ...state,
+                discountSurchargeModalVisible: false
+            }
+        case actions.HIDE_FINALIZE_SALE_MODAL:
+            return {
+                ...state,
+                finalizeSaleModalIsVisible: false
+            }
+        case actions.LOADING_DOCUMENT_INDEX:
+            return {
+                ...state,
+                loadingDocumentIndex: !state.loadingDocumentIndex
+            }
+        case actions.LOADING_VIEW:
+            return {
+                ...state,
+                loadingView: !state.loadingView
+            }
         case actions.SET_ALL_PAYMENT_METHODS:
             return {
                 ...state,
@@ -275,15 +324,15 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 allDocuments: action.payload
             }
-        case actions.SHOW_DISCOUNT_SURCHARGE_MODAL:
+        case actions.SET_CLIENT_INPUT:
             return {
                 ...state,
-                discountSurchargeModalVisible: true
+                clientInput: action.payload
             }
-        case actions.HIDE_DISCOUNT_SURCHARGE_MODAL:
+        case actions.SET_DOCUMENT_INPUT:
             return {
                 ...state,
-                discountSurchargeModalVisible: false
+                documentInput: action.payload
             }
         case actions.SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION:
             const refreshLinesValues = (percentageType, productos) => {
@@ -311,49 +360,99 @@ const reducer = (state = initialState, action) => {
                 renglones: refreshLinesValues(action.payload, state.productos),
                 discountSurchargeModalOperation: action.payload,
             }
+        case actions.SHOW_DISCOUNT_SURCHARGE_MODAL:
+            return {
+                ...state,
+                discountSurchargeModalVisible: true
+            }
         case actions.SHOW_FINALIZE_SALE_MODAL:
             return {
                 ...state,
                 finalizeSaleModalIsVisible: true
             }
-        case actions.HIDE_FINALIZE_SALE_MODAL:
-            return {
-                ...state,
-                finalizeSaleModalIsVisible: false
-            }
-        case actions.CLOSE_FISCAL_OPERATION:
-            return {
-                ...state,
-                cae: action.payload.CAE,
-                vencimientoCae: action.payload.CAEFchVto,
-                closedSale: true
-            }
-        case actions.CLOSE_NO_FISCAL_OPERATION:
-            return {
-                ...state,
-                closedSale: true
-            }
-        case actions.LOADING_DOCUMENT_INDEX:
-            return {
-                ...state,
-                loadingDocumentIndex: !state.loadingDocumentIndex
-            }
-        case actions.LOADING_VIEW:
-            return {
-                ...state,
-                loadingView: !state.loadingView
-            }
 
-        //--------------------------------------------- Reducers of sale data -------------------------------------------------------/
-        case actions.SET_INDEX:
-            return {
-                ...state,
-                indice: action.payload
+        //--------------------------------------------- Reducers of sale data -------------------------------------------------------/       
+        case actions.SET_CLIENT:
+            if (!action.payload) {
+                return {
+                    ...state,
+                    cliente: null,
+                    clienteRazonSocial: null,
+                    clienteDireccion: null,
+                    clienteIdentificador: null,
+                    clienteCondicionIva: null,
+                    clienteDocumentoReceptor: null
+                }
+            } else {
+                return {
+                    ...state,
+                    cliente: action.payload,
+                    clienteRazonSocial: action.payload.razonSocial,
+                    clienteDireccion: action.payload.direccion,
+                    clienteIdentificador: action.payload.cuit,
+                    clienteCondicionIva: action.payload.condicionFiscal.nombre,
+                    clienteDocumentoReceptor: action.payload.documentoReceptor
+                }
             }
-        case actions.SET_USER:
+        case actions.SET_COMPANY:
             return {
                 ...state,
-                usuario: action.payload
+                empresa: action.payload,
+                empresaRazonSocial: action.payload.razonSocial,
+                empresaDireccion: action.payload.direccion,
+                empresaCondicionIva: action.payload.condicionFiscal ? action.payload.condicionFiscal.nombre : null,
+                empresaCuit: action.payload.cuit,
+                empresaIngresosBrutos: action.payload.ingresosBrutos,
+                empresaInicioActividad: action.payload.fechaInicioActividad,
+                empresaLogo: action.payload.logo ? action.payload.logo.url : null
+            }
+        case actions.SET_DATES:
+            return {
+                ...state,
+                valueForDatePicker: dayjs(localFormat(action.payload), 'DD/MM/YYYY'),
+                fechaEmision: action.payload,
+                fechaEmisionString: simpleDateWithHours(action.payload)
+            }
+        case actions.SET_DOCUMENT:
+            if (!action.payload) {
+                return {
+                    ...state,
+                    documento: null,
+                    documentoLetra: null,
+                    documentoFiscal: null,
+                    documentoCodigo: null,
+                    documentoDocumentoReceptor: null
+                }
+            } else {
+                return {
+                    ...state,
+                    documento: action.payload,
+                    documentoLetra: action.payload.letra,
+                    documentoFiscal: action.payload.fiscal,
+                    documentoCodigo: action.payload.codigoUnico,
+                    documentoDocumentoReceptor: action.payload.documentoReceptor
+                }
+            }
+        case actions.SET_FRACTIONED:
+            return {
+                ...state,
+                renglones: state.renglones.map(line => {
+                    const lineProduct = state.productos.find(product => product._id === line._id)
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
+                    const productUnfractionedPrice = lineProduct.precioVenta
+                    const productUnfractionedProfit = lineProduct.gananciaNeta
+                    const productFractionedPrice = lineProduct.precioVentaFraccionado
+                    const productFractionedProfit = lineProduct.gananciaNetaFraccionado / lineProduct.unidadMedida.fraccionamiento
+                    if (line._id === action.payload._id) {
+                        line.fraccionar = action.payload.fraccionar
+                        line.profit = action.payload.fraccionar
+                            ? productFractionedProfit * action.payload.cantidadUnidades
+                            : productUnfractionedProfit * action.payload.cantidadUnidades
+                        if (!action.payload.fraccionar) line.cantidadUnidades = 1
+                    }
+                    updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                    return line
+                })
             }
         case actions.SET_GLOBAL_DISCOUNT_PERCENT:
             return {
@@ -379,6 +478,33 @@ const reducer = (state = initialState, action) => {
                     return line
                 }),
             }
+        case actions.SET_INDEX:
+            return {
+                ...state,
+                indice: action.payload
+            }
+        case actions.SET_LINE_DISCOUNT_PERCENT:
+            return {
+                ...state,
+                renglones: state.renglones.map((line) => {
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                    if (line._id === action.payload._id) {
+                        line.porcentajeDescuentoRenglon = action.payload.porcentajeDescuentoRenglon
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                    }
+                    return line
+                }),
+            }
+        case actions.SET_LINE_NOTE:
+            return {
+                ...state,
+                renglones: state.renglones.map(line => {
+                    if (line._id === action.payload.lineID) line.nota = action.payload.note
+                    return line
+                })
+            }
         case actions.SET_LINE_QUANTITY:
             return {
                 ...state,
@@ -392,6 +518,80 @@ const reducer = (state = initialState, action) => {
                     }
                     return line
                 }),
+            }
+        case actions.SET_LINE_SURCHARGE_PERCENT:
+            return {
+                ...state,
+                renglones: state.renglones.map((line) => {
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
+                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
+                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
+                    if (line._id === action.payload._id) {
+                        line.porcentajeRecargoRenglon = action.payload.porcentajeRecargoRenglon
+                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+                    }
+                    return line
+                }),
+            }
+        case actions.SET_LINES:
+            return {
+                ...state,
+                renglones: action.payload.map(line => {
+                    const isCustomLine = line._id.startsWith('customProduct_')
+                    const unitMeasure_gramsToGrams = (!line.unidadMedida)
+                        ? false
+                        : (
+                            !(((line.unidadMedida.nombre).toLowerCase()).includes('kilo'))
+                            && ((line.unidadMedida.nombre).toLowerCase()).includes(' gramo')
+                        )
+                            ? true
+                            : false
+                    const fractionament = (!line.unidadMedida)
+                        ? 1
+                        : line.unidadMedida.fraccionamiento
+                    const productUnitOfMeasure = (!line.unidadMedida)
+                        ? null
+                        : action.payload.find(item => item._id === line._id).unidadMedida.nombre
+
+                    const linePresent = state.renglones
+                        .filter(renglon => !renglon._id.startsWith('customProduct_'))
+                        .find(renglon => renglon._id === line._id)
+                    if (linePresent) return linePresent
+
+                    const formattedLine = {
+                        _id: line._id,
+                        cantidadAgregadaPorDescuento_enKg: 0,
+                        cantidadg: isCustomLine ? 0 : unitMeasure_gramsToGrams ? fractionament : 0,
+                        cantidadKg: isCustomLine ? 0 : unitMeasure_gramsToGrams ? 0 : (fractionament < 1000) ? fractionament : 1,
+                        cantidadQuitadaPorRecargo_enKg: 0,
+                        cantidadUnidades: 1,
+                        codigoBarras: line.codigoBarras,
+                        descuento: 0,
+                        fraccionamiento: fractionament,
+                        fraccionar: fractionament > 1 ? true : false,
+                        importeIva: line?.ivaVenta ?? 0,
+                        key: line._id,
+                        nombre: line.nombre,
+                        nota: '',
+                        porcentajeDescuentoRenglon: 0,
+                        porcentajeIva: line?.porcentajeIvaVenta ?? 0,
+                        porcentajeRecargoRenglon: 0,
+                        precioBruto: isCustomLine ? line.precioVenta : fractionament ? line.precioVentaFraccionado : line.precioVenta,
+                        precioNeto: isCustomLine ? line.precioVenta : fractionament ? line.precioVentaFraccionado : line.precioVenta,
+                        precioNetoFijo: false,
+                        precioUnitario: isCustomLine ? line.precioVenta : fractionament ? line.precioVentaFraccionado : line.precioVenta,
+                        profit: line.profit ? line.profit : fractionament ? line.gananciaNetaFraccionado : line.gananciaNeta,
+                        recargo: 0,
+                        unidadMedida: productUnitOfMeasure
+                    }
+
+                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
+                    const productUnfractionedPrice = formattedLine.precioUnitario
+                    const productFractionedPrice = formattedLine.precioUnitario
+                    updateValues(formattedLine, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
+
+                    return formattedLine
+                })
             }
         case actions.SET_NET_PRICE:
             return {
@@ -424,206 +624,16 @@ const reducer = (state = initialState, action) => {
                     return line
                 })
             }
-        case actions.SET_LINE_DISCOUNT_PERCENT:
-            return {
-                ...state,
-                renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
-                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                    if (line._id === action.payload._id) {
-                        line.porcentajeDescuentoRenglon = action.payload.porcentajeDescuentoRenglon
-                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
-                    }
-                    return line
-                }),
-            }
-        case actions.SET_LINE_SURCHARGE_PERCENT:
-            return {
-                ...state,
-                renglones: state.renglones.map((line) => {
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-                    const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
-                    const productFractionedPrice = state.productos.find(product => product._id === line._id).precioVentaFraccionado
-                    if (line._id === action.payload._id) {
-                        line.porcentajeRecargoRenglon = action.payload.porcentajeRecargoRenglon
-                        updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
-                    }
-                    return line
-                }),
-            }
-        case actions.SET_LINE_NOTE:
-            return {
-                ...state,
-                renglones: state.renglones.map(line => {
-                    if (line._id === action.payload.lineID) line.nota = action.payload.note
-                    return line
-                })
-            }
-        case actions.SET_LINES:
-            return {
-                ...state,
-                renglones: action.payload.map(line => {
-                    const unitMeasure_gramsToGrams = (!line.unidadMedida)
-                        ? false
-                        : (
-                            !(((line.unidadMedida.nombre).toLowerCase()).includes('kilo'))
-                            && ((line.unidadMedida.nombre).toLowerCase()).includes(' gramo')
-                        )
-                            ? true
-                            : false
-                    const fractionament = (!line.unidadMedida)
-                        ? 1
-                        : line.unidadMedida.fraccionamiento
-                    const productUnitOfMeasure = (!line.unidadMedida)
-                        ? null
-                        : action.payload.find(item => item._id === line._id).unidadMedida.nombre
-
-                    const linePresent = state.renglones
-                        .filter(renglon => !(renglon._id.startsWith('customProduct_')))
-                        .find(renglon => renglon._id === line._id)
-                    if (linePresent) return linePresent
-
-                    const formattedLine = {
-                        _id: line._id,
-                        cantidadAgregadaPorDescuento_enKg: 0,
-                        cantidadg: unitMeasure_gramsToGrams ? fractionament : 0,
-                        cantidadKg: unitMeasure_gramsToGrams ? 0 : (fractionament < 1000) ? fractionament : 1,
-                        cantidadQuitadaPorRecargo_enKg: 0,
-                        cantidadUnidades: 1,
-                        codigoBarras: line.codigoBarras,
-                        descuento: 0,
-                        fraccionamiento: fractionament,
-                        fraccionar: false,
-                        importeIva: line.ivaVenta ? line.ivaVenta : 0,
-                        key: line._id,
-                        nombre: line.nombre,
-                        nota: '',
-                        porcentajeDescuentoRenglon: 0,
-                        porcentajeIva: line.porcentajeIvaVenta ? line.porcentajeIvaVenta : 0,
-                        porcentajeRecargoRenglon: 0,
-                        precioBruto: line.precioVenta,
-                        precioNeto: line.precioVenta,
-                        precioNetoFijo: false,
-                        precioUnitario: line.precioVenta,
-                        profit: line.profit ? line.profit : line.gananciaNeta,
-                        recargo: 0,
-                        unidadMedida: productUnitOfMeasure,
-                    }
-
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-                    const productUnfractionedPrice = formattedLine.precioUnitario
-                    const productFractionedPrice = formattedLine.precioUnitario
-                    updateValues(formattedLine, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
-
-                    return formattedLine
-                })
-            }
-        case actions.SET_FRACTIONED:
-            return {
-                ...state,
-                renglones: state.renglones.map(line => {
-                    const lineProduct = state.productos.find(product => product._id === line._id)
-                    const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-                    const productUnfractionedPrice = lineProduct.precioVenta
-                    const productUnfractionedProfit = lineProduct.gananciaNeta
-                    const productFractionedPrice = lineProduct.precioVentaFraccionado
-                    const productFractionedProfit = lineProduct.gananciaNetaFraccionado / lineProduct.unidadMedida.fraccionamiento
-                    if (line._id === action.payload._id) {
-                        line.fraccionar = action.payload.fraccionar
-                        line.profit = action.payload.fraccionar
-                            ? productFractionedProfit * action.payload.cantidadUnidades
-                            : productUnfractionedProfit * action.payload.cantidadUnidades
-                        if (!action.payload.fraccionar) line.cantidadUnidades = 1
-                    }
-                    updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePago, productUnfractionedPrice, productFractionedPrice)
-                    return line
-                })
-            }
-        case actions.SET_PRODUCTS:
-            return {
-                ...state,
-                productos: action.payload,
-            }
-        case actions.SET_CLIENT:
-            if (!action.payload) {
-                return {
-                    ...state,
-                    cliente: null,
-                    clienteRazonSocial: null,
-                    clienteDireccion: null,
-                    clienteIdentificador: null,
-                    clienteCondicionIva: null,
-                    clienteDocumentoReceptor: null
-                }
-            } else {
-                return {
-                    ...state,
-                    cliente: action.payload,
-                    clienteRazonSocial: action.payload.razonSocial,
-                    clienteDireccion: action.payload.direccion,
-                    clienteIdentificador: action.payload.cuit,
-                    clienteCondicionIva: action.payload.condicionFiscal.nombre,
-                    clienteDocumentoReceptor: action.payload.documentoReceptor
-                }
-            }
-        case actions.SET_DOCUMENT:
-            if (!action.payload) {
-                return {
-                    ...state,
-                    documento: null,
-                    documentoLetra: null,
-                    documentoFiscal: null,
-                    documentoCodigo: null,
-                    documentoDocumentoReceptor: null
-                }
-            } else {
-                return {
-                    ...state,
-                    documento: action.payload,
-                    documentoLetra: action.payload.letra,
-                    documentoFiscal: action.payload.fiscal,
-                    documentoCodigo: action.payload.codigoUnico,
-                    documentoDocumentoReceptor: action.payload.documentoReceptor
-                }
-            }
-        case actions.SET_COMPANY:
-            return {
-                ...state,
-                empresa: action.payload,
-                empresaRazonSocial: action.payload.razonSocial,
-                empresaDireccion: action.payload.direccion,
-                empresaCondicionIva: action.payload.condicionFiscal ? action.payload.condicionFiscal.nombre : null,
-                empresaCuit: action.payload.cuit,
-                empresaIngresosBrutos: action.payload.ingresosBrutos,
-                empresaInicioActividad: action.payload.fechaInicioActividad,
-                empresaLogo: action.payload.logo ? action.payload.logo.url : null
-            }
-        case actions.SET_SALE_POINT:
-            return {
-                ...state,
-                puntoVenta: action.payload,
-                puntoVentaNumero: action.payload.numero,
-                puntoVentaNombre: action.payload.nombre,
-            }
-        case actions.SET_DATES:
-            return {
-                ...state,
-                valueForDatePicker: dayjs(localFormat(action.payload), 'DD/MM/YYYY'),
-                fechaEmision: action.payload,
-                fechaEmisionString: simpleDateWithHours(action.payload)
-            }
-        case actions.SET_VOUCHER_NUMBERS:
-            return {
-                ...state,
-                numeroFactura: action.payload,
-                numeroCompletoFactura: formatToCompleteVoucherNumber(state.puntoVentaNumero, action.payload)
-            }
         case actions.SET_PAYMENT_METHOD:
             return {
                 ...state,
                 mediosPago: action.payload.map(paymentMethod => paymentMethod._id),
                 mediosPagoNombres: action.payload.map(paymentMethod => paymentMethod.nombre)
+            }
+        case actions.SET_PAYMENT_METHOD_INPUT:
+            return {
+                ...state,
+                mediosPagoInput: action.payload,
             }
         case actions.SET_PAYMENT_PLAN:
             const porcentajePlanDePagoSeleccionado = (action.payload.length > 0) ? decimalPercent(action.payload[0].porcentaje) : 0
@@ -637,6 +647,46 @@ const reducer = (state = initialState, action) => {
                     updateValues(line, state.porcentajeRecargoGlobal, state.porcentajeDescuentoGlobal, porcentajePlanDePagoSeleccionado, productUnfractionedPrice, productFractionedPrice)
                     return line
                 })
+            }
+        case actions.SET_PAYMENT_PLAN_INPUT:
+            return {
+                ...state,
+                planesPagoInput: action.payload,
+            }
+        case actions.SET_REFS:
+            return {
+                ...state,
+                saleRefs: {
+                    ...state.saleRefs,
+                    ref_autocompleteClient: action.payload.ref_autocompleteClient,
+                    ref_autocompleteDocument: action.payload.ref_autocompleteDocument,
+                    ref_autocompletePaymentMethod: action.payload.ref_autocompletePaymentMethod,
+                    ref_autocompletePaymentPlan: action.payload.ref_autocompletePaymentPlan,
+                    ref_buttonToFinalizeSale: action.payload.ref_buttonToFinalizeSale
+                }
+            }
+        case actions.SET_PRODUCTS:
+            return {
+                ...state,
+                productos: action.payload,
+            }
+        case actions.SET_SALE_POINT:
+            return {
+                ...state,
+                puntoVenta: action.payload,
+                puntoVentaNumero: action.payload.numero,
+                puntoVentaNombre: action.payload.nombre,
+            }
+        case actions.SET_USER:
+            return {
+                ...state,
+                usuario: action.payload
+            }
+        case actions.SET_VOUCHER_NUMBERS:
+            return {
+                ...state,
+                numeroFactura: action.payload,
+                numeroCompletoFactura: formatToCompleteVoucherNumber(state.puntoVentaNumero, action.payload)
             }
         case actions.SET_TOTAL:
             if (state.renglones.length === 0) {

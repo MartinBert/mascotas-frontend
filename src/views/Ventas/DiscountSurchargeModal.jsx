@@ -16,6 +16,21 @@ const DiscountSurchargeModal = () => {
     const saleContext = useSaleContext()
     const [sale_state, sale_dispatch] = saleContext
 
+    const redirectFocus = () => {
+        const clientField = sale_state.saleRefs.ref_autocompleteClient
+        const documentField = sale_state.saleRefs.ref_autocompleteDocument
+        const finalizeButton = sale_state.saleRefs.ref_buttonToFinalizeSale
+        const paymentMethodField = sale_state.saleRefs.ref_autocompletePaymentMethod
+        const paymentPlanField = sale_state.saleRefs.ref_autocompletePaymentPlan
+        let unfilledField
+        if (clientField.value === '') unfilledField = clientField
+        else if (documentField.value === '') unfilledField = documentField
+        else if (paymentMethodField.value === '') unfilledField = paymentMethodField
+        else if (paymentPlanField.value === '') unfilledField = paymentPlanField
+        else unfilledField = finalizeButton
+        unfilledField.focus()
+    }
+
     const changePercentage = (e) => {
         sale_dispatch({
             type: (sale_state.discountSurchargeModalOperation === 'surcharge')
@@ -51,16 +66,17 @@ const DiscountSurchargeModal = () => {
         sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION', payload: e })
         sale_dispatch({ type: 'SET_TOTAL' })
     }
-    
+
     return (
         <Modal
-            title='Agregar descuento o recargo a la factura'
-            open={sale_state.discountSurchargeModalVisible}
+            afterClose={redirectFocus}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             onOk={() => {
                 sale_dispatch({ type: 'HIDE_DISCOUNT_SURCHARGE_MODAL' })
             }}
+            open={sale_state.discountSurchargeModalVisible}
+            title='Agregar descuento o recargo a la factura'
             width={1200}
         >
             <Row justify='space between' gutter={16}>
@@ -80,7 +96,7 @@ const DiscountSurchargeModal = () => {
                         min={0}
                         onChange={e => changePercentage(e)}
                         placeholder='Ingrese el porcentaje de modificación'
-                        style={{width: '100%'}}
+                        style={{ width: '100%' }}
                         value={
                             sale_state.porcentajeRecargoGlobal > 0
                                 ? sale_state.porcentajeRecargoGlobal
