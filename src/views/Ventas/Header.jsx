@@ -44,20 +44,36 @@ const Header = () => {
     const [, saleProducts_dispatch] = useSaleProductsContext()
 
     // --------------------- Actions --------------------- //
-    const unfilledAutocomplete = () => {
+    const redirectFocus = () => {
         const clientField = sale_state.saleRefs.ref_autocompleteClient
+        const dateField = sale_state.saleRefs.ref_datePicker
         const documentField = sale_state.saleRefs.ref_autocompleteDocument
         const finalizeButton = sale_state.saleRefs.ref_buttonToFinalizeSale
+        const openProductSelectionModalButton = sale_state.saleRefs.ref_buttonToOpenProductSelectionModal
         const paymentMethodField = sale_state.saleRefs.ref_autocompletePaymentMethod
         const paymentPlanField = sale_state.saleRefs.ref_autocompletePaymentPlan
         let unfilledField
-        if (clientField.value === '') unfilledField = clientField
+        if (!sale_state.valueForDatePicker) unfilledField = dateField
+        else if (clientField.value === '') unfilledField = clientField
         else if (documentField.value === '') unfilledField = documentField
         else if (paymentMethodField.value === '') unfilledField = paymentMethodField
         else if (paymentPlanField.value === '') unfilledField = paymentPlanField
+        else if (sale_state.renglones.length === 0) unfilledField = openProductSelectionModalButton
         else unfilledField = finalizeButton
-        return unfilledField
+        if (!unfilledField) return
+        else return unfilledField.focus()
     }
+
+    useEffect(() => { redirectFocus() }, [
+        sale_state.cliente,
+        sale_state.documento,
+        sale_state.fechaEmision,
+        sale_state.mediosPago,
+        sale_state.planesPago,
+        sale_state.porcentajeDescuentoGlobal,
+        sale_state.porcentajeRecargoGlobal,
+        sale_state.renglones.length
+    ])
 
     useEffect(() => {
         const loadNextVoucherNumber = async () => {
@@ -110,7 +126,6 @@ const Header = () => {
         const [client] = findClient.docs
         sale_dispatch({ type: 'SET_CLIENT', payload: client })
         sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: client.razonSocial })
-        unfilledAutocomplete().focus()
     }
 
     const autocompleteClient = (
@@ -156,7 +171,6 @@ const Header = () => {
         const [document] = findDocument.docs
         sale_dispatch({ type: 'SET_DOCUMENT', payload: document })
         sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: document.nombre })
-        unfilledAutocomplete().focus()
     }
 
     const autocompleteDocument = (
@@ -203,7 +217,6 @@ const Header = () => {
         sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: paymentMethod })
         sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: paymentMethod[0].nombre })
         sale_dispatch({ type: 'SET_TOTAL' })
-        unfilledAutocomplete().focus()
     }
 
     const autocompletePaymentMethod = (
@@ -254,7 +267,6 @@ const Header = () => {
         sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: paymentPlan })
         sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: paymentPlan[0].nombre })
         sale_dispatch({ type: 'SET_TOTAL' })
-        unfilledAutocomplete().focus()
     }
 
     const autocompletePaymentPlan = (
@@ -301,10 +313,15 @@ const Header = () => {
 
     // -------- Button to clear global percentage -------- //
     const onClearGlobalPercentage = () => {
+        sale_dispatch({ type: 'SET_FIELD_STATUS', payload: { percentage: null, percentageType: null } })
         sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_PERCENT', payload: 0 })
+        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION', payload: 'discount' })
+        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION_INPUT', payload: 'discount' })
         sale_dispatch({ type: 'SET_GLOBAL_SURCHARGE_PERCENT', payload: 0 })
+        sale_dispatch({ type: 'SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT', payload: '' })
+        sale_dispatch({ type: 'SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT', payload: '' })
         sale_dispatch({ type: 'SET_TOTAL' })
-        unfilledAutocomplete().focus()
+        redirectFocus()
     }
 
     const buttonToClearGlobalPercentage = (
@@ -321,7 +338,7 @@ const Header = () => {
     // ------------ Button to clear products ------------- //
     const onClearProducts = () => {
         saleProducts_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
-        unfilledAutocomplete().focus()
+        redirectFocus()
     }
 
     const buttonToClearProducts = (
@@ -343,6 +360,7 @@ const Header = () => {
     const buttonToOpenProductsSelectionModal = (
         <Button
             className='btn-primary'
+            id='buttonToOpenProductSelectionModal'
             onClick={openProductsSelectionModal}
         >
             Productos
@@ -387,20 +405,19 @@ const Header = () => {
     const changeDate = (e) => {
         if (!e) {
             sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-            unfilledAutocomplete().focus()
         } else {
             if (isItLater(new Date(), e.$d)) {
                 errorAlert('No es conveniente facturar con fecha posterior a hoy.')
                 sale_dispatch({ type: 'SET_DATES', payload: new Date() })
             }
             else sale_dispatch({ type: 'SET_DATES', payload: e.$d })
-            unfilledAutocomplete().focus()
         }
     }
 
     const datePickerForBillingDate = (
         <DatePicker
             format={['DD/MM/YYYY']}
+            id='datePicker'
             onChange={changeDate}
             style={{ width: '100%' }}
             value={sale_state.valueForDatePicker}
@@ -471,34 +488,27 @@ const Header = () => {
 
     return (
         <Col span={24}>
-            <Row>
-                <Col span={24}>
-                    <Row
-                        gutter={[
-                            responsiveGrid.gutter.horizontal,
-                            responsiveGrid.gutter.vertical
-                        ]}
-                        justify='space-around'
-                    >
-                        {
-                            header.map((item, index) => {
-                                return (
-                                    <Col
-                                        key={'saleHeader_itemsToRender_' + index}
-                                        lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
-                                        md={{ order: item.order.md, span: responsiveGrid.span.md }}
-                                        sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
-                                        xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
-                                        xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
-                                        xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
-                                    >
-                                        {item.element}
-                                    </Col>
-                                )
-                            })
-                        }
-                    </Row>
-                </Col>
+            <Row
+                gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}
+                justify='space-around'
+            >
+                {
+                    header.map((item, index) => {
+                        return (
+                            <Col
+                                key={'saleHeader_itemsToRender_' + index}
+                                lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
+                                md={{ order: item.order.md, span: responsiveGrid.span.md }}
+                                sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
+                                xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
+                                xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
+                                xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
+                            >
+                                {item.element}
+                            </Col>
+                        )
+                    })
+                }
             </Row>
             <br />
             <Row>

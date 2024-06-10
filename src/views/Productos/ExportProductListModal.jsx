@@ -24,7 +24,7 @@ const { useAuthContext } = contexts.Auth
 const { useProductsContext } = contexts.Products
 const { useSalesAreasContext } = contexts.SalesAreas
 const { generateExcel } = helpers.excel
-const { roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { createProductsCataloguePdf } = helpers.pdfHelper.productsCatalogue
 
 
@@ -98,49 +98,34 @@ const ExportProductListModal = () => {
     )
 
     // --------- Button to export product list ----------- //
-    const sumSalesAreaPercentage = (param) => {
-        const fixedParam = param
-            - salesAreas_state.selectedSalesArea[0].discountPercentage
-            + salesAreas_state.selectedSalesArea[0].surchargePercentage
-        return fixedParam
-    }
-
-    const addSalesAreaPercentage = (param) => {
-        const fixedParam = param * (1
-            - salesAreas_state.selectedSalesArea[0].discountDecimal
-            + salesAreas_state.selectedSalesArea[0].surchargeDecimal
-        )
-        return roundToMultiple(fixedParam, 10)
-    }
-
-    const calculateSalePricePerUnit = (product) => {
-        const precioVentaFraccionado = addSalesAreaPercentage(product.precioVentaFraccionado)
-        const fraccionamiento = product.unidadMedida.fraccionamiento
-        const salePricePerUnit = (fraccionamiento < 1000)
-            ? precioVentaFraccionado / fraccionamiento
-            : precioVentaFraccionado * 1000 / fraccionamiento
-        const salePricePerUnitFixed = roundToMultiple(salePricePerUnit, 10)
-        return salePricePerUnitFixed
-    }
-
-    const calculateSaleProfit = (product) => {
-        const saleProfit = addSalesAreaPercentage(product.precioVenta)
-            - product.precioUnitario
-            - product.ivaVenta
-        const saleFractionedProfit = addSalesAreaPercentage(product.precioVentaFraccionado)
-            - product.precioUnitario
-            - product.ivaVenta
-        return { saleProfit, saleFractionedProfit }
-    }
-
-    const calculateSaleProfitPerUnit = (product) => {
-        const fraccionamiento = product.unidadMedida.fraccionamiento
-        const gananciaNetaFraccionado = calculateSaleProfit(product).saleFractionedProfit
-        const saleProfitPerUnit = (fraccionamiento < 1000)
-            ? gananciaNetaFraccionado / fraccionamiento
-            : gananciaNetaFraccionado * 1000 / fraccionamiento
-        const saleProfitPerUnitFixed = roundTwoDecimals(saleProfitPerUnit)
-        return saleProfitPerUnitFixed
+    const fixProductValues = (product) => {
+        const fractionament = product.unidadMedida.fraccionamiento
+        const decimalDiscountOfArea = salesAreas_state.selectedSalesArea[0].discountPercentage
+        const decimalSurchargeOfArea = salesAreas_state.selectedSalesArea[0].surchargePercentage
+        const parameter = decimalSurchargeOfArea - decimalDiscountOfArea
+        const margenGanancia = product.margenGanancia + parameter
+        const margenGananciaFraccionado = product.margenGananciaFraccionado + parameter
+        const unfractionedSalePrice = product.precioUnitario * (1 + decimalPercent(margenGanancia)) + product.ivaVenta
+        const fractionedSalePrice = product.precioUnitario * (1 + decimalPercent(margenGananciaFraccionado)) + product.ivaVenta
+        const salePricePerUnit = (fractionament < 1000) ? fractionedSalePrice / fractionament : fractionedSalePrice * 1000 / fractionament
+        const gananciaNeta = unfractionedSalePrice - product.precioUnitario - product.ivaVenta
+        const gananciaNetaFraccionado = fractionedSalePrice - product.precioUnitario - product.ivaVenta
+        const saleProfitPerUnit = (fractionament < 1000)
+            ? gananciaNetaFraccionado / fractionament
+            : gananciaNetaFraccionado * 1000 / fractionament
+        const fixedProduct = {
+            ...product,
+            gananciaNeta,
+            gananciaNetaFraccionado,
+            margenGanancia,
+            margenGananciaFraccionado,
+            precioVenta: roundToMultiple(unfractionedSalePrice, 10),
+            precioVentaFraccionado: roundToMultiple(fractionedSalePrice, 10),
+            salePricePerUnit: roundToMultiple(salePricePerUnit, 10),
+            saleProfitPerUnit: roundTwoDecimals(saleProfitPerUnit)
+        }
+        console.log(fixedProduct)
+        return fixedProduct
     }
 
     const generateHeaders = () => {
@@ -174,14 +159,14 @@ const ExportProductListModal = () => {
             if (headers.includes('Precio de lista ($)')) activeOptions.push(product.precioUnitario ? product.precioUnitario : '-')
             if (headers.includes('% IVA venta')) activeOptions.push(product.porcentajeIvaVenta ? '% ' + product.porcentajeIvaVenta : '-')
             if (headers.includes('IVA venta ($)')) activeOptions.push(product.ivaVenta ? product.ivaVenta : '-')
-            if (headers.includes('% Ganancia')) activeOptions.push(product.margenGanancia ? '% ' + sumSalesAreaPercentage(product.margenGanancia) : '-')
-            if (headers.includes('Precio de venta ($)')) activeOptions.push(product.precioVenta ? addSalesAreaPercentage(product.precioVenta) : '-')
-            if (headers.includes('Ganancia por venta ($)')) activeOptions.push(product.gananciaNeta ? calculateSaleProfit(product).saleProfit : '-')
-            if (headers.includes('% Ganancia fraccionada')) activeOptions.push(product.margenGananciaFraccionado ? '% ' + sumSalesAreaPercentage(product.margenGananciaFraccionado) : '-- Sin fraccionar --')
-            if (headers.includes('Precio de venta fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado ? addSalesAreaPercentage(product.precioVentaFraccionado) : '-- Sin fraccionar --')
-            if (headers.includes('Ganancia venta fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado ? calculateSaleProfit(product).saleFractionedProfit : '-- Sin fraccionar --')
-            if (headers.includes('Precio de venta por unidad fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado && product.unidadMedida ? calculateSalePricePerUnit(product) : '-- Sin fraccionar --')
-            if (headers.includes('Ganancia venta por unidad fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado && product.unidadMedida ? calculateSaleProfitPerUnit(product) : '-- Sin fraccionar --')
+            if (headers.includes('% Ganancia')) activeOptions.push(product.margenGanancia ? '% ' + fixProductValues(product).margenGanancia : '-')
+            if (headers.includes('Precio de venta ($)')) activeOptions.push(product.precioVenta ? fixProductValues(product).precioVenta : '-')
+            if (headers.includes('Ganancia por venta ($)')) activeOptions.push(product.gananciaNeta ? fixProductValues(product).gananciaNeta : '-')
+            if (headers.includes('% Ganancia fraccionada')) activeOptions.push(product.margenGananciaFraccionado ? '% ' + fixProductValues(product).margenGananciaFraccionado : '-- Sin fraccionar --')
+            if (headers.includes('Precio de venta fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado ? fixProductValues(product).precioVentaFraccionado : '-- Sin fraccionar --')
+            if (headers.includes('Ganancia venta fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado ? fixProductValues(product).gananciaNetaFraccionado : '-- Sin fraccionar --')
+            if (headers.includes('Precio de venta por unidad fraccionada ($)')) activeOptions.push(product.precioVentaFraccionado && product.unidadMedida ? fixProductValues(product).salePricePerUnit : '-- Sin fraccionar --')
+            if (headers.includes('Ganancia venta por unidad fraccionada ($)')) activeOptions.push(product.gananciaNetaFraccionado && product.unidadMedida ? fixProductValues(product).saleProfitPerUnit : '-- Sin fraccionar --')
             if (headers.includes('Stock')) activeOptions.push(product.cantidadStock ? product.cantidadStock : '-')
             if (headers.includes('Stock fraccionado')) activeOptions.push(product.cantidadFraccionadaStock ? product.cantidadFraccionadaStock : '-- Sin fraccionar --')
             if (headers.includes('Unidad de medida')) activeOptions.push(product.unidadMedida ? product.unidadMedida.nombre : '-- Sin fraccionar --')
@@ -197,7 +182,7 @@ const ExportProductListModal = () => {
         const nameOfDocument = 'Lista de productos'
         const nameOfSheet = 'Hoja de productos'
         const result = await generateExcel(headers, lines, nameOfSheet, nameOfDocument)
-        return {isCreated: result.isCreated, docType: 'excel'}
+        return { isCreated: result.isCreated, docType: 'excel' }
     }
 
     const exportPdf = async () => {
@@ -209,7 +194,7 @@ const ExportProductListModal = () => {
         const types = products_state.exportProductList.typesForSelect.selectedTypesNames.map(type => type.value)
         const data = { brands, enterprise, headers, lines, salesArea, types }
         const result = await createProductsCataloguePdf(data)
-        return {isCreated: result.isCreated, docType: 'pdf'}
+        return { isCreated: result.isCreated, docType: 'pdf' }
     }
 
     const exportProductList = async () => {

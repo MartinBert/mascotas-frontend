@@ -36,6 +36,7 @@ const fiscalNotesCodes = fiscalVouchersCodes
     .flat(1)
     .filter(code => code !== null)
 
+
 const FinalizeSaleModal = () => {
     const [auth_state, auth_dispatch] = useAuthContext()
     const [sale_state, sale_dispatch] = useSaleContext()
@@ -50,6 +51,20 @@ const FinalizeSaleModal = () => {
     }, [auth_dispatch])
 
     // --------------------- Actions --------------------- //
+    const activateKeyboard = (e) => {
+        if (e.keyCode === 27) {
+            e.preventDefault()
+            cancelSale()
+        } else return
+    }
+
+    const redirectFocusIntoModal = (e) => {
+        if (e) {
+            const buttonToSave = sale_state.saleRefs.ref_buttonToSaveFinalizeSale
+            buttonToSave.focus()
+        } else return
+    }
+
     const reload = () => { return window.location.reload() }
 
     // ----------------- Button to cancel ---------------- //
@@ -76,7 +91,7 @@ const FinalizeSaleModal = () => {
                 errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')
                     .then(() => {
                         sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-                        sale_dispatch({ type: 'LOADING_VIEW' })
+                        sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
                     })
             )
         }
@@ -85,7 +100,7 @@ const FinalizeSaleModal = () => {
 
     const startCloseSale = async () => {
         sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
-        sale_dispatch({ type: 'LOADING_VIEW' })
+        sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
         sale_state.documentoFiscal
             ? closeFiscalOperation()
             : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
@@ -134,7 +149,8 @@ const FinalizeSaleModal = () => {
         })
         sale_state.productos = sale_state.productos
             .filter(product => !(product._id.startsWith('customProduct_')))
-        const response = await api.ventas.save(sale_state)
+        const {saleRefs, ...saleData} = sale_state
+        const response = await api.ventas.save(saleData)
         if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
     }
 
@@ -196,7 +212,9 @@ const FinalizeSaleModal = () => {
 
     const buttonToSave = (
         <Button
+            id='buttonToSaveFinalizeSale'
             onClick={startCloseSale}
+            onKeyUp={activateKeyboard}
             style={{ width: '100%' }}
             className='btn-primary'
         >
@@ -210,8 +228,10 @@ const FinalizeSaleModal = () => {
 
     return (
         <Modal
+            afterOpenChange={redirectFocusIntoModal}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
+            forceRender
             okButtonProps={{ style: { display: 'none' } }}
             open={sale_state.finalizeSaleModalIsVisible}
             width={600}

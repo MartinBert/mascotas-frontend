@@ -46,7 +46,7 @@ const ProductosForm = () => {
         porcentajeIvaVenta: 0,
         ivaCompra: 0,
         ivaVenta: 0,
-        imagenes: null,
+        imagenes: null
     })
     const [loading, setLoading] = useState(true)
     const [selectedBrand, setSelectedBrand] = useState(null)
@@ -520,7 +520,7 @@ const ProductosForm = () => {
                                     ?
                                     <Col span={24} style={{ display: 'flex', marginBottom: '20px' }}>
                                         {product.imagenes.map(imageData => (
-                                            <div style={{ position: 'relative', border: '1px solid', borderRadius: '2px 2px 2px 2px', marginRight: '10px' }} key={imageData._id}>
+                                            <div style={{ position: 'relative', marginRight: '10px' }} key={imageData._id}>
                                                 <div
                                                     style={{
                                                         padding: '3px',
@@ -547,7 +547,7 @@ const ProductosForm = () => {
                                                 >
                                                     <FaTrashAlt color='red' />
                                                 </div>
-                                                <img src={imageData.url} alt='Producto Mascotafeliz' width='100' height='100' />
+                                                <img src={imageData.url} alt='Producto Mascotafeliz' width='100' height='100' crossOrigin='anonymus' />
                                             </div>
                                         ))}
                                     </Col>

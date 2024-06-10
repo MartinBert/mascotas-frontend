@@ -4,6 +4,89 @@ const existsProperty = (object = null, prop = null) => {
     return exists // boolean
 }
 
+const formatVoucherDataToSave = (data) => {
+    const formattedData = {
+        associatedVouchers: !data.associatedVouchers
+            ? []
+            : Array.isArray(data.associatedVouchers)
+                ? data.associatedVouchers
+                : [data.associatedVouchers],
+        baseImponible10: parseFloat(data.baseImponible10),
+        baseImponible21: parseFloat(data.baseImponible21),
+        baseImponible27: parseFloat(data.baseImponible27),
+        buyers: !data.buyers
+            ? []
+            : Array.isArray(data.buyers)
+                ? data.buyers
+                : [data.buyers],
+        cae: data.cae ? data.cae : null,
+        cliente: data.cliente,
+        clienteDireccion: data.clienteDireccion,
+        clienteCondicionIva: data.clienteCondicionIva,
+        clienteDocumentoReceptor: parseInt(data.clienteDocumentoReceptor),
+        clienteIdentificador: data.clienteIdentificador,
+        clienteRazonSocial: data.clienteRazonSocial,
+        condicionVenta: data.condicionVenta[0],
+        documento: data.documento,
+        documentoCodigo: data.documentoCodigo,
+        documentoFiscal: data.documentoFiscal,
+        documentoLetra: data.documentoLetra,
+        empresa: data.empresa,
+        empresaCondicionIva: data.empresaCondicionIva,
+        empresaCuit: data.empresaCuit,
+        empresaDireccion: data.empresaDireccion,
+        empresaIngresosBrutos: data.empresaIngresosBrutos,
+        empresaInicioActividad: data.empresaInicioActividad,
+        empresaLogo: data.empresaLogo,
+        empresaRazonSocial: data.empresaRazonSocial,
+        fechaEmision: data.fechaEmision,
+        fechaEmisionString: data.fechaEmisionString,
+        importeIva: parseFloat(data.importeIva),
+        indice: data.indice,
+        iva: !data.iva
+            ? []
+            : Array.isArray(data.iva)
+                ? data.iva
+                : [data.iva],
+        iva10: parseFloat(data.iva10),
+        iva21: parseFloat(data.iva21),
+        iva27: parseFloat(data.iva27),
+        mediosPago: data.mediosPago,
+        mediosPagoNombres: Array.isArray(data.mediosPagoNombres) ? data.mediosPagoNombres : [data.mediosPagoNombres],
+        numeroFactura: parseInt(data.numeroFactura),
+        numeroCompletoFactura: data.numeroCompletoFactura,
+        optionals: !data.optionals
+            ? []
+            : Array.isArray(data.optionals)
+                ? data.optionals
+                : [data.optionals],
+        planesPago: data.planesPago,
+        planesPagoNombres: Array.isArray(data.planesPagoNombres) ? data.planesPagoNombres : [data.planesPagoNombres],
+        porcentajeDescuentoGlobal: data.porcentajeDescuentoGlobal ? parseFloat(data.porcentajeDescuentoGlobal) : 0,
+        porcentajeRecargoGlobal: data.porcentajeRecargoGlobal ? parseFloat(data.porcentajeRecargoGlobal) : 0,
+        productos: data.productos ? data.productos : [],
+        profit: data.profit ? parseFloat(data.profit) : 0,
+        puntoVenta: data.puntoVenta,
+        puntoVentaNumero: parseInt(data.puntoVentaNumero),
+        puntoVentaNombre: data.puntoVentaNombre,
+        renglones: data.renglones ? data.renglones : [],
+        subTotal: parseFloat(data.subTotal),
+        taxes: !data.taxes
+            ? []
+            : Array.isArray(data.taxes)
+                ? data.taxes
+                : [data.taxes],
+        total: parseFloat(data.total),
+        totalDescuento: data.totalDescuento ? parseFloat(data.totalDescuento) : 0,
+        totalDiferencia: parseFloat(data.totalDiferencia),
+        totalRecargo: data.totalRecargo ? parseFloat(data.totalRecargo) : 0,
+        totalRedondeado: parseFloat(data.totalRedondeado),
+        usuario: data.usuario._id,
+        vencimientoCae: data.vencimientoCae ? data.vencimientoCae : null
+    }
+    return formattedData
+}
+
 // Does not allow empty keys - 'true' is successful validation
 const noEmptyKeys = (obj) => {
     const validation = !Object.values(obj).some(value => (value === ''))
@@ -142,6 +225,7 @@ const spanishVoucherDataToSave = (data) => {
 
 const objHelper = {
     existsProperty,
+    formatVoucherDataToSave,
     noEmptyKeys,
     sortArray,
     spanishVoucherDataToSave

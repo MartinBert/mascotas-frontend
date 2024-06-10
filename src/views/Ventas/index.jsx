@@ -37,7 +37,19 @@ const Ventas = () => {
             ref_autocompleteDocument: sale_state.loadingView ? null : document.getElementById('autocompleteDocument'),
             ref_autocompletePaymentMethod: sale_state.loadingView ? null : document.getElementById('autocompletePaymentMethod'),
             ref_autocompletePaymentPlan: sale_state.loadingView ? null : document.getElementById('autocompletePaymentPlan'),
-            ref_buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToFinalizeSale')
+            ref_buttonToAddCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToAddCustomProduct'),
+            ref_buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToFinalizeSale'),
+            ref_buttonToOpenProductSelectionModal: sale_state.loadingView ? null : document.getElementById('buttonToOpenProductSelectionModal'),
+            ref_buttonToSaveAddedCustomProducts: sale_state.loadingView ? null : document.getElementById('buttonToSaveAddedCustomProducts'),
+            ref_buttonToSaveCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToSaveCustomProduct'),
+            ref_buttonToSaveDiscountSurchargeModal: sale_state.loadingView ? null : document.getElementById('buttonToSaveDiscountSurchargeModal'),
+            ref_buttonToSaveFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToSaveFinalizeSale'),
+            ref_datePicker: sale_state.loadingView ? null : document.getElementById('datePicker'),
+            ref_inputConceptOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputConceptOfCustomProduct'),
+            ref_inputPercentageIVAOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputPercentageIVAOfCustomProduct'),
+            ref_inputPercentageOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('inputPercentageOfDiscountAndSurchargeModal'),
+            ref_inputUnitPriceOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputUnitPriceOfCustomProduct'),
+            ref_selectPercentageTypeOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('selectPercentageTypeOfDiscountAndSurchargeModal')
         }
         sale_dispatch({ type: 'SET_REFS', payload: refs })
 
@@ -82,36 +94,44 @@ const Ventas = () => {
                 sale_state.loadingView
                     ? <Spin />
                     : (
-                        <Row>
-                            <Col span={24}>
-                                <Header />
-                            </Col>
-                            <Col span={24}>
-                                <Lines />
-                            </Col>
-                            <Col span={24} style={{ marginTop: '1%' }}>
-                                <Row>
-                                    <Col span={6}>
-                                        <Button
-                                            className='btn-primary'
-                                            id='buttonToFinalizeSale'
-                                            onClick={openFinalizeSaleModal}
-                                        >
-                                            Finalizar venta
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
+                        <>
+                            {
+                                sale_state.loadingFinalizeSale
+                                    ? <Spin />
+                                    : (
+                                        <Row>
+                                            <Col span={24}>
+                                                <Header />
+                                            </Col>
+                                            <Col span={24}>
+                                                <Lines />
+                                            </Col>
+                                            <Col span={24} style={{ marginTop: '1%' }}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <Button
+                                                            className='btn-primary'
+                                                            id='buttonToFinalizeSale'
+                                                            onClick={openFinalizeSaleModal}
+                                                        >
+                                                            Finalizar venta
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    )
+                            }
+                            <CustomLineModal />
+                            <DiscountSurchargeModal />
+                            <FinalizeSaleModal />
+                            <ListCustomLinesModal />
+                            <ProductSelectionModal />
+                            <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
+                            <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
+                        </>
                     )
             }
-            <CustomLineModal />
-            <DiscountSurchargeModal />
-            <FinalizeSaleModal />
-            <ListCustomLinesModal />
-            <ProductSelectionModal />
-            <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
-            <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
         </>
     )
 }

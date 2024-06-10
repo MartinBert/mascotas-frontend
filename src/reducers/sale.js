@@ -17,16 +17,20 @@ const actions = {
     HIDE_FINALIZE_SALE_MODAL: 'HIDE_FINALIZE_SALE_MODAL',
     LOADING_DOCUMENT_INDEX: 'LOADING_DOCUMENT_INDEX',
     LOADING_VIEW: 'LOADING_VIEW',
-    RESET_STATE: 'RESET_STATE',
     SET_ALL_CLIENTS: 'SET_ALL_CLIENTS',
     SET_ALL_DOCUMENTS: 'SET_ALL_DOCUMENTS',
     SET_ALL_PAYMENT_METHODS: 'SET_ALL_PAYMENT_METHODS',
     SET_ALL_PAYMENT_PLANS: 'SET_ALL_PAYMENT_PLANS',
     SET_CLIENT_INPUT: 'SET_CLIENT_INPUT',
     SET_DOCUMENT_INPUT: 'SET_DOCUMENT_INPUT',
+    SET_FIELD_STATUS: 'SET_FIELD_STATUS',
     SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION',
+    SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION_INPUT: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION_INPUT',
+    SET_LOADING_TO_FINALIZE_SALE: 'SET_LOADING_TO_FINALIZE_SALE',
     SET_PAYMENT_METHOD_INPUT: 'SET_PAYMENT_METHOD_INPUT',
     SET_PAYMENT_PLAN_INPUT: 'SET_PAYMENT_PLAN_INPUT',
+    SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT: 'SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT',
+    SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT: 'SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT',
     SET_REFS: 'SET_REFS',
     SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
     SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
@@ -61,14 +65,23 @@ const initialState = {
     allClients: [],
     allDocuments: [],
     clientInput: null,
-    discountSurchargeModalOperation: 'discount',
+    discountSurchargeModalActiveOption: 'discount',
+    discountSurchargeModalActiveOptionInput: 'discount',
+    discountSurchargeModalOptions: [{ label: 'Descuento', value: 'discount' }, { label: 'Recargo', value: 'surcharge' }],
     discountSurchargeModalVisible: false,
     documentInput: null,
+    fieldStatus: {
+        percentage: null,
+        percentageType: null
+    },
     finalizeSaleModalIsVisible: false,
     loadingDocumentIndex: false,
+    loadingFinalizeSale: false,
     loadingView: false,
     mediosPagoInput: null,
     mediosPagoToAutocomplete: [],
+    percentageOfGlobalDiscountInput: '',
+    percentageOfGlobalSurchargeInput: '',
     planesPagoInput: null,
     planesPagoToAutocomplete: [],
     saleRefs: {
@@ -76,7 +89,18 @@ const initialState = {
         ref_autocompleteDocument: null,
         ref_autocompletePaymentMethod: null,
         ref_autocompletePaymentPlan: null,
-        ref_buttonToFinalizeSale: null
+        ref_buttonToAddCustomProduct: null,
+        ref_buttonToFinalizeSale: null,
+        ref_buttonToOpenProductSelectionModal: null,
+        ref_buttonToSaveAddedCustomProducts: null,
+        ref_buttonToSaveCustomProduct: null,
+        ref_buttonToSaveDiscountSurchargeModal: null,
+        ref_buttonToSaveFinalizeSale: null,
+        ref_inputConceptOfCustomProduct: null,
+        ref_inputPercentageIVAOfCustomProduct: null,
+        ref_inputPercentageOfDiscountAndSurchargeModal: null,
+        ref_inputUnitPriceOfCustomProduct: null,
+        ref_selectPercentageTypeOfDiscountAndSurchargeModal: null
     },
     valueForDatePicker: null,
 
@@ -118,8 +142,8 @@ const initialState = {
     numeroCompletoFactura: null,
     planesPago: [],
     planesPagoNombres: [],
-    porcentajeRecargoGlobal: 0,
     porcentajeDescuentoGlobal: 0,
+    porcentajeRecargoGlobal: 0,
     productos: [],
     profit: 0,
     puntoVenta: null,
@@ -334,6 +358,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 documentInput: action.payload
             }
+        case actions.SET_FIELD_STATUS:
+            return {
+                ...state,
+                fieldStatus: action.payload
+            }
         case actions.SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION:
             const refreshLinesValues = (percentageType, productos) => {
                 const porcentajePlanDePago = (state.planesPago.length > 0) ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
@@ -358,7 +387,17 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 renglones: refreshLinesValues(action.payload, state.productos),
-                discountSurchargeModalOperation: action.payload,
+                discountSurchargeModalActiveOption: action.payload,
+            }
+        case actions.SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION_INPUT:
+            return {
+                ...state,
+                discountSurchargeModalActiveOptionInput: action.payload
+            }
+        case actions.SET_LOADING_TO_FINALIZE_SALE:
+            return {
+                ...state,
+                loadingFinalizeSale: action.payload
             }
         case actions.SHOW_DISCOUNT_SURCHARGE_MODAL:
             return {
@@ -628,6 +667,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 mediosPago: action.payload.map(paymentMethod => paymentMethod._id),
+                mediosPagoInput: null,
                 mediosPagoNombres: action.payload.map(paymentMethod => paymentMethod.nombre)
             }
         case actions.SET_PAYMENT_METHOD_INPUT:
@@ -640,6 +680,8 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 planesPago: action.payload,
+                planesPagoInput: null,
+                planesPagoToAutocomplete: [],
                 planesPagoNombres: action.payload.map(paymentPlan => paymentPlan.nombre),
                 renglones: state.renglones.map(line => {
                     const productUnfractionedPrice = state.productos.find(product => product._id === line._id).precioVenta
@@ -651,7 +693,17 @@ const reducer = (state = initialState, action) => {
         case actions.SET_PAYMENT_PLAN_INPUT:
             return {
                 ...state,
-                planesPagoInput: action.payload,
+                planesPagoInput: action.payload
+            }
+        case actions.SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT:
+            return {
+                ...state,
+                percentageOfGlobalDiscountInput: action.payload
+            }
+        case actions.SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT:
+            return {
+                ...state,
+                percentageOfGlobalSurchargeInput: action.payload
             }
         case actions.SET_REFS:
             return {
@@ -662,20 +714,32 @@ const reducer = (state = initialState, action) => {
                     ref_autocompleteDocument: action.payload.ref_autocompleteDocument,
                     ref_autocompletePaymentMethod: action.payload.ref_autocompletePaymentMethod,
                     ref_autocompletePaymentPlan: action.payload.ref_autocompletePaymentPlan,
-                    ref_buttonToFinalizeSale: action.payload.ref_buttonToFinalizeSale
+                    ref_buttonToAddCustomProduct: action.payload.ref_buttonToAddCustomProduct,
+                    ref_buttonToCancelDiscountSurchargeModal: action.payload.ref_buttonToCancelDiscountSurchargeModal,
+                    ref_buttonToFinalizeSale: action.payload.ref_buttonToFinalizeSale,
+                    ref_buttonToOpenProductSelectionModal: action.payload.ref_buttonToOpenProductSelectionModal,
+                    ref_buttonToSaveAddedCustomProducts: action.payload.ref_buttonToSaveAddedCustomProducts,
+                    ref_buttonToSaveCustomProduct: action.payload.ref_buttonToSaveCustomProduct,
+                    ref_buttonToSaveDiscountSurchargeModal: action.payload.ref_buttonToSaveDiscountSurchargeModal,
+                    ref_buttonToSaveFinalizeSale: action.payload.ref_buttonToSaveFinalizeSale,
+                    ref_inputConceptOfCustomProduct: action.payload.ref_inputConceptOfCustomProduct,
+                    ref_inputPercentageIVAOfCustomProduct: action.payload.ref_inputPercentageIVAOfCustomProduct,
+                    ref_inputPercentageOfDiscountAndSurchargeModal: action.payload.ref_inputPercentageOfDiscountAndSurchargeModal,
+                    ref_inputUnitPriceOfCustomProduct: action.payload.ref_inputUnitPriceOfCustomProduct,
+                    ref_selectPercentageTypeOfDiscountAndSurchargeModal: action.payload.ref_selectPercentageTypeOfDiscountAndSurchargeModal
                 }
             }
         case actions.SET_PRODUCTS:
             return {
                 ...state,
-                productos: action.payload,
+                productos: action.payload
             }
         case actions.SET_SALE_POINT:
             return {
                 ...state,
                 puntoVenta: action.payload,
                 puntoVentaNumero: action.payload.numero,
-                puntoVentaNombre: action.payload.nombre,
+                puntoVentaNombre: action.payload.nombre
             }
         case actions.SET_USER:
             return {

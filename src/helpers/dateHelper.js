@@ -28,7 +28,8 @@ const dateToAfip = (unformattedDate) => {
     const year = date.getFullYear().toString()
     const month = (parseInt(date.getMonth()) + 1).toString()
     const day = date.getDate().toString()
-    return year + twoCharsPattern(month) + twoCharsPattern(day)
+    const dateToReturn = year + twoCharsPattern(month) + twoCharsPattern(day)
+    return dateToReturn
 }
 
 const dateToQrAfip = (unformattedDate) => {
