@@ -135,7 +135,7 @@ const ExportProductListModal = () => {
         return headers
     }
 
-    const processExcelLines = async (headers) => {
+    const formatLines = async (headers) => {
         const processedLines = []
         for await (let product of products_state.exportProductList.productsToExport) {
             const activeOptions = []
@@ -175,7 +175,7 @@ const ExportProductListModal = () => {
 
     const exportExcel = async () => {
         const headers = generateHeaders()
-        const lines = await processExcelLines(headers)
+        const lines = await formatLines(headers)
         const nameOfDocument = 'Lista de productos'
         const nameOfSheet = 'Hoja de productos'
         const result = await generateExcel(headers, lines, nameOfSheet, nameOfDocument)
@@ -186,7 +186,7 @@ const ExportProductListModal = () => {
         const brands = products_state.exportProductList.brandsForSelect.selectedBrandsNames.map(brand => brand.value)
         const enterprise = auth_state.user.empresa
         const headers = generateHeaders()
-        const lines = await processExcelLines(headers)
+        const lines = await formatLines(headers)
         const salesArea = salesAreas_state.selectedSalesAreaName.value
         const types = products_state.exportProductList.typesForSelect.selectedTypesNames.map(type => type.value)
         const data = { brands, enterprise, headers, lines, salesArea, types }

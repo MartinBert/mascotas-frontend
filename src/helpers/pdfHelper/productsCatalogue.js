@@ -75,8 +75,6 @@ const generateHeader = (enterprise, salesArea) => {
 }
 
 const generateBodyWithImages = (lines) => {
-    const orderedLines = sortArray(lines, [1, 2])
-
     const bodyWithImages = `
         <div
             style='
@@ -88,7 +86,7 @@ const generateBodyWithImages = (lines) => {
                 row-gap: 5px;'
         >
             ${
-                orderedLines.map(line => {
+                lines.map(line => {
                     return (`
                         <div
                             style='
@@ -139,8 +137,6 @@ const generateBodyWithImages = (lines) => {
 }
 
 const generateBodyWithoutImages = (headers, lines) => {
-    const orderedLines = sortArray(lines, [1, 2])
-
     const bodyWithoutImages = `
         <div style='${pageMargins} display: block;'>
             <div style='border-bottom: solid 1px; display: flex; width: 100%;'>
@@ -152,7 +148,7 @@ const generateBodyWithoutImages = (headers, lines) => {
                 <div style='${overflowEllipsis} width: 133px;'><i>${headers[5]}</i></div>
             </div>
             <div style='display: block;'>
-                ${orderedLines.map((line, index) => {
+                ${lines.map((line, index) => {
                     return (`
                         <div style='display: flex; width: 100%; ${isPar(index) ? 'background-color: #D2F1F8' : null}'>
                             <div style='${overflowEllipsis} margin-right: 10px; width: 80px;'><i>${line[1]}</i></div>
@@ -198,6 +194,7 @@ const frontPageOfCatalogue = (data) => {
 }
 
 const createProductsCataloguePdf = async (data) => {
+    data.lines = sortArray(data.lines, [1, 2])
     const dataForPdf = []
 
     // Front page
