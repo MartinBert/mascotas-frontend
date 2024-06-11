@@ -131,8 +131,10 @@ const sortArray = (elements, reversedKeysToCompare = null) => {
         for (let index = 0; index < keysToCompare.length; index++) {
             const key = keysToCompare[index]
             elements.sort((a, b) => {
-                if (a[key] > b[key]) return 1
-                else if (a[key] < b[key]) return -1
+                const firstValue = a[key].toLowerCase()
+                const secondValue = b[key].toLowerCase()
+                if (firstValue > secondValue) return 1
+                else if (firstValue < secondValue) return -1
                 else return 0
             })
         }
