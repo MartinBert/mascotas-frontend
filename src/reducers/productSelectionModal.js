@@ -14,10 +14,25 @@ const actions = {
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PRODUCTS_TO_RENDER: 'SET_PRODUCTS_TO_RENDER',
     SET_PRODUCTS_TO_SELECT: 'SET_PRODUCTS_TO_SELECT',
+    SET_REFS: 'SET_REFS',
     SHOW_PRODUCT_MODAL: 'SHOW_PRODUCT_MODAL'
 }
 
 const initialState = {
+    refs: {
+        buttonToCancel: null,
+        buttonToCheckPage: null,
+        buttonToRestartFilters: null,
+        buttonToSave: null,
+        buttonToUncheckPage: null,
+        inputToFilterByBarcode: null,
+        inputToFilterbyName: null,
+        inputToFilterByProductCode: null,
+        selectToFilterByBrands: null,
+        selectToFilterByTypes: null,
+        titleOfActions: null,
+        titleOfFilters: null
+    },
     brandsForSelect: {
         allBrands: [],
         allBrandsNames: [],
@@ -228,6 +243,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 productsToSelect: action.payload
+            }
+        case actions.SET_REFS:
+            return {
+                ...state,
+                refs: action.payload
             }
         case actions.SHOW_PRODUCT_MODAL:
             return {

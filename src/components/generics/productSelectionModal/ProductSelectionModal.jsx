@@ -30,8 +30,60 @@ const ProductSelectionModal = () => {
     const [entries_state, entries_dispatch] = useEntriesContext()
     const [outputs_state, outputs_dispatch] = useOutputsContext()
     const [productSelectionModal_state, productSelectionModal_dispatch] = useProductSelectionModalContext()
-    const [sale_state, sale_dispatch] = useSaleContext()
+    const [sale_state] = useSaleContext()
     const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
+
+    // ------------------- Load refs --------------------- //
+    const loadRefs = () => {
+        if (!productSelectionModal_state.visibility) return
+        const refs = {
+            buttonToCancel: document.getElementById('buttonToCancel'),
+            buttonToCheckPage: document.getElementById('buttonToCheckPage'),
+            buttonToRestartFilters: document.getElementById('buttonToRestartFilters'),
+            buttonToSave: document.getElementById('buttonToSave'),
+            buttonToUncheckPage: document.getElementById('buttonToUncheckPage'),
+            inputToFilterByBarcode: document.getElementById('inputToFilterByBarcode'),
+            inputToFilterByName: document.getElementById('inputToFilterByName'),
+            inputToFilterByProductCode: document.getElementById('inputToFilterByProductCode'),
+            selectToFilterByBrands: document.getElementById('selectToFilterByBrands'),
+            selectToFilterByTypes: document.getElementById('selectToFilterByTypes'),
+            titleOfActions: document.getElementById('titleOfActions'),
+            titleOfFilters: document.getElementById('titleOfFilters')
+        }
+        productSelectionModal_dispatch({ type: 'SET_REFS', payload: refs })
+    }
+
+    useEffect(() => { loadRefs() }, [productSelectionModal_state.visibility])
+
+    const validateFocus = () => {
+        let correctLocation
+        if (location.pathname.includes('entradas')) correctLocation = false
+        else if (location.pathname.includes('salidas')) correctLocation = false
+        else if (!location.pathname.includes('venta')) correctLocation = false
+        else correctLocation = true
+        const refs = {
+            autocompleteClient: sale_state.saleRefs.ref_autocompleteClient,
+            autocompleteDocument: sale_state.saleRefs.ref_autocompleteDocument,
+            autocompletePaymentMethod: sale_state.saleRefs.ref_autocompletePaymentMethod,
+            autocompletePaymentPlan: sale_state.saleRefs.ref_autocompletePaymentPlan,
+            buttonToCancel: productSelectionModal_state.refs.buttonToCancel,
+            buttonToCheckPage: productSelectionModal_state.refs.buttonToCheckPage,
+            buttonToFinalizeSale: sale_state.saleRefs.ref_buttonToFinalizeSale,
+            buttonToRestartFilters: productSelectionModal_state.refs.buttonToRestartFilters,
+            buttonToSave: productSelectionModal_state.refs.buttonToSave,
+            buttonToUncheckPage: productSelectionModal_state.refs.buttonToUncheckPage,
+            inputToFilterByBarcode: productSelectionModal_state.refs.inputToFilterByBarcode,
+            inputToFilterByName: productSelectionModal_state.refs.inputToFilterByName,
+            inputToFilterByProductCode: productSelectionModal_state.refs.inputToFilterByProductCode,
+            selectToFilterByBrands: productSelectionModal_state.refs.selectToFilterByBrands,
+            selectToFilterByTypes: productSelectionModal_state.refs.selectToFilterByTypes,
+            titleOfActions: productSelectionModal_state.refs.titleOfActions,
+            titleOfFilters: productSelectionModal_state.refs.titleOfFilters
+        }
+        const existsRefs = !Object.values(refs).includes(null)
+        const data = { correctLocation, existsRefs, refs }
+        return data
+    }
 
     // ----------- Redirect to correct state ------------- //
     const product_dispatch = (action) => {
@@ -47,21 +99,22 @@ const ProductSelectionModal = () => {
     }
 
     // ----------------- Redirect focus ------------------ //
-    const redirectFocus = () => {
-        if (location.pathname.includes('entradas')) return
-        if (location.pathname.includes('salidas')) return
-        if (!location.pathname.includes('venta')) return
-        const clientField = sale_state.saleRefs.ref_autocompleteClient
-        const documentField = sale_state.saleRefs.ref_autocompleteDocument
-        const finalizeButton = sale_state.saleRefs.ref_buttonToFinalizeSale
-        const paymentMethodField = sale_state.saleRefs.ref_autocompletePaymentMethod
-        const paymentPlanField = sale_state.saleRefs.ref_autocompletePaymentPlan
+    const setFocus = (e) => { // e: true when modal is open, false when is close
+        const { correctLocation, existsRefs, refs } = validateFocus()
+        if (!correctLocation || !existsRefs) return
         let unfilledField
-        if (clientField.value === '') unfilledField = clientField
-        else if (documentField.value === '') unfilledField = documentField
-        else if (paymentMethodField.value === '') unfilledField = paymentMethodField
-        else if (paymentPlanField.value === '') unfilledField = paymentPlanField
-        else unfilledField = finalizeButton
+        if (e) {
+            if (refs.inputToFilterByName.value === '') unfilledField = refs.inputToFilterByName
+            else if (refs.inputToFilterByBarcode.value === '') unfilledField = refs.inputToFilterByBarcode
+            else if (refs.inputToFilterByProductCode.value === '') unfilledField = refs.inputToFilterByProductCode
+            else unfilledField = refs.buttonToSave
+        } else {
+            if (refs.autocompleteClient.value === '') unfilledField = refs.autocompleteClient
+            else if (refs.autocompleteDocument.value === '') unfilledField = refs.autocompleteDocument
+            else if (refs.autocompletePaymentMethod.value === '') unfilledField = refs.autocompletePaymentMethod
+            else if (refs.autocompletePaymentPlan.value === '') unfilledField = refs.autocompletePaymentPlan
+            else unfilledField = refs.buttonToFinalizeSale
+        }
         unfilledField.focus()
     }
 
@@ -70,10 +123,11 @@ const ProductSelectionModal = () => {
         productSelectionModal_dispatch({ type: 'CLEAR_MODIFIES' })
     }
 
-    const buttonToCancelModifies = (
+    const buttonToCancel = (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Button
                 className='btn-secondary'
+                id='buttonToCancel'
                 onClick={cancelModifies}
                 style={{ width: '50%' }}
             >
@@ -95,6 +149,7 @@ const ProductSelectionModal = () => {
     const buttonToCheckPage = (
         <Button
             className='btn-primary'
+            id='buttonToCheckPage'
             onClick={checkPage}
             style={{ width: '100%' }}
         >
@@ -107,14 +162,15 @@ const ProductSelectionModal = () => {
         productSelectionModal_dispatch({ type: 'CLEAR_FILTERS' })
     }
 
-    const buttonToClearFilters = (
+    const buttonToRestartFilters = (
         <Button
             danger
+            id='buttonToRestartFilters'
             onClick={clearFilters}
             style={{ width: '100%' }}
             type='primary'
         >
-            Limpiar filtros
+            Reiniciar filtros
         </Button>
     )
 
@@ -125,10 +181,11 @@ const ProductSelectionModal = () => {
         productSelectionModal_dispatch({ type: 'CLEAR_MODIFIES' })
     }
 
-    const buttonToSaveProducts = (
+    const buttonToSave = (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Button
                 className='btn-primary'
+                id='buttonToSave'
                 onClick={saveProducts}
                 style={{ width: '50%' }}
             >
@@ -149,6 +206,7 @@ const ProductSelectionModal = () => {
     const buttonToUncheckPage = (
         <Button
             className='btn-secondary'
+            id='buttonToUncheckPage'
             onClick={uncheckPage}
             style={{ width: '100%' }}
         >
@@ -202,7 +260,7 @@ const ProductSelectionModal = () => {
     const inputToFilterByBarcode = (
         <Input
             color='primary'
-            name='codigoBarras'
+            id='inputToFilterByBarcode'
             onChange={onChangeBarCode}
             placeholder='Buscar por código de barras'
             style={{ width: '100%' }}
@@ -239,9 +297,10 @@ const ProductSelectionModal = () => {
         else productSelectionModal_dispatch({ type: 'DESELECT_ALL_BRANDS' })
     }
 
-    const selectToFilterByBrand = (
+    const selectToFilterByBrands = (
         <Select
             allowClear
+            id='selectToFilterByBrands'
             labelInValue
             mode='multiple'
             onChange={changeBrands}
@@ -265,7 +324,7 @@ const ProductSelectionModal = () => {
     const inputToFilterByName = (
         <Input
             color='primary'
-            name='nombre'
+            id='inputToFilterByName'
             onChange={onChangeName}
             placeholder='Buscar por nombre'
             style={{ width: '100%' }}
@@ -286,7 +345,7 @@ const ProductSelectionModal = () => {
     const inputToFilterByProductCode = (
         <Input
             color='primary'
-            name='codigoProducto'
+            id='inputToFilterByProductCode'
             onChange={onChangeProductCode}
             placeholder='Buscar por código de producto'
             style={{ width: '100%' }}
@@ -323,9 +382,10 @@ const ProductSelectionModal = () => {
         else productSelectionModal_dispatch({ type: 'DESELECT_ALL_TYPES' })
     }
 
-    const selectToFilterByType = (
+    const selectToFilterByTypes = (
         <Select
             allowClear
+            id='selectToFilterByTypes'
             labelInValue
             mode='multiple'
             onChange={changeTypes}
@@ -442,60 +502,72 @@ const ProductSelectionModal = () => {
     )
 
     // --------------- Title of actions ------------------ //
-    const titleOfActions = <h3>Acciones</h3>
+    const titleOfActions = <h3 id='titleOfActions'>Acciones</h3>
 
     // --------------- Title of filters ------------------ //
-    const titleOfFilters = <h3>Filtrar productos</h3>
+    const titleOfFilters = <h3 id='titleOfFilters'>Filtrar productos</h3>
 
 
     const itemsToRender = [
         {
             element: buttonToCheckPage,
-            order: { lg: 11, md: 11, sm: 12, xl: 11, xs: 12, xxl: 11 }
+            order: { lg: 11, md: 11, sm: 12, xl: 11, xs: 12, xxl: 11 },
+            render: productSelectionModal_state.refs.buttonToCheckPage ? true : false
         },
         {
-            element: buttonToClearFilters,
-            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
+            element: buttonToRestartFilters,
+            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 },
+            render: productSelectionModal_state.refs.buttonToRestartFilters ? true : false
         },
         {
             element: buttonToUncheckPage,
-            order: { lg: 9, md: 9, sm: 11, xl: 9, xs: 11, xxl: 9 }
+            order: { lg: 9, md: 9, sm: 11, xl: 9, xs: 11, xxl: 9 },
+            render: productSelectionModal_state.refs.buttonToUncheckPage ? true : false
         },
         {
             element: <InputHidden />,
-            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
+            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 },
+            render: productSelectionModal_state.refs.buttonToCheckPage ? true : false
         },
         {
             element: <InputHidden />,
-            order: { lg: 7, md: 7, sm: 10, xl: 7, xs: 10, xxl: 7 }
+            order: { lg: 7, md: 7, sm: 10, xl: 7, xs: 10, xxl: 7 },
+            render: productSelectionModal_state.refs.buttonToCheckPage ? true : false
         },
         {
             element: inputToFilterByBarcode,
-            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 }
+            order: { lg: 6, md: 6, sm: 6, xl: 6, xs: 6, xxl: 6 },
+            render: productSelectionModal_state.refs.inputToFilterByBarcode ? true : false
         },
         {
             element: inputToFilterByName,
-            order: { lg: 4, md: 4, sm: 5, xl: 4, xs: 5, xxl: 4 }
+            order: { lg: 4, md: 4, sm: 5, xl: 4, xs: 5, xxl: 4 },
+            render: productSelectionModal_state.refs.inputToFilterByName ? true : false
         },
         {
             element: inputToFilterByProductCode,
-            order: { lg: 8, md: 8, sm: 7, xl: 8, xs: 7, xxl: 8 }
+            order: { lg: 8, md: 8, sm: 7, xl: 8, xs: 7, xxl: 8 },
+            render: productSelectionModal_state.refs.inputToFilterByProductCode ? true : false
         },
         {
-            element: selectToFilterByBrand,
-            order: { lg: 10, md: 10, sm: 8, xl: 10, xs: 8, xxl: 10 }
+            element: selectToFilterByBrands,
+            order: { lg: 10, md: 10, sm: 8, xl: 10, xs: 8, xxl: 10 },
+            render: productSelectionModal_state.refs.selectToFilterByBrands ? true : false
         },
         {
-            element: selectToFilterByType,
-            order: { lg: 12, md: 12, sm: 9, xl: 12, xs: 9, xxl: 12 }
+            element: selectToFilterByTypes,
+            order: { lg: 12, md: 12, sm: 9, xl: 12, xs: 9, xxl: 12 },
+            render: productSelectionModal_state.refs.selectToFilterByTypes ? true : false
         },
         {
             element: titleOfActions,
-            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 },
+            render: productSelectionModal_state.refs.titleOfActions ? true : false
         },
         {
             element: titleOfFilters,
-            order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 }
+            order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 },
+            render: productSelectionModal_state.refs.titleOfFilters ? true : false
         }
     ]
 
@@ -506,7 +578,7 @@ const ProductSelectionModal = () => {
 
     return (
         <Modal
-            afterClose={redirectFocus}
+            afterOpenChange={setFocus}
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
@@ -518,21 +590,23 @@ const ProductSelectionModal = () => {
                 justify='space-around'
             >
                 {
-                    itemsToRender.map((item, index) => {
-                        return (
-                            <Col
-                                key={'productSelectionModal_item_' + index}
-                                lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
-                                md={{ order: item.order.md, span: responsiveGrid.span.md }}
-                                sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
-                                xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
-                                xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
-                                xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
-                            >
-                                {item.element}
-                            </Col>
-                        )
-                    })
+                    itemsToRender
+                        // .filter(item => item.render)
+                        .map((item, index) => {
+                            return (
+                                <Col
+                                    key={'productSelectionModal_item_' + index}
+                                    lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
+                                    md={{ order: item.order.md, span: responsiveGrid.span.md }}
+                                    sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
+                                    xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
+                                    xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
+                                    xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
+                                >
+                                    {item.element}
+                                </Col>
+                            )
+                        })
                 }
             </Row>
             <br />
@@ -546,10 +620,10 @@ const ProductSelectionModal = () => {
                 justify='space-around'
             >
                 <Col span={8}>
-                    {buttonToCancelModifies}
+                    {buttonToCancel}
                 </Col>
                 <Col span={8}>
-                    {buttonToSaveProducts}
+                    {buttonToSave}
                 </Col>
             </Row>
         </Modal>

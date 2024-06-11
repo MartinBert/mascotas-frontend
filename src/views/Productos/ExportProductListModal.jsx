@@ -99,7 +99,7 @@ const ExportProductListModal = () => {
 
     // --------- Button to export product list ----------- //
     const fixProductValues = (product) => {
-        const fractionament = product.unidadMedida.fraccionamiento
+        const fractionament = product.unidadMedida?.fraccionamiento ?? 1
         const decimalDiscountOfArea = salesAreas_state.selectedSalesArea[0].discountPercentage
         const decimalSurchargeOfArea = salesAreas_state.selectedSalesArea[0].surchargePercentage
         const parameter = decimalSurchargeOfArea - decimalDiscountOfArea
@@ -110,9 +110,7 @@ const ExportProductListModal = () => {
         const salePricePerUnit = (fractionament < 1000) ? fractionedSalePrice / fractionament : fractionedSalePrice * 1000 / fractionament
         const gananciaNeta = unfractionedSalePrice - product.precioUnitario - product.ivaVenta
         const gananciaNetaFraccionado = fractionedSalePrice - product.precioUnitario - product.ivaVenta
-        const saleProfitPerUnit = (fractionament < 1000)
-            ? gananciaNetaFraccionado / fractionament
-            : gananciaNetaFraccionado * 1000 / fractionament
+        const saleProfitPerUnit = (fractionament < 1000) ? gananciaNetaFraccionado / fractionament : gananciaNetaFraccionado * 1000 / fractionament
         const fixedProduct = {
             ...product,
             gananciaNeta,
@@ -124,7 +122,6 @@ const ExportProductListModal = () => {
             salePricePerUnit: roundToMultiple(salePricePerUnit, 10),
             saleProfitPerUnit: roundTwoDecimals(saleProfitPerUnit)
         }
-        console.log(fixedProduct)
         return fixedProduct
     }
 
