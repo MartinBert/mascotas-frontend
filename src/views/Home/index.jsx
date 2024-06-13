@@ -254,11 +254,11 @@ const Home = () => {
             const product = products[index]
             const productFixed = {
                 ...product,
-                normalizedBarcode: normalizeString(product.codigoBarras),
-                normalizedBrand: normalizeString(product.marca.nombre),
-                normalizedName: normalizeString(product.nombre),
-                normalizedProductCode: normalizeString(product.codigoProducto),
-                normalizedType: normalizeString(product.rubro.nombre)
+                normalizedBarcode: product.codigoBarras ? normalizeString(product.codigoBarras) : null,
+                normalizedBrand: product.marca.nombre ? normalizeString(product.marca.nombre) : null,
+                normalizedName: product.nombre ? normalizeString(product.nombre) : null,
+                normalizedProductCode: product.codigoProducto ? normalizeString(product.codigoProducto) : null,
+                normalizedType: product.rubro.nombre ? normalizeString(product.rubro.nombre) : null
             }
             await api.productos.edit(productFixed)
         }
@@ -301,7 +301,7 @@ const Home = () => {
     }
 
 
-    const testRenderElementDisplay = 'none'
+    const testRenderElementDisplay = 'block'
 
     return (
         <>
