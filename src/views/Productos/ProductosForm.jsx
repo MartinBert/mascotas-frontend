@@ -1,6 +1,6 @@
 // React Components and Hooks
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { FaTrashAlt } from 'react-icons/fa'
 
 // Custom Components
@@ -25,8 +25,9 @@ const { normalizeString } = helpers.stringHelper
 
 
 const ProductosForm = () => {
+    const location = useLocation()
+    const id = location.pathname.substring(11)
     const navigate = useNavigate()
-    const { id } = useParams()
     const [product, setProduct] = useState({
         nombre: '',
         codigoProducto: '',
@@ -60,7 +61,7 @@ const ProductosForm = () => {
     const [selectedMeasure, setSelectedMeasure] = useState(null)
     const [uploadedImages, setUploadedImages] = useState([])
 
-    const fetchProductById = async (id) => {
+    const fetchProductById = async () => {
         if (id === 'nuevo') return setLoading(false)
         const response = await api.productos.findById(id)
         const product = response.data
