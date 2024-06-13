@@ -255,10 +255,10 @@ const Home = () => {
             const productFixed = {
                 ...product,
                 normalizedBarcode: product.codigoBarras ? normalizeString(product.codigoBarras) : null,
-                normalizedBrand: product.marca.nombre ? normalizeString(product.marca.nombre) : null,
+                normalizedBrand: product.marca ? normalizeString(product.marca.nombre) : null,
                 normalizedName: product.nombre ? normalizeString(product.nombre) : null,
                 normalizedProductCode: product.codigoProducto ? normalizeString(product.codigoProducto) : null,
-                normalizedType: product.rubro.nombre ? normalizeString(product.rubro.nombre) : null
+                normalizedType: product.rubro ? normalizeString(product.rubro.nombre) : null
             }
             await api.productos.edit(productFixed)
         }
