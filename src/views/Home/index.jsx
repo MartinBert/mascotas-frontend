@@ -300,6 +300,15 @@ const Home = () => {
         console.log(stockHistory)
     }
 
+    const showDataWithoutBrandOrType = async () => {
+        const findAllProducts = await api.productos.findAll()
+        const allProducts = findAllProducts.docs
+        const productsWithoutBrandOrType = allProducts.filter(product =>
+            !product.marca || !product.rubro
+        )
+        console.log(productsWithoutBrandOrType)
+    }
+    
 
     const testRenderElementDisplay = 'block'
 
@@ -332,6 +341,13 @@ const Home = () => {
                 style={{ display: testRenderElementDisplay }}
             >
                 Mostrar datos en consola
+            </button>
+            <hr style={{ display: testRenderElementDisplay }} />
+            <button
+                onClick={showDataWithoutBrandOrType}
+                style={{ display: testRenderElementDisplay }}
+            >
+                Mostrar productos con marca o rubro sin nombre en consola
             </button>
         </>
     )
