@@ -24,6 +24,44 @@ const Lines = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
     const [saleProducts_state, saleProducts_dispatch] = useSaleProductsContext()
 
+    const validateFocus = () => {
+        const refs = {
+            autocompleteClient: sale_state.refs.autocompleteClient,
+            autocompleteDocument: sale_state.refs.autocompleteDocument,
+            autocompletePaymentMethod: sale_state.refs.autocompletePaymentMethod,
+            autocompletePaymentPlan: sale_state.refs.autocompletePaymentPlan,
+            buttonToFinalizeSale: sale_state.refs.buttonToFinalizeSale,
+            datePicker: sale_state.refs.datePicker,
+            selectToAddProductByBarcode: sale_state.refs.selectToAddProductByBarcode,
+            selectToAddProductByName: sale_state.refs.selectToAddProductByName,
+            selectToAddProductByProductCode: sale_state.refs.selectToAddProductByProductCode
+        }
+        const existsRefs = !Object.values(refs).includes(null)
+        const data = { existsRefs, refs }
+        return data
+    }
+
+    const setFocus = () => {
+        const { existsRefs, refs } = validateFocus()
+        if (!existsRefs) return
+        let unfilledField
+        if (!sale_state.valueForDatePicker) unfilledField = refs.datePicker
+        else if (refs.autocompleteClient.value === '') unfilledField = refs.autocompleteClient
+        else if (refs.autocompleteDocument.value === '') unfilledField = refs.autocompleteDocument
+        else if (refs.autocompletePaymentMethod.value === '') unfilledField = refs.autocompletePaymentMethod
+        else if (refs.autocompletePaymentPlan.value === '') unfilledField = refs.autocompletePaymentPlan
+        else if (sale_state.renglones.length === 0) unfilledField = refs.selectToAddProductByName
+        else unfilledField = refs.buttonToFinalizeSale
+        unfilledField.focus()
+    }
+
+    const setFocusWhenPressingEsc = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            setFocus()
+        } else return
+    }
+
     const deleteProduct = (line) => {
         saleProducts_dispatch({ type: 'DELETE_PRODUCTS', payload: [line] })
     }
@@ -108,6 +146,7 @@ const Lines = () => {
                     checked={line.fraccionar === true ? true : false}
                     disabled={line._id.startsWith('customProduct_')}
                     onChange={e => onChangeFractionateCheckbox(e, line)}
+                    onKeyUp={setFocusWhenPressingEsc}
                 />
             ),
             title: 'Fracc.'
@@ -131,6 +170,7 @@ const Lines = () => {
                                 disabled={line.precioNetoFijo === true ? true : false}
                                 value={line.fraccionar === true ? round(line.cantidadUnidades) : roundTwoDecimals(line.cantidadUnidades)}
                                 onChange={e => onChangeLineQuantity(e, line)}
+                                onKeyUp={setFocusWhenPressingEsc}
                             />
                         </Col>
                         {
@@ -155,6 +195,7 @@ const Lines = () => {
                 <Input
                     color='primary'
                     type='number'
+                    onKeyUp={setFocusWhenPressingEsc}
                     placeholder='Prec. U.'
                     value={line.cantidadUnidades > 0 ? line.precioUnitario : 0}
                     disabled={true}
@@ -172,6 +213,7 @@ const Lines = () => {
                     value={line.porcentajeDescuentoRenglon}
                     disabled={line.porcentajeRecargoRenglon > 0}
                     onChange={e => onChangeDiscountPercent(e, line)}
+                    onKeyUp={setFocusWhenPressingEsc}
                 />
             ),
             title: '% Descuento'
@@ -182,6 +224,7 @@ const Lines = () => {
                 <Input
                     color='primary'
                     type='number'
+                    onKeyUp={setFocusWhenPressingEsc}
                     placeholder='Porc. recargo'
                     value={line.porcentajeRecargoRenglon}
                     disabled={line.porcentajeDescuentoRenglon > 0}
@@ -208,7 +251,10 @@ const Lines = () => {
             render: (_, line) => (
                 <Row align='middle'>
                     <Col span={3}>
-                        <Checkbox onChange={e => onChangeFixedNetPriceCheckbox(e, line)} />
+                        <Checkbox
+                            onChange={e => onChangeFixedNetPriceCheckbox(e, line)}
+                            onKeyUp={setFocusWhenPressingEsc}
+                        />
                     </Col>
                     <Col span={21}>
                         <Input
@@ -217,7 +263,9 @@ const Lines = () => {
                             placeholder='Total'
                             disabled={line.precioNetoFijo === true ? true : false}
                             value={line.precioNeto}
-                            onChange={e => onChangeNetPrice(e, line)} />
+                            onChange={e => onChangeNetPrice(e, line)}
+                            onKeyUp={setFocusWhenPressingEsc}
+                        />
                     </Col>
                 </Row>
             ),

@@ -62,13 +62,13 @@ const ProductSelectionModal = () => {
         else if (!location.pathname.includes('venta')) correctLocation = false
         else correctLocation = true
         const refs = {
-            autocompleteClient: sale_state.saleRefs.ref_autocompleteClient,
-            autocompleteDocument: sale_state.saleRefs.ref_autocompleteDocument,
-            autocompletePaymentMethod: sale_state.saleRefs.ref_autocompletePaymentMethod,
-            autocompletePaymentPlan: sale_state.saleRefs.ref_autocompletePaymentPlan,
+            autocompleteClient: sale_state.refs.autocompleteClient,
+            autocompleteDocument: sale_state.refs.autocompleteDocument,
+            autocompletePaymentMethod: sale_state.refs.autocompletePaymentMethod,
+            autocompletePaymentPlan: sale_state.refs.autocompletePaymentPlan,
             buttonToCancel: productSelectionModal_state.refs.buttonToCancel,
             buttonToCheckPage: productSelectionModal_state.refs.buttonToCheckPage,
-            buttonToFinalizeSale: sale_state.saleRefs.ref_buttonToFinalizeSale,
+            buttonToFinalizeSale: sale_state.refs.buttonToFinalizeSale,
             buttonToRestartFilters: productSelectionModal_state.refs.buttonToRestartFilters,
             buttonToSave: productSelectionModal_state.refs.buttonToSave,
             buttonToUncheckPage: productSelectionModal_state.refs.buttonToUncheckPage,

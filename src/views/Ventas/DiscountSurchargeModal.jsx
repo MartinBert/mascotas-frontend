@@ -32,16 +32,16 @@ const DiscountSurchargeModal = () => {
 
     const existsRefs = () => {
         const refs = {
-            buttonToSavePercentage: sale_state.saleRefs.ref_buttonToSaveDiscountSurchargeModal,
-            clientField: sale_state.saleRefs.ref_autocompleteClient,
-            dateField: sale_state.saleRefs.ref_datePicker,
-            documentField: sale_state.saleRefs.ref_autocompleteDocument,
-            finalizeButton: sale_state.saleRefs.ref_buttonToFinalizeSale,
-            openProductSelectionModalButton: sale_state.saleRefs.ref_buttonToOpenProductSelectionModal,
-            paymentMethodField: sale_state.saleRefs.ref_autocompletePaymentMethod,
-            paymentPlanField: sale_state.saleRefs.ref_autocompletePaymentPlan,
-            percentageField: sale_state.saleRefs.ref_inputPercentageOfDiscountAndSurchargeModal,
-            selectPercentageType: sale_state.saleRefs.ref_selectPercentageTypeOfDiscountAndSurchargeModal
+            buttonToSavePercentage: sale_state.refs.buttonToSaveDiscountSurchargeModal,
+            clientField: sale_state.refs.autocompleteClient,
+            dateField: sale_state.refs.datePicker,
+            documentField: sale_state.refs.autocompleteDocument,
+            finalizeButton: sale_state.refs.buttonToFinalizeSale,
+            openProductSelectionModalButton: sale_state.refs.buttonToOpenProductSelectionModal,
+            paymentMethodField: sale_state.refs.autocompletePaymentMethod,
+            paymentPlanField: sale_state.refs.autocompletePaymentPlan,
+            percentageField: sale_state.refs.inputPercentageOfDiscountAndSurchargeModal,
+            selectPercentageType: sale_state.refs.selectPercentageTypeOfDiscountAndSurchargeModal
         }
         const exists = !Object.values(refs).includes(null)
         const data = { exists, refs }

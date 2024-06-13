@@ -22,7 +22,14 @@ const actions = {
     SET_LOADING: 'SET_LOADING',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PARAMS: 'SET_PARAMS',
-    SET_PRODUCTS: 'SET_PRODUCTS'
+    SET_PRODUCTS: 'SET_PRODUCTS',
+    SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE',
+    SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME',
+    SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE',
+    SET_REFS: 'SET_REFS',
+    SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE: 'SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE',
+    SET_VALUE_OF_SELECT_PRODUCT_BY_NAME: 'SET_VALUE_OF_SELECT_PRODUCT_BY_NAME',
+    SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE: 'SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE'
 }
 
 const formatDate = (dateToFormat) => {
@@ -58,7 +65,7 @@ const initialState = {
         page: 1
     },
     params: {
-        descripcion: '-- Sin descripción --',
+        descripcion: '',
         fecha: new Date(),
         fechaString: simpleDateWithHours(new Date()),
         cantidad: 0,
@@ -67,7 +74,31 @@ const initialState = {
         productos: [],
         usuario: null
     },
-    rangePickerValueForExcelReport: null
+    rangePickerValueForExcelReport: null,
+    refs: {
+        buttonToAddProduct: null,
+        buttonToCancel: null,
+        buttonToRemoveProducts: null,
+        buttonToRestartFields: null,
+        buttonToSave: null,
+        datePicker: null,
+        inputDescription: null,
+        selectToAddProductByBarcode: null,
+        selectToAddProductByName: null,
+        selectToAddProductByProductCode: null
+    },
+    selectToAddProductByBarcode: {
+        options: [],
+        selectedValue: null
+    },
+    selectToAddProductByName: {
+        options: [],
+        selectedValue: null
+    },
+    selectToAddProductByProductCode: {
+        options: [],
+        selectedValue: null
+    }
 }
 
 
@@ -105,7 +136,7 @@ const reducer = (state = initialState, action) => {
                 datePickerValue: formatDate(new Date()),
                 params: {
                     ...state.params,
-                    descripcion: '-- Sin descripción --',
+                    descripcion: '',
                     fecha: new Date(),
                     fechaString: simpleDateWithHours(new Date()),
                 }
@@ -142,6 +173,30 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 dataForDetailsModal: action.payload,
                 detailsModalVisibility: true
+            }
+        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE:
+            return {
+                ...state,
+                selectToAddProductByBarcode: {
+                    ...state.selectToAddProductByBarcode,
+                    options: action.payload
+                }
+            }
+        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME:
+            return {
+                ...state,
+                selectToAddProductByName: {
+                    ...state.selectToAddProductByName,
+                    options: action.payload
+                }
+            }
+        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE:
+            return {
+                ...state,
+                selectToAddProductByProductCode: {
+                    ...state.selectToAddProductByProductCode,
+                    options: action.payload
+                }
             }
         case actions.SET_OUTPUTS_FOR_EXCEL_REPORT:
             const rangePickerValue = action.payload.rangePickerValueForExcelReport
@@ -190,6 +245,35 @@ const reducer = (state = initialState, action) => {
                 params: {
                     ...state.params,
                     productos
+                }
+            }
+        case actions.SET_REFS:
+            return {
+                ...state,
+                refs: action.payload
+            }
+        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE:
+            return {
+                ...state,
+                selectToAddProductByBarcode: {
+                    ...state.selectToAddProductByBarcode,
+                    selectedValue: action.payload
+                }
+            }
+        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_NAME:
+            return {
+                ...state,
+                selectToAddProductByName: {
+                    ...state.selectToAddProductByName,
+                    selectedValue: action.payload
+                }
+            }
+        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE:
+            return {
+                ...state,
+                selectToAddProductByProductCode: {
+                    ...state.selectToAddProductByProductCode,
+                    selectedValue: action.payload
                 }
             }
         default:

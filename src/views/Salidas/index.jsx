@@ -88,18 +88,14 @@ const Salidas = () => {
     const [outputs_state, outputs_dispatch] = useOutputsContext()
 
     // ------------------ Fetch Outputs ------------------ //
-    useEffect(() => {
-        const fetchOutputs_paginated = async () => {
-            const findParams = formatFindParams(outputs_state.paginationParams)
-            const data = await api.salidas.findPaginated(findParams)
-            outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: data })
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
-        fetchOutputs_paginated()
-    }, [
-        deleteModal_state.loading,
-        outputs_state.paginationParams
-    ])
+    const fetchOutputs_paginated = async () => {
+        const findParams = formatFindParams(outputs_state.paginationParams)
+        const data = await api.salidas.findPaginated(findParams)
+        outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: data })
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    useEffect(() => { fetchOutputs_paginated() }, [deleteModal_state.loading, outputs_state.paginationParams])
 
     // ------------------ Output Deletion ------------------ //
     const outputDeletion = (output) => {

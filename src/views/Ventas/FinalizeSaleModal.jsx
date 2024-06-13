@@ -60,7 +60,7 @@ const FinalizeSaleModal = () => {
 
     const redirectFocusIntoModal = (e) => {
         if (e) {
-            const buttonToSave = sale_state.saleRefs.ref_buttonToSaveFinalizeSale
+            const buttonToSave = sale_state.refs.buttonToSaveFinalizeSale
             buttonToSave.focus()
         } else return
     }
@@ -149,7 +149,7 @@ const FinalizeSaleModal = () => {
         })
         sale_state.productos = sale_state.productos
             .filter(product => !(product._id.startsWith('customProduct_')))
-        const {saleRefs, ...saleData} = sale_state
+        const {refs, ...saleData} = sale_state
         const response = await api.ventas.save(saleData)
         if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
     }

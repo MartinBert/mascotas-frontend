@@ -12,6 +12,7 @@ import api from '../../services'
 // Imports Destructuring
 const { formatFindParams } = actions.paginationParams
 const { roundTwoDecimals } = helpers.mathHelper
+const { normalizeString } = helpers.stringHelper
 
 
 const Home = () => {
@@ -246,6 +247,25 @@ const Home = () => {
         console.log('listo')
     }
 
+    const addNormalizedNames = async () => {
+        const findProducts = await api.productos.findAll()
+        const products = findProducts.docs
+        for (let index = 0; index < products.length; index++) {
+            const product = products[index]
+            const productFixed = {
+                ...product,
+                normalizedBarcode: normalizeString(product.codigoBarras),
+                normalizedBrand: normalizeString(product.marca.nombre),
+                normalizedName: normalizeString(product.nombre),
+                normalizedProductCode: normalizeString(product.codigoProducto),
+                normalizedType: normalizeString(product.rubro.nombre)
+            }
+            await api.productos.edit(productFixed)
+        }
+        
+        console.log('listo')
+    }
+
     const showData = async () => {
         const findAllEntries = await api.entradas.findAll()
         const findAllOutputs = await api.salidas.findAll()
@@ -281,7 +301,7 @@ const Home = () => {
     }
 
 
-    const testRenderElementDisplay = 'none'
+    const testRenderElementDisplay = 'block'
 
     return (
         <>
@@ -298,6 +318,13 @@ const Home = () => {
                 style={{ display: testRenderElementDisplay }}
             >
                 Borrar historial de stock
+            </button>
+            <hr style={{ display: testRenderElementDisplay }} />
+            <button
+                onClick={addNormalizedNames}
+                style={{ display: testRenderElementDisplay }}
+            >
+                Agregar nombres normalizados a productos
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button

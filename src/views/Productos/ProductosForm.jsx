@@ -13,14 +13,15 @@ import { Row, Col, Form, Input, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 
 // Helpers
-import helper from '../../helpers'
+import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
 
 // Imports Destructuring
 const { Spinner } = graphics
-const {decimalPercent, roundToMultiple, roundTwoDecimals} = helper.mathHelper
+const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { normalizeString } = helpers.stringHelper
 
 
 const ProductosForm = () => {
@@ -38,6 +39,11 @@ const ProductosForm = () => {
         precioUnitario: 0,
         margenGanancia: 0,
         margenGananciaFraccionado: 0,
+        normalizedBarcode: '',
+        normalizedBrand: '',
+        normalizedName: '',
+        normalizedProductCode: '',
+        normalizedType: '',
         precioVenta: 0,
         precioVentaFraccionado: 0,
         gananciaNeta: 0,
@@ -54,50 +60,26 @@ const ProductosForm = () => {
     const [selectedMeasure, setSelectedMeasure] = useState(null)
     const [uploadedImages, setUploadedImages] = useState([])
 
-    useEffect(() => {
-        const fetchProductById = async (id) => {
-            const response = await api.productos.findById(id)
-            const product = response.data
+    const fetchProductById = async (id) => {
+        if (id === 'nuevo') return setLoading(false)
+        const response = await api.productos.findById(id)
+        const product = response.data
+        setSelectedBrand({ _id: product?.marca?._id ?? null, nombre: product?.marca?.nombre ?? null })
+        setSelectedHeading({ _id: product?.rubro?._id ?? null, nombre: product?.rubro?.nombre ?? null })
+        setSelectedMeasure({ _id: product?.unidadMedida?._id ?? null, nombre: product?.unidadMedida?.nombre ?? null })
+        setProduct(product)
+        setUploadedImages(product.imagenes)
+        setLoading(false)
+    }
 
-            if (!product.marca) {
-                product.marca = {
-                    _id: 'no especificado',
-                    nombre: 'no especificado'
-                }
-            } else { setSelectedBrand({ _id: product.marca._id, nombre: product.marca.nombre }) }
+    useEffect(() => { fetchProductById() }, [id])
 
-            if (!product.rubro) {
-                product.rubro = {
-                    _id: 'no especificado',
-                    nombre: 'no especificado'
-                }
-            } else { setSelectedHeading({ _id: product.rubro._id, nombre: product.rubro.nombre }) }
-
-            if (!product.unidadMedida) {
-                product.unidadMedida = {
-                    _id: 'no especificado',
-                    nombre: 'no especificado'
-                }
-            } else { setSelectedMeasure({ _id: product.unidadMedida._id, nombre: product.unidadMedida.nombre }) }
-
-            setProduct(product)
-            setUploadedImages(product.imagenes)
-            setLoading(false)
-        }
-        if (id !== 'nuevo') {
-            fetchProductById(id)
-        } else {
-            setLoading(false)
-        }
-    }, [loading, id])
-
-    useEffect(() => {
+    const updateProductValues = () => {
         const margenGanancia = decimalPercent(product.margenGanancia)
         const margenGananciaFraccionado = decimalPercent(product.margenGananciaFraccionado)
         const precioUnitario = parseFloat(product.precioUnitario)
         const porcentajeIvaCompra = decimalPercent(product.porcentajeIvaCompra)
         const porcentajeIvaVenta = decimalPercent(product.porcentajeIvaVenta)
-
         const gananciaNeta = roundTwoDecimals(precioUnitario * margenGanancia)
         const gananciaNetaFraccionado = roundTwoDecimals(precioUnitario * margenGananciaFraccionado)
         const ivaCompra = roundTwoDecimals(precioUnitario - (precioUnitario / (1 + porcentajeIvaCompra)))
@@ -107,8 +89,7 @@ const ProductosForm = () => {
         const diferenciaPrecioVenta = precioVenta - precioVentaSinRedondear
         const precioVentaFraccionadoSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado)
         const precioVentaFraccionado = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado), 10)
-        const diferenciaPrecioVentaFraccionado = precioVentaFraccionado - precioVentaFraccionadoSinRedondear      
-
+        const diferenciaPrecioVentaFraccionado = precioVentaFraccionado - precioVentaFraccionadoSinRedondear
         setProduct({
             ...product,
             ivaCompra,
@@ -118,7 +99,9 @@ const ProductosForm = () => {
             precioVenta,
             precioVentaFraccionado
         })
-    }, [
+    }
+
+    useEffect(() => { updateProductValues() }, [
         product.precioUnitario,
         product.margenGanancia,
         product.margenGananciaFraccionado,
@@ -127,10 +110,12 @@ const ProductosForm = () => {
     ])
 
     const setFormDataToProduct = async (e) => {
-        setProduct({
-            ...product,
-            [e.target.name]: e.target.value
-        })
+        const target = e.target.name
+        const value = e.target.value
+        setProduct({ ...product, [target]: value })
+        if (target === 'codigoBarras') setProduct({ ...product, normalizedBarcode: normalizeString(value) })
+        if (target === 'codigoProducto') setProduct({ ...product, normalizedProductCode: normalizeString(value) })
+        if (target === 'nombre') setProduct({ ...product, normalizedName: normalizeString(value) })
     }
 
     const setSelectedBrandToProduct = async (brand) => {
@@ -138,7 +123,8 @@ const ProductosForm = () => {
         const response = await api.marcas.findById(brand._id)
         setProduct({
             ...product,
-            marca: response
+            marca: response,
+            normalizedBrand: response.nombre
         })
     }
 
@@ -147,7 +133,8 @@ const ProductosForm = () => {
         const response = await api.rubros.findById(heading._id)
         setProduct({
             ...product,
-            rubro: response
+            rubro: response,
+            normalizedType: response.nombre
         })
     }
 

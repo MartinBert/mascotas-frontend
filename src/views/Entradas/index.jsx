@@ -88,18 +88,14 @@ const Entradas = () => {
     const [entries_state, entries_dispatch] = useEntriesContext()
 
     // ------------------ Fetch Entries ------------------ //
-    useEffect(() => {
-        const fetchEntries_paginated = async () => {
-            const findParams = formatFindParams(entries_state.paginationParams)
-            const data = await api.entradas.findPaginated(findParams)
-            entries_dispatch({ type: 'SET_ENTRIES_FOR_RENDER', payload: data })
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
-        fetchEntries_paginated()
-    }, [
-        deleteModal_state.loading,
-        entries_state.paginationParams
-    ])
+    const fetchEntries_paginated = async () => {
+        const findParams = formatFindParams(entries_state.paginationParams)
+        const data = await api.entradas.findPaginated(findParams)
+        entries_dispatch({ type: 'SET_ENTRIES_FOR_RENDER', payload: data })
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    useEffect(() => { fetchEntries_paginated() }, [deleteModal_state.loading, entries_state.paginationParams])
 
     // ------------------ Entry Deletion ------------------ //
     const entryDeletion = (entry) => {

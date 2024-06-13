@@ -33,23 +33,26 @@ const Ventas = () => {
 
         // Refs data
         const refs = {
-            ref_autocompleteClient: sale_state.loadingView ? null : document.getElementById('autocompleteClient'),
-            ref_autocompleteDocument: sale_state.loadingView ? null : document.getElementById('autocompleteDocument'),
-            ref_autocompletePaymentMethod: sale_state.loadingView ? null : document.getElementById('autocompletePaymentMethod'),
-            ref_autocompletePaymentPlan: sale_state.loadingView ? null : document.getElementById('autocompletePaymentPlan'),
-            ref_buttonToAddCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToAddCustomProduct'),
-            ref_buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToFinalizeSale'),
-            ref_buttonToOpenProductSelectionModal: sale_state.loadingView ? null : document.getElementById('buttonToOpenProductSelectionModal'),
-            ref_buttonToSaveAddedCustomProducts: sale_state.loadingView ? null : document.getElementById('buttonToSaveAddedCustomProducts'),
-            ref_buttonToSaveCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToSaveCustomProduct'),
-            ref_buttonToSaveDiscountSurchargeModal: sale_state.loadingView ? null : document.getElementById('buttonToSaveDiscountSurchargeModal'),
-            ref_buttonToSaveFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToSaveFinalizeSale'),
-            ref_datePicker: sale_state.loadingView ? null : document.getElementById('datePicker'),
-            ref_inputConceptOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputConceptOfCustomProduct'),
-            ref_inputPercentageIVAOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputPercentageIVAOfCustomProduct'),
-            ref_inputPercentageOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('inputPercentageOfDiscountAndSurchargeModal'),
-            ref_inputUnitPriceOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputUnitPriceOfCustomProduct'),
-            ref_selectPercentageTypeOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('selectPercentageTypeOfDiscountAndSurchargeModal')
+            autocompleteClient: sale_state.loadingView ? null : document.getElementById('autocompleteClient'),
+            autocompleteDocument: sale_state.loadingView ? null : document.getElementById('autocompleteDocument'),
+            autocompletePaymentMethod: sale_state.loadingView ? null : document.getElementById('autocompletePaymentMethod'),
+            autocompletePaymentPlan: sale_state.loadingView ? null : document.getElementById('autocompletePaymentPlan'),
+            buttonToAddCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToAddCustomProduct'),
+            buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToFinalizeSale'),
+            buttonToSaveAddedCustomProducts: sale_state.loadingView ? null : document.getElementById('buttonToSaveAddedCustomProducts'),
+            buttonToSaveCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToSaveCustomProduct'),
+            buttonToSaveDiscountSurchargeModal: sale_state.loadingView ? null : document.getElementById('buttonToSaveDiscountSurchargeModal'),
+            buttonToSaveFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToSaveFinalizeSale'),
+            datePicker: sale_state.loadingView ? null : document.getElementById('datePicker'),
+            inputConceptOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputConceptOfCustomProduct'),
+            inputPercentageIVAOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputPercentageIVAOfCustomProduct'),
+            inputPercentageOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('inputPercentageOfDiscountAndSurchargeModal'),
+            inputUnitPriceOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputUnitPriceOfCustomProduct'),
+            lines: sale_state.loadingView ? null : document.getElementById('saleLines'),
+            selectPercentageTypeOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('selectPercentageTypeOfDiscountAndSurchargeModal'),
+            selectToAddProductByBarcode: sale_state.loadingView ? null : document.getElementById('selectToAddProductByBarcode'),
+            selectToAddProductByName: sale_state.loadingView ? null : document.getElementById('selectToAddProductByName'),
+            selectToAddProductByProductCode: sale_state.loadingView ? null : document.getElementById('selectToAddProductByProductCode')
         }
         sale_dispatch({ type: 'SET_REFS', payload: refs })
 
@@ -107,15 +110,23 @@ const Ventas = () => {
                                                 <Lines />
                                             </Col>
                                             <Col span={24} style={{ marginTop: '1%' }}>
-                                                <Row>
+                                                <Row gutter={8} align='middle'>
                                                     <Col span={6}>
                                                         <Button
                                                             className='btn-primary'
+                                                            disabled={sale_state.loadingDocumentIndex ? true : false}
                                                             id='buttonToFinalizeSale'
                                                             onClick={openFinalizeSaleModal}
                                                         >
                                                             Finalizar venta
                                                         </Button>
+                                                    </Col>
+                                                    <Col span={6}>
+                                                        {
+                                                            sale_state.loadingDocumentIndex
+                                                                ? <Spin />
+                                                                : null
+                                                        }
                                                     </Col>
                                                 </Row>
                                             </Col>

@@ -478,7 +478,7 @@ const ExportProductListModal = () => {
     const fetchProducts = async () => {
         const findParamsForRender = formatFindParams(products_state.exportProductList.paginationParams)
         const dataForRender = await api.productos.findPaginated(findParamsForRender)
-        const dataForExport = await api.productos.findAllFiltered(findParamsForRender.filters)
+        const dataForExport = await api.productos.findAllByFilters(findParamsForRender.filters)
         const data = {
             productsToExport: dataForExport.docs,
             productsToRender: dataForRender.docs,

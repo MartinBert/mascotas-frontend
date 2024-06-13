@@ -1,3 +1,12 @@
+const completeLengthWithZero = (value, length) => {
+    const cicles = length - value.toString().length
+    if (cicles <= 0) return value
+    for (let i = 0; i < cicles; i++) {
+        value = '0' + value
+    }
+    return value
+}
+
 const countDecimalPlaces = (stringValue) => {
     const pointPosition = stringValue.indexOf('.')
     if (pointPosition === -1) return 0
@@ -6,20 +15,16 @@ const countDecimalPlaces = (stringValue) => {
     return numberOfDecimalPlaces
 }
 
+const normalizeString = (string) => {
+    const normalizeString = string.normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    return normalizeString
+}
+
 const regExp = {
     ifNotNumber: /\D/gm,
     ifNotNumbersOrBar: /[^0-9\/]/gm,
     ifNotNumbersCommaAndPoint: /[^0-9,.]/gm,
     ifSpecialCharacter: /\W/gm
-}
-
-const completeLengthWithZero = (value, length) => {
-    const cicles = length - value.toString().length
-    if (cicles <= 0) return value
-    for (let i = 0; i < cicles; i++) {
-        value = '0' + value
-    }
-    return value
 }
 
 // Fixed commas and points of input number values
@@ -45,8 +50,12 @@ const fixInputNumber = (currentValue, prevValue) => {
 }
 
 // Non case sensitive for 'Autocomplete' antd
-const nonCaseSensitive = (inputValue, option) =>
-    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+const nonCaseSensitive = (inputValue, option) => {
+    const normalizedInputValue = normalizeString(inputValue)
+    const normalizedOptionValue = normalizeString(option.value)
+    if (normalizedOptionValue.toUpperCase().indexOf(normalizedInputValue.toUpperCase()) !== -1) return true
+    else return false
+}
 
 const replaceFor = (string, segment, newSegment) => {
     const newString = string.replaceAll(segment, newSegment)
@@ -57,6 +66,7 @@ const stringHelper = {
     completeLengthWithZero,
     fixInputNumber,
     nonCaseSensitive,
+    normalizeString,
     regExp,
     replaceFor
 }

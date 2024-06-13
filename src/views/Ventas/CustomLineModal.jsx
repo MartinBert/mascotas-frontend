@@ -33,12 +33,12 @@ const CustomLineModal = () => {
 
     const existsRefs = () => {
         const refs = {
-            buttonToAdd: sale_state.saleRefs.ref_buttonToAddCustomProduct,
-            buttonToSaveAddedCustomProducts: sale_state.saleRefs.ref_buttonToSaveAddedCustomProducts,
-            buttonToSaveCustomProduct: sale_state.saleRefs.ref_buttonToSaveCustomProduct,
-            inputConcept: sale_state.saleRefs.ref_inputConceptOfCustomProduct,
-            inputPercentageIVA: sale_state.saleRefs.ref_inputPercentageIVAOfCustomProduct,
-            inputUnitPrice: sale_state.saleRefs.ref_inputUnitPriceOfCustomProduct
+            buttonToAdd: sale_state.refs.buttonToAddCustomProduct,
+            buttonToSaveAddedCustomProducts: sale_state.refs.buttonToSaveAddedCustomProducts,
+            buttonToSaveCustomProduct: sale_state.refs.buttonToSaveCustomProduct,
+            inputConcept: sale_state.refs.inputConceptOfCustomProduct,
+            inputPercentageIVA: sale_state.refs.inputPercentageIVAOfCustomProduct,
+            inputUnitPrice: sale_state.refs.inputUnitPriceOfCustomProduct
         }
         const exists = !Object.values(refs).includes(null)
         const data = { exists, refs }

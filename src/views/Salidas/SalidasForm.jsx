@@ -6,12 +6,13 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { errorAlert, successAlert } from '../../components/alerts'
 import { ProductSelectionModal } from '../../components/generics'
 import icons from '../../components/icons'
+import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Contexts
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, DatePicker, Input, InputNumber, Row, Spin, Table } from 'antd'
+import { Button, Col, DatePicker, Input, InputNumber, Row, Select, Spin, Table } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -25,8 +26,9 @@ const { useOutputsContext } = contexts.Outputs
 const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { resetDate, simpleDateWithHours } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
+const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
-
+const { ifNotNumbersCommaAndPoint } = regExp
 
 const SalidasForm = () => {
     const outputID = useLocation().pathname.replace('/salidas/', '')
@@ -35,57 +37,110 @@ const SalidasForm = () => {
     const [outputs_state, outputs_dispatch] = useOutputsContext()
     const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
-    // ------------------------------------- First load ------------------------------------- //
-    useEffect(() => {
-        const loadOutputData = async () => {
-            if (outputID !== 'nuevo') {
-                const response = await api.salidas.findById(outputID)
-                outputs_dispatch({ type: 'SET_PARAMS', payload: response.data })
-            } else {
-                const usuario = localStorage.getItem('userId')
-                const newParams = { ...outputs_state.params, usuario }
-                outputs_dispatch({ type: 'SET_PARAMS', payload: newParams })
-            }
-        }
-        loadOutputData()
-    }, [outputID])
+    const returnToIndex = () => { navigate('/salidas') }
 
-    // ------------------------------------- Actions ------------------------------------- //
-    const redirectToSalidas = () => {
-        navigate('/salidas')
+    // ---------------------- Actions -------------------- //
+    const focusOnButtonToCancelWhenPressingEsc = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            outputs_state.refs.buttonToCancel.focus()
+        } else return
     }
 
-    // ------------------------------- Update state values -------------------------------- //
-    const dispatchParams = (newParams) => {
-        const params = { ...outputs_state.params }
-        for (let index = 0; index < newParams.targets.length; index++) {
-            const target = newParams.targets[index]
-            const value = newParams.values[index]
-            params[target] = value
-        }
-        outputs_dispatch({ type: 'SET_PARAMS', payload: params })
+    const focusOnSelectToAddProductByName = () => {
+        const selectToAddProductByName = outputs_state.refs.selectToAddProductByName
+        if (!selectToAddProductByName) return
+        selectToAddProductByName.focus()
     }
 
-    useEffect(() => {
-        const updateOutputsLoadingState = () => {
-            if (!outputs_state.params.usuario) outputs_dispatch({ type: 'SET_LOADING', payload: true })
-            outputs_dispatch({ type: 'SET_LOADING', payload: false })
+    const loadParams = async () => {
+        if (outputID !== 'nuevo') {
+            const response = await api.salidas.findById(outputID)
+            outputs_dispatch({ type: 'SET_PARAMS', payload: response.data })
+        } else {
+            const usuario = localStorage.getItem('userId')
+            const newParams = { ...outputs_state.params, usuario }
+            outputs_dispatch({ type: 'SET_PARAMS', payload: newParams })
         }
-        updateOutputsLoadingState()
-    }, [outputs_state.params.usuario])
+    }
 
-    useEffect(() => {
-        const updateOutputsState = () => {
-            outputs_dispatch({ type: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY' })
+    const loadRefs = () => {
+        const refs = {
+            buttonToAddProduct: document.getElementById('outputsForm_buttonToAddProduct'),
+            buttonToCancel: document.getElementById('outputsForm_buttonToCancel'),
+            buttonToRemoveProducts: document.getElementById('outputsForm_buttonToRemoveProducts'),
+            buttonToRestartFields: document.getElementById('outputsForm_buttonToRestartFields'),
+            buttonToSave: document.getElementById('outputsForm_buttonToSave'),
+            datePicker: document.getElementById('outputsForm_datePicker'),
+            inputDescription: document.getElementById('outputsForm_inputDescription'),
+            selectToAddProductByBarcode: document.getElementById('outputsForm_selectToAddProductByBarcode'),
+            selectToAddProductByName: document.getElementById('outputsForm_selectToAddProductByName'),
+            selectToAddProductByProductCode: document.getElementById('outputsForm_selectToAddProductByProductCode')
         }
-        updateOutputsState()
-    }, [outputs_state.params.productos])
+        outputs_dispatch({ type: 'SET_REFS', payload: refs })
+    }
 
-    // ------------------- Button to cancel modal of outputs product -------------------- //
-    const button_cancelModal = (
+    const returnToIndexWhenPressingEsc = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            returnToIndex()
+        } else return
+    }
+
+    const setFocus = () => {
+        const productsWithoutDefindedQuantity = outputs_state.params.productos.filter(product =>
+            product.cantidadesSalientes == 0 || !product.cantidadesSalientes
+        )
+        const firstProductWithoutDefindedQuantity = outputs_state.params.productos.find(product =>
+            product.cantidadesSalientes == 0 || !product.cantidadesSalientes
+        )
+        let unfilledField
+        if (outputs_state.params.descripcion === '') unfilledField = outputs_state.refs.inputDescription
+        else if (!outputs_state.params.fecha) unfilledField = outputs_state.refs.datePicker
+        else if (outputs_state.params.productos.length === 0) unfilledField = outputs_state.refs.selectToAddProductByName
+        else if (productsWithoutDefindedQuantity.length > 0) unfilledField = document.getElementById(firstProductWithoutDefindedQuantity._id)
+        else unfilledField = outputs_state.refs.buttonToSave
+        unfilledField.focus()
+    }
+
+    const updateLoading = () => {
+        if (!outputs_state.params.usuario) outputs_dispatch({ type: 'SET_LOADING', payload: true })
+        outputs_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const updateState = () => {
+        outputs_dispatch({ type: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY' })
+    }
+
+    useEffect(() => { loadParams() }, [outputID])
+    useEffect(() => { loadRefs() }, [])
+    useEffect(() => { updateLoading() }, [outputs_state.params.usuario])
+    useEffect(() => { updateState() }, [outputs_state.params.cantidad, outputs_state.params.productos])
+
+    // -------------- Button to add product -------------- //
+    const openProductSelectionModal = () => {
+        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
+    }
+
+    const buttonToAddProduct = (
+        <Button
+            className='btn-primary'
+            id='outputsForm_buttonToAddProduct'
+            onClick={openProductSelectionModal}
+            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
+            style={{ width: '100%' }}
+        >
+            Añadir producto
+        </Button>
+    )
+
+    // ----------------- Button to cancel ---------------- //
+    const buttonToCancel = (
         <Button
             danger
-            onClick={redirectToSalidas}
+            id='outputsForm_buttonToCancel'
+            onClick={returnToIndex}
+            onKeyUp={returnToIndexWhenPressingEsc}
             style={{ width: '100%' }}
             type='primary'
         >
@@ -93,61 +148,57 @@ const SalidasForm = () => {
         </Button>
     )
 
-    // -------------------- Button to clear inputs of outputs form --------------------- //
-    const clearFields = () => {
-        outputs_dispatch({ type: 'CLEAR_INPUTS' })
-    }
-
-    const button_clearInputs = (
-        <Button
-            className='btn-primary'
-            onClick={clearFields}
-        >
-            Borrar campos
-        </Button>
-    )
-
-    // ------------------ Button to clear products of outputs form ------------------- //
-    const clearProducts = () => {
+    // ------------ Button to remove products ------------ //
+    const removeProducts = () => {
         outputs_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
+        setFocus()
     }
 
-    const button_clearProducts = (
+    const buttonToRemoveProducts = (
         <Button
             className='btn-primary'
-            onClick={clearProducts}
+            id='outputsForm_buttonToRemoveProducts'
+            onClick={removeProducts}
+            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
+            style={{ width: '100%' }}
         >
-            Borrar productos
+            Quitar productos
         </Button>
     )
 
-    // -------------------- Button to open modal of outputs form --------------------- //
-    const openModal = () => {
-        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
+    // ------------- Button to restart fields ------------ //
+    const restartFields = () => {
+        outputs_dispatch({ type: 'CLEAR_INPUTS' })
+        outputs_state.refs.inputDescription.focus()
     }
 
-    const button_openModal = (
+    const buttonToRestartFields = (
         <Button
             className='btn-primary'
-            onClick={openModal}
+            id='outputsForm_buttonToRestartFields'
+            onClick={restartFields}
+            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
+            style={{ width: '100%' }}
         >
-            Añadir producto
+            Reiniciar campos
         </Button>
     )
 
-    // ---------------------------- Button to save output ---------------------------- //
-    const validateOutputSave = () => {
+    // ----------------- Button to save ------------------ //
+    const validateSave = () => {
         const quantityOfSelectedProducts = outputs_state.params.productos.length
         if (quantityOfSelectedProducts === 0) {
             errorAlert('¡Debes seleccionar al menos un producto!')
             return 'FAIL'
         }
         for (const product of outputs_state.params.productos) {
-            if (product.cantidadesSalientes === 0) {
+            if (product.cantidadesSalientes == 0 || !product.cantidadesSalientes) {
                 errorAlert(`Indica una cantidad mayor que cero a: ${product.nombre}`)
                 return 'FAIL'
             }
+            product.cantidadesSalientes = parseFloat(product.cantidadesSalientes)
         }
+        if (outputs_state.params.descripcion === '') outputs_state.params.descripcion = '-- Sin descripción --'
         return 'OK'
     }
 
@@ -186,7 +237,7 @@ const SalidasForm = () => {
     }
 
     const saveNew = async () => {
-        const result = validateOutputSave()
+        const result = validateSave()
         if (result === 'FAIL') return
 
         // Datos necesarios para corregir el stock y las estadísticas diarias
@@ -225,11 +276,14 @@ const SalidasForm = () => {
         if (response.code === 200) {
             successAlert('El registro se guardó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
-            redirectToSalidas()
+            returnToIndex()
         } else errorAlert('Fallo al guardar el registro. Intente de nuevo.')
     }
 
     const saveEdit = async () => {
+        const result = validateSave()
+        if (result === 'FAIL') return
+
         // Datos necesarios para corregir el stock y las estadísticas diarias
         const findOutputToEdit = await api.salidas.findById(outputID)
         const outputToEdit = findOutputToEdit.data
@@ -280,20 +334,22 @@ const SalidasForm = () => {
         if (response.code === 200) {
             successAlert('El registro se editó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
-            redirectToSalidas()
+            returnToIndex()
         } else {
             errorAlert('Fallo al editar el registro. Intente de nuevo.')
         }
     }
 
-    const saveOutput = () => {
+    const save = () => {
         if (outputID === 'nuevo') saveNew()
         else saveEdit()
     }
 
     const button_saveOutput = (
         <Button
-            onClick={saveOutput}
+            id='outputsForm_buttonToSave'
+            onClick={save}
+            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
             style={{ width: '100%' }}
             type='primary'
         >
@@ -301,64 +357,246 @@ const SalidasForm = () => {
         </Button>
     )
 
-    // --------------------- Input to set product description ----------------------- //
-    const setDescription = (e) => {
-        const newParams = {
-            targets: ['descripcion'],
-            values: e.target.value !== '' ? [e.target.value] : ['-- Sin descripción --']
+    // ------------------- Date picker ------------------- //
+    const onChangeDate = (e) => {
+        const params = {
+            ...outputs_state.params,
+            fecha: e ? new Date(e.$d) : new Date(),
+            fechaString: e ? simpleDateWithHours(new Date(e.$d)) : simpleDateWithHours(new Date())
         }
-        dispatchParams(newParams)
+        outputs_dispatch({ type: 'SET_PARAMS', payload: params })
     }
 
-    const input_productsDescription = (
-        <Input
-            onChange={setDescription}
-            placeholder='-- Sin descripción --'
-            value={
-                outputs_state.params.descripcion === '-- Sin descripción --'
-                    ? ''
-                    : outputs_state.params.descripcion
-            }
-        />
-    )
-
-    // ------------------------- Picker to set product date -------------------------- //
-    const setDate = (date) => {
-        const newParams = {
-            targets: ['fecha', 'fechaString'],
-            values: date
-                ? [new Date(date.$d), simpleDateWithHours(new Date(date.$d))]
-                : [new Date(), simpleDateWithHours(new Date())]
+    const onKeyUpDatePicker = (e) => {
+        if (e.keyCode === 13) { // Enter
+            e.preventDefault()
+            setFocus()
+        } else if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            focusOnButtonToCancelWhenPressingEsc(e)
         }
-        dispatchParams(newParams)
+        else return
     }
 
-    const picker_productsDate = (
+    const datePicker = (
         <DatePicker
             format={['DD/MM/YYYY']}
-            onChange={setDate}
+            id='outputsForm_datePicker'
+            onChange={onChangeDate}
+            onKeyUp={onKeyUpDatePicker}
             style={{ width: '100%' }}
             value={outputs_state.datePickerValue}
         />
     )
 
-    // ------------------------- Table of selected products -------------------------- //
+    // ---------------- Input description ---------------- //
+    const onChangeDescription = (e) => {
+        const params = { ...outputs_state.params, descripcion: e.target.value }
+        outputs_dispatch({ type: 'SET_PARAMS', payload: params })
+    }
+
+    const onKeyUpDescription = (e) => {
+        if (e.keyCode === 13) { // Enter
+            e.preventDefault()
+            if (outputs_state.params.descripcion === '') {
+                const params = { ...outputs_state.params, descripcion: '-- Sin descripción --' }
+                outputs_dispatch({ type: 'SET_PARAMS', payload: params })
+            }
+            setFocus()
+        } else if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            focusOnButtonToCancelWhenPressingEsc(e)
+        } else return
+    }
+
+    const inputDescription = (
+        <Input
+            allowClear
+            autoFocus
+            id='outputsForm_inputDescription'
+            onChange={onChangeDescription}
+            onKeyUp={onKeyUpDescription}
+            placeholder='Descripción'
+            value={outputs_state.params.descripcion}
+        />
+    )
+
+    // -------- Select to add product by barcode --------- //
+    const onKeyUpSelectToAddProductByBarcode = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            setFocus()
+        } else return
+    }
+
+    const onSearchProductByBarcode = async (e) => {
+        const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
+        const params = { page: 1, limit: 15, filters }
+        const findProducts = await api.productos.findPaginated(params)
+        const products = findProducts.docs
+        const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedBarcode)
+        const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
+        const options = productsNotYetSelected.map(product => {
+            return {
+                label: product.nombre + ` (${product.codigoBarras})`,
+                value: product.normalizedBarcode
+            }
+        })
+        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE', payload: options })
+    }
+
+    const onSelectProductByBarcode = async (e) => {
+        const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
+        const params = { page: 1, limit: 8, filters }
+        const findProducts = await api.productos.findPaginated(params)
+        const products = findProducts.docs
+        const productsToSet = [...outputs_state.params.productos, ...products]
+        outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
+        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE', payload: [] })
+        outputs_state.refs.selectToAddProductByBarcode.focus()
+    }
+
+    const selectToAddProductByBarcode = (
+        <Select
+            allowClear
+            id='outputsForm_selectToAddProductByBarcode'
+            onKeyUp={onKeyUpSelectToAddProductByBarcode}
+            onSearch={onSearchProductByBarcode}
+            onSelect={onSelectProductByBarcode}
+            options={outputs_state.selectToAddProductByBarcode.options}
+            placeholder='Buscar producto por cód. barras'
+            showSearch
+            style={{ width: '100%' }}
+            value={outputs_state.selectToAddProductByBarcode.selectedValue}
+        />
+    )
+
+    // ---------- Select to add product by name ---------- //
+    const onKeyUpSelectToAddProductByName = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            setFocus()
+        } else return
+    }
+
+    const onSearchProductByName = async (e) => {
+        const filters = JSON.stringify({ normalizedName: normalizeString(e) })
+        const params = { page: 1, limit: 8, filters }
+        const findProducts = await api.productos.findPaginated(params)
+        const products = findProducts.docs
+        const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedName)
+        const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedName))
+        const options = productsNotYetSelected.map(product => { return { label: product.nombre, value: product.normalizedName } })
+        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME', payload: options })
+    }
+
+    const onSelectProductByName = async (e) => {
+        const filters = JSON.stringify({ normalizedName: e })
+        const findProducts = await api.productos.findAllByFilters(filters)
+        const products = findProducts.docs
+        const productsToSet = [...outputs_state.params.productos, ...products]
+        outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
+        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME', payload: [] })
+        outputs_state.refs.selectToAddProductByName.focus()
+    }
+
+    const selectToAddProductByName = (
+        <Select
+            allowClear
+            filterOption={nonCaseSensitive}
+            id='outputsForm_selectToAddProductByName'
+            onKeyUp={onKeyUpSelectToAddProductByName}
+            onSearch={onSearchProductByName}
+            onSelect={onSelectProductByName}
+            options={outputs_state.selectToAddProductByName.options}
+            placeholder='Buscar producto por nombre'
+            showSearch
+            style={{ width: '100%' }}
+            value={outputs_state.selectToAddProductByName.selectedValue}
+        />
+    )
+
+    // ------ Select to add product by product code ------ //
+    const onKeyUpSelectToAddProductByProductCode = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            setFocus()
+        } else return
+    }
+
+    const onSearchProductByProductCode = async (e) => {
+        const filters = JSON.stringify({ normalizedProductCode: normalizeString(e) })
+        const params = { page: 1, limit: 15, filters }
+        const findProducts = await api.productos.findPaginated(params)
+        const products = findProducts.docs
+        const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedProductCode)
+        const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedProductCode))
+        const options = productsNotYetSelected.map(product => {
+            return {
+                label: product.nombre + ` (${product.codigoProducto})`,
+                value: product.normalizedProductCode
+            }
+        })
+        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE', payload: options })
+    }
+
+    const onSelectProductByProductCode = async (e) => {
+        const filters = JSON.stringify({ normalizedProductCode: e })
+        const findProducts = await api.productos.findAllByFilters(filters)
+        const products = findProducts.docs
+        const productsToSet = [...outputs_state.params.productos, ...products]
+        outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
+        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE', payload: [] })
+        outputs_state.refs.selectToAddProductByProductCode.focus()
+    }
+
+    const selectToAddProductByProductCode = (
+        <Select
+            allowClear
+            id='outputsForm_selectToAddProductByProductCode'
+            onKeyUp={onKeyUpSelectToAddProductByProductCode}
+            onSearch={onSearchProductByProductCode}
+            onSelect={onSelectProductByProductCode}
+            options={outputs_state.selectToAddProductByProductCode.options}
+            placeholder='Buscar producto por cód. producto'
+            showSearch
+            style={{ width: '100%' }}
+            value={outputs_state.selectToAddProductByProductCode.selectedValue}
+        />
+    )
+
+    // ----------- Table of selected products  ----------- //
+    const changeQuantity = (e, product) => {
+        const productsEditted = outputs_state.params.productos.map(productInState => {
+            if (productInState._id === product._id) {
+                const prevValue = productInState?.cantidadesSalientes ?? ''
+                const currentValue = e.target.value.replace(ifNotNumbersCommaAndPoint, '')
+                const fixedValue = fixInputNumber(currentValue, prevValue)
+                productInState.cantidadesSalientes = fixedValue
+            }
+            return productInState
+        })
+        const params = { ...outputs_state.params, productos: productsEditted }
+        outputs_dispatch({ type: 'SET_PARAMS', payload: params })
+    }
+
     const deleteProduct = (product) => {
         const remainingProducts = outputs_state.params.productos
             .filter(currentProduct => currentProduct._id !== product._id)
         outputs_dispatch({ type: 'SET_PRODUCTS', payload: remainingProducts })
     }
 
-    const changeQuantity = (e, product) => {
-        const productsEditted = outputs_state.params.productos.map(productInState => {
-            if (productInState._id === product._id) productInState.cantidadesSalientes = e
-            return productInState
-        })
-        const newParams = { targets: ['productos'], values: [productsEditted] }
-        dispatchParams(newParams)
+    const onKeyUpProductQuantity = (e) => {
+        if (e.keyCode === 13) { // Enter
+            e.preventDefault()
+            setFocus()
+        } else if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            outputs_state.refs.buttonToCancel.focus()
+        } else return
     }
 
-    const header = [
+    const tableOfSelectedProductsColumns = [
         {
             align: 'start',
             dataIndex: 'output_productBarcode',
@@ -378,8 +616,10 @@ const SalidasForm = () => {
             dataIndex: 'output_productQuantity',
             key: 'output_productQuantity',
             render: (_, product) => (
-                <InputNumber
+                <Input
+                    id={product._id}
                     onChange={e => changeQuantity(e, product)}
+                    onKeyUp={onKeyUpProductQuantity}
                     value={product.cantidadesSalientes}
                 />
             ),
@@ -398,54 +638,61 @@ const SalidasForm = () => {
         }
     ]
 
-    const table_selectedProducts = (
+    const tableOfSelectedProducts = (
         <Table
-            columns={header}
+            columns={tableOfSelectedProductsColumns}
             dataSource={outputs_state.params.productos}
             rowKey='_id'
         />
     )
 
-    // ------------------------- Title of total income of output -------------------------- //
-    useEffect(() => {
-        outputs_dispatch({ type: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY' })
-    }, [outputs_state.params.cantidad, outputs_state.params.productos])
-
-    const title_netProfit = <h1>Ingreso Total: {roundTwoDecimals(outputs_state.params.ganancia)}</h1>
+    // -------------- Title of total cost  --------------- //
+    const titleOfNetProfit = <h1>Ingreso Total: {roundTwoDecimals(outputs_state.params.ganancia)}</h1>
 
 
-    const outputsRender = [
+    const itemsToRender = [
         {
-            element: button_openModal,
-            name: 'outputs_addProduct',
-            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
+            element: buttonToAddProduct,
+            order: { lg: 2, md: 1, sm: 1, xl: 2, xs: 1, xxl: 2 }
         },
         {
-            element: button_clearInputs,
-            name: 'outputs_clearFields',
-            order: { lg: 2, md: 2, sm: 5, xl: 2, xs: 5, xxl: 2 }
+            element: buttonToRemoveProducts,
+            order: { lg: 4, md: 2, sm: 2, xl: 4, xs: 2, xxl: 4 }
         },
         {
-            element: button_clearProducts,
-            name: 'outputs_clearProducts',
-            order: { lg: 4, md: 4, sm: 6, xl: 4, xs: 6, xxl: 4 }
+            element: buttonToRestartFields,
+            order: { lg: 6, md: 3, sm: 3, xl: 6, xs: 3, xxl: 6 }
         },
         {
-            element: picker_productsDate,
-            name: 'outputs_productDate',
-            order: { lg: 5, md: 5, sm: 3, xl: 5, xs: 3, xxl: 5 }
+            element: datePicker,
+            order: { lg: 3, md: 6, sm: 6, xl: 3, xs: 6, xxl: 3 }
         },
         {
-            element: input_productsDescription,
-            name: 'outputs_productDescription',
-            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
+            element: inputDescription,
+            order: { lg: 1, md: 5, sm: 5, xl: 1, xs: 5, xxl: 1 }
+        },
+        {
+            element: <InputHidden />,
+            order: { lg: 8, md: 4, sm: 4, xl: 8, xs: 4, xxl: 8 }
+        },
+        {
+            element: selectToAddProductByBarcode,
+            order: { lg: 7, md: 8, sm: 8, xl: 7, xs: 8, xxl: 7 }
+        },
+        {
+            element: selectToAddProductByName,
+            order: { lg: 5, md: 7, sm: 7, xl: 5, xs: 7, xxl: 5 }
+        },
+        {
+            element: selectToAddProductByProductCode,
+            order: { lg: 9, md: 9, sm: 9, xl: 9, xs: 9, xxl: 9 }
         }
     ]
 
     const responsiveGrid = {
         formGutter: { horizontal: 0, vertical: 16 },
         headGutter: { horizontal: 8, vertical: 8 },
-        span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
+        span: { lg: 12, md: 24, sm: 24, xl: 12, xs: 24, xxl: 12 }
     }
 
 
@@ -473,10 +720,10 @@ const SalidasForm = () => {
                                         ]}
                                     >
                                         {
-                                            outputsRender.map(item => {
+                                            itemsToRender.map((item, index) => {
                                                 return (
                                                     <Col
-                                                        key={item.name}
+                                                        key={'outputsForm_itemsToRender_' + index}
                                                         lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
                                                         md={{ order: item.order.md, span: responsiveGrid.span.md }}
                                                         sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
@@ -492,15 +739,15 @@ const SalidasForm = () => {
                                     </Row>
                                 </Col>
                                 <Col span={24} style={{ textAlign: 'right' }}>
-                                    {title_netProfit}
+                                    {titleOfNetProfit}
                                 </Col>
                                 <Col span={24}>
-                                    {table_selectedProducts}
+                                    {tableOfSelectedProducts}
                                 </Col>
                                 <Col span={24}>
                                     <Row justify='space-around'>
                                         <Col span={6}>
-                                            {button_cancelModal}
+                                            {buttonToCancel}
                                         </Col>
                                         <Col span={6}>
                                             {button_saveOutput}

@@ -41,7 +41,7 @@ const findAll = async () => {
     }
 }
 
-const findAllFiltered = async (filters) => {
+const findAllByFilters = async (filters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos?filters=${filters}`, headers)
@@ -132,7 +132,7 @@ const productos = {
     deleteById,
     edit,
     findAll,
-    findAllFiltered,
+    findAllByFilters,
     findById,
     findMultipleIds,
     findPaginated,

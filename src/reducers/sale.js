@@ -32,6 +32,12 @@ const actions = {
     SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT: 'SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT',
     SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT: 'SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT',
     SET_REFS: 'SET_REFS',
+    SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE',
+    SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME',
+    SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE',
+    SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE: 'SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE',
+    SET_VALUE_OF_SELECT_PRODUCT_BY_NAME: 'SET_VALUE_OF_SELECT_PRODUCT_BY_NAME',
+    SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE: 'SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE',
     SHOW_DISCOUNT_SURCHARGE_MODAL: 'SHOW_DISCOUNT_SURCHARGE_MODAL',
     SHOW_FINALIZE_SALE_MODAL: 'SHOW_FINALIZE_SALE_MODAL',
 
@@ -84,23 +90,38 @@ const initialState = {
     percentageOfGlobalSurchargeInput: '',
     planesPagoInput: null,
     planesPagoToAutocomplete: [],
-    saleRefs: {
-        ref_autocompleteClient: null,
-        ref_autocompleteDocument: null,
-        ref_autocompletePaymentMethod: null,
-        ref_autocompletePaymentPlan: null,
-        ref_buttonToAddCustomProduct: null,
-        ref_buttonToFinalizeSale: null,
-        ref_buttonToOpenProductSelectionModal: null,
-        ref_buttonToSaveAddedCustomProducts: null,
-        ref_buttonToSaveCustomProduct: null,
-        ref_buttonToSaveDiscountSurchargeModal: null,
-        ref_buttonToSaveFinalizeSale: null,
-        ref_inputConceptOfCustomProduct: null,
-        ref_inputPercentageIVAOfCustomProduct: null,
-        ref_inputPercentageOfDiscountAndSurchargeModal: null,
-        ref_inputUnitPriceOfCustomProduct: null,
-        ref_selectPercentageTypeOfDiscountAndSurchargeModal: null
+    refs: {
+        autocompleteClient: null,
+        autocompleteDocument: null,
+        autocompletePaymentMethod: null,
+        autocompletePaymentPlan: null,
+        buttonToAddCustomProduct: null,
+        buttonToFinalizeSale: null,
+        buttonToSaveAddedCustomProducts: null,
+        buttonToSaveCustomProduct: null,
+        buttonToSaveDiscountSurchargeModal: null,
+        buttonToSaveFinalizeSale: null,
+        inputConceptOfCustomProduct: null,
+        inputPercentageIVAOfCustomProduct: null,
+        inputPercentageOfDiscountAndSurchargeModal: null,
+        inputUnitPriceOfCustomProduct: null,
+        lines: null,
+        selectPercentageTypeOfDiscountAndSurchargeModal: null,
+        selectToAddProductByBarcode: null,
+        selectToAddProductByName: null,
+        selectToAddProductByProductCode: null
+    },
+    selectToAddProductByBarcode: {
+        options: [],
+        selectedValue: null
+    },
+    selectToAddProductByName: {
+        options: [],
+        selectedValue: null
+    },
+    selectToAddProductByProductCode: {
+        options: [],
+        selectedValue: null
     },
     valueForDatePicker: null,
 
@@ -663,6 +684,30 @@ const reducer = (state = initialState, action) => {
                     return line
                 })
             }
+        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE:
+            return {
+                ...state,
+                selectToAddProductByBarcode: {
+                    ...state.selectToAddProductByBarcode,
+                    options: action.payload
+                }
+            }
+        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME:
+            return {
+                ...state,
+                selectToAddProductByName: {
+                    ...state.selectToAddProductByName,
+                    options: action.payload
+                }
+            }
+        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE:
+            return {
+                ...state,
+                selectToAddProductByProductCode: {
+                    ...state.selectToAddProductByProductCode,
+                    options: action.payload
+                }
+            }
         case actions.SET_PAYMENT_METHOD:
             return {
                 ...state,
@@ -708,26 +753,7 @@ const reducer = (state = initialState, action) => {
         case actions.SET_REFS:
             return {
                 ...state,
-                saleRefs: {
-                    ...state.saleRefs,
-                    ref_autocompleteClient: action.payload.ref_autocompleteClient,
-                    ref_autocompleteDocument: action.payload.ref_autocompleteDocument,
-                    ref_autocompletePaymentMethod: action.payload.ref_autocompletePaymentMethod,
-                    ref_autocompletePaymentPlan: action.payload.ref_autocompletePaymentPlan,
-                    ref_buttonToAddCustomProduct: action.payload.ref_buttonToAddCustomProduct,
-                    ref_buttonToCancelDiscountSurchargeModal: action.payload.ref_buttonToCancelDiscountSurchargeModal,
-                    ref_buttonToFinalizeSale: action.payload.ref_buttonToFinalizeSale,
-                    ref_buttonToOpenProductSelectionModal: action.payload.ref_buttonToOpenProductSelectionModal,
-                    ref_buttonToSaveAddedCustomProducts: action.payload.ref_buttonToSaveAddedCustomProducts,
-                    ref_buttonToSaveCustomProduct: action.payload.ref_buttonToSaveCustomProduct,
-                    ref_buttonToSaveDiscountSurchargeModal: action.payload.ref_buttonToSaveDiscountSurchargeModal,
-                    ref_buttonToSaveFinalizeSale: action.payload.ref_buttonToSaveFinalizeSale,
-                    ref_inputConceptOfCustomProduct: action.payload.ref_inputConceptOfCustomProduct,
-                    ref_inputPercentageIVAOfCustomProduct: action.payload.ref_inputPercentageIVAOfCustomProduct,
-                    ref_inputPercentageOfDiscountAndSurchargeModal: action.payload.ref_inputPercentageOfDiscountAndSurchargeModal,
-                    ref_inputUnitPriceOfCustomProduct: action.payload.ref_inputUnitPriceOfCustomProduct,
-                    ref_selectPercentageTypeOfDiscountAndSurchargeModal: action.payload.ref_selectPercentageTypeOfDiscountAndSurchargeModal
-                }
+                refs: action.payload
             }
         case actions.SET_PRODUCTS:
             return {
@@ -745,6 +771,30 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 usuario: action.payload
+            }
+        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE:
+            return {
+                ...state,
+                selectToAddProductByBarcode: {
+                    ...state.selectToAddProductByBarcode,
+                    selectedValue: action.payload
+                }
+            }
+        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_NAME:
+            return {
+                ...state,
+                selectToAddProductByName: {
+                    ...state.selectToAddProductByName,
+                    selectedValue: action.payload
+                }
+            }
+        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE:
+            return {
+                ...state,
+                selectToAddProductByProductCode: {
+                    ...state.selectToAddProductByProductCode,
+                    selectedValue: action.payload
+                }
             }
         case actions.SET_VOUCHER_NUMBERS:
             return {
