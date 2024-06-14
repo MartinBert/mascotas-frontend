@@ -624,7 +624,7 @@ const reducer = (state = initialState, action) => {
                         cantidadg: isCustomLine ? 0 : unitMeasure_gramsToGrams ? fractionament : 0,
                         cantidadKg: isCustomLine ? 0 : unitMeasure_gramsToGrams ? 0 : (fractionament < 1000) ? fractionament : 1,
                         cantidadQuitadaPorRecargo_enKg: 0,
-                        cantidadUnidades: 1,
+                        cantidadUnidades: fractionament < 1000 ? 1 : 1000,
                         codigoBarras: line.codigoBarras,
                         descuento: 0,
                         fraccionamiento: fractionament,
