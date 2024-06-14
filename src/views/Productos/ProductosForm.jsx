@@ -113,10 +113,32 @@ const ProductosForm = () => {
     const setFormDataToProduct = async (e) => {
         const target = e.target.name
         const value = e.target.value
-        setProduct({ ...product, [target]: value })
-        if (target === 'codigoBarras') setProduct({ ...product, normalizedBarcode: normalizeString(value) })
-        if (target === 'codigoProducto') setProduct({ ...product, normalizedProductCode: normalizeString(value) })
-        if (target === 'nombre') setProduct({ ...product, normalizedName: normalizeString(value) })
+        if (target === 'codigoBarras') {
+            setProduct({
+                ...product,
+                codigoBarras: value,
+                normalizedBarcode: normalizeString(value)
+            })
+        }
+        else if (target === 'codigoProducto') {
+            setProduct({
+                ...product,
+                codigoProducto: value,
+                normalizedProductCode: normalizeString(value)
+            })
+        }
+        else if (target === 'nombre') {
+            setProduct({
+                ...product,
+                nombre: value,
+                normalizedName: normalizeString(value)
+            })
+        } else {
+            setProduct({
+                ...product,
+                [target]: value
+            })
+        }
     }
 
     const setSelectedBrandToProduct = async (brand) => {
@@ -148,8 +170,41 @@ const ProductosForm = () => {
             cantidadFraccionadaStock: response.fraccionamiento
         })
     }
+
+    const saveValidation = () => {
+        if (product.nombre === '') {
+            errorAlert('Agregue un NOMBRE a su producto.')
+            return false
+        }
+        if (product.codigoBarras === '') {
+            errorAlert('Agregue un COD. BARRAS a su producto.')
+            return false
+        }
+        if (product.codigoProducto === '') {
+            errorAlert('Agregue un COD. PRODUCTO a su producto.')
+            return false
+        }
+        if (!product.marca) {
+            errorAlert('Agregue una MARCA a su producto.')
+            return false
+        }
+        if (!product.rubro) {
+            errorAlert('Agregue un RUBRO a su producto.')
+            return false
+        }
+        if (!product.unidadMedida) {
+            errorAlert('Agregue una UNIDAD MEDIDA a su producto.')
+            return false
+        }
+        return true
+    }
+
     const saveProduct = () => {
+        const validated = saveValidation()
+        if (!validated) return
+
         product.imagenes = uploadedImages
+
         const saveProduct = async () => {
             const response = await api.productos.save(product)
             if (response.code === 200) {
@@ -226,7 +281,7 @@ const ProductosForm = () => {
                                         name='nombre'
                                         placeholder='Nombre'
                                         value={product.nombre}
-                                        onChange={e => { setFormDataToProduct(e) }}
+                                        onChange={setFormDataToProduct}
                                     />
                                 </Form.Item>
                             </Col>
