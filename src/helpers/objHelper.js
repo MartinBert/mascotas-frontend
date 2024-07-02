@@ -142,6 +142,14 @@ const sortArray = (elements, reversedKeysToCompare = null) => {
     return elements
 }
 
+const sortArrayOfSelectOptions = (a, b) => {
+    const optionA = a.value.toUpperCase()
+    const optionB = b.value.toUpperCase()
+    if (optionA < optionB) return -1
+    if (optionA > optionB) return 1
+    return 0
+}
+
 const spanishVoucherDataToSave = (data) => {
     const formattedData = {
         associatedVouchers: !data.associatedVouchers
@@ -230,6 +238,7 @@ const objHelper = {
     formatVoucherDataToSave,
     noEmptyKeys,
     sortArray,
+    sortArrayOfSelectOptions,
     spanishVoucherDataToSave
 }
 

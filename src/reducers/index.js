@@ -6,10 +6,7 @@ import fiscalNoteModal from './fiscalNoteModal'
 import outputs from './outputs'
 import privateRoute from './privateRoute'
 import products from './products'
-import productSelectionModal from './productSelectionModal'
 import sale from './sale'
-import saleCustomProducts from './saleCustomProducts'
-import saleProducts from './saleProducts'
 import salesAreas from './salesAreas'
 
 const reducers = {
@@ -21,10 +18,7 @@ const reducers = {
     outputs,
     privateRoute,
     products,
-    productSelectionModal,
     sale,
-    saleCustomProducts,
-    saleProducts,
     salesAreas
 }
 

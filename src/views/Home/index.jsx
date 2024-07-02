@@ -248,19 +248,44 @@ const Home = () => {
     }
 
     const addNormalizedNames = async () => {
-        const findProducts = await api.productos.findAll()
-        const products = findProducts.docs
-        for (let index = 0; index < products.length; index++) {
-            const product = products[index]
-            const productFixed = {
-                ...product,
-                normalizedBarcode: product.codigoBarras ? normalizeString(product.codigoBarras) : null,
-                normalizedBrand: product.marca ? normalizeString(product.marca.nombre) : null,
-                normalizedName: product.nombre ? normalizeString(product.nombre) : null,
-                normalizedProductCode: product.codigoProducto ? normalizeString(product.codigoProducto) : null,
-                normalizedType: product.rubro ? normalizeString(product.rubro.nombre) : null
+        const findClients = await api.clientes.findAll()
+        const clients = findClients.docs
+        for (let index = 0; index < clients.length; index++) {
+            const client = clients[index]
+            const clientFixed = {
+                ...client,
+                normalizedBusinessName: client.razonSocial ? normalizeString(client.razonSocial) : null
             }
-            await api.productos.edit(productFixed)
+            await api.clientes.edit(clientFixed)
+        }
+
+        const findDocuments = await api.documentos.findAll()
+        const documents = findDocuments.docs
+        for (let index = 0; index < documents.length; index++) {
+            const document = documents[index]
+            const documentFixed = {
+                ...document,
+                normalizedName: document.nombre ? normalizeString(document.nombre) : null
+            }
+            await api.documentos.edit(documentFixed)
+        }
+
+        const findPaymentMethods = await api.mediospago.findAll()
+        const paymentMethods = findPaymentMethods.docs
+        for (let index = 0; index < paymentMethods.length; index++) {
+            const paymentMethod = paymentMethods[index]
+            const paymentMethodFixed = {
+                ...paymentMethod,
+                normalizedName: paymentMethod.nombre ? normalizeString(paymentMethod.nombre) : null,
+                planes: paymentMethod.planes.map(plan => {
+                    const planFixed = {
+                        ...plan,
+                        normalizedName: plan.nombre ? normalizeString(plan.nombre) : null
+                    }
+                    return planFixed
+                })
+            }
+            await api.mediospago.edit(paymentMethodFixed)
         }
         
         console.log('listo')
@@ -310,7 +335,7 @@ const Home = () => {
     }
     
 
-    const testRenderElementDisplay = 'none'
+    const testRenderElementDisplay = 'block'
 
     return (
         <>
@@ -333,7 +358,7 @@ const Home = () => {
                 onClick={addNormalizedNames}
                 style={{ display: testRenderElementDisplay }}
             >
-                Agregar nombres normalizados a productos
+                Agregar nombres normalizados a clientes, documentos, medios de pago y planes de pago
             </button>
             <hr style={{ display: testRenderElementDisplay }} />
             <button

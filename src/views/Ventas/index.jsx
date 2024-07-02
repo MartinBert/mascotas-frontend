@@ -2,94 +2,570 @@
 import React, { useEffect } from 'react'
 
 // Custom Components
-import { errorAlert } from '../../components/alerts'
-import { ProductSelectionModal } from '../../components/generics'
+import Delete from '../../components/icons/Delete'
 
 // Design Components
-import { Button, Col, Row, Spin } from 'antd'
+import { Button, Checkbox, Col, Input, Row, Space, Spin, Table } from 'antd'
 
 // Custom Context Providers
 import contexts from '../../contexts'
+
+// Helpers
+import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
 
 // Views
-import CustomLineModal from './CustomLineModal'
 import Header from './Header'
-import DiscountSurchargeModal from './DiscountSurchargeModal'
 import FinalizeSaleModal from './FinalizeSaleModal'
-import Lines from './Lines'
-import ListCustomLinesModal from './ListCustomLinesModal'
 
 // Imports Destructurings
 const { useSaleContext } = contexts.Sale
+const { round, roundTwoDecimals } = helpers.mathHelper
+const { fixInputNumber, fixInputNumberValue } = helpers.stringHelper
 
 
 const Ventas = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
 
-    const loadData = async () => {
-
-        // Refs data
+    // --------------------- Actions --------------------- //
+    const addRefs = () => {
         const refs = {
-            autocompleteClient: sale_state.loadingView ? null : document.getElementById('autocompleteClient'),
-            autocompleteDocument: sale_state.loadingView ? null : document.getElementById('autocompleteDocument'),
-            autocompletePaymentMethod: sale_state.loadingView ? null : document.getElementById('autocompletePaymentMethod'),
-            autocompletePaymentPlan: sale_state.loadingView ? null : document.getElementById('autocompletePaymentPlan'),
-            buttonToAddCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToAddCustomProduct'),
-            buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToFinalizeSale'),
-            buttonToSaveAddedCustomProducts: sale_state.loadingView ? null : document.getElementById('buttonToSaveAddedCustomProducts'),
-            buttonToSaveCustomProduct: sale_state.loadingView ? null : document.getElementById('buttonToSaveCustomProduct'),
-            buttonToSaveDiscountSurchargeModal: sale_state.loadingView ? null : document.getElementById('buttonToSaveDiscountSurchargeModal'),
-            buttonToSaveFinalizeSale: sale_state.loadingView ? null : document.getElementById('buttonToSaveFinalizeSale'),
-            datePicker: sale_state.loadingView ? null : document.getElementById('datePicker'),
-            inputConceptOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputConceptOfCustomProduct'),
-            inputPercentageIVAOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputPercentageIVAOfCustomProduct'),
-            inputPercentageOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('inputPercentageOfDiscountAndSurchargeModal'),
-            inputUnitPriceOfCustomProduct: sale_state.loadingView ? null : document.getElementById('inputUnitPriceOfCustomProduct'),
-            lines: sale_state.loadingView ? null : document.getElementById('saleLines'),
-            selectPercentageTypeOfDiscountAndSurchargeModal: sale_state.loadingView ? null : document.getElementById('selectPercentageTypeOfDiscountAndSurchargeModal'),
-            selectToAddProductByBarcode: sale_state.loadingView ? null : document.getElementById('selectToAddProductByBarcode'),
-            selectToAddProductByName: sale_state.loadingView ? null : document.getElementById('selectToAddProductByName'),
-            selectToAddProductByProductCode: sale_state.loadingView ? null : document.getElementById('selectToAddProductByProductCode')
+            ...sale_state.refs,
+            inputCustomPercentageIva: sale_state.loadingView ? null : document.getElementById('salesHeader_inputCustomPercentageIva')
         }
         sale_dispatch({ type: 'SET_REFS', payload: refs })
+    }
 
+    const loadData = async () => {
+        // Refs data
+        const refs = {
+            buttonToAddCustomProduct: sale_state.loadingView ? null : document.getElementById('salesHeader_buttonToAddCustomProduct'),
+            buttonToCancelFinalizeSale: sale_state.loadingView ? null : document.getElementById('salesFinalizeSaleModal_buttonToCancelFinalizeSale'),
+            buttonToFinalizeSale: sale_state.loadingView ? null : document.getElementById('salesIndex_buttonToFinalizeSale'),
+            buttonToSaveFinalizeSale: sale_state.loadingView ? null : document.getElementById('salesFinalizeSaleModal_buttonToSaveFinalizeSale'),
+            datePicker: sale_state.loadingView ? null : document.getElementById('salesHeader_datePickerForBillingDate'),
+            inputCustomConcept: sale_state.loadingView ? null : document.getElementById('salesHeader_inputCustomConcept'),
+            inputCustomProduct: sale_state.loadingView ? null : document.getElementById('salesHeader_inputCustomProduct'),
+            inputCustomUnitPrice: sale_state.loadingView ? null : document.getElementById('salesHeader_inputCustomUnitPrice'),
+            inputGeneralPercentage: sale_state.loadingView ? null : document.getElementById('salesHeader_inputGeneralPercentage'),
+            inputGeneralPercentageValue: sale_state.loadingView ? null : document.getElementById('salesHeader_inputGeneralPercentageValue'),
+            salesIndex: sale_state.loadingView ? null : document.getElementById('salesIndex'),
+            selectClient: sale_state.loadingView ? null : document.getElementById('salesHeader_selectClient'),
+            selectDocument: sale_state.loadingView ? null : document.getElementById('salesHeader_selectDocument'),
+            selectPaymentMethod: sale_state.loadingView ? null : document.getElementById('salesHeader_selectPaymentMethod'),
+            selectPaymentPlan: sale_state.loadingView ? null : document.getElementById('salesHeader_selectPaymentPlan'),
+            selectGeneralPercentageType: sale_state.loadingView ? null : document.getElementById('salesHeader_selectGeneralPercentageType'),
+            selectToAddProductByBarcode: sale_state.loadingView ? null : document.getElementById('salesHeader_selectToAddProductByBarcode'),
+            selectToAddProductByName: sale_state.loadingView ? null : document.getElementById('salesHeader_selectToAddProductByName')
+        }
+        sale_dispatch({ type: 'SET_REFS', payload: refs })
         // User data
         const userId = localStorage.getItem('userId')
         const loggedUser = await api.usuarios.findById(userId)
         sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.empresa })
         sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.puntoVenta })
         sale_dispatch({ type: 'SET_USER', payload: loggedUser })
-
         // Voucher data
         const lastIndex = await api.ventas.findLastIndex()
         sale_dispatch({ type: 'SET_INDEX', payload: lastIndex + 1 })
-
     }
 
-    useEffect(() => { loadData() }, [])
+    const setFocus = () => {
+        const { existsRefs, refs } = validateFocus()
+        if (!existsRefs) return
+        let unfilledField
+        if (!sale_state.valueForDatePicker) unfilledField = refs.datePicker
+        else if (!sale_state.selectClient.selectedValue) unfilledField = refs.selectClient
+        else if (!sale_state.selectDocument.selectedValue) unfilledField = refs.selectDocument
+        else if (!sale_state.selectPaymentMethod.selectedValue) unfilledField = refs.selectPaymentMethod
+        else if (!sale_state.selectPaymentPlan.selectedValue) unfilledField = refs.selectPaymentPlan
+        else if (sale_state.renglones.length === 0) unfilledField = refs.selectToAddProductByName
+        else unfilledField = refs.buttonToFinalizeSale
+        unfilledField.focus()
+    }
 
-    const checkState = async () => {
-        const result = new Promise(resolve => {
-            if (!sale_state.renglones || sale_state.renglones.length < 1) resolve('Debe seleccionar al menos un producto para realizar la venta.')
-            if (!sale_state.cliente) resolve('Debe seleccionar un cliente para realizar la venta.')
-            if (!sale_state.documento) resolve('Debe indicar el documento/comprobante de la operación.')
-            if (!sale_state.mediosPago || sale_state.mediosPago.length < 1) resolve('Debe seleccionar al menos un medio de pago para realizar la venta.')
-            if (!sale_state.planesPago || sale_state.planesPago.length < 1) resolve('Debe seleccionar al menos un plan de pago para realizar la venta.')
-            resolve('OK')
+    const setFocusWhenPressingEsc = (e) => {
+        if (e.keyCode === 27) { // Escape
+            e.preventDefault()
+            setFocus()
+        } else return
+    }
+
+    const updateLines = () => {
+        sale_dispatch({ type: 'SET_LINES', payload: sale_state.productos })
+    }
+
+    const updateState = () => {
+        sale_dispatch({ type: 'UPDATE_LINES_VALUES' })
+        sale_dispatch({ type: 'UPDATE_TOTALS' })
+    }
+
+    const validateFocus = () => {
+        const refs = {
+            buttonToFinalizeSale: sale_state.refs.buttonToFinalizeSale,
+            datePicker: sale_state.refs.datePicker,
+            selectClient: sale_state.refs.selectClient,
+            selectDocument: sale_state.refs.selectDocument,
+            selectPaymentMethod: sale_state.refs.selectPaymentMethod,
+            selectPaymentPlan: sale_state.refs.selectPaymentPlan,
+            selectToAddProductByBarcode: sale_state.refs.selectToAddProductByBarcode,
+            selectToAddProductByName: sale_state.refs.selectToAddProductByName,
+            selectToAddProductByProductCode: sale_state.refs.selectToAddProductByProductCode
+        }
+        const existsRefs = !Object.values(refs).includes(null)
+        const data = { existsRefs, refs }
+        return data
+    }
+
+    const verifyErrorsInLines = () => {
+        const errorsInLines = sale_state.renglones.map(line => {
+            const errorsArray = [
+                statusOfLineDiscountPercentage(line) === 'error' ? true : false,
+                statusOfLineNetPrice(line) === 'error' ? true : false,
+                statusOfLineQuantity(line) === 'error' ? true : false,
+                statusOfLineSurchargePercentage(line) === 'error' ? true : false
+            ]
+            const existsErrorInLine = errorsArray.includes(true) ? true : false
+            return existsErrorInLine
         })
-        return await result
+        const existsErrors = errorsInLines.includes(true) ? true : false
+        if (existsErrors) sale_dispatch({ type: 'SET_EXISTS_LINE_ERROR', payload: true })
+        else sale_dispatch({ type: 'SET_EXISTS_LINE_ERROR', payload: false })
     }
 
-    const openFinalizeSaleModal = () => {
-        checkState()
-            .then(result => {
-                if (result === 'OK') return sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
-                return errorAlert(result)
-            })
+    useEffect(() => { addRefs() }, [sale_state.empresa])
+    useEffect(() => { verifyErrorsInLines() }, [sale_state.renglones])
+    useEffect(() => { loadData() }, [])
+    useEffect(() => { setFocus() }, [
+        sale_state.valueForDatePicker,
+        sale_state.selectClient.selectedValue,
+        sale_state.selectDocument.selectedValue,
+        sale_state.selectPaymentMethod.selectedValue,
+        sale_state.selectPaymentPlan.selectedValue
+    ])
+    useEffect(() => { updateLines() }, [sale_state.productos.length])
+    useEffect(() => { updateState() }, [sale_state.lastModifiedParameter])
+
+    // ------------ Actions of product to sale ----------- //
+    const deleteProduct = (line) => {
+        sale_dispatch({ type: 'DELETE_PRODUCT', payload: line })
     }
+
+    const actionsOfProductToSale = (line) => {
+        const element = (
+            <div
+                align='middle'
+                onClick={e => deleteProduct(line)}
+            >
+                <Delete />
+            </div>
+        )
+        return element
+    }
+
+    // ---------- Button to start finalize sale ---------- //
+    const restartErrorIfNotExistsProducts = () => {
+        return sale_dispatch({ type: 'SET_ERROR_IF_NOT_EXISTS_PRODUCTS', payload: false })
+    }
+
+    const startFinalizeSale = () => {
+        if (sale_state.renglones.length < 1) {
+            sale_dispatch({ type: 'SET_ERROR_IF_NOT_EXISTS_PRODUCTS', payload: true })
+            setTimeout(restartErrorIfNotExistsProducts, 2000)
+            return sale_state.refs.selectToAddProductByName.focus()
+        }
+        const status = {
+            ...sale_state.fieldStatus,
+            client: !sale_state.cliente ? 'error' : null,
+            document: !sale_state.documento ? 'error' : null,
+            paymentMethod: sale_state.mediosPago.length < 1 ? 'error' : null,
+            paymentPlan: sale_state.planesPago.length < 1 ? 'error' : null
+        }
+        sale_dispatch({ type: 'SET_STATUS_TO_FINALIZE_SALE', payload: status })
+        const errorAtStartFinalizeSale = Object.values(status).includes('error') || sale_state.existsLineError
+        if (errorAtStartFinalizeSale) return
+        sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
+    }
+
+    const buttonToStartFinalizeSale = (
+        <Row gutter={8} align='middle'>
+            <Col span={6}>
+                <Button
+                    className='btn-primary'
+                    disabled={sale_state.loadingDocumentIndex ? true : false}
+                    id='salesIndex_buttonToFinalizeSale'
+                    onClick={startFinalizeSale}
+                >
+                    Finalizar venta
+                </Button>
+            </Col>
+            {
+                !sale_state.loadingDocumentIndex
+                    ? null
+                    : <Col span={6}><Spin /></Col>
+            }
+            {
+                !sale_state.errorIfNotExistsProducts
+                    ? null
+                    : (
+                        <Col span={6}>
+                            <span style={{ color: 'red' }}>
+                                Debes seleccionar al menos un producto.
+                            </span>
+                        </Col>
+                    )
+            }
+        </Row>
+    )
+
+    // ------------- Checkbox to fractionate ------------- //
+    const onChangeFractionateCheckbox = (e, line) => {
+        line.fraccionar = e.target.checked
+        sale_dispatch({ type: 'SET_FRACTIONED', payload: line })
+    }
+
+    const checkboxToFractionate = (line) => {
+        const element = (
+            <Checkbox
+                checked={line.fraccionar === true ? true : false}
+                disabled={line._id.startsWith('customProduct_')}
+                onChange={e => onChangeFractionateCheckbox(e, line)}
+                onKeyUp={setFocusWhenPressingEsc}
+            />
+        )
+        return element
+    }
+
+    // ------------- Input discount percentage ----------- //
+    const statusOfLineDiscountPercentage = (line) => {
+        if (
+            parseFloat(line.porcentajeDescuentoRenglon) < 0
+            || parseFloat(line.porcentajeDescuentoRenglon) > 100
+            || line?.porcentajeDescuentoRenglon?.toString()?.endsWith('.')
+            || line?.porcentajeDescuentoRenglon?.toString()?.endsWith(',')
+        ) return 'error'
+        else return null
+    }
+
+    const onChangeDiscountPercent = (e, line) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.renglones.find(renglon => renglon._id === line._id).porcentajeDescuentoRenglon
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({
+            type: 'SET_LINE_DISCOUNT_PERCENTAGE',
+            payload: { _id: line._id, porcentajeDescuentoRenglon: fixedValue }
+        })
+    }
+
+    const inputDiscountPercentage = (line) => {
+        const element = (
+            <>
+                <Input
+                    allowClear
+                    disabled={line.porcentajeRecargoRenglon > 0}
+                    onChange={e => onChangeDiscountPercent(e, line)}
+                    onKeyUp={setFocusWhenPressingEsc}
+                    status={statusOfLineDiscountPercentage(line)}
+                    style={{ width: '100%' }}
+                    value={line.porcentajeDescuentoRenglon}
+                />
+                <span
+                    style={{
+                        color: 'red',
+                        display: statusOfLineDiscountPercentage(line) === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    Escribe un porcentaje válido entre cero y 100.
+                </span>
+            </>
+        )
+        return element
+    }
+
+    // ----------------- Input gross price --------------- //
+    const inputGrossPrice = (line) => {
+        const element = (
+            <Input
+                disabled={true}
+                value={roundTwoDecimals(line.precioBruto)}
+            />
+        )
+        return element
+    }
+
+    // ------------------ Input net price ---------------- //
+    const statusOfLineNetPrice = (line) => {
+        if (
+            !line.precioNeto
+            || line.precioNeto === ''
+            || parseFloat(line.precioNeto) < 0
+            || line?.precioNeto?.toString()?.endsWith('.')
+            || line?.precioNeto?.toString()?.endsWith(',')
+        ) return 'error'
+        else return null
+    }
+
+    const onChangeFixedNetPriceCheckbox = (e, line) => {
+        line.precioNetoFijo = e.target.checked
+        sale_dispatch({ type: 'SET_NET_PRICE_FIXED', payload: line })
+    }
+
+    const onChangeNetPrice = (e, line) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.renglones.find(renglon => renglon._id === line._id).precioNeto
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({
+            type: 'SET_NET_PRICE',
+            payload: { _id: line._id, precioNeto: fixedValue }
+        })
+    }
+
+    const inputNetPrice = (line) => {
+        const element = (
+            <Row align='middle'>
+                <Col span={3}>
+                    <Checkbox
+                        onChange={e => onChangeFixedNetPriceCheckbox(e, line)}
+                        onKeyUp={setFocusWhenPressingEsc}
+                    />
+                </Col>
+                <Col span={21}>
+                    <Input
+                        allowClear
+                        disabled={line.precioNetoFijo ? true : false}
+                        onChange={e => onChangeNetPrice(e, line)}
+                        onKeyUp={setFocusWhenPressingEsc}
+                        status={statusOfLineNetPrice(line)}
+                        style={{ width: '100%' }}
+                        value={line.precioNeto}
+                    />
+                </Col>
+                <span
+                    style={{
+                        color: 'red',
+                        display: statusOfLineNetPrice(line) === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    Escribe un precio neto válido.
+                </span>
+            </Row>
+        )
+        return element
+    }
+
+    // -------------------- Input note ------------------- //
+    const setNote = (value, lineID) => {
+        sale_dispatch({ type: 'SET_LINE_NOTE', payload: { lineID: lineID, note: value } })
+    }
+
+    const inputNote = (line) => {
+        const element = (
+            <Space.Compact style={{ width: '100%' }}>
+                <Input
+                    addonBefore='Nota'
+                    key={line._id}
+                    onChange={e => setNote(e.target.value, line._id)}
+                    onKeyUp={setFocusWhenPressingEsc}
+                    value={line.nota}
+                />
+                <Button
+                    danger
+                    onClick={() => setNote('', line._id)}
+                    onKeyUp={setFocusWhenPressingEsc}
+                    type='primary'
+                >
+                    Borrar
+                </Button>
+            </Space.Compact>
+        )
+        return element
+    }
+
+    // ------------------ Input quantity ----------------- //
+    const statusOfLineQuantity = (line) => {
+        if (
+            !line.cantidadUnidades
+            || parseFloat(line.cantidadUnidades) < 0
+            || line?.cantidadUnidades?.toString()?.endsWith('.')
+            || line?.cantidadUnidades?.toString()?.endsWith(',')
+        ) return 'error'
+        else return null
+    }
+
+    const hideSpanOfMeasureUnity = (line) => {
+        if (!line.unidadMedida) return 'none'
+        const unitOfMeasureIncludesKg = line.unidadMedida.toLowerCase().includes('kilo')
+        const unitOfMeasureIncludesGr = line.unidadMedida.toLowerCase().includes('gramo')
+        if (unitOfMeasureIncludesKg || unitOfMeasureIncludesGr) return 'block'
+        else return 'none'
+    }
+
+    const onChangeLineQuantity = (e, line) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.renglones.find(renglon => renglon._id === line._id).cantidadUnidades
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({
+            type: 'SET_LINE_QUANTITY',
+            payload: { _id: line._id, cantidadUnidades: fixedValue }
+        })
+    }
+
+    const inputQuantity = (line) => {
+        const element = (
+            <Row gutter={8}>
+                <Col span={16}>
+                    <Input
+                        allowClear
+                        disabled={line.precioNetoFijo === true ? true : false}
+                        onChange={e => onChangeLineQuantity(e, line)}
+                        onKeyUp={setFocusWhenPressingEsc}
+                        status={statusOfLineQuantity(line)}
+                        style={{ width: '100%' }}
+                        value={line.cantidadUnidades}
+                    />
+                </Col>
+                <Col span={8}>
+                    {line.fraccionar ? <p>/ {line.fraccionamiento}</p> : null}
+                </Col>
+                <span
+                    style={{ textAlign: 'end', display: hideSpanOfMeasureUnity(line) }}
+                >
+                    {line.cantidadKg} kg {round(line.cantidadg)} g
+                </span>
+                <span
+                    style={{
+                        color: 'red',
+                        display: statusOfLineQuantity(line) === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    Escribe una cantidad válida.
+                </span>
+            </Row>
+        )
+        return element
+    }
+
+    // ------------ Input surcharge percentage ----------- //
+    const statusOfLineSurchargePercentage = (line) => {
+        if (
+            parseFloat(line.porcentajeRecargoRenglon) < 0
+            || line?.porcentajeRecargoRenglon?.toString()?.endsWith('.')
+            || line?.porcentajeRecargoRenglon?.toString()?.endsWith(',')
+        ) return 'error'
+        else return null
+    }
+
+    const onChangeSurchargePercent = (e, line) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.renglones.find(renglon => renglon._id === line._id).porcentajeRecargoRenglon
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({
+            type: 'SET_LINE_SURCHARGE_PERCENTAGE',
+            payload: { _id: line._id, porcentajeRecargoRenglon: fixedValue }
+        })
+    }
+
+    const inputSurchargePercentage = (line) => {
+        const element = (
+            <>
+                <Input
+                    allowClear
+                    disabled={line.porcentajeDescuentoRenglon > 0}
+                    onKeyUp={setFocusWhenPressingEsc}
+                    status={statusOfLineSurchargePercentage(line)}
+                    style={{ width: '100%' }}
+                    onChange={e => onChangeSurchargePercent(e, line)}
+                    value={line.porcentajeRecargoRenglon}
+                />
+                <span
+                    style={{
+                        color: 'red',
+                        display: statusOfLineSurchargePercentage(line) === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    Escribe un porcentaje válido.
+                </span>
+            </>
+        )
+        return element
+    }
+
+    // ----------------- Input unit price ---------------- //
+    const inputUnitPrice = (line) => {
+        const element = (
+            <Input
+                disabled={true}
+                value={line.cantidadUnidades > 0 ? line.precioUnitario : 0}
+            />
+        )
+        return element
+    }
+
+    // ----------- Table of products for sale ------------ //
+    const columns = [
+        {
+            dataIndex: 'saleProducts_fractionate',
+            render: (_, line) => checkboxToFractionate(line),
+            title: 'Fracc.'
+        },
+        {
+            dataIndex: 'saleProducts_name',
+            render: (_, line) => line.nombre,
+            title: 'Producto',
+            width: 300
+        },
+        {
+            dataIndex: 'saleProducts_quantity',
+            render: (_, line) => inputQuantity(line),
+            title: 'Cantidad'
+        },
+        {
+            dataIndex: 'saleProducts_unitPrice',
+            render: (_, line) => inputUnitPrice(line),
+            title: 'Prec. U.'
+        },
+        {
+            dataIndex: 'saleProducts_discountPercentage',
+            render: (_, line) => inputDiscountPercentage(line),
+            title: '% Descuento'
+        },
+        {
+            dataIndex: 'saleProducts_surchargePercentage',
+            render: (_, line) => inputSurchargePercentage(line),
+            title: '% Recargo'
+        },
+        {
+            dataIndex: 'saleProducts_grossPrice',
+            render: (_, line) => inputGrossPrice(line),
+            title: 'Precio bruto'
+        },
+        {
+            dataIndex: 'saleProducts_netPrice',
+            render: (_, line) => inputNetPrice(line),
+            title: 'Precio neto'
+        },
+        {
+            dataIndex: 'saleProducts_actions',
+            render: (_, line) => actionsOfProductToSale(line),
+            title: 'Quitar'
+        }
+    ]
+
+    const tableOfProductsForSale = (
+        <Table
+            columns={columns}
+            dataSource={sale_state.renglones}
+            expandable={{ expandedRowRender: renglon => inputNote(renglon) }}
+            pagination={false}
+            rowKey='_id'
+            size='small'
+            tableLayout='auto'
+            width={'100%'}
+        />
+    )
+
 
     return (
         <>
@@ -102,42 +578,20 @@ const Ventas = () => {
                                 sale_state.loadingFinalizeSale
                                     ? <Spin />
                                     : (
-                                        <Row>
+                                        <Row gutter={[0, 8]} id='salesIndex'>
                                             <Col span={24}>
                                                 <Header />
                                             </Col>
                                             <Col span={24}>
-                                                <Lines />
+                                                {tableOfProductsForSale}
                                             </Col>
-                                            <Col span={24} style={{ marginTop: '1%' }}>
-                                                <Row gutter={8} align='middle'>
-                                                    <Col span={6}>
-                                                        <Button
-                                                            className='btn-primary'
-                                                            disabled={sale_state.loadingDocumentIndex ? true : false}
-                                                            id='buttonToFinalizeSale'
-                                                            onClick={openFinalizeSaleModal}
-                                                        >
-                                                            Finalizar venta
-                                                        </Button>
-                                                    </Col>
-                                                    <Col span={6}>
-                                                        {
-                                                            sale_state.loadingDocumentIndex
-                                                                ? <Spin />
-                                                                : null
-                                                        }
-                                                    </Col>
-                                                </Row>
+                                            <Col span={24}>
+                                                {buttonToStartFinalizeSale}
                                             </Col>
                                         </Row>
                                     )
                             }
-                            <CustomLineModal />
-                            <DiscountSurchargeModal />
                             <FinalizeSaleModal />
-                            <ListCustomLinesModal />
-                            <ProductSelectionModal />
                             <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
                             <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
                         </>

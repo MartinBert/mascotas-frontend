@@ -18,6 +18,7 @@ import api from '../../services'
 // Imports Destructuring
 const { Spinner } = graphics
 const { noEmptyKeys } = helpers.objHelper
+const { normalizeString } = helpers.stringHelper
 
 
 const DocumentosForm = () => {
@@ -62,7 +63,8 @@ const DocumentosForm = () => {
 
     const save = async () => {
         if (id && noEmptyKeys(documento) === true) {
-            const response = (id === 'nuevo') ? await api.documentos.save(documento) : await api.documentos.edit(documento)
+            const fixedDocument = { ...documento, normalizedName: normalizeString(documento.nombre) }
+            const response = (id === 'nuevo') ? await api.documentos.save(fixedDocument) : await api.documentos.edit(fixedDocument)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')
                 redirectToDocumentos()

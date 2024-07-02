@@ -4,15 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { ProductSelectionModal } from '../../components/generics'
 import icons from '../../components/icons'
-import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Contexts
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, DatePicker, Input, InputNumber, Row, Select, Spin, Table } from 'antd'
+import { Button, Col, DatePicker, Input, Row, Select, Spin, Table } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -23,7 +21,6 @@ import api from '../../services'
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
-const { useProductSelectionModalContext } = contexts.ProductSelectionModal
 const { resetDate, simpleDateWithHours } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
@@ -35,7 +32,6 @@ const SalidasForm = () => {
     const navigate = useNavigate()
     const [deleteModal_state] = useDeleteModalContext()
     const [outputs_state, outputs_dispatch] = useOutputsContext()
-    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
 
     const returnToIndex = () => { navigate('/salidas') }
 
@@ -45,12 +41,6 @@ const SalidasForm = () => {
             e.preventDefault()
             outputs_state.refs.buttonToCancel.focus()
         } else return
-    }
-
-    const focusOnSelectToAddProductByName = () => {
-        const selectToAddProductByName = outputs_state.refs.selectToAddProductByName
-        if (!selectToAddProductByName) return
-        selectToAddProductByName.focus()
     }
 
     const loadParams = async () => {
@@ -66,16 +56,12 @@ const SalidasForm = () => {
 
     const loadRefs = () => {
         const refs = {
-            buttonToAddProduct: document.getElementById('outputsForm_buttonToAddProduct'),
             buttonToCancel: document.getElementById('outputsForm_buttonToCancel'),
-            buttonToRemoveProducts: document.getElementById('outputsForm_buttonToRemoveProducts'),
-            buttonToRestartFields: document.getElementById('outputsForm_buttonToRestartFields'),
             buttonToSave: document.getElementById('outputsForm_buttonToSave'),
             datePicker: document.getElementById('outputsForm_datePicker'),
             inputDescription: document.getElementById('outputsForm_inputDescription'),
             selectToAddProductByBarcode: document.getElementById('outputsForm_selectToAddProductByBarcode'),
-            selectToAddProductByName: document.getElementById('outputsForm_selectToAddProductByName'),
-            selectToAddProductByProductCode: document.getElementById('outputsForm_selectToAddProductByProductCode')
+            selectToAddProductByName: document.getElementById('outputsForm_selectToAddProductByName')
         }
         outputs_dispatch({ type: 'SET_REFS', payload: refs })
     }
@@ -117,23 +103,6 @@ const SalidasForm = () => {
     useEffect(() => { updateLoading() }, [outputs_state.params.usuario])
     useEffect(() => { updateState() }, [outputs_state.params.cantidad, outputs_state.params.productos])
 
-    // -------------- Button to add product -------------- //
-    const openProductSelectionModal = () => {
-        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
-    }
-
-    const buttonToAddProduct = (
-        <Button
-            className='btn-primary'
-            id='outputsForm_buttonToAddProduct'
-            onClick={openProductSelectionModal}
-            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
-            style={{ width: '100%' }}
-        >
-            Añadir producto
-        </Button>
-    )
-
     // ----------------- Button to cancel ---------------- //
     const buttonToCancel = (
         <Button
@@ -145,42 +114,6 @@ const SalidasForm = () => {
             type='primary'
         >
             Cancelar
-        </Button>
-    )
-
-    // ------------ Button to remove products ------------ //
-    const removeProducts = () => {
-        outputs_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
-        setFocus()
-    }
-
-    const buttonToRemoveProducts = (
-        <Button
-            className='btn-primary'
-            id='outputsForm_buttonToRemoveProducts'
-            onClick={removeProducts}
-            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
-            style={{ width: '100%' }}
-        >
-            Quitar productos
-        </Button>
-    )
-
-    // ------------- Button to restart fields ------------ //
-    const restartFields = () => {
-        outputs_dispatch({ type: 'CLEAR_INPUTS' })
-        outputs_state.refs.inputDescription.focus()
-    }
-
-    const buttonToRestartFields = (
-        <Button
-            className='btn-primary'
-            id='outputsForm_buttonToRestartFields'
-            onClick={restartFields}
-            onKeyUp={focusOnButtonToCancelWhenPressingEsc}
-            style={{ width: '100%' }}
-        >
-            Reiniciar campos
         </Button>
     )
 
@@ -345,7 +278,7 @@ const SalidasForm = () => {
         else saveEdit()
     }
 
-    const button_saveOutput = (
+    const buttonToSave = (
         <Button
             id='outputsForm_buttonToSave'
             onClick={save}
@@ -516,55 +449,6 @@ const SalidasForm = () => {
         />
     )
 
-    // ------ Select to add product by product code ------ //
-    const onKeyUpSelectToAddProductByProductCode = (e) => {
-        if (e.keyCode === 27) { // Escape
-            e.preventDefault()
-            setFocus()
-        } else return
-    }
-
-    const onSearchProductByProductCode = async (e) => {
-        const filters = JSON.stringify({ normalizedProductCode: normalizeString(e) })
-        const params = { page: 1, limit: 15, filters }
-        const findProducts = await api.productos.findPaginated(params)
-        const products = findProducts.docs
-        const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedProductCode)
-        const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedProductCode))
-        const options = productsNotYetSelected.map(product => {
-            return {
-                label: product.nombre + ` (${product.codigoProducto})`,
-                value: product.normalizedProductCode
-            }
-        })
-        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE', payload: options })
-    }
-
-    const onSelectProductByProductCode = async (e) => {
-        const filters = JSON.stringify({ normalizedProductCode: e })
-        const findProducts = await api.productos.findAllByFilters(filters)
-        const products = findProducts.docs
-        const productsToSet = [...outputs_state.params.productos, ...products]
-        outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
-        outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE', payload: [] })
-        outputs_state.refs.selectToAddProductByProductCode.focus()
-    }
-
-    const selectToAddProductByProductCode = (
-        <Select
-            allowClear
-            id='outputsForm_selectToAddProductByProductCode'
-            onKeyUp={onKeyUpSelectToAddProductByProductCode}
-            onSearch={onSearchProductByProductCode}
-            onSelect={onSelectProductByProductCode}
-            options={outputs_state.selectToAddProductByProductCode.options}
-            placeholder='Buscar producto por cód. producto'
-            showSearch
-            style={{ width: '100%' }}
-            value={outputs_state.selectToAddProductByProductCode.selectedValue}
-        />
-    )
-
     // ----------- Table of selected products  ----------- //
     const changeQuantity = (e, product) => {
         const productsEditted = outputs_state.params.productos.map(productInState => {
@@ -652,40 +536,20 @@ const SalidasForm = () => {
 
     const itemsToRender = [
         {
-            element: buttonToAddProduct,
-            order: { lg: 2, md: 1, sm: 1, xl: 2, xs: 1, xxl: 2 }
-        },
-        {
-            element: buttonToRemoveProducts,
+            element: datePicker,
             order: { lg: 4, md: 2, sm: 2, xl: 4, xs: 2, xxl: 4 }
         },
         {
-            element: buttonToRestartFields,
-            order: { lg: 6, md: 3, sm: 3, xl: 6, xs: 3, xxl: 6 }
-        },
-        {
-            element: datePicker,
-            order: { lg: 3, md: 6, sm: 6, xl: 3, xs: 6, xxl: 3 }
-        },
-        {
             element: inputDescription,
-            order: { lg: 1, md: 5, sm: 5, xl: 1, xs: 5, xxl: 1 }
-        },
-        {
-            element: <InputHidden />,
-            order: { lg: 8, md: 4, sm: 4, xl: 8, xs: 4, xxl: 8 }
+            order: { lg: 2, md: 1, sm: 1, xl: 2, xs: 1, xxl: 2 }
         },
         {
             element: selectToAddProductByBarcode,
-            order: { lg: 7, md: 8, sm: 8, xl: 7, xs: 8, xxl: 7 }
+            order: { lg: 3, md: 4, sm: 4, xl: 3, xs: 4, xxl: 3 }
         },
         {
             element: selectToAddProductByName,
-            order: { lg: 5, md: 7, sm: 7, xl: 5, xs: 7, xxl: 5 }
-        },
-        {
-            element: selectToAddProductByProductCode,
-            order: { lg: 9, md: 9, sm: 9, xl: 9, xs: 9, xxl: 9 }
+            order: { lg: 1, md: 3, sm: 3, xl: 1, xs: 3, xxl: 1 }
         }
     ]
 
@@ -750,7 +614,7 @@ const SalidasForm = () => {
                                             {buttonToCancel}
                                         </Col>
                                         <Col span={6}>
-                                            {button_saveOutput}
+                                            {buttonToSave}
                                         </Col>
                                     </Row>
                                 </Col>
@@ -758,7 +622,6 @@ const SalidasForm = () => {
                         )
                 }
             </Col>
-            <ProductSelectionModal />
         </Row>
     )
 }

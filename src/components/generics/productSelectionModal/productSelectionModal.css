@@ -1,9 +1,0 @@
-.productNotSelected:hover td{
-    background-color: #c5deec !important;
-    cursor: pointer !important;
-}
-
-.productSelected td{
-    background-color: #8ac5e7 !important;
-    cursor: pointer !important; 
-}

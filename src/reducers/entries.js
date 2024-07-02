@@ -9,9 +9,7 @@ const { roundTwoDecimals } = helpers.mathHelper
 
 const actions = {
     CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY: 'CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY',
-    CLEAR_INPUTS: 'CLEAR_INPUTS',
     CLEAN_STATE: 'CLEAN_STATE',
-    DELETE_ALL_PRODUCTS: 'DELETE_ALL_PRODUCTS',
     DESELECT_ALL_EXCEL_OPTIONS: 'DESELECT_ALL_EXCEL_OPTIONS',
     HIDE_DETAILS_MODAL: 'HIDE_DETAILS_MODAL',
     SELECT_ALL_EXCEL_OPTIONS: 'SELECT_ALL_EXCEL_OPTIONS',
@@ -25,11 +23,7 @@ const actions = {
     SET_PRODUCTS: 'SET_PRODUCTS',
     SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE',
     SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME',
-    SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE',
-    SET_REFS: 'SET_REFS',
-    SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE: 'SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE',
-    SET_VALUE_OF_SELECT_PRODUCT_BY_NAME: 'SET_VALUE_OF_SELECT_PRODUCT_BY_NAME',
-    SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE: 'SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE'
+    SET_REFS: 'SET_REFS'
 }
 
 const formatDate = (dateToFormat) => {
@@ -74,26 +68,18 @@ const initialState = {
     },
     rangePickerValueForExcelReport: null,
     refs: {
-        buttonToAddProduct: null,
         buttonToCancel: null,
-        buttonToRemoveProducts: null,
-        buttonToRestartFields: null,
         buttonToSave: null,
         datePicker: null,
         inputDescription: null,
         selectToAddProductByBarcode: null,
-        selectToAddProductByName: null,
-        selectToAddProductByProductCode: null
+        selectToAddProductByName: null
     },
     selectToAddProductByBarcode: {
         options: [],
         selectedValue: null
     },
     selectToAddProductByName: {
-        options: [],
-        selectedValue: null
-    },
-    selectToAddProductByProductCode: {
         options: [],
         selectedValue: null
     }
@@ -118,24 +104,8 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 params: { ...state.params, cantidad, costoTotal }
             }
-        case actions.CLEAR_INPUTS:
-            return {
-                ...state,
-                datePickerValue: formatDate(new Date()),
-                params: {
-                    ...state.params,
-                    descripcion: '',
-                    fecha: new Date(),
-                    fechaString: simpleDateWithHours(new Date()),
-                }
-            }
         case actions.CLEAN_STATE:
             return initialState
-        case actions.DELETE_ALL_PRODUCTS:
-            return {
-                ...state,
-                params: { ...state.params, productos: [] }
-            }
         case actions.DESELECT_ALL_EXCEL_OPTIONS:
             const notAllOptions = state.activeExcelOptions.filter(option => option.value !== 'todas')
             const optionsValues = notAllOptions.map(option => option.value)
@@ -204,14 +174,6 @@ const reducer = (state = initialState, action) => {
                     options: action.payload
                 }
             }
-        case actions.SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE:
-            return {
-                ...state,
-                selectToAddProductByProductCode: {
-                    ...state.selectToAddProductByProductCode,
-                    options: action.payload
-                }
-            }
         case actions.SET_PAGINATION_PARAMS:
             return {
                 ...state,
@@ -239,30 +201,6 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 refs: action.payload
-            }
-        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_BARCODE:
-            return {
-                ...state,
-                selectToAddProductByBarcode: {
-                    ...state.selectToAddProductByBarcode,
-                    selectedValue: action.payload
-                }
-            }
-        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_NAME:
-            return {
-                ...state,
-                selectToAddProductByName: {
-                    ...state.selectToAddProductByName,
-                    selectedValue: action.payload
-                }
-            }
-        case actions.SET_VALUE_OF_SELECT_PRODUCT_BY_PRODUCTCODE:
-            return {
-                ...state,
-                selectToAddProductByProductCode: {
-                    ...state.selectToAddProductByProductCode,
-                    selectedValue: action.payload
-                }
             }
         default:
             return state

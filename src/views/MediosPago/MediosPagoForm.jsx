@@ -20,6 +20,7 @@ import api from '../../services'
 const { Spinner } = graphics
 const { Add, Delete } = icons
 const { mathHelper } = helpers
+const { normalizeString } = helpers.stringHelper
 
 
 const MediosPagoForm = () => {
@@ -56,7 +57,11 @@ const MediosPagoForm = () => {
             planLines.forEach(el => {
                 if (!el.nombre || !el.cuotas || !el.porcentaje) return errorAlert('Campos incompletos en planes de pago')
             })
-            mediopago.planes = planLines
+            mediopago.normalizedName = normalizeString(mediopago.nombre)
+            mediopago.planes = planLines.map(plan => {
+                const fixedPlan = { ...plan, normalizedName: normalizeString(plan.nombre) }
+                return fixedPlan
+            })
             if (id === 'nuevo') {
                 api.mediospago.save(mediopago)
                     .then(response => {

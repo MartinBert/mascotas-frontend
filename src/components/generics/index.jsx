@@ -4,7 +4,6 @@ import giselaDetailsModal from './productDetailsModal/GiselaDetailsModal'
 import inputHidden from './InputHidden'
 import openImage from './openImage/OpenImage'
 import productDetailsModal from './productDetailsModal/ProductDetailsModal'
-import productSelectionModal from './productSelectionModal/ProductSelectionModal'
 
 
 export const DeleteModal = deleteModal
@@ -13,4 +12,3 @@ export const GiselaDetailsModal = giselaDetailsModal
 export const InputHidden = inputHidden
 export const OpenImage = openImage
 export const ProductDetailsModal = productDetailsModal
-export const ProductSelectionModal = productSelectionModal

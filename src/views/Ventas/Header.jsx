@@ -3,13 +3,12 @@ import React, { useEffect } from 'react'
 
 // Custom components
 import { errorAlert } from '../../components/alerts'
-import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Context Providers
 import contexts from '../../contexts'
 
 // Design Components
-import { AutoComplete, Button, Col, DatePicker, Row, Select } from 'antd'
+import { Button, Col, DatePicker, Input, Row, Select } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -18,48 +17,40 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructurings
-const { useProductSelectionModalContext } = contexts.ProductSelectionModal
-const { useSaleCustomProductsContext } = contexts.SaleCustomProducts
 const { useSaleContext } = contexts.Sale
-const { useSaleProductsContext } = contexts.SaleProducts
 const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, fiscalVouchersCodes } = helpers.afipHelper
 const { isItLater } = helpers.dateHelper
-const { sortArray } = helpers.objHelper
-const { nonCaseSensitive, normalizeString } = helpers.stringHelper
+const { roundTwoDecimals } = helpers.mathHelper
+const { sortArrayOfSelectOptions } = helpers.objHelper
+const { fixInputNumber, fixInputNumberValue, nonCaseSensitive, normalizeString } = helpers.stringHelper
 
-const creditCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.credit)
-    .filter(code => code !== null)
-
-const debitCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.debit)
-    .filter(code => code !== null)
-
+const creditCodes = fiscalVouchersCodes.filter(item => typeof item !== 'string').map(code => code.credit).filter(code => code)
+const debitCodes = fiscalVouchersCodes.filter(item => typeof item !== 'string').map(code => code.debit).filter(code => code)
 
 const Header = () => {
-    const [, productSelectionModal_dispatch] = useProductSelectionModalContext()
-    const [, customProducts_dispatch] = useSaleCustomProductsContext()
     const [sale_state, sale_dispatch] = useSaleContext()
-    const [, saleProducts_dispatch] = useSaleProductsContext()
 
     // --------------------- Actions --------------------- //
-    const validateFocus = () => {
-        const refs = {
-            autocompleteClient: sale_state.refs.autocompleteClient,
-            autocompleteDocument: sale_state.refs.autocompleteDocument,
-            autocompletePaymentMethod: sale_state.refs.autocompletePaymentMethod,
-            autocompletePaymentPlan: sale_state.refs.autocompletePaymentPlan,
-            buttonToFinalizeSale: sale_state.refs.buttonToFinalizeSale,
-            datePicker: sale_state.refs.datePicker,
-            selectToAddProductByBarcode: sale_state.refs.selectToAddProductByBarcode,
-            selectToAddProductByName: sale_state.refs.selectToAddProductByName,
-            selectToAddProductByProductCode: sale_state.refs.selectToAddProductByProductCode
+    const loadNextVoucherNumber = async () => {
+        if (!sale_state.documento) return
+        sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
+
+        let number
+        if (sale_state.documento.fiscal) {
+            const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(
+                sale_state.documentoCodigo,
+                sale_state.empresaCuit,
+                sale_state.puntoVentaNumero
+            )
+            number = fiscalVoucherNumber
+        } else {
+            const noFiscalVoucherNumber = await findNextVoucherNumber_noFiscal(
+                sale_state.documentoCodigo
+            )
+            number = noFiscalVoucherNumber
         }
-        const existsRefs = !Object.values(refs).includes(null)
-        const data = { existsRefs, refs }
-        return data
+        sale_dispatch({ type: 'SET_VOUCHER_NUMBERS', payload: number })
+        sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
     }
 
     const setFocus = () => {
@@ -67,13 +58,27 @@ const Header = () => {
         if (!existsRefs) return
         let unfilledField
         if (!sale_state.valueForDatePicker) unfilledField = refs.datePicker
-        else if (refs.autocompleteClient.value === '') unfilledField = refs.autocompleteClient
-        else if (refs.autocompleteDocument.value === '') unfilledField = refs.autocompleteDocument
-        else if (refs.autocompletePaymentMethod.value === '') unfilledField = refs.autocompletePaymentMethod
-        else if (refs.autocompletePaymentPlan.value === '') unfilledField = refs.autocompletePaymentPlan
+        else if (!sale_state.selectClient.selectedValue) unfilledField = refs.selectClient
+        else if (!sale_state.selectDocument.selectedValue) unfilledField = refs.selectDocument
+        else if (!sale_state.selectPaymentMethod.selectedValue) unfilledField = refs.selectPaymentMethod
+        else if (!sale_state.selectPaymentPlan.selectedValue) unfilledField = refs.selectPaymentPlan
         else if (sale_state.renglones.length === 0) unfilledField = refs.selectToAddProductByName
         else unfilledField = refs.buttonToFinalizeSale
         unfilledField.focus()
+    }
+
+    const setFocusWhenPressingEnter = (e) => {
+        if (e.keyCode === 13) { // Enter
+            e.preventDefault()
+            setFocus()
+        } else return
+    }
+
+    const setFocusWhenPressingEnterOrEsc = (e) => {
+        if (e.keyCode === 13 || e.keyCode === 27) { // Enter or Escape
+            e.preventDefault()
+            setFocus()
+        } else return
     }
 
     const setFocusWhenPressingEsc = (e) => {
@@ -83,6 +88,23 @@ const Header = () => {
         } else return
     }
 
+    const validateFocus = () => {
+        const refs = {
+            buttonToFinalizeSale: sale_state.refs.buttonToFinalizeSale,
+            datePicker: sale_state.refs.datePicker,
+            selectClient: sale_state.refs.selectClient,
+            selectDocument: sale_state.refs.selectDocument,
+            selectPaymentMethod: sale_state.refs.selectPaymentMethod,
+            selectPaymentPlan: sale_state.refs.selectPaymentPlan,
+            selectToAddProductByBarcode: sale_state.refs.selectToAddProductByBarcode,
+            selectToAddProductByName: sale_state.refs.selectToAddProductByName
+        }
+        const existsRefs = !Object.values(refs).includes(null)
+        const data = { existsRefs, refs }
+        return data
+    }
+
+    useEffect(() => { loadNextVoucherNumber() }, [sale_state.documento])
     useEffect(() => { setFocus() }, [
         sale_state.cliente,
         sale_state.documento,
@@ -90,326 +112,6 @@ const Header = () => {
         sale_state.mediosPago,
         sale_state.planesPago
     ])
-
-    useEffect(() => {
-        const loadNextVoucherNumber = async () => {
-            if (!sale_state.documento) return
-            sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
-            sale_dispatch({ type: 'SET_TOTAL' })
-
-            let number
-            if (sale_state.documento.fiscal) {
-                const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(
-                    sale_state.documentoCodigo,
-                    sale_state.empresaCuit,
-                    sale_state.puntoVentaNumero
-                )
-                number = fiscalVoucherNumber
-            } else {
-                const noFiscalVoucherNumber = await findNextVoucherNumber_noFiscal(
-                    sale_state.documentoCodigo
-                )
-                number = noFiscalVoucherNumber
-            }
-            sale_dispatch({ type: 'SET_VOUCHER_NUMBERS', payload: number })
-            sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
-        }
-        loadNextVoucherNumber()
-    }, [sale_state.documento])
-
-    // --------------- Autocomplete client --------------- //
-    const loadClients = async () => {
-        const findClients = await api.clientes.findAll()
-        const clients = findClients.docs
-        const clientNames = clients.map(client => { return { value: client.razonSocial } })
-        const orderedClientNames = sortArray(clientNames, 'value')
-        sale_dispatch({ type: 'SET_ALL_CLIENTS', payload: orderedClientNames })
-    }
-
-    useEffect(() => { loadClients() }, [])
-
-    const onChangeClient = (e) => {
-        sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: e })
-    }
-
-    const onClearClient = () => {
-        sale_dispatch({ type: 'SET_CLIENT', payload: null })
-    }
-
-    const onSelectClient = async (e) => {
-        const filters = JSON.stringify({ razonSocial: e })
-        const findClient = await api.clientes.findAllByFilters(filters)
-        const [client] = findClient.docs
-        sale_dispatch({ type: 'SET_CLIENT', payload: client })
-        sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: client.razonSocial })
-    }
-
-    const autocompleteClient = (
-        <AutoComplete
-            allowClear
-            autoFocus
-            defaultActiveFirstOption
-            filterOption={nonCaseSensitive}
-            id='autocompleteClient'
-            onChange={onChangeClient}
-            onClear={onClearClient}
-            onSelect={onSelectClient}
-            options={sale_state.allClients}
-            placeholder='Cliente'
-            style={{ width: '100%' }}
-            value={sale_state.clientInput}
-        />
-    )
-
-    // -------------- Autocomplete document -------------- //
-    const loadDocuments = async () => {
-        const fiscalNotesCodes = [...creditCodes, ...debitCodes]
-        const findDocuments = await api.documentos.findAll()
-        const documents = findDocuments.docs.filter(document => !fiscalNotesCodes.includes(document.codigoUnico))
-        const documentsNames = documents.map(document => { return { value: document.nombre } })
-        const orderedDocumentsNames = sortArray(documentsNames, 'value')
-        sale_dispatch({ type: 'SET_ALL_DOCUMENTS', payload: orderedDocumentsNames })
-    }
-
-    useEffect(() => { loadDocuments() }, [])
-
-    const onChangeDocument = (e) => {
-        sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: e })
-    }
-
-    const onClearDoument = () => {
-        sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
-    }
-
-    const onSelectDocument = async (e) => {
-        const filters = JSON.stringify({ nombre: e })
-        const findDocument = await api.documentos.findAllByFilters(filters)
-        const [document] = findDocument.docs
-        sale_dispatch({ type: 'SET_DOCUMENT', payload: document })
-        sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: document.nombre })
-    }
-
-    const autocompleteDocument = (
-        <>
-            <AutoComplete
-                allowClear
-                defaultActiveFirstOption
-                filterOption={nonCaseSensitive}
-                id='autocompleteDocument'
-                onChange={onChangeDocument}
-                onClear={onClearDoument}
-                onSelect={onSelectDocument}
-                options={sale_state.allDocuments}
-                placeholder='Documento'
-                style={{ width: '100%' }}
-                value={sale_state.documentInput}
-            />
-        </>
-    )
-
-    // ----------- Autocomplete payment method ----------- //
-    const loadPaymentMethods = async () => {
-        const findPaymentMethods = await api.mediospago.findAll()
-        const paymentMethods = findPaymentMethods.docs
-        const paymentMethodsNames = paymentMethods.map(paymentMethod => { return { value: paymentMethod.nombre } })
-        const orderedPaymentMethodsNames = sortArray(paymentMethodsNames)
-        sale_dispatch({ type: 'SET_ALL_PAYMENT_METHODS', payload: orderedPaymentMethodsNames })
-    }
-
-    useEffect(() => { loadPaymentMethods() }, [])
-
-    const onChangePaymentMethod = (e) => {
-        sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: e })
-    }
-
-    const onClearPaymentMethods = () => {
-        sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: [] })
-        sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    const onSelectPaymentMethods = async (e) => {
-        const filters = JSON.stringify({ nombre: e })
-        const findPaymentMethod = await api.mediospago.findAllByFilters(filters)
-        const paymentMethod = findPaymentMethod.docs
-        sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: paymentMethod })
-        sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: paymentMethod[0].nombre })
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    const autocompletePaymentMethod = (
-        <AutoComplete
-            allowClear
-            defaultActiveFirstOption
-            filterOption={nonCaseSensitive}
-            id='autocompletePaymentMethod'
-            onChange={onChangePaymentMethod}
-            onClear={onClearPaymentMethods}
-            onSelect={onSelectPaymentMethods}
-            options={sale_state.mediosPagoToAutocomplete}
-            placeholder='Medio de pago'
-            style={{ width: '100%' }}
-            value={sale_state.mediosPagoInput}
-        />
-    )
-
-    // ----------- Autocomplete payment plans ---------- //
-    const loadPaymentPlans = async () => {
-        const playmentMethodSelectedID = sale_state.mediosPago
-        if (playmentMethodSelectedID.length === 0) return sale_dispatch({ type: 'SET_ALL_PAYMENT_PLANS', payload: [] })
-        const findPaymentMethodSelected = await api.mediospago.findById(playmentMethodSelectedID[0])
-        const paymentPlans = findPaymentMethodSelected?.data?.planes ?? []
-        const paymentPlansNames = paymentPlans.map(paymentPlan => { return { value: paymentPlan.nombre } })
-        const orderedPaymentPlansNames = sortArray(paymentPlansNames, 'value')
-        sale_dispatch({ type: 'SET_ALL_PAYMENT_PLANS', payload: orderedPaymentPlansNames })
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    useEffect(() => { loadPaymentPlans() }, [sale_state.mediosPagoNombres])
-
-    const onChangePaymentPlan = (e) => {
-        sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: e })
-    }
-
-    const onClearPaymentPlans = () => {
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    const onSelectPaymentPlans = async (e) => {
-        const playmentMethodSelectedID = sale_state.mediosPago
-        if (playmentMethodSelectedID.length === 0) return
-        const findPaymentMethodSelected = await api.mediospago.findById(playmentMethodSelectedID[0])
-        const paymentPlans = findPaymentMethodSelected?.data?.planes ?? []
-        const paymentPlan = paymentPlans.filter(paymentPlan => paymentPlan.nombre === e)
-        sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: paymentPlan })
-        sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: paymentPlan[0].nombre })
-        sale_dispatch({ type: 'SET_TOTAL' })
-    }
-
-    const autocompletePaymentPlan = (
-        <AutoComplete
-            allowClear
-            defaultActiveFirstOption
-            filterOption={nonCaseSensitive}
-            id='autocompletePaymentPlan'
-            onChange={onChangePaymentPlan}
-            onClear={onClearPaymentPlans}
-            onSelect={onSelectPaymentPlans}
-            options={sale_state.planesPagoToAutocomplete}
-            placeholder='Plan de pago'
-            style={{ width: '100%' }}
-            value={sale_state.planesPagoInput}
-        />
-    )
-
-    // ------------- Button to clear fields -------------- //
-    const onClearFields = () => {
-        sale_dispatch({ type: 'SET_CLIENT', payload: null })
-        sale_dispatch({ type: 'SET_CLIENT_INPUT', payload: null })
-        sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-        sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
-        sale_dispatch({ type: 'SET_DOCUMENT_INPUT', payload: null })
-        sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: [] })
-        sale_dispatch({ type: 'SET_PAYMENT_METHOD_INPUT', payload: null })
-        sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
-        sale_dispatch({ type: 'SET_PAYMENT_PLAN_INPUT', payload: null })
-        sale_dispatch({ type: 'SET_TOTAL' })
-        sale_state.refs.autocompleteClient.focus()
-    }
-
-    const buttonToClearFields = (
-        <Button
-            danger
-            onClick={onClearFields}
-            style={{ width: '100%' }}
-            type='primary'
-        >
-            Reiniciar campos
-        </Button>
-    )
-
-    // -------- Button to clear global percentage -------- //
-    const onClearGlobalPercentage = () => {
-        sale_dispatch({ type: 'SET_FIELD_STATUS', payload: { percentage: null, percentageType: null } })
-        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_PERCENT', payload: 0 })
-        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION', payload: 'discount' })
-        sale_dispatch({ type: 'SET_GLOBAL_DISCOUNT_SURCHARGE_OPERATION_INPUT', payload: 'discount' })
-        sale_dispatch({ type: 'SET_GLOBAL_SURCHARGE_PERCENT', payload: 0 })
-        sale_dispatch({ type: 'SET_PERCENTAGE_OF_GLOBAL_DISCOUNT_INPUT', payload: '' })
-        sale_dispatch({ type: 'SET_PERCENTAGE_OF_GLOBAL_SURCHARGE_INPUT', payload: '' })
-        sale_dispatch({ type: 'SET_TOTAL' })
-        setFocus()
-    }
-
-    const buttonToClearGlobalPercentage = (
-        <Button
-            danger
-            onClick={onClearGlobalPercentage}
-            style={{ width: '100%' }}
-            type='primary'
-        >
-            Quitar porcentaje global
-        </Button>
-    )
-
-    // ------------ Button to clear products ------------- //
-    const onClearProducts = () => {
-        saleProducts_dispatch({ type: 'DELETE_ALL_PRODUCTS' })
-        setFocus()
-    }
-
-    const buttonToClearProducts = (
-        <Button
-            danger
-            onClick={onClearProducts}
-            style={{ width: '100%' }}
-            type='primary'
-        >
-            Quitar productos
-        </Button>
-    )
-
-    // ---- Button to open products selection modal ------ //
-    const openProductsSelectionModal = () => {
-        productSelectionModal_dispatch({ type: 'SHOW_PRODUCT_MODAL' })
-    }
-
-    const buttonToOpenProductsSelectionModal = (
-        <Button
-            className='btn-primary'
-            onClick={openProductsSelectionModal}
-        >
-            Productos
-        </Button>
-    )
-
-    // -- Button to open custom products selection modal -- //
-    const openCustomProductsSelectionModal = () => {
-        customProducts_dispatch({ type: 'SHOW_LIST_OF_CUSTOM_PRODUCT_MODAL' })
-    }
-
-    const buttonToOpenCustomProductsSelectionModal = (
-        <Button
-            className='btn-primary'
-            onClick={openCustomProductsSelectionModal}
-        >
-            Productos personalizados
-        </Button>
-    )
-
-    // ----- Button to open general percentage modal ----- //
-    const openGeneralPercentageModal = () => {
-        sale_dispatch({ type: 'SHOW_DISCOUNT_SURCHARGE_MODAL' })
-    }
-
-    const buttonToOpenGeneralPercentageModal = (
-        <Button
-            className='btn-primary'
-            onClick={openGeneralPercentageModal}
-        >
-            Descuento/Recargo general
-        </Button>
-    )
 
     // ---------- Date picker for billing date ----------- //
     const loadTodayDate = () => {
@@ -433,11 +135,550 @@ const Header = () => {
     const datePickerForBillingDate = (
         <DatePicker
             format={['DD/MM/YYYY']}
-            id='datePicker'
+            id='salesHeader_datePickerForBillingDate'
             onChange={changeDate}
             style={{ width: '100%' }}
             value={sale_state.valueForDatePicker}
         />
+    )
+
+    // -------------- Input custom product --------------- //
+    const addCustomProduct = () => {
+        const {
+            isConceptInvalid,
+            isPercentageIvaInvalid,
+            isUnitPriceInvalid,
+            invalidStatus
+        } = invalidStatusOfCustomProduct()
+        if (invalidStatus) {
+            const status = {
+                concept: isConceptInvalid ? 'error' : null,
+                percentageIva: isPercentageIvaInvalid ? 'error' : null,
+                unitPrice: isUnitPriceInvalid ? 'error' : null
+            }
+            sale_dispatch({ type: 'SET_STATUS_OF_CUSTOM_PRODUCT', payload: status })
+            setTimeout(resetStatusOfCustomProduct, 2000)
+        } else {
+            const customProduct = generateCustomProductParams()
+            sale_dispatch({ type: 'SET_PRODUCT', payload: customProduct })
+        }
+    }
+
+    const generateCustomProductParams = () => {
+        const porcentajeIvaVenta = parseFloat(sale_state.customProductParams.percentageIva)
+        const precioVenta = parseFloat(sale_state.customProductParams.unitPrice)
+        const ivaVenta = precioVenta * porcentajeIvaVenta / 100
+        const quantityOfAlreadyCustomProductsSaved = sale_state.productos.filter(product => product._id.startsWith('customProduct_')).length
+        const _id = 'customProduct_' + (quantityOfAlreadyCustomProductsSaved + 1)
+        const customProduct = {
+            _id,
+            codigoBarras: _id,
+            ivaVenta: roundTwoDecimals(ivaVenta),
+            key: _id,
+            nombre: sale_state.customProductParams.concept,
+            precioVenta: roundTwoDecimals(precioVenta),
+            porcentajeIvaVenta: roundTwoDecimals(porcentajeIvaVenta),
+            profit: roundTwoDecimals(precioVenta - ivaVenta),
+            unidadMedida: { fraccionamiento: 1, nombre: 'Unid.' }
+        }
+        return customProduct
+    }
+
+    const inputCustomProductStyle = {
+        border: 'solid 1px',
+        borderColor: '#808080',
+        borderRadius: '5px',
+        marginLeft: '3px',
+        marginRight: '3px',
+        padding: '5px'
+    }
+
+    const invalidStatusOfCustomPercentageIva = (value) => {
+        if (!value) return false
+        if (
+            parseFloat(value) < 0
+            || parseFloat(value) > 100
+            || value.endsWith('.')
+            || value.endsWith(',')
+        ) return true
+        else return false
+    }
+
+    const invalidStatusOfCustomProduct = () => {
+        const customConcept = sale_state.customProductParams.concept
+        const customPercentageIva = sale_state.customProductParams.percentageIva
+        const customUnitPrice = sale_state.customProductParams.unitPrice
+        const isConceptInvalid = (
+            !customConcept
+            || customConcept == 0
+        )
+        const isPercentageIvaInvalid = (
+            !customPercentageIva
+            || customPercentageIva == 0
+            || invalidStatusOfCustomPercentageIva(customPercentageIva)
+        )
+        const isUnitPriceInvalid = (
+            !customUnitPrice
+            || customUnitPrice == 0
+            || invalidStatusOfCustomUnitPrice(customUnitPrice)
+        )
+        const invalidStatus = [isConceptInvalid, isPercentageIvaInvalid, isUnitPriceInvalid].includes(true)
+        const data = { isConceptInvalid, isPercentageIvaInvalid, isUnitPriceInvalid, invalidStatus }
+        return data
+    }
+
+    const invalidStatusOfCustomUnitPrice = (value) => {
+        if (!value) return false
+        if (
+            parseFloat(value) < 0
+            || value.endsWith('.')
+            || value.endsWith(',')
+        ) return true
+        else return false
+    }
+
+    const loadCustomPercentageIva = () => {
+        if (!sale_state.empresa) return
+        const addIvaInVoucher = sale_state.empresa.condicionFiscal.adicionaIva
+        let defaultIva
+        if (!addIvaInVoucher) defaultIva = '0'
+        else defaultIva = '21'
+        sale_dispatch({ type: 'SET_CUSTOM_PERCENTAGE_IVA', payload: defaultIva })
+    }
+
+    useEffect(() => { loadCustomPercentageIva() }, [sale_state.empresa])
+
+    const onChangeCustomConcept = async (e) => {
+        const value = e.target.value === '' ? null : e.target.value
+        sale_dispatch({ type: 'SET_CUSTOM_CONCEPT', payload: value })
+        const status = null
+        sale_dispatch({ type: 'SET_STATUS_OF_CUSTOM_CONCEPT', payload: status })
+    }
+
+    const onChangeCustomPercentageIva = async (e) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.customProductParams.percentageIva
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({ type: 'SET_CUSTOM_PERCENTAGE_IVA', payload: fixedValue })
+        const status = invalidStatusOfCustomPercentageIva(currentValue) ? 'error' : null
+        sale_dispatch({ type: 'SET_STATUS_OF_CUSTOM_PERCENTAGE_IVA', payload: status })
+    }
+
+    const onChangeCustomUnitPrice = async (e) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.customProductParams.unitPrice
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({ type: 'SET_CUSTOM_UNIT_PRICE', payload: fixedValue })
+        const status = invalidStatusOfCustomUnitPrice(currentValue) ? 'error' : null
+        sale_dispatch({ type: 'SET_STATUS_OF_CUSTOM_UNIT_PRICE', payload: status })
+    }
+
+    const resetStatusOfCustomProduct = () => {
+        const currentCustomPercentageIva = sale_state.customProductParams.percentageIva
+        const currentCustomUnitPrice = sale_state.customProductParams.unitPrice
+        const status = {
+            concept: null,
+            percentageIva: invalidStatusOfCustomPercentageIva(currentCustomPercentageIva) ? 'error' : null,
+            unitPrice: invalidStatusOfCustomUnitPrice(currentCustomUnitPrice) ? 'error' : null
+        }
+        sale_dispatch({ type: 'SET_STATUS_OF_CUSTOM_PRODUCT', payload: status })
+    }
+
+    const keyboardFocusAfterChangeCustomConcept = (e) => {
+        if (e.keyCode === 13) { // Enter
+            e.preventDefault()
+            if (!sale_state.customProductParams.concept) sale_state.refs.inputCustomConcept.focus()
+            else if (!sale_state.customProductParams.unitPrice) sale_state.refs.inputCustomUnitPrice.focus()
+            else if (sale_state.empresa.condicionFiscal.adicionaIva && !sale_state.customProductParams.percentageIva)
+                sale_state.refs.inputCustomPercentageIva.focus()
+            else return setFocus()
+        } else if (e.keyCode === 27) { // Escape
+            setFocusWhenPressingEsc(e)
+        }
+    }
+
+    const inputCustomProduct = (
+        <Row
+            gutter={[8, 8]}
+            id='salesHeader_inputCustomProduct'
+            justify='center'
+            style={inputCustomProductStyle}
+        >
+            <Col span={24}>
+                Agregar concepto personalizado
+            </Col>
+            <Col span={24}>
+                <Input
+                    allowClear
+                    id='salesHeader_inputCustomConcept'
+                    onChange={onChangeCustomConcept}
+                    onKeyUp={keyboardFocusAfterChangeCustomConcept}
+                    placeholder='Concepto'
+                    status={sale_state.fieldStatus.customProduct.concept}
+                    style={{ width: '100%' }}
+                    value={sale_state.customProductParams.concept}
+                />
+                <span
+                    style={{
+                        color: 'red',
+                        display: sale_state.fieldStatus.customProduct.concept === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    Escribe un concepto.
+                </span>
+            </Col>
+            <Col span={12}>
+                <Input
+                    allowClear
+                    id='salesHeader_inputCustomUnitPrice'
+                    onChange={onChangeCustomUnitPrice}
+                    onKeyUp={keyboardFocusAfterChangeCustomConcept}
+                    placeholder='Precio Unitario'
+                    status={sale_state.fieldStatus.customProduct.unitPrice}
+                    style={{ width: '100%' }}
+                    value={sale_state.customProductParams.unitPrice}
+                />
+                <span
+                    style={{
+                        color: 'red',
+                        display: sale_state.fieldStatus.customProduct.unitPrice === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    Escribe un precio válido mayor que cero.
+                </span>
+            </Col>
+            {
+                !sale_state.empresa?.condicionFiscal?.adicionaIva
+                    ? null
+                    : (
+                        <Col span={12}>
+                            <Input
+                                allowClear
+                                id='salesHeader_inputCustomPercentageIva'
+                                onChange={onChangeCustomPercentageIva}
+                                onKeyUp={keyboardFocusAfterChangeCustomConcept}
+                                placeholder='Porcentaje IVA'
+                                status={sale_state.fieldStatus.customProduct.percentageIva}
+                                style={{ width: '100%' }}
+                                suffix='% IVA'
+                                value={sale_state.customProductParams.percentageIva}
+                            />
+                            <span
+                                style={{
+                                    color: 'red',
+                                    display: sale_state.fieldStatus.customProduct.percentageIva === 'error' ? 'block' : 'none'
+                                }}
+                            >
+                                Igrese un valor entre cero y 100.
+                            </span>
+                        </Col>
+                    )
+            }
+            <Col span={12}>
+                <Button
+                    className='btn-primary'
+                    id='salesHeader_buttonToAddCustomProduct'
+                    onClick={addCustomProduct}
+                    onKeyUp={setFocusWhenPressingEsc}
+                    style={{ width: '100%' }}
+                >
+                    Añadir
+                </Button>
+            </Col>
+        </Row>
+    )
+
+    // ------------ Input general percentage ------------- //
+    const statusOfGeneralPercentageValue = () => {
+        const generalPercentage = sale_state.generalPercentage
+        if (!generalPercentage) return null
+        if (
+            parseFloat(generalPercentage) < 0
+            || (sale_state.generalPercentageType === 'discount' && parseFloat(generalPercentage) > 100)
+            || generalPercentage.toString().endsWith('.')
+            || generalPercentage.toString().endsWith(',')
+        ) return 'error'
+        else return null
+    }
+
+    const inputGeneralPercentageStyle = {
+        border: 'solid 1px',
+        borderColor: '#808080',
+        borderRadius: '5px',
+        marginLeft: '3px',
+        marginRight: '3px',
+        padding: '5px'
+    }
+
+    const onChangeGeneralPercentage = (e) => {
+        const currentValue = fixInputNumberValue(e.target.value)
+        const prevValue = sale_state.generalPercentage
+        const fixedValue = fixInputNumber(currentValue, prevValue)
+        sale_dispatch({ type: 'SET_GENERAL_PERCENTAGE', payload: fixedValue })
+        const fieldStatus = statusOfGeneralPercentageValue()
+        sale_dispatch({ type: 'SET_STATUS_OF_GENERAL_PERCENTAGE', payload: fieldStatus })
+    }
+
+    const onClearGeneralPercentageType = () => {
+        sale_dispatch({ type: 'SET_GENERAL_PERCENTAGE', payload: null })
+        sale_dispatch({ type: 'SET_GENERAL_PERCENTAGE_TYPE', payload: null })
+    }
+
+    const onSelectGeneralPercentageType = (e) => {
+        sale_dispatch({ type: 'SET_GENERAL_PERCENTAGE_TYPE', payload: e })
+        if (!sale_state.generalPercentage) sale_state.refs.inputGeneralPercentageValue.focus()
+        else setFocus()
+    }
+
+    const inputGeneralPercentage = (
+        <Row
+            gutter={[8, 8]}
+            id='salesHeader_inputGeneralPercentage'
+            style={inputGeneralPercentageStyle}
+        >
+            <Col span={24}>
+                Agregar descuento/recargo general
+            </Col>
+            <Col span={12}>
+                <Select
+                    allowClear
+                    id='salesHeader_selectGeneralPercentageType'
+                    onClear={onClearGeneralPercentageType}
+                    onKeyUp={setFocusWhenPressingEsc}
+                    onSelect={onSelectGeneralPercentageType}
+                    options={sale_state.selectGeneralPercentageType.options}
+                    placeholder='Descuento/Recargo'
+                    style={{ width: '100%' }}
+                    value={sale_state.selectGeneralPercentageType.selectedValue}
+                />
+            </Col>
+            <Col span={12}>
+                <Input
+                    allowClear
+                    id='salesHeader_inputGeneralPercentageValue'
+                    onChange={onChangeGeneralPercentage}
+                    onKeyUp={setFocusWhenPressingEnterOrEsc}
+                    placeholder='Porcentaje'
+                    status={statusOfGeneralPercentageValue()}
+                    style={{ width: '100%' }}
+                    value={sale_state.generalPercentage}
+                />
+                <span
+                    style={{
+                        color: 'red',
+                        display: statusOfGeneralPercentageValue() === 'error' ? 'block' : 'none'
+                    }}
+                >
+                    {
+                        sale_state.generalPercentageType === 'discount'
+                            ? 'Escribe un porcentaje válido entre cero y 100.'
+                            : 'Escribe un porcentaje válido mayor que cero.'
+                    }
+                </span>
+            </Col>
+        </Row>
+    )
+
+    // ------------------ Select client ------------------ //
+    const onSearchClient = async (e) => {
+        const filters = JSON.stringify({ normalizedBusinessName: normalizeString(e) })
+        const params = { page: 1, limit: 8, filters }
+        const findClients = await api.clientes.findPaginated(params)
+        const clients = findClients.docs
+        const options = clients.map(client => { return { label: client.razonSocial, value: client.normalizedBusinessName } })
+        sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_CLIENT', payload: options })
+    }
+
+    const onSelectClient = async (e) => {
+        const filters = JSON.stringify({ normalizedBusinessName: e })
+        const findClients = await api.clientes.findAllByFilters(filters)
+        const [client] = findClients.docs
+        sale_dispatch({ type: 'SET_CLIENT', payload: client })
+        sale_dispatch({ type: 'SET_STATUS_OF_CLIENT', payload: null })
+    }
+
+    const onClearClient = () => {
+        sale_dispatch({ type: 'SET_CLIENT', payload: null })
+    }
+
+    const selectClient = (
+        <>
+            <Select
+                allowClear
+                filterOption={nonCaseSensitive}
+                filterSort={sortArrayOfSelectOptions}
+                id='salesHeader_selectClient'
+                onClear={onClearClient}
+                onSearch={onSearchClient}
+                onSelect={onSelectClient}
+                options={sale_state.selectClient.options}
+                placeholder='Cliente'
+                showSearch
+                status={sale_state.fieldStatus.client}
+                style={{ width: '100%' }}
+                value={sale_state.selectClient.selectedValue}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: sale_state.fieldStatus.client === 'error' ? 'block' : 'none'
+                }}
+            >
+                Debe seleccionar el cliente.
+            </span>
+        </>
+    )
+
+    // ------------------ Select document ----------------- //
+    const onSearchDocument = async (e) => {
+        const filters = JSON.stringify({ normalizedName: normalizeString(e) })
+        const params = { page: 1, limit: 8, filters }
+        const findDocuments = await api.documentos.findPaginated(params)
+        const documents = findDocuments.docs
+        const fixedDocuments = documents.filter(document => !creditCodes.includes(document.codigoUnico) && !debitCodes.includes(document.codigoUnico))
+        const options = fixedDocuments.map(document => { return { label: document.nombre, value: document.normalizedName } })
+        sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_DOCUMENT', payload: options })
+    }
+
+    const onSelectDocument = async (e) => {
+        const filters = JSON.stringify({ normalizedName: e })
+        const findDocuments = await api.documentos.findAllByFilters(filters)
+        const [document] = findDocuments.docs
+        sale_dispatch({ type: 'SET_DOCUMENT', payload: document })
+        sale_dispatch({ type: 'SET_STATUS_OF_DOCUMENT', payload: null })
+    }
+
+    const onClearDocument = () => {
+        sale_dispatch({ type: 'SET_DOCUMENT', payload: null })
+    }
+
+    const selectDocument = (
+        <>
+            <Select
+                allowClear
+                filterOption={nonCaseSensitive}
+                filterSort={sortArrayOfSelectOptions}
+                id='salesHeader_selectDocument'
+                onClear={onClearDocument}
+                onSearch={onSearchDocument}
+                onSelect={onSelectDocument}
+                options={sale_state.selectDocument.options}
+                placeholder='Documento'
+                showSearch
+                status={sale_state.fieldStatus.document}
+                style={{ width: '100%' }}
+                value={sale_state.selectDocument.selectedValue}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: sale_state.fieldStatus.document === 'error' ? 'block' : 'none'
+                }}
+            >
+                Debe seleccionar el documento a emitir.
+            </span>
+        </>
+    )
+
+    // -------------- Select payment method -------------- //
+    const onSearchPaymentMethod = async (e) => {
+        const filters = JSON.stringify({ normalizedName: normalizeString(e) })
+        const params = { page: 1, limit: 8, filters }
+        const findPaymentMethods = await api.mediospago.findPaginated(params)
+        const paymentMethods = findPaymentMethods.docs
+        const options = paymentMethods.map(paymentMethod => { return { label: paymentMethod.nombre, value: paymentMethod.normalizedName } })
+        sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PAYMENT_METHOD', payload: options })
+    }
+
+    const onSelectPaymentMethod = async (e) => {
+        const filters = JSON.stringify({ normalizedName: e })
+        const findPaymentMethods = await api.mediospago.findAllByFilters(filters)
+        const paymentMethods = findPaymentMethods.docs
+        sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: paymentMethods })
+        sale_dispatch({ type: 'SET_STATUS_OF_PAYMENT_METHOD', payload: null })
+    }
+
+    const onClearPaymentMethod = () => {
+        sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: [] })
+        sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
+    }
+
+    const selectPaymentMethod = (
+        <>
+            <Select
+                allowClear
+                filterOption={nonCaseSensitive}
+                filterSort={sortArrayOfSelectOptions}
+                id='salesHeader_selectPaymentMethod'
+                onClear={onClearPaymentMethod}
+                onSearch={onSearchPaymentMethod}
+                onSelect={onSelectPaymentMethod}
+                options={sale_state.selectPaymentMethod.options}
+                placeholder='Medio de pago'
+                showSearch
+                status={sale_state.fieldStatus.paymentMethod}
+                style={{ width: '100%' }}
+                value={sale_state.selectPaymentMethod.selectedValue}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: sale_state.fieldStatus.paymentMethod === 'error' ? 'block' : 'none'
+                }}
+            >
+                Debe seleccionar un medio de pago.
+            </span>
+        </>
+    )
+
+    // -------------- Select payment plans ------------- //
+    const loadPaymentPlans = async () => {
+        if (sale_state.mediosPagoNombres.length === 0) return
+        const findSelectedPaymentMethod = await api.mediospago.findById(sale_state.mediosPago[0])
+        const paymentPlans = findSelectedPaymentMethod?.data?.planes ?? []
+        const options = paymentPlans.map(paymentPlan => { return { label: paymentPlan.nombre, value: paymentPlan.normalizedName } })
+        sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PAYMENT_PLAN', payload: options })
+    }
+
+    useEffect(() => { loadPaymentPlans() }, [sale_state.mediosPagoNombres])
+
+    const onSelectPaymentPlan = async (e) => {
+        const findSelectedPaymentMethod = await api.mediospago.findById(sale_state.mediosPago[0])
+        const findPlansOfPaymentMethod = findSelectedPaymentMethod?.data?.planes ?? []
+        const paymentPlan = findPlansOfPaymentMethod.filter(paymentPlan => paymentPlan.normalizedName === e)
+        sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: paymentPlan })
+        sale_dispatch({ type: 'SET_STATUS_OF_PAYMENT_PLAN', payload: null })
+    }
+
+    const onClearPaymentPlan = () => {
+        sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
+    }
+
+    const selectPaymentPlan = (
+        <>
+            <Select
+                allowClear
+                filterOption={nonCaseSensitive}
+                filterSort={sortArrayOfSelectOptions}
+                id='salesHeader_selectPaymentPlan'
+                onClear={onClearPaymentPlan}
+                onSelect={onSelectPaymentPlan}
+                options={sale_state.selectPaymentPlan.options}
+                placeholder='Plan de pago'
+                showSearch
+                status={sale_state.fieldStatus.paymentPlan}
+                style={{ width: '100%' }}
+                value={sale_state.selectPaymentPlan.selectedValue}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: sale_state.fieldStatus.paymentPlan === 'error' ? 'block' : 'none'
+                }}
+            >
+                Debe seleccionar un plan de pago.
+            </span>
+        </>
     )
 
     // -------- Select to add product by barcode --------- //
@@ -462,8 +703,10 @@ const Header = () => {
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.productos.findPaginated(params)
         const products = findProducts.docs
-        const productsToSet = [...sale_state.productos, ...products]
-        saleProducts_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
+        for (let index = 0; index < products.length; index++) {
+            const product = products[index]
+            sale_dispatch({ type: 'SET_PRODUCT', payload: product })
+        }
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE', payload: [] })
         sale_state.refs.selectToAddProductByBarcode.focus()
     }
@@ -471,7 +714,7 @@ const Header = () => {
     const selectToAddProductByBarcode = (
         <Select
             allowClear
-            id='selectToAddProductByBarcode'
+            id='salesHeader_selectToAddProductByBarcode'
             onKeyUp={setFocusWhenPressingEsc}
             onSearch={onSearchProductByBarcode}
             onSelect={onSelectProductByBarcode}
@@ -499,8 +742,10 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedName: e })
         const findProducts = await api.productos.findAllByFilters(filters)
         const products = findProducts.docs
-        const productsToSet = [...sale_state.productos, ...products]
-        saleProducts_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
+        for (let index = 0; index < products.length; index++) {
+            const product = products[index]
+            sale_dispatch({ type: 'SET_PRODUCT', payload: product })
+        }
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME', payload: [] })
         sale_state.refs.selectToAddProductByName.focus()
     }
@@ -509,7 +754,7 @@ const Header = () => {
         <Select
             allowClear
             filterOption={nonCaseSensitive}
-            id='selectToAddProductByName'
+            id='salesHeader_selectToAddProductByName'
             onKeyUp={setFocusWhenPressingEsc}
             onSearch={onSearchProductByName}
             onSelect={onSelectProductByName}
@@ -521,167 +766,89 @@ const Header = () => {
         />
     )
 
-    // ------ Select to add product by product code ------ //
-    const onSearchProductByProductCode = async (e) => {
-        const filters = JSON.stringify({ normalizedProductCode: normalizeString(e) })
-        const params = { page: 1, limit: 15, filters }
-        const findProducts = await api.productos.findPaginated(params)
-        const products = findProducts.docs
-        const productsAlreadySelected = sale_state.productos.map(product => product.normalizedProductCode)
-        const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedProductCode))
-        const options = productsNotYetSelected.map(product => {
-            return {
-                label: product.nombre + ` (${product.codigoProducto})`,
-                value: product.normalizedProductCode
-            }
-        })
-        sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE', payload: options })
+    // ----------- Title of general percentage ----------- //
+    const invalidStatusOfTitleOfGeneralPercentage = () => {
+        const invalidStatus = statusOfGeneralPercentageValue() === 'error' || !sale_state.generalPercentage || !sale_state.generalPercentageType
+        if (invalidStatus) return true
+        else return false
     }
 
-    const onSelectProductByProductCode = async (e) => {
-        const filters = JSON.stringify({ normalizedProductCode: e })
-        const findProducts = await api.productos.findAllByFilters(filters)
-        const products = findProducts.docs
-        const productsToSet = [...sale_state.productos, ...products]
-        saleProducts_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
-        sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_PRODUCTCODE', payload: [] })
-        sale_state.refs.selectToAddProductByProductCode.focus()
+    const titleOfGeneralPercentage = invalidStatusOfTitleOfGeneralPercentage()
+        ? null
+        : sale_state.generalPercentageType === 'discount'
+            ? <h1>Descuento general del {sale_state.generalPercentage}%</h1>
+            : <h1>Recargo general del {sale_state.generalPercentage}%</h1>
+
+    // ------------- Title of voucher total -------------- //
+    const invalidStatusOfTitleOfVoucherTotal = () => {
+        const invalidStatus = statusOfGeneralPercentageValue() === 'error' || sale_state.existsLineError
+        if (invalidStatus) return true
+        else return false
     }
 
-    const selectToAddProductByProductCode = (
-        <Select
-            allowClear
-            id='selectToAddProductByProductCode'
-            onKeyUp={setFocusWhenPressingEsc}
-            onSearch={onSearchProductByProductCode}
-            onSelect={onSelectProductByProductCode}
-            options={sale_state.selectToAddProductByProductCode.options}
-            placeholder='Buscar producto por cód. producto'
-            showSearch
-            style={{ width: '100%' }}
-            value={sale_state.selectToAddProductByProductCode.selectedValue}
-        />
-    )
+    const titleOfVoucherTotal = invalidStatusOfTitleOfVoucherTotal()
+        ? null
+        : <h1>Neto Total: {sale_state.total}</h1>
 
 
-    const header = [
-        {
-            element: autocompleteClient,
-            order: { lg: 5, md: 5, sm: 5, xl: 5, xs: 5, xxl: 5 }
-        },
-        {
-            element: autocompleteDocument,
-            order: { lg: 8, md: 8, sm: 6, xl: 8, xs: 6, xxl: 8 }
-        },
-        {
-            element: autocompletePaymentMethod,
-            order: { lg: 11, md: 11, sm: 8, xl: 11, xs: 8, xxl: 11 }
-        },
-        {
-            element: autocompletePaymentPlan,
-            order: { lg: 14, md: 14, sm: 9, xl: 14, xs: 9, xxl: 14 }
-        },
-        {
-            element: buttonToClearFields,
-            order: { lg: 12, md: 12, sm: 10, xl: 12, xs: 10, xxl: 12 }
-        },
-        {
-            element: buttonToClearGlobalPercentage,
-            order: { lg: 16, md: 16, sm: 12, xl: 16, xs: 12, xxl: 16 }
-        },
-        {
-            element: buttonToClearProducts,
-            order: { lg: 15, md: 15, sm: 11, xl: 15, xs: 11, xxl: 15 }
-        },
-        {
-            element: buttonToOpenCustomProductsSelectionModal,
-            order: { lg: 6, md: 6, sm: 2, xl: 6, xs: 2, xxl: 6 }
-        },
-        {
-            element: buttonToOpenGeneralPercentageModal,
-            order: { lg: 9, md: 9, sm: 3, xl: 9, xs: 3, xxl: 9 }
-        },
-        {
-            element: buttonToOpenProductsSelectionModal,
-            order: { lg: 3, md: 3, sm: 1, xl: 3, xs: 1, xxl: 3 }
-        },
-        {
-            element: datePickerForBillingDate,
-            order: { lg: 2, md: 2, sm: 4, xl: 2, xs: 4, xxl: 2 }
-        },
-        {
-            element: <InputHidden />,
-            order: { lg: 10, md: 10, sm: 4, xl: 10, xs: 4, xxl: 10 }
-        },
-        {
-            element: <InputHidden />,
-            order: { lg: 13, md: 13, sm: 4, xl: 13, xs: 4, xxl: 13 }
-        },
-        {
-            element: selectToAddProductByBarcode,
-            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
-        },
-        {
-            element: selectToAddProductByName,
-            order: { lg: 1, md: 1, sm: 4, xl: 1, xs: 4, xxl: 1 }
-        },
-        {
-            element: selectToAddProductByProductCode,
-            order: { lg: 7, md: 7, sm: 4, xl: 7, xs: 4, xxl: 7 }
-        }
+    // ----------------------- GRID ---------------------- //
+    const itemsToRender_group1 = [selectToAddProductByName, selectToAddProductByBarcode]
+    const itemsToRender_group2 = [datePickerForBillingDate, selectClient, selectDocument, selectPaymentMethod, selectPaymentPlan]
+    const itemsToRender_group3 = [inputCustomProduct, inputGeneralPercentage]
+    const groupsToRender = [
+        { order: { lg: 3, md: 3, sm: 3, xl: 1, xs: 3, xxl: 1 }, toRender: itemsToRender_group1 },
+        { order: { lg: 1, md: 1, sm: 1, xl: 2, xs: 1, xxl: 2 }, toRender: itemsToRender_group2 },
+        { order: { lg: 2, md: 2, sm: 2, xl: 3, xs: 2, xxl: 3 }, toRender: itemsToRender_group3 }
     ]
-
-    const responsiveGrid = {
-        gutter: { horizontal: 8, vertical: 8 },
-        span: { lg: 8, md: 8, sm: 24, xl: 8, xs: 24, xxl: 8 }
-    }
+    const responsiveSpan = { lg: 12, md: 12, sm: 24, xl: 8, xs: 24, xxl: 8 }
 
     return (
-        <Col span={24}>
-            <Row
-                gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}
-                justify='end'
-            >
-                {
-                    header.map((item, index) => {
-                        return (
-                            <Col
-                                key={'saleHeader_itemsToRender_' + index}
-                                lg={{ order: item.order.lg, span: responsiveGrid.span.lg }}
-                                md={{ order: item.order.md, span: responsiveGrid.span.md }}
-                                sm={{ order: item.order.sm, span: responsiveGrid.span.sm }}
-                                xl={{ order: item.order.xl, span: responsiveGrid.span.xl }}
-                                xs={{ order: item.order.xs, span: responsiveGrid.span.xs }}
-                                xxl={{ order: item.order.xxl, span: responsiveGrid.span.xxl }}
-                            >
-                                {item.element}
-                            </Col>
-                        )
-                    })
-                }
-            </Row>
-            <br />
-            <Row>
-                <Col span={12}>
+        <Row gutter={[0, 16]}>
+            <Col span={24}>
+                <Row gutter={[8, 8]}>
                     {
-                        (sale_state.porcentajeDescuentoGlobal === 0 && sale_state.porcentajeRecargoGlobal === 0)
-                            ? null
-                            : (
-                                <span>
-                                    {
-                                        sale_state.porcentajeDescuentoGlobal !== 0
-                                            ? <h1>Descuento de {sale_state.porcentajeDescuentoGlobal}% aplicado a toda la factura</h1>
-                                            : <h1>Recargo de {sale_state.porcentajeRecargoGlobal}% aplicado a toda la factura</h1>
-                                    }
-                                </span>
+                        groupsToRender.map((group, groupIndex) => {
+                            return (
+                                <Col
+                                    key={'saleHeader_groupsToRender_' + groupIndex}
+                                    lg={{ order: group.order.lg, span: responsiveSpan.lg }}
+                                    md={{ order: group.order.md, span: responsiveSpan.md }}
+                                    sm={{ order: group.order.sm, span: responsiveSpan.sm }}
+                                    xl={{ order: group.order.xl, span: responsiveSpan.xl }}
+                                    xs={{ order: group.order.xs, span: responsiveSpan.xs }}
+                                    xxl={{ order: group.order.xxl, span: responsiveSpan.xxl }}
+                                >
+                                    <Row gutter={[8, 8]}>
+                                        {
+                                            group.toRender.map((item, itemIndex) => {
+                                                return (
+                                                    <Col
+                                                        key={`saleHeader_itemsToRender_group${groupIndex}_ + ${itemIndex}`}
+                                                        span={24}
+                                                    >
+                                                        {item}
+                                                    </Col>
+                                                )
+                                            })
+                                        }
+                                    </Row>
+                                </Col>
                             )
+                        })
                     }
-                </Col>
-                <Col span={12} style={{ textAlign: 'right' }}>
-                    <h1>Neto Total: {sale_state.total}</h1>
-                </Col>
-            </Row>
-        </Col>
+                </Row>
+            </Col>
+            <Col span={24}>
+                <Row>
+                    <Col span={12}>
+                        {titleOfGeneralPercentage}
+                    </Col>
+                    <Col span={12} style={{ textAlign: 'right' }}>
+                        {titleOfVoucherTotal}
+                    </Col>
+                </Row>
+            </Col>
+        </Row>
     )
 }
 

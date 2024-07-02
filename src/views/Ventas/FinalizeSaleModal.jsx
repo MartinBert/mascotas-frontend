@@ -74,6 +74,7 @@ const FinalizeSaleModal = () => {
 
     const buttonToCancel = (
         <Button
+            id='salesFinalizeSaleModal_buttonToCancelFinalizeSale'
             onClick={cancelSale}
             style={{ width: '100%' }}
             className='btn-secondary'
@@ -99,11 +100,24 @@ const FinalizeSaleModal = () => {
     }
 
     const startCloseSale = async () => {
-        sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
-        sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
-        sale_state.documentoFiscal
-            ? closeFiscalOperation()
-            : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
+        sale_state.generalPercentage = roundTwoDecimals(sale_state.generalPercentage)
+        sale_state.porcentajeDescuentoGlobal = roundTwoDecimals(sale_state.porcentajeDescuentoGlobal)
+        sale_state.porcentajeRecargoGlobal = roundTwoDecimals(sale_state.porcentajeRecargoGlobal)
+        sale_state.renglones = sale_state.renglones.map(line => {
+            const fixedLine = {
+                ...line,
+                cantidadUnidades: roundTwoDecimals(line.cantidadUnidades),
+                porcentajeDescuentoRenglon: roundTwoDecimals(line.porcentajeDescuentoRenglon),
+                porcentajeRecargoRenglon: roundTwoDecimals(line.porcentajeRecargoRenglon)
+            }
+            return fixedLine
+        })
+        console.log(sale_state)
+        // sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
+        // sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
+        // sale_state.documentoFiscal
+        //     ? closeFiscalOperation()
+        //     : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
     }
 
     const applyStockModification = async () => {
@@ -202,7 +216,7 @@ const FinalizeSaleModal = () => {
         //Create document
         createSaleDocument()
 
-        return successAlert('Venta realizada con éxito').then(reload)
+        return successAlert('Comprobante emitido con éxito').then(reload)
     }
 
     useEffect(() => {
@@ -212,7 +226,7 @@ const FinalizeSaleModal = () => {
 
     const buttonToSave = (
         <Button
-            id='buttonToSaveFinalizeSale'
+            id='salesFinalizeSaleModal_buttonToSaveFinalizeSale'
             onClick={startCloseSale}
             onKeyUp={activateKeyboard}
             style={{ width: '100%' }}

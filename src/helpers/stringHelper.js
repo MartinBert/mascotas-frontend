@@ -29,9 +29,11 @@ const regExp = {
 
 // Fixed commas and points of input number values
 const fixInputNumber = (currentValue, prevValue) => {
+    if (!currentValue || currentValue === '') return null
+
     // Data
     let currentValueString = currentValue.toString()
-    const prevValueString = prevValue.toString()
+    const prevValueString = prevValue ? prevValue.toString() : ''
     currentValueString = currentValueString.replace(regExp.ifNotNumbersCommaAndPoint, '').replace(',', '.')
     const previousValueAlreadyContainsAPoint = prevValueString.includes('.')
     const endsWithPoint = currentValueString.endsWith('.')
@@ -49,7 +51,20 @@ const fixInputNumber = (currentValue, prevValue) => {
     return currentValueString
 }
 
-// Non case sensitive for 'Autocomplete' antd
+const fixInputNumberValue = (value) => {
+    if (!value || value === '') return ''
+    const stringValue = value.toString()
+    const fixedStringValue = stringValue.replace(regExp.ifNotNumbersCommaAndPoint, '').replace(',', '.')
+    const pointsInFixedStringValue = fixedStringValue.match(/[.]/g)
+    const existsTwoPoints = !pointsInFixedStringValue ? false : pointsInFixedStringValue.length > 1 ? true : false
+    const pointsAreFollowed = !existsTwoPoints
+        ? false
+        : (fixedStringValue.indexOf('.') + 1 === fixedStringValue.lastIndexOf('.')) ? true : false
+    const fixedValue = (existsTwoPoints && !pointsAreFollowed) ? fixedStringValue.substring(0, fixedStringValue.length - 1) : fixedStringValue
+    return fixedValue
+}
+
+// Non case sensitive for 'Select' antd
 const nonCaseSensitive = (inputValue, option) => {
     const normalizedInputValue = normalizeString(inputValue)
     const normalizedOptionValue = normalizeString(option.value)
@@ -65,6 +80,7 @@ const replaceFor = (string, segment, newSegment) => {
 const stringHelper = {
     completeLengthWithZero,
     fixInputNumber,
+    fixInputNumberValue,
     nonCaseSensitive,
     normalizeString,
     regExp,

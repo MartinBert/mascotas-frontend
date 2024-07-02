@@ -22,6 +22,7 @@ import api from '../../services'
 // Imports Destructuring
 const { Spinner } = graphics
 const { noEmptyKeys } = helpers.objHelper
+const { normalizeString } = helpers.stringHelper
 const { useAuthContext } = contexts.Auth
 
 
@@ -93,7 +94,8 @@ const ClientesForm = () => {
 
     const save = async () => {
         if (id && noEmptyKeys(cliente) === true) {
-            const response = (id === 'nuevo') ? await api.clientes.save(cliente) : await api.clientes.edit(cliente)
+            const fixedClient = { ...cliente, normalizedBusinessName: normalizeString(cliente.razonSocial) }
+            const response = (id === 'nuevo') ? await api.clientes.save(fixedClient) : await api.clientes.edit(fixedClient)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')
                 redirectToClientes()
