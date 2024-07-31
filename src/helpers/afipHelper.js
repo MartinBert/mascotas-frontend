@@ -56,7 +56,7 @@ const findNextVoucherNumber_noFiscal = async (documentoCodigo) => {
 
 const fiscalVouchersCodes = [
     '001', /* Factura A */          { credit: '003', debit: '002' }, /* Notas fiscales asociadas a Factura A */
-    '016', /* Factura B */          { credit: '008', debit: '007' }, /* Notas fiscales asociadas a Factura B */
+    '006', /* Factura B */          { credit: '008', debit: '007' }, /* Notas fiscales asociadas a Factura B */
     '011', /* Factura C */          { credit: '013', debit: '012' }, /* Notas fiscales asociadas a Factura C */
     '051', /* Factura M */          { credit: '053', debit: '052' }, /* Notas fiscales asociadas a Factura M */
     '081', /* Ticket Factura A */   { credit: '112', debit: '115' }, /* Notas fiscales asociadas a Ticket Factura A */

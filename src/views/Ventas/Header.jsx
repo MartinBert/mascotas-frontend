@@ -19,7 +19,7 @@ import api from '../../services'
 // Imports Destructurings
 const { useSaleContext } = contexts.Sale
 const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, fiscalVouchersCodes } = helpers.afipHelper
-const { isItLater } = helpers.dateHelper
+const { dateToAfip, isItLater } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const { sortArrayOfSelectOptions } = helpers.objHelper
 const { fixInputNumber, fixInputNumberValue, nonCaseSensitive, normalizeString } = helpers.stringHelper
@@ -27,14 +27,15 @@ const { fixInputNumber, fixInputNumberValue, nonCaseSensitive, normalizeString }
 const creditCodes = fiscalVouchersCodes.filter(item => typeof item !== 'string').map(code => code.credit).filter(code => code)
 const debitCodes = fiscalVouchersCodes.filter(item => typeof item !== 'string').map(code => code.debit).filter(code => code)
 
+
 const Header = () => {
     const [sale_state, sale_dispatch] = useSaleContext()
 
     // --------------------- Actions --------------------- //
     const loadNextVoucherNumber = async () => {
         if (!sale_state.documento) return
+        if (!sale_state.empresa) return
         sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
-
         let number
         if (sale_state.documento.fiscal) {
             const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(
@@ -67,13 +68,6 @@ const Header = () => {
         unfilledField.focus()
     }
 
-    const setFocusWhenPressingEnter = (e) => {
-        if (e.keyCode === 13) { // Enter
-            e.preventDefault()
-            setFocus()
-        } else return
-    }
-
     const setFocusWhenPressingEnterOrEsc = (e) => {
         if (e.keyCode === 13 || e.keyCode === 27) { // Enter or Escape
             e.preventDefault()
@@ -104,7 +98,7 @@ const Header = () => {
         return data
     }
 
-    useEffect(() => { loadNextVoucherNumber() }, [sale_state.documento])
+    useEffect(() => { loadNextVoucherNumber() }, [sale_state.documento, sale_state.empresa])
     useEffect(() => { setFocus() }, [
         sale_state.cliente,
         sale_state.documento,
@@ -120,16 +114,20 @@ const Header = () => {
 
     useEffect(() => { loadTodayDate() }, [])
 
-    const changeDate = (e) => {
-        if (!e) {
-            sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-        } else {
-            if (isItLater(new Date(), e.$d)) {
-                errorAlert('No es conveniente facturar con fecha posterior a hoy.')
-                sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-            }
-            else sale_dispatch({ type: 'SET_DATES', payload: e.$d })
+    const changeDate = async (e) => {
+        if (!e) return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
+        if (isItLater(new Date(), e.$d)) {
+            errorAlert('No es conveniente facturar con fecha posterior a hoy.')
+            return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
         }
+        const [lastBill] = await api.ventas.findNewerSale()
+        const dateOfLastBill = parseInt(dateToAfip(lastBill.fechaEmision))
+        const selectedDate = parseInt(dateToAfip(e.$d))
+        if (selectedDate < dateOfLastBill) {
+            errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')
+            return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
+        }
+        sale_dispatch({ type: 'SET_DATES', payload: e.$d })
     }
 
     const datePickerForBillingDate = (
@@ -632,6 +630,37 @@ const Header = () => {
     )
 
     // -------------- Select payment plans ------------- //
+    const clearPaymentPlanWhenSelectingPaymentMethod = async () => {
+        const idOfSelectedPaymentMethods = sale_state.mediosPago
+        const selectedPaymentPlans = sale_state.planesPago
+        if (idOfSelectedPaymentMethods.length < 1 || selectedPaymentPlans.length < 1) return
+        const selectedPaymentMethods = await Promise.all(
+            idOfSelectedPaymentMethods.map(async idOfMethod => {
+                const findMethod = await api.mediospago.findById(idOfMethod)
+                return findMethod.data
+            })
+        )
+        if (selectedPaymentMethods.includes(null) || selectedPaymentMethods.includes(undefined)) {
+            return sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
+        }
+        const verifyIfSelectedPaymentMethodIncludesSelectedPaymentPlan = selectedPaymentMethods.map(method => {
+            const arrayIdOfMethodPlans = method.planes.map(plan => plan._id)
+            const idOfSelectedPlans = selectedPaymentPlans.map(plan => plan._id)
+            const verifyIfSelectedMethodPlansIncludesSelectedPlans = idOfSelectedPlans.map(selectedPlanId => {
+                if (arrayIdOfMethodPlans.includes(selectedPlanId)) return true
+                else return false
+            })
+            if (verifyIfSelectedMethodPlansIncludesSelectedPlans.includes(true)) return true
+            else return false
+        })
+        const selectedPaymentMethodIncludesSelectedPaymentPlan =
+            verifyIfSelectedPaymentMethodIncludesSelectedPaymentPlan.includes(true) ? true : false
+        if (selectedPaymentMethodIncludesSelectedPaymentPlan) return
+        else sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
+    }
+
+    useEffect(() => { clearPaymentPlanWhenSelectingPaymentMethod() }, [sale_state.mediosPagoNombres])
+
     const loadPaymentPlans = async () => {
         if (sale_state.mediosPagoNombres.length === 0) return
         const findSelectedPaymentMethod = await api.mediospago.findById(sale_state.mediosPago[0])

@@ -1,6 +1,6 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 
 // Custom Routers
 import PublicRouter from './PublicRouter'
@@ -12,6 +12,9 @@ import contexts from '../contexts'
 // Design Components
 import { Spin } from 'antd'
 
+// Helpers
+import helpers from '../helpers'
+
 // Services
 import api from '../services'
 
@@ -20,6 +23,43 @@ const { publicRoutesData } = PublicRouter
 const { privateRoutesData } = PrivateRouter
 const { useAuthContext } = contexts.Auth
 const { usePrivateRouteContext } = contexts.PrivateRoute
+const { findNextVoucherNumber_fiscal, fiscalVouchersCodes } = helpers.afipHelper
+
+// Load Afip services
+const getUserData = async () => {
+    const userId = localStorage.getItem('userId')
+    const loggedUser = await api.usuarios.findById(userId)
+    return loggedUser
+}
+
+const refreshAfipServices = async () => {
+    const { loggedUser, isVerified } = verifyRefresh()
+    if (!isVerified) return
+    const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
+    for (let index = 0; index < billCodes.length; index++) {
+        const code = billCodes[index]
+        const { empresa, puntoVenta } = loggedUser
+        const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(code, empresa.cuit, puntoVenta.numero)
+        if (!fiscalVoucherNumber) window.location.reload()
+        else return
+    }
+}
+
+const verifyRefresh = async () => {
+    // Sea entre las 2 y 2:11 de la mañana
+    const hours = new Date().getHours()
+    const minutes = new Date().getMinutes()
+    const minutesElapsedToday = hours * 60 + minutes
+    const correctSchedule = 120 < minutesElapsedToday < 131
+    // Haya un usuario logeado
+    const loggedUser = await getUserData()
+
+    const isVerified = correctSchedule && loggedUser
+    const data = { loggedUser, isVerified }
+    return data
+}
+
+setInterval(refreshAfipServices, 600000)
 
 
 const AppRouter = () => {

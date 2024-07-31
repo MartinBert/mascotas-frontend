@@ -89,11 +89,8 @@ const FinalizeSaleModal = () => {
         const responseOfAfip = await api.afip.generateVoucher(auth_state.user.empresa.cuit, bodyToAfip)
         if (!responseOfAfip) {
             return (
-                errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')
-                    .then(() => {
-                        sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-                        sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
-                    })
+                errorAlert('Ocurrió un error al solicitar la creción del comprobante a AFIP. Intente de nuevo.')
+                    .then(() => sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' }))
             )
         }
         else sale_dispatch({ type: 'CLOSE_FISCAL_OPERATION', payload: responseOfAfip })
@@ -112,12 +109,11 @@ const FinalizeSaleModal = () => {
             }
             return fixedLine
         })
-        console.log(sale_state)
-        // sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
-        // sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
-        // sale_state.documentoFiscal
-        //     ? closeFiscalOperation()
-        //     : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
+        sale_dispatch({ type: 'HIDE_FINALIZE_SALE_MODAL' })
+        sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' })
+        sale_state.documentoFiscal
+            ? closeFiscalOperation()
+            : sale_dispatch({ type: 'CLOSE_NO_FISCAL_OPERATION' })
     }
 
     const applyStockModification = async () => {
@@ -163,7 +159,7 @@ const FinalizeSaleModal = () => {
         })
         sale_state.productos = sale_state.productos
             .filter(product => !(product._id.startsWith('customProduct_')))
-        const {refs, ...saleData} = sale_state
+        const { refs, ...saleData } = sale_state
         const response = await api.ventas.save(saleData)
         if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
     }
@@ -207,8 +203,10 @@ const FinalizeSaleModal = () => {
         saveStockHistoryOfProducts()
 
         //Modify stock of products
-        const modifyStock = sale_state.documento.cashRegister && !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
-        if (modifyStock) applyStockModification()
+        const itsASale = sale_state.documento.cashRegister
+        const isNotFiscalNote = !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
+        const conditionsToModifyStock = itsASale && isNotFiscalNote
+        if (conditionsToModifyStock) applyStockModification()
 
         //Save sale data in sales list
         saveSaleData()

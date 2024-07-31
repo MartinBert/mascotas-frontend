@@ -208,105 +208,7 @@ const initialState = {
     vencimientoCae: null
 }
 
-const editGrossPrice = (line) => {
-    const quantity = line.fraccionar ? line.cantidadUnidades / line.fraccionamiento : line.cantidadUnidades
-    const grossPrice = roundToMultiple(quantity * line.precioUnitario, 10)
-    return grossPrice
-}
-
-const editMetadata = (line, stateData) => {
-    const { generalDiscount, generalSurcharge, lastParameterModified, paymentPlanPercentage } = stateData
-    const { currentQuantity, fixedQuantity } = editProductQuantity(line, stateData)
-    const netPriceFixedOrModified = line.precioNetoFijo || lastParameterModified === 'lineNetPrice'
-    const quantityWasAdded = (
-        netPriceFixedOrModified && (
-            roundTwoDecimals(line.porcentajeDescuentoRenglon) > 0
-            || roundTwoDecimals(generalDiscount) > 0
-            || roundTwoDecimals(paymentPlanPercentage) < 0
-        )
-    )
-    const quantityWasRemoved = (
-        netPriceFixedOrModified && (
-            roundTwoDecimals(line.porcentajeRecargoRenglon) > 0
-            || roundTwoDecimals(generalSurcharge) > 0
-            || roundTwoDecimals(paymentPlanPercentage) > 0
-        )
-    )
-    const addedQuantity = quantityWasAdded ? fixedQuantity - currentQuantity : 0
-    const fixedAddedQuantity = line.fraccionar
-        ? roundTwoDecimals(addedQuantity / line.fraccionamiento)
-        : roundTwoDecimals(addedQuantity)
-    const removedQuantity = quantityWasRemoved ? currentQuantity - fixedQuantity : 0
-    const fixedRemovedQuantity = line.fraccionar
-        ? roundTwoDecimals(removedQuantity / line.fraccionamiento)
-        : roundTwoDecimals(removedQuantity)
-    const data = {
-        cantidadAgregadaPorDescuento_enKg: fixedAddedQuantity,
-        cantidadQuitadaPorRecargo_enKg: fixedRemovedQuantity
-    }
-    return data
-}
-
-const editNetPrice = (line, lineDiscount, lineSurcharge) => {
-    const grossPrice = editGrossPrice(line)
-    const netPrice = grossPrice - lineDiscount + lineSurcharge
-    const roundedNetPrice = roundToMultiple(netPrice, 10)
-    return roundedNetPrice
-}
-
-const editProductQuantity = (line, stateData) => {
-    const { generalDiscount, generalSurcharge, paymentPlanPercentage } = stateData
-    const lineDiscountPercentage = fixLineDiscountPercentage(line)
-    const lineSurchargePercentage = fixLineSurchargePercentage(line)
-    const currentQuantity = line.fraccionar
-        ? (line.precioNeto / line.precioUnitario) * line.fraccionamiento
-        : line.precioNeto / line.precioUnitario
-    const fixedQuantity = currentQuantity * (1
-        - decimalPercent(lineSurchargePercentage)
-        - decimalPercent(generalSurcharge)
-        + decimalPercent(lineDiscountPercentage)
-        + decimalPercent(generalDiscount)
-        + (paymentPlanPercentage > 0 ? - paymentPlanPercentage : paymentPlanPercentage)
-    )
-    const roundedCurrentQuantity = roundTwoDecimals(currentQuantity)
-    const roundedFixedQuantity = roundTwoDecimals(fixedQuantity)
-    const data = {
-        currentQuantity: roundedCurrentQuantity,
-        fixedQuantity: roundedFixedQuantity
-    }
-    return data
-}
-
-const editProductSpanQuantity = (line) => {
-    const unitMeasureInlcudesKilograms = line?.unidadMedida.toLowerCase().includes('kilo') ?? null
-    const unitMeasureInlcudesGrams = line?.unidadMedida.toLowerCase().includes(' gramo') ?? null
-    const isUnitMeasureGramsToGrams = (!unitMeasureInlcudesKilograms && unitMeasureInlcudesGrams) ? true : false
-    if (line.fraccionar) {
-        if (line.fraccionamiento < 1000 && !isUnitMeasureGramsToGrams) {
-            line.cantidadKg = roundTwoDecimals(previousInteger(line.cantidadUnidades))
-            line.cantidadg = 0
-        } else {
-            line.cantidadKg = roundTwoDecimals(previousInteger(line.cantidadUnidades / 1000))
-            line.cantidadg = roundTwoDecimals(line.cantidadUnidades % 1000)
-        }
-    } else {
-        if (line.fraccionamiento < 1000) {
-            if (isUnitMeasureGramsToGrams) {
-                const remainder = (line.cantidadUnidades % 1000)
-                line.cantidadKg = roundTwoDecimals(previousInteger(line.cantidadUnidades * line.fraccionamiento / 1000))
-                line.cantidadg = roundTwoDecimals(remainder * line.fraccionamiento % 1000)
-            } else {
-                const remainder = line.cantidadUnidades * line.fraccionamiento - previousInteger(line.cantidadUnidades * line.fraccionamiento)
-                line.cantidadKg = roundTwoDecimals(previousInteger(line.cantidadUnidades * line.fraccionamiento))
-                line.cantidadg = roundTwoDecimals(remainder * 1000)
-            }
-        } else {
-            line.cantidadKg = roundTwoDecimals(previousInteger(line.cantidadUnidades))
-            line.cantidadg = roundTwoDecimals((line.cantidadUnidades - previousInteger(line.cantidadUnidades)) * 1000)
-        }
-    }
-}
-
+// ---------------- Auxiliar functions --------------- //
 const fixLineDiscountPercentage = (line) => {
     if (!line.porcentajeDescuentoRenglon) return null
     if (line.porcentajeDescuentoRenglon.endsWith('.') || line.porcentajeDescuentoRenglon.endsWith(',')) return null
@@ -319,87 +221,184 @@ const fixLineSurchargePercentage = (line) => {
     return line.porcentajeRecargoRenglon
 }
 
-const getLineDiscount = (line, discountData) => {
-    const { generalDiscount, paymentPlanPercentage } = discountData
-    const grossPrice = editGrossPrice(line)
+const getDiscountVariation = (line, stateData) => {
+    const { generalDiscount, paymentPlanPercentage } = stateData
     const lineDiscountPercentage = fixLineDiscountPercentage(line)
+    const discountVariation = (
+        decimalPercent(lineDiscountPercentage)
+        + decimalPercent(generalDiscount)
+        + (paymentPlanPercentage > 0 ? 0 : paymentPlanPercentage)
+    )
+    return discountVariation
+}
 
+const calculateLineDiscount = (line, stateData) => {
+    const discountVariation = getDiscountVariation(line, stateData)
+    const factor = 1 - discountVariation
+    const grossPrice = calculateGrossPriceFromQuantity(line)
     let lineDiscount
     if (line.precioNetoFijo) {
         lineDiscount = grossPrice > line.precioNeto ? grossPrice - line.precioNeto : 0
     } else {
-        const netPrice = grossPrice * (1
-            - decimalPercent(lineDiscountPercentage)
-            - decimalPercent(generalDiscount)
-            + (paymentPlanPercentage < 0 ? paymentPlanPercentage : 0)
-        )
+        const netPrice = grossPrice * factor
         lineDiscount = grossPrice - netPrice
     }
     const roundedLineDiscount = roundTwoDecimals(lineDiscount)
     return roundedLineDiscount
 }
 
-const getLineSurcharge = (line, surchargeData) => {
-    const { generalSurcharge, paymentPlanPercentage } = surchargeData
-    const grossPrice = editGrossPrice(line)
-    const lineSurchargePercentage = fixLineSurchargePercentage(line)
-
+const calculateLineSurcharge = (line, stateData) => {
+    const surchargeVariation = getSurchargeVariation(line, stateData)
+    const factor = 1 + surchargeVariation
+    const grossPrice = calculateGrossPriceFromQuantity(line)
     let lineSurcharge
     if (line.precioNetoFijo) {
         lineSurcharge = line.precioNeto > grossPrice ? line.precioNeto - grossPrice : 0
     } else {
-        const netPrice = grossPrice * (1
-            + decimalPercent(lineSurchargePercentage)
-            + decimalPercent(generalSurcharge)
-            + (paymentPlanPercentage > 0 ? paymentPlanPercentage : 0)
-        )
+        const netPrice = grossPrice * factor
         lineSurcharge = netPrice - grossPrice
     }
     const roundedLineSurcharge = roundTwoDecimals(lineSurcharge)
     return roundedLineSurcharge
 }
 
+const getSurchargeVariation = (line, stateData) => {
+    const { generalSurcharge, paymentPlanPercentage } = stateData
+    const lineSurchargePercentage = fixLineSurchargePercentage(line)
+    const surchargeVariation = (
+        decimalPercent(lineSurchargePercentage)
+        + decimalPercent(generalSurcharge)
+        + (paymentPlanPercentage > 0 ? paymentPlanPercentage : 0)
+    )
+    return surchargeVariation
+}
+
+// ---------------- Update functions ----------------- //
+const calculateGrossPriceFromNetPrice = (line, stateData) => {
+    const discountVariation = getDiscountVariation(line, stateData)
+    const surchargeVariation = getSurchargeVariation(line, stateData)
+    const grossPrice = line.precioNeto / (1 - discountVariation + surchargeVariation)
+    const roundedGrossPrice = roundTwoDecimals(grossPrice)
+    return roundedGrossPrice
+}
+
+const calculateGrossPriceFromQuantity = (line) => {
+    const quantity = line.fraccionar
+        ? line.cantidadUnidades / line.fraccionamiento
+        : line.cantidadUnidades
+    const grossPrice = quantity * line.precioUnitario
+    const roundedGrossPrice = roundTwoDecimals(grossPrice)
+    return roundedGrossPrice
+}
+
+const calculateNetPrice = (line, lineDiscount, lineSurcharge) => {
+    const grossPrice = calculateGrossPriceFromQuantity(line)
+    const netPrice = grossPrice - lineDiscount + lineSurcharge
+    const roundedNetPrice = roundToMultiple(netPrice, 10)
+    return roundedNetPrice
+}
+
+const calculateQuantities = (line, stateData) => {
+    const discountVariation = getDiscountVariation(line, stateData)
+    const surchargeVariation = getSurchargeVariation(line, stateData)
+    const factor = 1 - discountVariation + surchargeVariation
+    const factorOfQuantity = line.precioNeto / factor / line.precioUnitario
+    const currentQuantity = line.fraccionar
+        ? (line.precioNeto / line.precioUnitario) * line.fraccionamiento
+        : line.precioNeto / line.precioUnitario
+    const updateQuantity = line.fraccionar
+        ? factorOfQuantity * line.fraccionamiento
+        : factorOfQuantity
+    const data = {
+        quantityAddedByDiscount: roundTwoDecimals(currentQuantity * discountVariation),
+        quantityRemovedBySurcharge: roundTwoDecimals(currentQuantity * surchargeVariation),
+        updatedQuantity: roundTwoDecimals(updateQuantity)
+    }
+    return data
+}
+
+const calculateSpanQuantity = (line) => {
+    const unitMeasureInlcudesKilograms = line?.unidadMedida.toLowerCase().includes('kilo') ?? null
+    const unitMeasureInlcudesGrams = line?.unidadMedida.toLowerCase().includes(' gramo') ?? null
+    const isUnitMeasureGramsToGrams = (!unitMeasureInlcudesKilograms && unitMeasureInlcudesGrams) ? true : false
+    let updatedKgQuantity
+    let updatedGrQuantity
+    if (line.fraccionar) {
+        if (line.fraccionamiento < 1000 && !isUnitMeasureGramsToGrams) {
+            updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades))
+            updatedGrQuantity = 0
+        } else {
+            updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades / 1000))
+            updatedGrQuantity = roundTwoDecimals(line.cantidadUnidades % 1000)
+        }
+    } else {
+        if (line.fraccionamiento < 1000) {
+            if (isUnitMeasureGramsToGrams) {
+                const remainder = (line.cantidadUnidades % 1000)
+                updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades * line.fraccionamiento / 1000))
+                updatedGrQuantity = roundTwoDecimals(remainder * line.fraccionamiento % 1000)
+            } else {
+                const remainder = line.cantidadUnidades * line.fraccionamiento - previousInteger(line.cantidadUnidades * line.fraccionamiento)
+                updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades * line.fraccionamiento))
+                updatedGrQuantity = roundTwoDecimals(remainder * 1000)
+            }
+        } else {
+            updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades))
+            updatedGrQuantity = roundTwoDecimals((line.cantidadUnidades - previousInteger(line.cantidadUnidades)) * 1000)
+        }
+    }
+    const data = { updatedKgQuantity, updatedGrQuantity }
+    return data
+}
+
 const updateLinesValues = (state) => {
     const verified = verifyUpdateLinesValues(state)
     if (!verified) return state.renglones
-
     // State data
     const generalDiscount = state.porcentajeDescuentoGlobal
     const generalSurcharge = state.porcentajeRecargoGlobal
     const lastParameterModified = state.lastModifiedParameter.parameter
     const paymentPlanPercentage = state.planesPago.length > 0 ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-    const discountData = { generalDiscount, paymentPlanPercentage }
-    const surchargeData = { generalSurcharge, paymentPlanPercentage }
-    const stateData = { generalDiscount, generalSurcharge, lastParameterModified, paymentPlanPercentage }
-
+    const stateData = { generalDiscount, generalSurcharge, paymentPlanPercentage }
+    // Lines update
     const updatedLines = state.renglones.map(line => {
         // Line data
-        const lineDiscount = getLineDiscount(line, discountData)
-        const lineSurcharge = getLineSurcharge(line, surchargeData)
-        const lineNetPrice = (!line.precioNetoFijo || lastParameterModified === 'lineQuantity') && !(lastParameterModified === 'lineNetPrice')
-            ? editNetPrice(line, lineDiscount, lineSurcharge)
-            : line.precioNeto
-        const lineQuantity = (line.precioNetoFijo || lastParameterModified === 'lineNetPrice') && !(lastParameterModified === 'lineQuantity')
-            ? editProductQuantity(line, stateData).fixedQuantity
-            : line.cantidadUnidades
+        const netPriceWasEdited = lastParameterModified === 'lineNetPrice'
+        const quantityWasEdited = lastParameterModified === 'lineQuantity'
+        const conditionsToEditNetPrice = !line.precioNetoFijo && !netPriceWasEdited
+        const conditionsToEditQuantity = (line.precioNetoFijo || netPriceWasEdited) && !quantityWasEdited
         const product = state.productos.find(product => product._id === line._id)
         const productFractionedPrice = product.precioVentaFraccionado ?? product.precioVenta
         const productUnfractionedPrice = product.precioVenta
-
-        line.cantidadAgregadaPorDescuento_enKg = editMetadata(line, stateData).cantidadAgregadaPorDescuento_enKg
-        line.cantidadQuitadaPorRecargo_enKg = editMetadata(line, stateData).cantidadQuitadaPorRecargo_enKg
-        line.cantidadUnidades = lineQuantity === 0 ? null : lineQuantity
-        line.descuento = roundToMultiple(lineDiscount, 10)
-        line.precioBruto = editGrossPrice(line)
-        line.precioNeto = lineNetPrice === 0 ? null : lineNetPrice
-        line.precioUnitario = line.fraccionar ? roundToMultiple(productFractionedPrice, 10) : roundToMultiple(productUnfractionedPrice, 10)
-        line.importeIva = roundTwoDecimals(decimalPercent(line.porcentajeIva) * line.precioBruto)
-        line.profit = roundTwoDecimals(line.precioNeto - line.importeIva)
-        line.recargo = roundToMultiple(lineSurcharge, 10)
-        editProductSpanQuantity(line)
+        // Line calculations
+        const { quantityAddedByDiscount, quantityRemovedBySurcharge, updatedQuantity } = calculateQuantities(line, stateData)
+        const { updatedKgQuantity, updatedGrQuantity } = calculateSpanQuantity(line)
+        const updatedGrossPrice = calculateGrossPriceFromNetPrice(line, stateData)
+        const updatedIvaImport = roundTwoDecimals(decimalPercent(line.porcentajeIva) * line.precioBruto)
+        const updatedLineDiscount = calculateLineDiscount(line, stateData)
+        const updatedLineSurcharge = calculateLineSurcharge(line, stateData)
+        const updatedProfit = roundTwoDecimals(line.precioNeto - line.importeIva)
+        const updatedUnitPrice = line.fraccionar ? roundTwoDecimals(productFractionedPrice) : roundTwoDecimals(productUnfractionedPrice)
+        // Line update
+        if (conditionsToEditNetPrice) {
+            const updatedNetPrice = calculateNetPrice(line, updatedLineDiscount, updatedLineSurcharge)
+            line.precioNeto = updatedNetPrice > 0 ? updatedNetPrice : null
+        }
+        if (conditionsToEditQuantity) {
+            line.cantidadUnidades = updatedQuantity > 0 ? updatedQuantity : null
+        }
+        line.cantidadg = updatedGrQuantity
+        line.cantidadKg = updatedKgQuantity
+        line.cantidadAgregadaPorDescuento_enKg = quantityAddedByDiscount
+        line.cantidadQuitadaPorRecargo_enKg = quantityRemovedBySurcharge
+        line.descuento = updatedLineDiscount
+        line.importeIva = updatedIvaImport
+        line.precioBruto = updatedGrossPrice
+        line.precioUnitario = updatedUnitPrice
+        line.profit = updatedProfit
+        line.recargo = updatedLineSurcharge
         return line
     })
-
     return updatedLines
 }
 

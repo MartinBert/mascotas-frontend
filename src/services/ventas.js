@@ -115,10 +115,32 @@ const findNewerRecord = async () => {
     }
 }
 
+const findNewerSale = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/salesInfo/newer`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findOldestRecord = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/recordsInfo/oldest`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const findOldestSale = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas/salesInfo/oldest`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -160,7 +182,9 @@ const ventas = {
     findLastVoucherNumber,
     findMultipleIds,
     findNewerRecord,
+    findNewerSale,
     findOldestRecord,
+    findOldestSale,
     findPaginated,
     save
 }
