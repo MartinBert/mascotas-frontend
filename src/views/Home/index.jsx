@@ -335,7 +335,7 @@ const Home = () => {
     }
     
 
-    const testRenderElementDisplay = 'block'
+    const testRenderElementDisplay = 'none'
 
     return (
         <>
