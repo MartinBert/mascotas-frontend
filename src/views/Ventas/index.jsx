@@ -135,6 +135,7 @@ const Ventas = () => {
         else sale_dispatch({ type: 'SET_EXISTS_LINE_ERROR', payload: false })
     }
 
+    /* eslint-disable */
     useEffect(() => { addRefs() }, [sale_state.empresa])
     useEffect(() => { verifyErrorsInLines() }, [sale_state.renglones])
     useEffect(() => { loadData() }, [])
@@ -147,6 +148,7 @@ const Ventas = () => {
     ])
     useEffect(() => { updateLines() }, [sale_state.productos.length])
     useEffect(() => { updateState() }, [sale_state.lastModifiedParameter])
+    /* eslint-enable */
 
     // ------------ Actions of product to sale ----------- //
     const deleteProduct = (line) => {
@@ -157,6 +159,7 @@ const Ventas = () => {
         const element = (
             <div
                 align='middle'
+                key={line.key}
                 onClick={e => deleteProduct(line)}
             >
                 <Delete />
@@ -190,7 +193,7 @@ const Ventas = () => {
     }
 
     const buttonToStartFinalizeSale = (
-        <Row gutter={8} align='middle'>
+        <Row align='middle' gutter={8}>
             <Col span={6}>
                 <Button
                     className='btn-primary'
@@ -230,7 +233,8 @@ const Ventas = () => {
         const element = (
             <Checkbox
                 checked={line.fraccionar === true ? true : false}
-                disabled={line._id.startsWith('customProduct_')}
+                disabled={line.key.startsWith('customProduct_')}
+                key={line.key}
                 onChange={e => onChangeFractionateCheckbox(e, line)}
                 onKeyUp={setFocusWhenPressingEsc}
             />
@@ -261,7 +265,7 @@ const Ventas = () => {
 
     const inputDiscountPercentage = (line) => {
         const element = (
-            <>
+            <div key={line.key}>
                 <Input
                     allowClear
                     disabled={line.porcentajeRecargoRenglon > 0}
@@ -279,7 +283,7 @@ const Ventas = () => {
                 >
                     Escribe un porcentaje válido entre cero y 100.
                 </span>
-            </>
+            </div>
         )
         return element
     }
@@ -289,6 +293,7 @@ const Ventas = () => {
         const element = (
             <Input
                 disabled={true}
+                key={line.key}
                 value={roundTwoDecimals(line.precioBruto)}
             />
         )
@@ -324,7 +329,7 @@ const Ventas = () => {
 
     const inputNetPrice = (line) => {
         const element = (
-            <Row align='middle'>
+            <Row align='middle' key={line.key}>
                 <Col span={3}>
                     <Checkbox
                         onChange={e => onChangeFixedNetPriceCheckbox(e, line)}
@@ -362,10 +367,9 @@ const Ventas = () => {
 
     const inputNote = (line) => {
         const element = (
-            <Space.Compact style={{ width: '100%' }}>
+            <Space.Compact key={line.key} style={{ width: '100%' }}>
                 <Input
                     addonBefore='Nota'
-                    key={line._id}
                     onChange={e => setNote(e.target.value, line._id)}
                     onKeyUp={setFocusWhenPressingEsc}
                     value={line.nota}
@@ -414,7 +418,7 @@ const Ventas = () => {
 
     const inputQuantity = (line) => {
         const element = (
-            <Row gutter={8}>
+            <Row gutter={8} key={line.key}>
                 <Col span={16}>
                     <Input
                         allowClear
@@ -469,7 +473,7 @@ const Ventas = () => {
 
     const inputSurchargePercentage = (line) => {
         const element = (
-            <>
+            <div key={line.key}>
                 <Input
                     allowClear
                     disabled={line.porcentajeDescuentoRenglon > 0}
@@ -487,7 +491,7 @@ const Ventas = () => {
                 >
                     Escribe un porcentaje válido.
                 </span>
-            </>
+            </div>
         )
         return element
     }
@@ -497,6 +501,7 @@ const Ventas = () => {
         const element = (
             <Input
                 disabled={true}
+                key={line.key}
                 value={line.cantidadUnidades > 0 ? line.precioUnitario : 0}
             />
         )

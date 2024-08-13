@@ -98,6 +98,7 @@ const Header = () => {
         return data
     }
 
+    /* eslint-disable */
     useEffect(() => { loadNextVoucherNumber() }, [sale_state.documento, sale_state.empresa])
     useEffect(() => { setFocus() }, [
         sale_state.cliente,
@@ -106,12 +107,14 @@ const Header = () => {
         sale_state.mediosPago,
         sale_state.planesPago
     ])
+    /* eslint-enable */
 
     // ---------- Date picker for billing date ----------- //
     const loadTodayDate = () => {
         sale_dispatch({ type: 'SET_DATES', payload: new Date() })
     }
 
+    // eslint-disable-next-line
     useEffect(() => { loadTodayDate() }, [])
 
     const changeDate = async (e) => {
@@ -206,18 +209,15 @@ const Header = () => {
         const customConcept = sale_state.customProductParams.concept
         const customPercentageIva = sale_state.customProductParams.percentageIva
         const customUnitPrice = sale_state.customProductParams.unitPrice
-        const isConceptInvalid = (
-            !customConcept
-            || customConcept == 0
-        )
-        const isPercentageIvaInvalid = (
+        const isConceptInvalid = !customConcept || customConcept === ''
+        const isPercentageIvaInvalid = sale_state.empresa?.condicionFiscal?.adicionaIva && (
             !customPercentageIva
-            || customPercentageIva == 0
+            || customPercentageIva === ''
             || invalidStatusOfCustomPercentageIva(customPercentageIva)
         )
         const isUnitPriceInvalid = (
             !customUnitPrice
-            || customUnitPrice == 0
+            || customUnitPrice === ''
             || invalidStatusOfCustomUnitPrice(customUnitPrice)
         )
         const invalidStatus = [isConceptInvalid, isPercentageIvaInvalid, isUnitPriceInvalid].includes(true)
@@ -244,6 +244,7 @@ const Header = () => {
         sale_dispatch({ type: 'SET_CUSTOM_PERCENTAGE_IVA', payload: defaultIva })
     }
 
+    // eslint-disable-next-line
     useEffect(() => { loadCustomPercentageIva() }, [sale_state.empresa])
 
     const onChangeCustomConcept = async (e) => {
@@ -659,8 +660,6 @@ const Header = () => {
         else sale_dispatch({ type: 'SET_PAYMENT_PLAN', payload: [] })
     }
 
-    useEffect(() => { clearPaymentPlanWhenSelectingPaymentMethod() }, [sale_state.mediosPagoNombres])
-
     const loadPaymentPlans = async () => {
         if (sale_state.mediosPagoNombres.length === 0) return
         const findSelectedPaymentMethod = await api.mediospago.findById(sale_state.mediosPago[0])
@@ -669,7 +668,10 @@ const Header = () => {
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PAYMENT_PLAN', payload: options })
     }
 
+    /* eslint-disable */
+    useEffect(() => { clearPaymentPlanWhenSelectingPaymentMethod() }, [sale_state.mediosPagoNombres])
     useEffect(() => { loadPaymentPlans() }, [sale_state.mediosPagoNombres])
+    /* eslint-enable */
 
     const onSelectPaymentPlan = async (e) => {
         const findSelectedPaymentMethod = await api.mediospago.findById(sale_state.mediosPago[0])

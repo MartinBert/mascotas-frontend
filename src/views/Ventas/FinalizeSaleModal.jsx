@@ -153,14 +153,15 @@ const FinalizeSaleModal = () => {
     }
 
     const saveSaleData = async () => {
-        sale_state.renglones = sale_state.renglones.map(renglon => {
-            delete renglon._id
-            return renglon
+        const fixedLines = sale_state.renglones.map(renglon => {
+            const { _id, ...lineData } = renglon
+            return lineData
         })
-        sale_state.productos = sale_state.productos
+        const fixedProducts = sale_state.productos
             .filter(product => !(product._id.startsWith('customProduct_')))
         const { refs, ...saleData } = sale_state
-        const response = await api.ventas.save(saleData)
+        const dataToSave = { ...saleData, renglones: fixedLines, productos: fixedProducts }
+        const response = await api.ventas.save(dataToSave)
         if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
     }
 
@@ -220,6 +221,7 @@ const FinalizeSaleModal = () => {
     useEffect(() => {
         if (!sale_state.closedSale) return
         save()
+        // eslint-disable-next-line
     }, [sale_state.closedSale])
 
     const buttonToSave = (

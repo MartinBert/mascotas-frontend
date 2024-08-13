@@ -22,6 +22,7 @@ export const questionAlert = async(message) => {
 
 export const successAlert = async(message) => {
     return Swal.fire({
+        focusConfirm: true,
         icon: 'success',
         title: 'Éxito!',
         text: message

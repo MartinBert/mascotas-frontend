@@ -17,8 +17,6 @@ const findLastVoucherNumber = async (cuit, salePointNumber, voucherCode) => {
 }
 
 const generateVoucher = async (cuit, voucher) => {
-    console.log(cuit)
-    console.log(voucher)
     try {
         const response = await axios.post(`${process.env.REACT_APP_API_REST_AFIP}/generarComprobante/${cuit}`, voucher)
         return response.data
