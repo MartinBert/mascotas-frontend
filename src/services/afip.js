@@ -36,6 +36,15 @@ const findTaxpayerData = async (userCuit, taxpayerCuit) => {
     }
 }
 
+const generateCertAndKey = async () => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/generateCertAndKey`)
+        return response.data
+    } catch (err) {
+        console.error(err)
+    }
+}
+
 const getDocumentsTypes = async (cuit) => {
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/obtenerTiposDocumentos/${cuit}`)
@@ -47,8 +56,9 @@ const getDocumentsTypes = async (cuit) => {
 
 const marcas = {
     findLastVoucherNumber,
-    generateVoucher,
     findTaxpayerData,
+    generateCertAndKey,
+    generateVoucher,
     getDocumentsTypes
 }
 

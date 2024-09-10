@@ -14,6 +14,7 @@ import productos from './productos'
 import puntosventa from './puntosventa'
 import rubros from './rubros'
 import salidas from './salidas'
+import seed from './seed'
 import stockHistory from './stockHistory'
 import unidadesmedida from './unidadesmedida'
 import uploader from './uploader'
@@ -39,6 +40,7 @@ const api = {
     puntosventa,
     rubros,
     salidas,
+    seed,
     stockHistory,
     unidadesmedida,
     uploader,

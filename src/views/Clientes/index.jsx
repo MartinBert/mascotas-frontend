@@ -45,12 +45,8 @@ const Clientes = () => {
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchClientes()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.loading, filters, limit, page ])
 
     // ------------------ Client Deletion ------------------ //
     const clientDeletion = (clientID) => {
@@ -72,10 +68,8 @@ const Clientes = () => {
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteClient()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.confirmDeletion, deleteModal_state.entityID ])
 
     // ------------------ Client Edition ------------------ //
     const clientEdition = (id) => {

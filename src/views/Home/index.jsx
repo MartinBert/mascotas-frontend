@@ -1,35 +1,47 @@
 // React Components and Hooks
 import React from 'react'
-import { useEffect } from 'react'
+
+// Design Components
+import { Button, Checkbox, Col, Row, Table } from 'antd'
+
+// Custom Context Providers
+import contexts from '../../contexts'
 
 // Helpers
-import actions from '../../actions'
 import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
 
 // Imports Destructuring
-const { formatFindParams } = actions.paginationParams
+const { useHomeContext } = contexts.Home
 const { roundTwoDecimals } = helpers.mathHelper
-const { normalizeString } = helpers.stringHelper
 
 
 const Home = () => {
+    const [home_state, home_dispatch] = useHomeContext()
 
-    const console_documentTypes = false // 'True' to console log all supported voucher types by the afip controller
-    useEffect(() => {
-        const findDocumentsTypes = async () => {
-            if (!console_documentTypes) return
-            const cuit = '20374528506'
-            const res = await api.afip.getDocumentsTypes(cuit)
-            console.log(res)
-        }
-        findDocumentsTypes()
-    }, [console_documentTypes])
+    // ------------------- Find all supported vouchers by Afip Controller -------------------- //
+    const consoleSupportedVouchers = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const cuit = '20374528506'
+        const res = await api.afip.getDocumentsTypes(cuit)
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
 
-    // ------------------- Update model ------------------ //
+    const buttonToConsoleSupportedVouchers = (
+        <Button
+            onClick={consoleSupportedVouchers}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------------ Generate stock histories ------------------------------- //
     const generateStockHistories = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
 
         // Data para generar los registros
         const findAllEntries = await api.entradas.findAll()
@@ -207,7 +219,7 @@ const Home = () => {
             await api.stockHistory.save(record)
         }
 
-        console.log('listo')
+        console.log('ready')
 
         // VERIFY IN CONSOLE
         // const quantityOfEntriesToSave = dataForSave.reduce((acc, val) => acc + val.entries, 0)
@@ -234,147 +246,373 @@ const Home = () => {
 
         // console.log('VALORES A GUARDAR: ', quantityOfEntriesToSave + quantityOfOutputsToSave)
         // console.log('VALORES GUARDADOS: ', savedEntries + fixedSavedOutputs)
+
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
+    const buttonToGenerateStockHistories = (
+        <Button
+            onClick={generateStockHistories}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------------- Delete stock histories -------------------------------- //
     const deleteStockHistories = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
         const findStockHistories = await api.stockHistory.findAll()
         const stockHistories = findStockHistories.docs
         for (let index = 0; index < stockHistories.length; index++) {
             const stockHistory = stockHistories[index]
             await api.stockHistory.deleteStockHistory(stockHistory._id)
         }
-
-        console.log('listo')
+        console.log('Stock histories was deleted.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
-    const addNormalizedNames = async () => {
-        const findClients = await api.clientes.findAll()
-        const clients = findClients.docs
-        for (let index = 0; index < clients.length; index++) {
-            const client = clients[index]
-            const clientFixed = {
-                ...client,
-                normalizedBusinessName: client.razonSocial ? normalizeString(client.razonSocial) : null
-            }
-            await api.clientes.edit(clientFixed)
-        }
+    const buttonToDeleteStockHistories = (
+        <Button
+            danger
+            onClick={deleteStockHistories}
+            type='primary'
+        >
+            Eliminar
+        </Button>
+    )
 
-        const findDocuments = await api.documentos.findAll()
-        const documents = findDocuments.docs
-        for (let index = 0; index < documents.length; index++) {
-            const document = documents[index]
-            const documentFixed = {
-                ...document,
-                normalizedName: document.nombre ? normalizeString(document.nombre) : null
-            }
-            await api.documentos.edit(documentFixed)
-        }
-
-        const findPaymentMethods = await api.mediospago.findAll()
-        const paymentMethods = findPaymentMethods.docs
-        for (let index = 0; index < paymentMethods.length; index++) {
-            const paymentMethod = paymentMethods[index]
-            const paymentMethodFixed = {
-                ...paymentMethod,
-                normalizedName: paymentMethod.nombre ? normalizeString(paymentMethod.nombre) : null,
-                planes: paymentMethod.planes.map(plan => {
-                    const planFixed = {
-                        ...plan,
-                        normalizedName: plan.nombre ? normalizeString(plan.nombre) : null
-                    }
-                    return planFixed
-                })
-            }
-            await api.mediospago.edit(paymentMethodFixed)
-        }
-        
-        console.log('listo')
-    }
-
-    const showData = async () => {
+    // ---------------------------------- Show all entries ----------------------------------- //
+    const consoleEntries = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllEntries = await api.entradas.findAll()
-        const findAllOutputs = await api.salidas.findAll()
-        const findAllProducts = await api.productos.findAll()
-        const findAllSales = await api.ventas.findAll()
-        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
-        const findStockHistory = await api.stockHistory.findAll()
-
         const allEntries = findAllEntries.docs
-        const allOutputs = findAllOutputs.docs
-        const allProducts = findAllProducts.docs
-        const allSales = findAllSales.docs
-        const statistics = findDailyBusinessStatistics.docs
-        const stockHistory = findStockHistory.docs
-
-        console.log('ENTRADAS')
         console.log(allEntries)
-        console.log('--------------------------------------------------------------')
-        console.log('SALIDAS')
-        console.log(allOutputs)
-        console.log('--------------------------------------------------------------')
-        console.log('PRODUCTOS')
-        console.log(allProducts)
-        console.log('--------------------------------------------------------------')
-        console.log('VENTAS')
-        console.log(allSales)
-        console.log('--------------------------------------------------------------')
-        console.log('ESTADISTICAS DIARIAS')
-        console.log(statistics)
-        console.log('--------------------------------------------------------------')
-        console.log('HISTORIAL DE STOCK')
-        console.log(stockHistory)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
-    const showDataWithoutBrandOrType = async () => {
+    const buttonToConsoleEntries = (
+        <Button
+            onClick={consoleEntries}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ---------------------------------- Show all outputs ----------------------------------- //
+    const consoleOutputs = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllOutputs = await api.salidas.findAll()
+        const allOutputs = findAllOutputs.docs
+        console.log(allOutputs)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleOutputs = (
+        <Button
+            onClick={consoleOutputs}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ---------------------------------- Show all products ---------------------------------- //
+    const consoleProducts = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllProducts = await api.productos.findAll()
+        const allProducts = findAllProducts.docs
+        console.log(allProducts)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleProducts = (
+        <Button
+            onClick={consoleProducts}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ----------------------------------- Show all sales ------------------------------------ //
+    const consoleSales = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllSales = await api.ventas.findAll()
+        const allSales = findAllSales.docs
+        console.log(allSales)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleSales = (
+        <Button
+            onClick={consoleSales}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------- Show all daily business statistics -------------------------- //
+    const consoleDailyBusinessStatistics = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const statistics = findDailyBusinessStatistics.docs
+        console.log(statistics)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleDailyBusinessStatistics = (
+        <Button
+            onClick={consoleDailyBusinessStatistics}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------------ Show all stock histories ------------------------------- //
+    const consoleStockHistories = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findStockHistory = await api.stockHistory.findAll()
+        const stockHistory = findStockHistory.docs
+        console.log(stockHistory)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleStockHistories = (
+        <Button
+            onClick={consoleStockHistories}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // -------------------- Show products without assigned Brand or Type --------------------- //
+    const consoleProductsWithoutAssignedBrandOrType = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllProducts = await api.productos.findAll()
         const allProducts = findAllProducts.docs
         const productsWithoutBrandOrType = allProducts.filter(product =>
             !product.marca || !product.rubro
         )
         console.log(productsWithoutBrandOrType)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
-    
 
-    const testRenderElementDisplay = 'none'
+    const buttonToConsoleProductsWithoutAssignedBrandOrType = (
+        <Button
+            onClick={consoleProductsWithoutAssignedBrandOrType}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // -------------------------- Generate cert and key from AFIP ---------------------------- //
+    const generateCertAndKey = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.afip.generateCertAndKey()
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToGenerateCertAndKeyFromAfip = (
+        <Button
+            onClick={generateCertAndKey}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // -------------------------------- SEED - Generate data --------------------------------- //
+    const generateSeedData = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.seed.generateData()
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    // eslint-disable-next-line
+    const buttonToGenerateSeedData = (
+        <Button
+            onClick={generateSeedData}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // --------------------------------- SEED - Delete data ---------------------------------- //
+    const deleteSeedData = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.seed.deleteData()
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    // eslint-disable-next-line
+    const buttonToDeleteSeedData = (
+        <Button
+            danger
+            onClick={deleteSeedData}
+            type='primary'
+        >
+            Eliminar
+        </Button>
+    )
+
+    // ------------------------------------- Table data -------------------------------------- //
+    const columns = [
+        {
+            dataIndex: 'home_description',
+            render: (_, source) => source.description,
+            title: 'Descripción'
+        },
+        {
+            dataIndex: 'home_primaryAction',
+            render: (_, source) => source.primaryAction,
+            title: 'Acción primaria'
+        },
+        {
+            dataIndex: 'home_secondaryAction',
+            render: (_, source) => source.secondaryAction,
+            title: 'Acción secundaria'
+        }
+    ]
+
+    const onChangeTableVisibility = (e) => {
+        home_dispatch({ type: 'SET_VISIBILITY_OF_DEV_TOOLS_TABLE', payload: e.target.checked })
+    }
+
+    const setPageAndLimit = (page, limit) => {
+        const paginationParams = {
+            ...home_state.paginationParams,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        }
+        home_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const source = [
+        {
+            description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
+            key: 'home_buttonToConsoleSupportedVouchers',
+            primaryAction: buttonToConsoleSupportedVouchers,
+            secondaryAction: null
+        },
+        {
+            description: 'Genera un certificado y llave privada desde Afip y los muestra en consola.',
+            key: 'home_buttonToGenerateCertAndKeyFromAfip',
+            primaryAction: buttonToGenerateCertAndKeyFromAfip,
+            secondaryAction: null
+        },
+        // {
+        //     description: 'Genera o elimina datos iniciales para probar el sistema. ¡CUIDADO! Utilizar solo en modo desarrollo.',
+        //     key: 'home_buttonsToGenerateAndDeleteSeedData',
+        //     primaryAction: buttonToGenerateSeedData,
+        //     secondaryAction: buttonToDeleteSeedData
+        // },
+        {
+            description: 'Muestra en consola aquellos productos que no tienen marca o rubro asignado.',
+            key: 'home_buttonToConsoleProductsWithoutAssignedBrandOrType',
+            primaryAction: buttonToConsoleProductsWithoutAssignedBrandOrType,
+            secondaryAction: null
+        },
+        {
+            description: 'Muestra en consola todos los productos registrados.',
+            key: 'home_buttonToConsoleProducts',
+            primaryAction: buttonToConsoleProducts,
+            secondaryAction: null
+        },
+        {
+            description: 'Generar o eliminar Historial de Stock de todos los productos. Útil para corregir datos erróneos de manera limpia.',
+            key: 'home_buttonsToGenerateAndDeleteStockHistories',
+            primaryAction: buttonToGenerateStockHistories,
+            secondaryAction: buttonToDeleteStockHistories
+        },
+        {
+            description: 'Muestra en consola todas las entradas de productos hasta la fecha.',
+            key: 'home_buttonToConsoleEntries',
+            primaryAction: buttonToConsoleEntries,
+            secondaryAction: null
+        },
+        {
+            description: 'Muestra en consola todas las salidas de productos hasta la fecha.',
+            key: 'home_buttonToConsoleOutputs',
+            primaryAction: buttonToConsoleOutputs,
+            secondaryAction: null
+        },
+        {
+            description: 'Muestra en consola todas los comprobantes generados hasta la fecha (facturas, tickets, presupuestos, etc.).',
+            key: 'home_buttonToConsoleSales',
+            primaryAction: buttonToConsoleSales,
+            secondaryAction: null
+        },
+        {
+            description: 'Muestra en consola todas las estadísticas diarias de negocio registradas hasta la fecha.',
+            key: 'home_buttonToConsoleDailyBusinessStatistics',
+            primaryAction: buttonToConsoleDailyBusinessStatistics,
+            secondaryAction: null
+        },
+        {
+            description: 'Muestra en consola el historial de stock de todos los productos registrados.',
+            key: 'home_buttonToConsoleStockHistories',
+            primaryAction: buttonToConsoleStockHistories,
+            secondaryAction: null
+        }
+    ]
 
     return (
-        <>
-            <h1>Home</h1>
-            <button
-                onClick={generateStockHistories}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Generar historial de stock
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={deleteStockHistories}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Borrar historial de stock
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={addNormalizedNames}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Agregar nombres normalizados a clientes, documentos, medios de pago y planes de pago
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={showData}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Mostrar datos en consola
-            </button>
-            <hr style={{ display: testRenderElementDisplay }} />
-            <button
-                onClick={showDataWithoutBrandOrType}
-                style={{ display: testRenderElementDisplay }}
-            >
-                Mostrar productos con marca o rubro sin nombre en consola
-            </button>
-        </>
+        <Row>
+            <Col span={24}>
+                <Row align='middle'>
+                    <Col
+                        span={12}
+                        style={{textAlign: 'left'}}
+                    >
+                        <h2>Home</h2>
+                    </Col>
+                    <Col
+                        span={12}
+                        style={{ textAlign: 'right' }}
+                    >
+                        <Checkbox onChange={onChangeTableVisibility}>
+                            Mostrar herramientas de desarrollador
+                        </Checkbox>
+                    </Col>
+                </Row>
+            </Col>
+            <Col span={24}>
+                {
+                    !home_state.visibilityOfDevToolsTable
+                        ? null
+                        : (
+                            <Table
+                                columns={columns}
+                                dataSource={source}
+                                loading={home_state.loading}
+                                pagination={{
+                                    defaultCurrent: home_state.paginationParams.page,
+                                    defaultPageSize: home_state.paginationParams.limit,
+                                    limit: home_state.paginationParams.limit,
+                                    onChange: (page, limit) => setPageAndLimit(page, limit),
+                                    pageSizeOptions: [5, 10],
+                                    showSizeChanger: true,
+                                    total: source.length
+                                }}
+                                rowKey='key'
+                                size='small'
+                                tableLayout='auto'
+                                width={'100%'}
+                            />
+                        )
+                }
+            </Col>
+        </Row>
     )
 }
 

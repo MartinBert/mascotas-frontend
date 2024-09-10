@@ -16,6 +16,7 @@ const { DailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { DeleteModalContext } = contexts.DeleteModal
 const { EntriesContext } = contexts.Entries
 const { FiscalNoteModalContext } = contexts.FiscalNoteModal
+const { HomeContext } = contexts.Home
 const { OutputsContext } = contexts.Outputs
 const { PrivateRouteContext } = contexts.PrivateRoute
 const { ProductsContext } = contexts.Products
@@ -32,19 +33,21 @@ function App() {
                     <DeleteModalContext>
                         <EntriesContext>
                             <FiscalNoteModalContext>
-                                <OutputsContext>
-                                    <PrivateRouteContext>
-                                        <ProductsContext>
-                                            <SaleContext>
-                                                <SalesAreasContext>
-                                                    <Router>
-                                                        <AppRouter />
-                                                    </Router>
-                                                </SalesAreasContext>
-                                            </SaleContext>
-                                        </ProductsContext>
-                                    </PrivateRouteContext>
-                                </OutputsContext>
+                                <HomeContext>
+                                    <OutputsContext>
+                                        <PrivateRouteContext>
+                                            <ProductsContext>
+                                                <SaleContext>
+                                                    <SalesAreasContext>
+                                                        <Router>
+                                                            <AppRouter />
+                                                        </Router>
+                                                    </SalesAreasContext>
+                                                </SaleContext>
+                                            </ProductsContext>
+                                        </PrivateRouteContext>
+                                    </OutputsContext>
+                                </HomeContext>
                             </FiscalNoteModalContext>
                         </EntriesContext>
                     </DeleteModalContext>

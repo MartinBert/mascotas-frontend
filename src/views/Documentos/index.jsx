@@ -45,12 +45,8 @@ const Documentos = () => {
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchDocumentos()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.loading, filters, limit, page ])
 
     // ------------------ Documents Deletion ------------------ //
     const documentDeletion = (documentID) => {
@@ -71,10 +67,8 @@ const Documentos = () => {
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteDocument()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.confirmDeletion, deleteModal_state.entityID ])
 
     // ------------------ Documents Edition ------------------ //
     const documentEdition = (id) => {

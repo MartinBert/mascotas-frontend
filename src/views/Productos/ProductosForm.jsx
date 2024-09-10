@@ -245,6 +245,7 @@ const ProductosForm = () => {
     }
 
     const uploadImageToServer = async (file) => {
+        console.log(file)
         const response = await api.uploader.uploadImage(file)
         if (response.file) {
             setUploadedImages([

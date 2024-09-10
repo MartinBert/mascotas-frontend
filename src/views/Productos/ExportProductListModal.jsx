@@ -63,6 +63,7 @@ const ExportProductListModal = () => {
     useEffect(() => {
         loadBrandsAndTypes()
         loadUserData()
+        // eslint-disable-next-line
     }, [])
 
     // ---------------- Button to cancel ----------------- //
@@ -447,10 +448,14 @@ const ExportProductListModal = () => {
     // ------------ Select to sales areas ---------------- //
     const loadSalesAreas = async () => {
         const findSalesAreas = await api.zonasdeventas.findAll()
+        if (findSalesAreas.docs.length === 0) return
         salesAreas_dispatch({ type: 'SET_ALL_SALES_AREAS', payload: findSalesAreas.docs })
     }
 
-    useEffect(() => { loadSalesAreas() }, [])
+    useEffect(() => {
+        loadSalesAreas()
+        // eslint-disable-next-line
+    }, [])
 
     const changeSalesArea = async (e) => {
         const filters = JSON.stringify({ name: e })
@@ -487,7 +492,10 @@ const ExportProductListModal = () => {
         products_dispatch({ type: 'SET_PRODUCTS_TO_EXPORT_PRODUCT_LIST_MODAL', payload: data })
     }
 
-    useEffect(() => { fetchProducts() }, [products_state.exportProductList.paginationParams])
+    useEffect(() => {
+        fetchProducts()
+        // eslint-disable-next-line
+    }, [products_state.exportProductList.paginationParams])
 
     const setPageAndLimitForTableOfProductsToExport = (page, limit) => {
         const paginationParams = {
