@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Contexts
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 

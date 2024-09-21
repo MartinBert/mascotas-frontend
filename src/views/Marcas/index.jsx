@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Contexts
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 
@@ -45,12 +46,8 @@ const Marcas = () => {
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchMarcas()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.loading, filters, limit, page])
 
     // ------------------ Brands Deletion ------------------ //
     const brandDeletion = (brandID) => {
@@ -72,10 +69,8 @@ const Marcas = () => {
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteBrand()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Brands Edition ------------------ //
     const brandEdition = (id) => {

@@ -61,8 +61,10 @@ const PuntosVentaForm = () => {
         }
 
         const saveItem = async () => {
-            const response = (puntoVenta._id) ? await api.puntosventa.edit(puntoVenta) : await api.puntosventa.save(puntoVenta)
-            if (response === 'OK') return success()
+            const response = (puntoVenta._id)
+                ? await api.puntosventa.edit(puntoVenta)
+                : await api.puntosventa.save(puntoVenta)
+            if (response.code === 200) return success()
             return fail()
         }
         saveItem()

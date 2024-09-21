@@ -1,14 +1,23 @@
-import autocomplete from './autocomplete/GenericAutocomplete'
-import deleteModal from './deleteModal/DeleteModal'
-import giselaDetailsModal from './productDetailsModal/GiselaDetailsModal'
-import inputHidden from './InputHidden'
-import openImage from './openImage/OpenImage'
-import productDetailsModal from './productDetailsModal/ProductDetailsModal'
+import DeleteModal from './DeleteModal'
+import Form from './Form'
+import GenericAutocomplete from './GenericAutocomplete'
+import InputHidden from './InputHidden'
+import OpenImage from './OpenImage'
+import productDetailsModal from './productDetailsModal'
+import ProgressCircle from './ProgressCircle'
+
+const { GiselaDetailsModal, ProductDetailsModal } = productDetailsModal
 
 
-export const DeleteModal = deleteModal
-export const GenericAutocomplete = autocomplete
-export const GiselaDetailsModal = giselaDetailsModal
-export const InputHidden = inputHidden
-export const OpenImage = openImage
-export const ProductDetailsModal = productDetailsModal
+const generics = {
+    DeleteModal,
+    Form,
+    GenericAutocomplete,
+    GiselaDetailsModal,
+    InputHidden,
+    OpenImage,
+    ProductDetailsModal,
+    ProgressCircle
+}
+
+export default generics

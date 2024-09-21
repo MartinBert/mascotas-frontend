@@ -11,15 +11,11 @@ import contexts from '../../contexts'
 // Design Components
 import { Button, Col, Form, Input, InputNumber, Row } from 'antd'
 
-// Helpers
-import helpers from '../../helpers'
-
 // Services
 import api from '../../services'
 
 // Imports Destructuring
 const { useSalesAreasContext } = contexts.SalesAreas
-const { formatValue } = helpers.objHelper
 
 
 const ZonasDeVentasForm = () => {
@@ -29,14 +25,16 @@ const ZonasDeVentasForm = () => {
     const [salesAreas_state, salesAreas_dispatch] = useSalesAreasContext()
 
     // ---------------- Find Sales Area to Edit ---------------- //
+    const loadSalesAreaDataState = async () => {
+        if (pathname === 'nuevo') return
+        const response = await api.zonasdeventas.findById(pathname)
+        formRef.current.setFieldsValue(response)
+        salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: response })
+    }
+
     useEffect(() => {
-        const loadSalesAreaDataState = async () => {
-            if (pathname === 'nuevo') return
-            const response = await api.zonasdeventas.findById(pathname)
-            formRef.current.setFieldsValue(response)
-            salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: response })
-        }
         loadSalesAreaDataState()
+        // eslint-disable-next-line
     }, [pathname])
 
     const cancel = () => {

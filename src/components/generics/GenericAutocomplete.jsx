@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Select } from 'antd'
-import api from '../../../services'
+import api from '../../services'
 
 const { Option } = Select
 

@@ -38,7 +38,10 @@ const ProductStockHistoryModal = () => {
         products_dispatch({ type: 'SET_STOCK_HISTORY_TO_RENDER', payload: data })
     }
 
-    useEffect(() => { fetchStockHistory() }, [
+    useEffect(() => {
+        fetchStockHistory()
+        // eslint-disable-next-line
+    }, [
         products_state.stockHistory.fixStockHistoryModal.modalVisibility,
         products_state.stockHistory.productStockHistoryModal.paginationParams
     ])
@@ -209,7 +212,10 @@ const ProductStockHistoryModal = () => {
         })
     }
 
-    useEffect(() => { loadTitlesValues() }, [
+    useEffect(() => {
+        loadTitlesValues()
+        // eslint-disable-next-line
+    }, [
         products_state.stockHistory.fixStockHistoryModal.modalVisibility,
         products_state.stockHistory.productStockHistoryModal.paginationParams
     ])

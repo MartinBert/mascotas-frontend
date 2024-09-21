@@ -22,6 +22,7 @@ const normalizeString = (string) => {
 
 const regExp = {
     ifNotNumber: /\D/gm,
+    // eslint-disable-next-line
     ifNotNumbersOrBar: /[^0-9\/]/gm,
     ifNotNumbersCommaAndPoint: /[^0-9,.]/gm,
     ifSpecialCharacter: /\W/gm

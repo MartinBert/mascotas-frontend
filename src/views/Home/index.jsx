@@ -1,8 +1,8 @@
 // React Components and Hooks
-import React from 'react'
+import React, { useEffect } from 'react'
 
 // Design Components
-import { Button, Checkbox, Col, Row, Table } from 'antd'
+import { Button, Col, Input, Row, Table } from 'antd'
 
 // Custom Context Providers
 import contexts from '../../contexts'
@@ -13,24 +13,175 @@ import helpers from '../../helpers'
 // Services
 import api from '../../services'
 
+// Views
+import FirstSteps from './FirstSteps'
+
 // Imports Destructuring
+const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
 const { roundTwoDecimals } = helpers.mathHelper
+const { normalizeString } = helpers.stringHelper
 
 
 const Home = () => {
+    const [auth_state] = useAuthContext()
     const [home_state, home_dispatch] = useHomeContext()
 
-    // ------------------- Find all supported vouchers by Afip Controller -------------------- //
+    // -------------------------------------- Actions ---------------------------------------- //
+    const verifyDevToolsVisibility = () => {
+        const activeBusiness = auth_state.user.empresa !== null
+        const activeSalePoint = auth_state.user.puntoVenta !== null
+        const activeDevPassword = home_state.devPassword === process.env.REACT_APP_DEV_PASSWORD
+        const devToolsAreVisible = activeBusiness && activeSalePoint && activeDevPassword
+        const firstStepsAreVisible = !activeBusiness || !activeSalePoint
+        home_dispatch({ type: 'SET_VISIBILITY_OF_DEV_TOOLS', payload: devToolsAreVisible })
+        home_dispatch({ type: 'SET_VISIBILITY_OF_FIRST_STEPS', payload: firstStepsAreVisible })
+    }
+
+    useEffect(() => {
+        verifyDevToolsVisibility()
+        // eslint-disable-next-line
+    }, [auth_state.user.empresa, auth_state.user.puntoVenta, home_state.devPassword])
+
+    // ----------------------------- Button to console entries ------------------------------- //
+    const consoleEntries = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllEntries = await api.entradas.findAll()
+        const allEntries = findAllEntries.docs
+        console.log(allEntries)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleEntries = (
+        <Button
+            onClick={consoleEntries}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // -------------------- Button to console daily business statistics ---------------------- //
+    const consoleDailyBusinessStatistics = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const statistics = findDailyBusinessStatistics.docs
+        console.log(statistics)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleDailyBusinessStatistics = (
+        <Button
+            onClick={consoleDailyBusinessStatistics}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ----------------------------- Button to console outputs ------------------------------- //
+    const consoleOutputs = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllOutputs = await api.salidas.findAll()
+        const allOutputs = findAllOutputs.docs
+        console.log(allOutputs)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleOutputs = (
+        <Button
+            onClick={consoleOutputs}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ----------------------------- Button to console products ------------------------------ //
+    const consoleProducts = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllProducts = await api.productos.findAll()
+        const allProducts = findAllProducts.docs
+        console.log(allProducts)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleProducts = (
+        <Button
+            onClick={consoleProducts}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------- Button to console products without assigned brand or type --------------- //
+    const consoleProductsWithoutAssignedBrandOrType = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllProducts = await api.productos.findAll()
+        const allProducts = findAllProducts.docs
+        const productsWithoutBrandOrType = allProducts.filter(product =>
+            !product.marca || !product.rubro
+        )
+        console.log(productsWithoutBrandOrType)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleProductsWithoutAssignedBrandOrType = (
+        <Button
+            onClick={consoleProductsWithoutAssignedBrandOrType}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------------ Button to console sales -------------------------------- //
+    const consoleSales = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findAllSales = await api.ventas.findAll()
+        const allSales = findAllSales.docs
+        console.log(allSales)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleSales = (
+        <Button
+            onClick={consoleSales}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------- Button to console stock histories --------------------------- //
+    const consoleStockHistories = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findStockHistory = await api.stockHistory.findAll()
+        const stockHistory = findStockHistory.docs
+        console.log(stockHistory)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToConsoleStockHistories = (
+        <Button
+            onClick={consoleStockHistories}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------- Button to console supported vouchers from AFIP Controller --------------- //
     const consoleSupportedVouchers = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const cuit = '20374528506'
+        const cuit = '20365455717'
         const res = await api.afip.getDocumentsTypes(cuit)
         console.log(res)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
-    const buttonToConsoleSupportedVouchers = (
+    const buttonToConsoleSupportedVouchersFromAfipController = (
         <Button
             onClick={consoleSupportedVouchers}
             type='primary'
@@ -39,7 +190,81 @@ const Home = () => {
         </Button>
     )
 
-    // ------------------------------ Generate stock histories ------------------------------- //
+    // -------------------------- Button to delete data from SEED ---------------------------- //
+    const deleteSeedData = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.seed.deleteData()
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToDeleteDataFromSeed = (
+        <Button
+            danger
+            onClick={deleteSeedData}
+            type='primary'
+        >
+            Eliminar
+        </Button>
+    )
+
+    // ------------------------- Button to delete stock histories ---------------------------- //
+    const deleteStockHistories = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findStockHistories = await api.stockHistory.findAll()
+        const stockHistories = findStockHistories.docs
+        for (let index = 0; index < stockHistories.length; index++) {
+            const stockHistory = stockHistories[index]
+            await api.stockHistory.deleteStockHistory(stockHistory._id)
+        }
+        console.log('Stock histories was deleted.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToDeleteStockHistories = (
+        <Button
+            danger
+            onClick={deleteStockHistories}
+            type='primary'
+        >
+            Eliminar
+        </Button>
+    )
+
+    // --------------------- Button to generate cert and key from AFIP ----------------------- //
+    const generateCertAndKey = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.afip.generateCertAndKey()
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToGenerateCertAndKeyFromAfip = (
+        <Button
+            onClick={generateCertAndKey}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------- Button to generate data from SEED --------------------------- //
+    const generateSeedData = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.seed.generateData()
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToGenerateDataFromSeed = (
+        <Button
+            onClick={generateSeedData}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------ Button to generate stock histories --------------------------- //
     const generateStockHistories = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
@@ -259,213 +484,75 @@ const Home = () => {
         </Button>
     )
 
-    // ------------------------------- Delete stock histories -------------------------------- //
-    const deleteStockHistories = async () => {
+    // -------------------- Button to get last voucher number from AFIP ---------------------- //
+    const getLastVoucherNumber = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findStockHistories = await api.stockHistory.findAll()
-        const stockHistories = findStockHistories.docs
-        for (let index = 0; index < stockHistories.length; index++) {
-            const stockHistory = stockHistories[index]
-            await api.stockHistory.deleteStockHistory(stockHistory._id)
+        const res = await api.afip.findLastVoucherNumber('20365455717', '2', '011')
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToGetLastVoucherNumberFromAFIP = (
+        <Button
+            onClick={getLastVoucherNumber}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
+    // ------------------------------ Input pass to dev tools -------------------------------- //
+    const onChangeDevPassword = (e) => {
+        home_dispatch({ type: 'SET_DEV_PASSWORD', payload: e.target.value })
+    }
+
+    const inputPassToDevTools = (
+        <Input.Password
+            allowClear
+            onChange={onChangeDevPassword}
+            placeholder='Dev pass'
+        />
+    )
+
+    // ----------------------------- Input to filter dev tools ------------------------------- //
+    const onChangeDescription = (e) => {
+        const description = normalizeString(e.target.value).toLowerCase()
+        home_dispatch({ type: 'SET_FILTERS', payload: description })
+    }
+
+    const setDevToolsToRender = () => {
+        const descriptionFilter = home_state.paginationParams.filters
+        const devTools = source.filter(devTool => {
+            const devToolDescription = normalizeString(devTool.description).toLowerCase()
+            if (devToolDescription.includes(descriptionFilter)) return true
+            else return false
+        })
+        home_dispatch({ type: 'SET_DEV_TOOLS_TO_RENDER', payload: devTools })
+    }
+
+    useEffect(() => {
+        setDevToolsToRender()
+        // eslint-disable-next-line
+    }, [home_state.paginationParams.filters])
+
+    const inputToFilterDevTools = (
+        <Input
+            onChange={onChangeDescription}
+            placeholder='Buscar herramienta'
+            type='primary'
+        />
+    )
+
+    // --------------------------------- Table of dev tools ---------------------------------- //
+    const setPageAndLimit = (page, limit) => {
+        const paginationParams = {
+            ...home_state.paginationParams,
+            page: parseInt(page),
+            limit: parseInt(limit)
         }
-        console.log('Stock histories was deleted.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
+        home_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
-    const buttonToDeleteStockHistories = (
-        <Button
-            danger
-            onClick={deleteStockHistories}
-            type='primary'
-        >
-            Eliminar
-        </Button>
-    )
-
-    // ---------------------------------- Show all entries ----------------------------------- //
-    const consoleEntries = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllEntries = await api.entradas.findAll()
-        const allEntries = findAllEntries.docs
-        console.log(allEntries)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleEntries = (
-        <Button
-            onClick={consoleEntries}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // ---------------------------------- Show all outputs ----------------------------------- //
-    const consoleOutputs = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllOutputs = await api.salidas.findAll()
-        const allOutputs = findAllOutputs.docs
-        console.log(allOutputs)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleOutputs = (
-        <Button
-            onClick={consoleOutputs}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // ---------------------------------- Show all products ---------------------------------- //
-    const consoleProducts = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllProducts = await api.productos.findAll()
-        const allProducts = findAllProducts.docs
-        console.log(allProducts)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleProducts = (
-        <Button
-            onClick={consoleProducts}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // ----------------------------------- Show all sales ------------------------------------ //
-    const consoleSales = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllSales = await api.ventas.findAll()
-        const allSales = findAllSales.docs
-        console.log(allSales)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleSales = (
-        <Button
-            onClick={consoleSales}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // ------------------------- Show all daily business statistics -------------------------- //
-    const consoleDailyBusinessStatistics = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
-        const statistics = findDailyBusinessStatistics.docs
-        console.log(statistics)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleDailyBusinessStatistics = (
-        <Button
-            onClick={consoleDailyBusinessStatistics}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // ------------------------------ Show all stock histories ------------------------------- //
-    const consoleStockHistories = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findStockHistory = await api.stockHistory.findAll()
-        const stockHistory = findStockHistory.docs
-        console.log(stockHistory)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleStockHistories = (
-        <Button
-            onClick={consoleStockHistories}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // -------------------- Show products without assigned Brand or Type --------------------- //
-    const consoleProductsWithoutAssignedBrandOrType = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllProducts = await api.productos.findAll()
-        const allProducts = findAllProducts.docs
-        const productsWithoutBrandOrType = allProducts.filter(product =>
-            !product.marca || !product.rubro
-        )
-        console.log(productsWithoutBrandOrType)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToConsoleProductsWithoutAssignedBrandOrType = (
-        <Button
-            onClick={consoleProductsWithoutAssignedBrandOrType}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // -------------------------- Generate cert and key from AFIP ---------------------------- //
-    const generateCertAndKey = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const res = await api.afip.generateCertAndKey()
-        console.log(res)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToGenerateCertAndKeyFromAfip = (
-        <Button
-            onClick={generateCertAndKey}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // -------------------------------- SEED - Generate data --------------------------------- //
-    const generateSeedData = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const res = await api.seed.generateData()
-        console.log(res)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    // eslint-disable-next-line
-    const buttonToGenerateSeedData = (
-        <Button
-            onClick={generateSeedData}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
-    // --------------------------------- SEED - Delete data ---------------------------------- //
-    const deleteSeedData = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const res = await api.seed.deleteData()
-        console.log(res)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    // eslint-disable-next-line
-    const buttonToDeleteSeedData = (
-        <Button
-            danger
-            onClick={deleteSeedData}
-            type='primary'
-        >
-            Eliminar
-        </Button>
-    )
-
-    // ------------------------------------- Table data -------------------------------------- //
     const columns = [
         {
             dataIndex: 'home_description',
@@ -484,38 +571,31 @@ const Home = () => {
         }
     ]
 
-    const onChangeTableVisibility = (e) => {
-        home_dispatch({ type: 'SET_VISIBILITY_OF_DEV_TOOLS_TABLE', payload: e.target.checked })
-    }
-
-    const setPageAndLimit = (page, limit) => {
-        const paginationParams = {
-            ...home_state.paginationParams,
-            page: parseInt(page),
-            limit: parseInt(limit)
-        }
-        home_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
     const source = [
         {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
             key: 'home_buttonToConsoleSupportedVouchers',
-            primaryAction: buttonToConsoleSupportedVouchers,
+            primaryAction: buttonToConsoleSupportedVouchersFromAfipController,
             secondaryAction: null
         },
         {
-            description: 'Genera un certificado y llave privada desde Afip y los muestra en consola.',
+            description: 'Genera un certificado y llave privada para testing desde Afip y los muestra en consola.',
             key: 'home_buttonToGenerateCertAndKeyFromAfip',
             primaryAction: buttonToGenerateCertAndKeyFromAfip,
             secondaryAction: null
         },
-        // {
-        //     description: 'Genera o elimina datos iniciales para probar el sistema. ¡CUIDADO! Utilizar solo en modo desarrollo.',
-        //     key: 'home_buttonsToGenerateAndDeleteSeedData',
-        //     primaryAction: buttonToGenerateSeedData,
-        //     secondaryAction: buttonToDeleteSeedData
-        // },
+        {
+            description: 'Muestra en consola el número del último comprobante fiscal emitido.',
+            key: 'home_buttonToGetLastVoucherNumber',
+            primaryAction: buttonToGetLastVoucherNumberFromAFIP,
+            secondaryAction: null
+        },
+        {
+            description: 'Genera o elimina datos iniciales para probar el sistema. ¡CUIDADO! Utilizar solo en modo desarrollo.',
+            key: 'home_buttonsToGenerateAndDeleteSeedData',
+            primaryAction: buttonToGenerateDataFromSeed,
+            secondaryAction: buttonToDeleteDataFromSeed
+        },
         {
             description: 'Muestra en consola aquellos productos que no tienen marca o rubro asignado.',
             key: 'home_buttonToConsoleProductsWithoutAssignedBrandOrType',
@@ -566,52 +646,71 @@ const Home = () => {
         }
     ]
 
+    const tableOfDevTools = (
+        <Table
+            columns={columns}
+            dataSource={home_state.devToolsToRender}
+            loading={home_state.loading}
+            pagination={{
+                defaultCurrent: home_state.paginationParams.page,
+                defaultPageSize: home_state.paginationParams.limit,
+                limit: home_state.paginationParams.limit,
+                onChange: (page, limit) => setPageAndLimit(page, limit),
+                pageSizeOptions: [5, 10],
+                showSizeChanger: true,
+                total: home_state.devToolsToRender.length
+            }}
+            rowKey='key'
+            size='small'
+            tableLayout='auto'
+            width={'100%'}
+        />
+    )
+
     return (
-        <Row>
+        <Row gutter={[0, 16]}>
+            {buttonToDeleteDataFromSeed}
             <Col span={24}>
                 <Row align='middle'>
                     <Col
                         span={12}
-                        style={{textAlign: 'left'}}
+                        style={{ textAlign: 'left' }}
                     >
-                        <h2>Home</h2>
+                        <h2>¡Bienvenido!</h2>
                     </Col>
                     <Col
                         span={12}
                         style={{ textAlign: 'right' }}
                     >
-                        <Checkbox onChange={onChangeTableVisibility}>
-                            Mostrar herramientas de desarrollador
-                        </Checkbox>
+                        {inputPassToDevTools}
                     </Col>
                 </Row>
             </Col>
-            <Col span={24}>
-                {
-                    !home_state.visibilityOfDevToolsTable
-                        ? null
-                        : (
-                            <Table
-                                columns={columns}
-                                dataSource={source}
-                                loading={home_state.loading}
-                                pagination={{
-                                    defaultCurrent: home_state.paginationParams.page,
-                                    defaultPageSize: home_state.paginationParams.limit,
-                                    limit: home_state.paginationParams.limit,
-                                    onChange: (page, limit) => setPageAndLimit(page, limit),
-                                    pageSizeOptions: [5, 10],
-                                    showSizeChanger: true,
-                                    total: source.length
-                                }}
-                                rowKey='key'
-                                size='small'
-                                tableLayout='auto'
-                                width={'100%'}
-                            />
-                        )
-                }
-            </Col>
+            {
+                !home_state.visibilityOfDevTools
+                    ? null
+                    : (
+                        <Col span={24}>
+                            <Row justify='end'>
+                                <Col span={12}>
+                                    {inputToFilterDevTools}
+                                </Col>
+                                <Col span={24}>
+                                    {tableOfDevTools}
+                                </Col>
+                            </Row>
+                        </Col>
+                    )
+            }
+            {
+                !home_state.visibilityOfFirstSteps
+                    ? null
+                    : (
+                        <Col span={24}>
+                            <FirstSteps />
+                        </Col>
+                    )
+            }
         </Row>
     )
 }

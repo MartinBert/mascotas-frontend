@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Context Providers
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 
@@ -36,21 +37,18 @@ const Rubros = () => {
     const [filters, setFilters] = useState(null)
 
     // ------------------ Fetch Product Categories ------------------ //
+    const fetchRubros = async () => {
+        const stringFilters = JSON.stringify(filters)
+        const data = await api.rubros.findPaginated({ page, limit, filters: stringFilters })
+        setRubros(data.docs)
+        setTotalDocs(data.totalDocs)
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     useEffect(() => {
-        const fetchRubros = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.rubros.findPaginated({ page, limit, filters: stringFilters })
-            setRubros(data.docs)
-            setTotalDocs(data.totalDocs)
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
         fetchRubros()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.loading, filters, limit, page])
 
     // ------------------ Product Category Deletion ------------------ //
     const productCategoryDeletion = (productCategoryID) => {
@@ -58,24 +56,23 @@ const Rubros = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteProductCategory = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.rubros.deleteRubro(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteProductCategory = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.rubros.deleteRubro(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteProductCategory()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Product Category Edition ------------------ //
     const productCategoryEdition = (id) => {

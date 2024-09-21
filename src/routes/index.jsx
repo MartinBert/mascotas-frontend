@@ -82,7 +82,10 @@ const AppRouter = () => {
         privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
     }
 
-    useEffect(() => { accessToPrivateRoutes() }, [privateRoute_state.openKey.length])
+    useEffect(() => {
+        accessToPrivateRoutes()
+        // eslint-disable-next-line
+    }, [privateRoute_state.openKey.length])
 
     const publicRoutes = publicRoutesData.map(route => (
         <Route

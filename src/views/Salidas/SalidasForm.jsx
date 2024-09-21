@@ -66,6 +66,17 @@ const SalidasForm = () => {
         outputs_dispatch({ type: 'SET_REFS', payload: refs })
     }
 
+    const productHasNoQuantity = (product) => {
+        const quantityNotExists = (
+            !product.cantidadesSalientes
+            || product.cantidadesSalientes === '0'
+            || product.cantidadesSalientes === ''
+            || product.cantidadesSalientes === 0
+        )
+        if (quantityNotExists) return true
+        else return false
+    }
+
     const returnToIndexWhenPressingEsc = (e) => {
         if (e.keyCode === 27) { // Escape
             e.preventDefault()
@@ -74,12 +85,10 @@ const SalidasForm = () => {
     }
 
     const setFocus = () => {
-        const productsWithoutDefindedQuantity = outputs_state.params.productos.filter(product =>
-            product.cantidadesSalientes == 0 || !product.cantidadesSalientes
-        )
-        const firstProductWithoutDefindedQuantity = outputs_state.params.productos.find(product =>
-            product.cantidadesSalientes == 0 || !product.cantidadesSalientes
-        )
+        const productsWithoutDefindedQuantity = outputs_state.params.productos
+            .filter(product => productHasNoQuantity(product))
+        const firstProductWithoutDefindedQuantity = outputs_state.params.productos
+            .find(product => productHasNoQuantity(product))
         let unfilledField
         if (outputs_state.params.descripcion === '') unfilledField = outputs_state.refs.inputDescription
         else if (!outputs_state.params.fecha) unfilledField = outputs_state.refs.datePicker
@@ -98,10 +107,12 @@ const SalidasForm = () => {
         outputs_dispatch({ type: 'CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY' })
     }
 
+    /* eslint-disable */
     useEffect(() => { loadParams() }, [outputID])
     useEffect(() => { loadRefs() }, [])
     useEffect(() => { updateLoading() }, [outputs_state.params.usuario])
     useEffect(() => { updateState() }, [outputs_state.params.cantidad, outputs_state.params.productos])
+    /* eslint-enable */
 
     // ----------------- Button to cancel ---------------- //
     const buttonToCancel = (
@@ -125,7 +136,7 @@ const SalidasForm = () => {
             return 'FAIL'
         }
         for (const product of outputs_state.params.productos) {
-            if (product.cantidadesSalientes == 0 || !product.cantidadesSalientes) {
+            if (productHasNoQuantity(product)) {
                 errorAlert(`Indica una cantidad mayor que cero a: ${product.nombre}`)
                 return 'FAIL'
             }

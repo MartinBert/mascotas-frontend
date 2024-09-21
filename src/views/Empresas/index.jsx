@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal, OpenImage } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Contexts
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal, OpenImage } = generics
 const { Edit, Delete } = icons
 
 
@@ -36,21 +37,18 @@ const Empresas = () => {
     const [filters, setFilters] = useState(null)
 
     // ------------------ Fetch Business ------------------ //
+    const fetchEmpresas = async () => {
+        const stringFilters = JSON.stringify(filters)
+        const data = await api.empresas.findPaginated({ page, limit, filters: stringFilters })
+        setEmpresas(data.docs)
+        setTotalDocs(data.totalDocs)
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     useEffect(() => {
-        const fetchEmpresas = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.empresas.findPaginated({ page, limit, filters: stringFilters })
-            setEmpresas(data.docs)
-            setTotalDocs(data.totalDocs)
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
         fetchEmpresas()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.loading, filters, limit, page ])
 
     // ------------------ Business Deletion ------------------ //
     const businessDeletion = (businessID) => {
@@ -58,24 +56,23 @@ const Empresas = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteBusiness = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.empresas.deleteEmpresa(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteBusiness = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.empresas.deleteEmpresa(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteBusiness()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.confirmDeletion, deleteModal_state.entityID ])
 
     // ------------------ Business Edition ------------------ //
     const businessEdition = (id) => {

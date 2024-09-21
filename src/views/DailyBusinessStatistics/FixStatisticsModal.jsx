@@ -39,26 +39,30 @@ const FixStatisticsModal = () => {
   }
 
   // ---------------------- UPDATE FORM FIELDS ----------------------------------------------------------------- //
+  const updateFields = () => {
+    form.setFieldsValue({
+      concept: dailyBusinessStatistics_state.params.concept,
+      dailyExpense: dailyBusinessStatistics_state.params.dailyExpense,
+      dailyIncome: dailyBusinessStatistics_state.params.dailyIncome
+    })
+  }
+
+  const updateReferenceFields = () => {
+    form.setFieldsValue({
+      referenceStatistics_concept: dailyBusinessStatistics_state.referenceStatistics.concept,
+      referenceStatistics_dateString: dailyBusinessStatistics_state.referenceStatistics.dateString,
+      referenceStatistics_dailyProfit: dailyBusinessStatistics_state.referenceStatistics.dailyProfit,
+    })
+  }
+
   useEffect(() => {
-    const updateFormFields = () => {
-      form.setFieldsValue({
-        concept: dailyBusinessStatistics_state.params.concept,
-        dailyExpense: dailyBusinessStatistics_state.params.dailyExpense,
-        dailyIncome: dailyBusinessStatistics_state.params.dailyIncome
-      })
-    }
-    updateFormFields()
+    updateFields()
+    // eslint-disable-next-line
   }, [dailyBusinessStatistics_state.params])
 
   useEffect(() => {
-    const updateFormFields = () => {
-      form.setFieldsValue({
-        referenceStatistics_concept: dailyBusinessStatistics_state.referenceStatistics.concept,
-        referenceStatistics_dateString: dailyBusinessStatistics_state.referenceStatistics.dateString,
-        referenceStatistics_dailyProfit: dailyBusinessStatistics_state.referenceStatistics.dailyProfit,
-      })
-    }
-    updateFormFields()
+    updateReferenceFields()
+    // eslint-disable-next-line
   }, [dailyBusinessStatistics_state.referenceStatistics])
 
   // ---------------------- UPDATE PARAMS ---------------------------------------------------------------------- //

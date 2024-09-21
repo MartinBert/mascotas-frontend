@@ -38,13 +38,15 @@ const profitColorCss = (profit) => {
 const DailyBusinessStatistics = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
 
+    const fetchDailyBusinessStatistics = async () => {
+        const findParams = formatFindParams(dailyBusinessStatistics_state.paginationParams)
+        const data = await api.dailyBusinessStatistics.findPaginated(findParams)
+        dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: data })
+    }
+
     useEffect(() => {
-        const fetchDailyBusinessStatistics = async () => {
-            const findParams = formatFindParams(dailyBusinessStatistics_state.paginationParams)
-            const data = await api.dailyBusinessStatistics.findPaginated(findParams)
-            dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: data })
-        }
         fetchDailyBusinessStatistics()
+        // eslint-disable-next-line
     }, [
         dailyBusinessStatistics_state.loading,
         dailyBusinessStatistics_state.loadingUpdatingRecords,

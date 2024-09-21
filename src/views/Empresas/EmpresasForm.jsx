@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 // Custom Components
-import { GenericAutocomplete } from '../../components/generics'
+import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
@@ -15,6 +15,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import api from '../../services'
 
 // Imports Destructuring
+const { GenericAutocomplete } = generics
 const { Spinner } = graphics
 
 

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Context Providers
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 
@@ -36,21 +37,18 @@ const UnidadesMedida = () => {
     const [filters, setFilters] = useState(null)
 
     // ------------------ Fetch Units of Measure ------------------ //
+    const fetchUnidadesMedida = async () => {
+        const stringFilters = JSON.stringify(filters)
+        const data = await api.unidadesmedida.findPaginated({ page, limit, filters: stringFilters })
+        setUnidadesMedida(data.docs)
+        setTotalDocs(data.totalDocs)
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     useEffect(() => {
-        const fetchUnidadesMedida = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.unidadesmedida.findPaginated({ page, limit, filters: stringFilters })
-            setUnidadesMedida(data.docs)
-            setTotalDocs(data.totalDocs)
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
         fetchUnidadesMedida()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.loading, filters, limit, page])
 
     // ------------------ Unit of Measure Deletion ------------------ //
     const unitOfMeasureDeletion = (unitOfMeasureID) => {
@@ -58,24 +56,23 @@ const UnidadesMedida = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteUnitOfMeasure = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.unidadesmedida.deleteUnidadMedida(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteUnitOfMeasure = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.unidadesmedida.deleteUnidadMedida(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteUnitOfMeasure()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Unit of Measure Edition ------------------ //
     const unitOfMeasureEdition = (id) => {

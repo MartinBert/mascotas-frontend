@@ -61,8 +61,10 @@ const CondicionesFiscalesForm = () => {
         }
 
         const saveItem = async () => {
-            const response = (condicionFiscal._id) ? await api.condicionesfiscales.edit(condicionFiscal) : await api.condicionesfiscales.save(condicionFiscal)
-            if (response === 'OK') return success()
+            const response = (condicionFiscal._id)
+                ? await api.condicionesfiscales.edit(condicionFiscal)
+                : await api.condicionesfiscales.save(condicionFiscal)
+            if (response.code === 200) return success()
             return fail()
         }
         saveItem()

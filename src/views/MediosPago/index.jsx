@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Contexts
@@ -24,6 +24,7 @@ import DetailsModal from './DetailsModal'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete, Details } = icons
 
 
@@ -48,12 +49,8 @@ const MediosPago = () => {
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchPaymentMethods()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.loading, filters, limit, page])
 
     // ------------------ Payment Methods Deletion ------------------ //
     const paymentMethodDeletion = (paymentMethodID) => {
@@ -75,10 +72,8 @@ const MediosPago = () => {
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }
         deleteMedioPago()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Payment Methods Edition ------------------ //
     const paymentMethodEdition = (id) => {

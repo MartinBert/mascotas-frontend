@@ -1,9 +1,6 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
 
-// Custom Components
-import { errorAlert, successAlert } from '../../components/alerts'
-
 // Custom Contexts
 import contexts from '../../contexts'
 
@@ -87,7 +84,10 @@ const DetailsModal = () => {
         dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_VIEW_DETAILS', payload: expensesData })
     }
 
-    useEffect(() => { loadExpenses() }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
+    useEffect(() => {
+        loadExpenses()
+        // eslint-disable-next-line
+    }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
 
     const setPageAndLimitOfTableOfExpenses = (page, limit) => {
         const paginationParams = {
@@ -200,7 +200,10 @@ const DetailsModal = () => {
         dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_VIEW_DETAILS', payload: incomesData })
     }
 
-    useEffect(() => { loadIncomes() }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
+    useEffect(() => {
+        loadIncomes()
+        // eslint-disable-next-line
+    }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
 
     const setPageAndLimitOfTableOfIncomes = (page, limit) => {
         const paginationParams = {

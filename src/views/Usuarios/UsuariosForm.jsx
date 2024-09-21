@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 // Custom Components
-import { GenericAutocomplete } from '../../components/generics'
+import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import messages from '../../components/messages'
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -15,8 +15,9 @@ import { Row, Col, Form, Input, Checkbox } from 'antd'
 import api from '../../services'
 
 // Imports Destructuring
-const { Error } = messages
+const { GenericAutocomplete } = generics
 const { Spinner } = graphics
+const { Error } = messages
 
 
 const UsuariosForm = () => {

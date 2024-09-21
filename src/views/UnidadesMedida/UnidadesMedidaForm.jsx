@@ -61,8 +61,10 @@ const UnidadesMedidaForm = () => {
         }
 
         const saveItem = async () => {
-            const response = (unidadMedida._id) ? await api.unidadesmedida.edit(unidadMedida) : await api.unidadesmedida.save(unidadMedida)
-            if (response === 'OK') return success()
+            const response = (unidadMedida._id)
+                ? await api.unidadesmedida.edit(unidadMedida)
+                : await api.unidadesmedida.save(unidadMedida)
+            if (response.code === 200) return success()
             return fail()
         }
         saveItem()

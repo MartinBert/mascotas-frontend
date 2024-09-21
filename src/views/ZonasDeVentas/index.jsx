@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Context Providers
@@ -25,6 +25,7 @@ const { validateDeletion } = actions.deleteModal
 const { formatFindParams } = actions.paginationParams
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useSalesAreasContext } = contexts.SalesAreas
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 
@@ -44,13 +45,15 @@ const ZonasDeVentas = () => {
     }
 
     // --------------- Fetch Sales Areas --------------- //
+    const fetchZonasDeVentas = async () => {
+        const findParams = formatFindParams(salesAreas_state.paginationParams)
+        const data = await api.zonasdeventas.findPaginated(findParams)
+        salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: data })
+    }
+
     useEffect(() => {
-        const fetchZonasDeVentas = async () => {
-            const findParams = formatFindParams(salesAreas_state.paginationParams)
-            const data = await api.zonasdeventas.findPaginated(findParams)
-            salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: data })
-        }
         fetchZonasDeVentas()
+        // eslint-disable-next-line
     }, [deleteModal_state.loading, salesAreas_state.paginationParams])
 
     // -------------- Sales Area Deletion -------------- //
@@ -59,24 +62,23 @@ const ZonasDeVentas = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteSalesArea = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.zonasdeventas.deleteByID(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteSalesArea = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.zonasdeventas.deleteByID(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteSalesArea()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // --------------- Sales Area Edition -------------- //
     const salesAreaEdition = (salesAreaID) => {

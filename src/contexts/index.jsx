@@ -1,4 +1,5 @@
 import Auth from './Auth'
+import Business from './Business'
 import DailyBusinessStatistics from './DailyBusinessStatistics'
 import DeleteModal from './DeleteModal'
 import Entries from './Entries'
@@ -9,9 +10,11 @@ import PrivateRoute from './PrivateRoute'
 import Products from './Products'
 import Sale from './Sale'
 import SalesAreas from './SalesAreas'
+import SalePoint from './SalePoint'
 
 const contexts = {
     Auth,
+    Business,
     DailyBusinessStatistics,
     DeleteModal,
     Entries,
@@ -21,7 +24,8 @@ const contexts = {
     PrivateRoute,
     Products,
     Sale,
-    SalesAreas
+    SalesAreas,
+    SalePoint
 }
 
 export default contexts

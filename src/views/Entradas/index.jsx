@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Contexts
@@ -26,6 +26,7 @@ const { validateDeletion } = actions.deleteModal
 const { formatFindParams } = actions.paginationParams
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
+const { DeleteModal } = generics
 const { Delete, Details, Edit } = icons
 
 const findEntry = async (entryID) => {
@@ -95,7 +96,10 @@ const Entradas = () => {
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
-    useEffect(() => { fetchEntries_paginated() }, [deleteModal_state.loading, entries_state.paginationParams])
+    useEffect(() => {
+        fetchEntries_paginated()
+        // eslint-disable-next-line
+    }, [deleteModal_state.loading, entries_state.paginationParams])
 
     // ------------------ Entry Deletion ------------------ //
     const entryDeletion = (entry) => {
@@ -103,25 +107,27 @@ const Entradas = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteEntry = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const findEntryToDelete = await findEntry(deleteModal_state.entityID)
+        if (findEntryToDelete.message !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
+        fixDailyBusinessStatistics(findEntryToDelete.data)
+        fixStock(findEntryToDelete.data)
+        fixStockHistory(findEntryToDelete.data)
+        const response = await api.entradas.deleteById(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteEntry = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const findEntryToDelete = await findEntry(deleteModal_state.entityID)
-            if (findEntryToDelete.message !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
-            fixDailyBusinessStatistics(findEntryToDelete.data)
-            fixStock(findEntryToDelete.data)
-            fixStockHistory(findEntryToDelete.data)
-            const response = await api.entradas.deleteById(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteEntry()
+        // eslint-disable-next-line
     }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Entry Edition ------------------ //

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal, OpenImage } from '../../components/generics'
+import generics from '../../components/generics'
 import GiselaDetailsModal from '../../components/generics/productDetailsModal/GiselaDetailsModal'
 import icons from '../../components/icons'
 
@@ -29,6 +29,7 @@ const { formatFindParams } = actions.paginationParams
 const { useAuthContext } = contexts.Auth
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useProductsContext } = contexts.Products
+const { DeleteModal, OpenImage } = generics
 const { Details, Edit, Delete } = icons
 
 
@@ -74,7 +75,10 @@ const Productos = () => {
         })
     }
 
-    useEffect(() => { loadBrandsAndTypes() }, [])
+    useEffect(() => {
+        loadBrandsAndTypes()
+        // eslint-disable-next-line
+    }, [])
 
     // ------------------ Fetch Logged User ------------------ //
     useEffect(() => {
@@ -87,16 +91,18 @@ const Productos = () => {
     }, [auth_dispatch])
 
     // ------------------ Fetch Products ------------------ //
+    const fetchProducts = async () => {
+        const findParamsForRender = formatFindParams(products_state.index.paginationParams)
+        const dataForRender = await api.productos.findPaginated(findParamsForRender)
+        const dataForExport = await api.productos.findAllByFilters(findParamsForRender.filters)
+        products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
+        products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExport.docs })
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            const findParamsForRender = formatFindParams(products_state.index.paginationParams)
-            const dataForRender = await api.productos.findPaginated(findParamsForRender)
-            const dataForExport = await api.productos.findAllByFilters(findParamsForRender.filters)
-            products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
-            products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExport.docs })
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
         fetchProducts()
+        // eslint-disable-next-line
     }, [deleteModal_state.loading, products_state.index.paginationParams])
 
     // ------------------ Products Deletion ------------------ //
@@ -105,20 +111,22 @@ const Productos = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteProduct = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.productos.deleteById(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+    
     useEffect(() => {
-        const deleteProduct = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.productos.deleteById(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteProduct()
+        // eslint-disable-next-line
     }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Products Edition ------------------ //

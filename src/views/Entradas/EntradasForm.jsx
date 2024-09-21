@@ -67,6 +67,17 @@ const EntradasForm = () => {
         entries_dispatch({ type: 'SET_REFS', payload: refs })
     }
 
+    const productHasNoQuantity = (product) => {
+        const quantityNotExists = (
+            !product.cantidadesEntrantes
+            || product.cantidadesEntrantes === '0'
+            || product.cantidadesEntrantes === ''
+            || product.cantidadesEntrantes === 0
+        )
+        if (quantityNotExists) return true
+        else return false
+    }
+
     const returnToIndexWhenPressingEsc = (e) => {
         if (e.keyCode === 27) { // Escape
             e.preventDefault()
@@ -75,12 +86,10 @@ const EntradasForm = () => {
     }
 
     const setFocus = () => {
-        const productsWithoutDefindedQuantity = entries_state.params.productos.filter(product =>
-            product.cantidadesEntrantes == 0 || !product.cantidadesEntrantes
-        )
-        const firstProductWithoutDefindedQuantity = entries_state.params.productos.find(product =>
-            product.cantidadesEntrantes == 0 || !product.cantidadesEntrantes
-        )
+        const productsWithoutDefindedQuantity = entries_state.params.productos
+            .filter(product => productHasNoQuantity(product))
+        const firstProductWithoutDefindedQuantity = entries_state.params.productos
+            .find(product => productHasNoQuantity(product))
         let unfilledField
         if (entries_state.params.descripcion === '') unfilledField = entries_state.refs.inputDescription
         else if (!entries_state.params.fecha) unfilledField = entries_state.refs.datePicker
@@ -99,10 +108,12 @@ const EntradasForm = () => {
         entries_dispatch({ type: 'CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY' })
     }
 
+    /* eslint-disable */
     useEffect(() => { loadRefs() }, [])
     useEffect(() => { loadParams() }, [entryID])
     useEffect(() => { updateLoading() }, [entries_state.params.usuario])
     useEffect(() => { updateState() }, [entries_state.params.cantidad, entries_state.params.productos])
+    /* eslint-enable */
 
     // ----------------- Button to cancel ---------------- //
     const buttonToCancel = (
@@ -126,7 +137,7 @@ const EntradasForm = () => {
             return 'FAIL'
         }
         for (const product of entries_state.params.productos) {
-            if (product.cantidadesEntrantes == 0 || !product.cantidadesEntrantes) {
+            if (productHasNoQuantity(product)) {
                 errorAlert(`Indica una cantidad mayor que cero a: ${product.nombre}`)
                 return 'FAIL'
             }
@@ -449,14 +460,6 @@ const EntradasForm = () => {
             value={entries_state.selectToAddProductByName.selectedValue}
         />
     )
-
-    // ------ Select to add product by product code ------ //
-    const onKeyUpSelectToAddProductByProductCode = (e) => {
-        if (e.keyCode === 27) { // Escape
-            e.preventDefault()
-            setFocus()
-        } else return
-    }
 
     // ----------- Table of selected products  ----------- //
     const changeQuantity = (e, product) => {

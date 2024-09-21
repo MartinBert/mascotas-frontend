@@ -47,7 +47,10 @@ const Header = () => {
         })
     }
 
-    useEffect(() => { loadBrandsAndTypes() }, [])
+    useEffect(() => {
+        loadBrandsAndTypes()
+        // eslint-disable-next-line
+    }, [])
 
     // ------------- Button to clear filters ------------- //
     const clearFilters = () => {

@@ -127,7 +127,7 @@ const generateExcel = async (columnHeaders, lines, nameSheet, nameDocument) => {
         const headersLength = columnHeaders.length
         const linesLength = lines.length
         const exportWithImages = columnHeaders.includes('Ilustración')
-        const stylizedSheet = stylizeSheet(sheet, headersLength, linesLength, exportWithImages)
+        stylizeSheet(sheet, headersLength, linesLength, exportWithImages)
 
         // Generar Excel con imágenes
         workbook.xlsx.writeBuffer().then(function (data) {

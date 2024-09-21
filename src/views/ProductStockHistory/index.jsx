@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 
 // Custom Components
-import OpenImage from '../../components/generics/openImage/OpenImage'
+import generics from '../../components/generics'
 
 // Custom Contexts
 import actions from '../../actions'
@@ -22,6 +22,7 @@ import ProductStockHistoryModal from './ProductStockHistoryModal'
 // Imports Destructurings
 const { formatFindParams } = actions.paginationParams
 const { useProductsContext } = contexts.Products
+const { OpenImage } = generics
 
 
 const ProductStockHistory = () => {
@@ -57,7 +58,10 @@ const ProductStockHistory = () => {
 		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
 	}
 
-	useEffect(() => { fetchProducts() }, [products_state.stockHistory.productsToRender.paginationParams])
+	useEffect(() => {
+		fetchProducts()
+		// eslint-disable-next-line
+	}, [products_state.stockHistory.productsToRender.paginationParams])
 
 
 	const columnsForTable = [

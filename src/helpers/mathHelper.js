@@ -3,7 +3,7 @@ const decimalPercent = (value) => {
 }
 
 const isPar = (value) => {
-    const verify = (value % 2) == 0
+    const verify = (value % 2) === 0
     return verify
 }
 

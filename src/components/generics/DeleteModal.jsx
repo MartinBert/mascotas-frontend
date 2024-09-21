@@ -5,7 +5,7 @@ import React from 'react'
 import { Modal } from 'antd'
 
 // Custom Contexts
-import contexts from '../../../contexts'
+import contexts from '../../contexts'
 
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal

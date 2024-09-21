@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { FaTrashAlt } from 'react-icons/fa'
 
 // Custom Components
-import { GenericAutocomplete } from '../../components/generics'
+import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import { errorAlert, questionAlert, successAlert } from '../../components/alerts'
 
@@ -19,6 +19,7 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
+const { GenericAutocomplete } = generics
 const { Spinner } = graphics
 const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
@@ -73,7 +74,10 @@ const ProductosForm = () => {
         setLoading(false)
     }
 
-    useEffect(() => { fetchProductById() }, [id])
+    useEffect(() => {
+        fetchProductById()
+        // eslint-disable-next-line
+    }, [id])
 
     const updateProductValues = () => {
         const margenGanancia = decimalPercent(product.margenGanancia)
@@ -102,7 +106,10 @@ const ProductosForm = () => {
         })
     }
 
-    useEffect(() => { updateProductValues() }, [
+    useEffect(() => {
+        updateProductValues()
+        // eslint-disable-next-line
+    }, [
         product.precioUnitario,
         product.margenGanancia,
         product.margenGananciaFraccionado,

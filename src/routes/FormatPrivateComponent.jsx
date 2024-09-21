@@ -110,23 +110,29 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
 
     return (
         <Layout style={{ height: '100%' }}>
-            <Sider
-                trigger={null}
-                collapsible
-                collapsed={privateRoute_state.collapsed}
-                style={{ background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)' }}
-            >
-                <div style={{ height: '57px', background: 'transparent', marginTop: '3px', marginLeft: '3px' }}></div>
-                <Menu
-                    theme='dark'
-                    mode='inline'
-                    style={{ background: 'transparent' }}
-                    defaultSelectedKeys={[(activeKey) ? activeKey[0] : '1']}
-                    defaultOpenKeys={[(activeKey) ? activeKey[1] : 'sub1']}
-                    onSelect={(e) => redirectToPath(e)}
-                    items={subMenusToSidebar}
-                />
-            </Sider>
+            {
+                !auth_state.user.empresa || !auth_state.user.puntoVenta
+                    ? null
+                    : (
+                        <Sider
+                            trigger={null}
+                            collapsible
+                            collapsed={privateRoute_state.collapsed}
+                            style={{ background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)' }}
+                        >
+                            <div style={{ height: '57px', background: 'transparent', marginTop: '3px', marginLeft: '3px' }}></div>
+                            <Menu
+                                theme='dark'
+                                mode='inline'
+                                style={{ background: 'transparent' }}
+                                defaultSelectedKeys={[(activeKey) ? activeKey[0] : '1']}
+                                defaultOpenKeys={[(activeKey) ? activeKey[1] : 'sub1']}
+                                onSelect={(e) => redirectToPath(e)}
+                                items={subMenusToSidebar}
+                            />
+                        </Sider>
+                    )
+            }
             <Layout className='site-layout' style={{ height: '100%' }}>
                 <Header className='site-layout-background' style={{ padding: 0, background: 'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)', display: 'flex', justifyContent: 'space-between' }}>
                     <div>

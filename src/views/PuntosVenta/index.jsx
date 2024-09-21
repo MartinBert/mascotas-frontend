@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Custom Context Providers
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 
@@ -36,21 +37,18 @@ const PuntosVenta = () => {
     const [filters, setFilters] = useState(null)
 
     // ------------------ Fetch Sale Points ------------------ //
+    const fetchPuntosVenta = async () => {
+        const stringFilters = JSON.stringify(filters)
+        const data = await api.puntosventa.findPaginated({ page, limit, filters: stringFilters })
+        setPuntosVenta(data.docs)
+        setTotalDocs(data.totalDocs)
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     useEffect(() => {
-        const fetchPuntosVenta = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.puntosventa.findPaginated({ page, limit, filters: stringFilters })
-            setPuntosVenta(data.docs)
-            setTotalDocs(data.totalDocs)
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
         fetchPuntosVenta()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.loading, filters, limit, page])
 
     // ------------------ Sale Point Deletion ------------------ //
     const salePointDeletion = (salePointID) => {
@@ -58,24 +56,23 @@ const PuntosVenta = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteSalePoint = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.puntosventa.deletePuntoVenta(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteSalePoint = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.puntosventa.deletePuntoVenta(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteSalePoint()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // ------------------ Sale Point Edition ------------------ //
     const salePointEdition = (id) => {

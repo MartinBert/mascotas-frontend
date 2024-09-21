@@ -52,7 +52,10 @@ const PriceModificatorModal = () => {
         })
     }
 
-    useEffect(() => { loadBrandsAndTypes() }, [])
+    useEffect(() => {
+        loadBrandsAndTypes()
+        // eslint-disable-next-line
+    }, [])
 
     // ----------- Button to cancel modifies ------------- //
     const cancelModifies = () => {
@@ -525,6 +528,7 @@ const PriceModificatorModal = () => {
 
     useEffect(() => {
         loadProductsToRender()
+        // eslint-disable-next-line
     }, [
         products_state.priceModificatorModal.modalVisibility,
         products_state.priceModificatorModal.productsToRender.paginationParams

@@ -21,7 +21,7 @@ const edit = async(condicionFiscal) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_REST}/condicionesfiscales/${condicionFiscal._id}`, condicionFiscal, headers)
-        return response.data.message
+        return response.data
     }catch(err){
         checkStorageStatus(err)
         console.error(err)
@@ -88,7 +88,7 @@ const save = async(condicionFiscal) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
         const response = await axios.post(`${process.env.REACT_APP_API_REST}/condicionesfiscales`, condicionFiscal, headers)
-        return response.data.message
+        return response.data
     }catch(err){
         checkStorageStatus(err)
         console.error(err)

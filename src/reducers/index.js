@@ -1,4 +1,5 @@
 import auth from './auth'
+import business from './business'
 import dailyBusinessStatistics from './dailyBusinessStatistics'
 import deleteModal from './deleteModal'
 import entries from './entries'
@@ -9,9 +10,11 @@ import privateRoute from './privateRoute'
 import products from './products'
 import sale from './sale'
 import salesAreas from './salesAreas'
+import salePoint from './salePoint'
 
 const reducers = {
     auth,
+    business,
     dailyBusinessStatistics,
     deleteModal,
     entries,
@@ -21,7 +24,8 @@ const reducers = {
     privateRoute,
     products,
     sale,
-    salesAreas
+    salesAreas,
+    salePoint
 }
 
 export default reducers

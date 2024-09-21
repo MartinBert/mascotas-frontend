@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
-import { DeleteModal } from '../../components/generics'
+import generics from '../../components/generics'
 import icons from '../../components/icons'
 
 // Design Components
@@ -23,6 +23,7 @@ import Header from './Header'
 // Imports Destructuring
 const { validateDeletion } = actions.deleteModal
 const { useDeleteModalContext } = contexts.DeleteModal
+const { DeleteModal } = generics
 const { Edit, Delete } = icons
 
 
@@ -36,21 +37,18 @@ const CondicionesFiscales = () => {
     const [filters, setFilters] = useState(null)
 
     // --------------- Fetch Fiscal Condition --------------- //
+    const fetchCondicionesFiscales = async () => {
+        const stringFilters = JSON.stringify(filters)
+        const data = await api.condicionesfiscales.findPaginated({ page, limit, filters: stringFilters })
+        setCondicionesFiscales(data.docs)
+        setTotalDocs(data.totalDocs)
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     useEffect(() => {
-        const fetchCondicionesFiscales = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const data = await api.condicionesfiscales.findPaginated({ page, limit, filters: stringFilters })
-            setCondicionesFiscales(data.docs)
-            setTotalDocs(data.totalDocs)
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
-        }
         fetchCondicionesFiscales()
-    }, [
-        deleteModal_state.loading,
-        filters,
-        limit,
-        page,
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.loading, filters, limit, page ])
 
     // --------------- Fiscal Condition Deletion --------------- //
     const fiscalConditionDeletion = (fiscalConditionID) => {
@@ -58,24 +56,23 @@ const CondicionesFiscales = () => {
         deleteModal_dispatch({ type: 'SHOW_DELETE_MODAL' })
     }
 
+    const deleteFiscalCondition = async () => {
+        const validation = validateDeletion(
+            deleteModal_state.confirmDeletion,
+            deleteModal_state.entityID
+        )
+        if (validation === 'FAIL') return
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await api.condicionesfiscales.deleteCondicionFiscal(deleteModal_state.entityID)
+        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        successAlert('El registro se eliminó correctamente.')
+        deleteModal_dispatch({ type: 'CLEAN_STATE' })
+    }
+
     useEffect(() => {
-        const deleteFiscalCondition = async () => {
-            const validation = validateDeletion(
-                deleteModal_state.confirmDeletion,
-                deleteModal_state.entityID
-            )
-            if (validation === 'FAIL') return
-            deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.condicionesfiscales.deleteCondicionFiscal(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
-            successAlert('El registro se eliminó correctamente.')
-            deleteModal_dispatch({ type: 'CLEAN_STATE' })
-        }
         deleteFiscalCondition()
-    }, [
-        deleteModal_state.confirmDeletion,
-        deleteModal_state.entityID
-    ])
+        // eslint-disable-next-line
+    }, [ deleteModal_state.confirmDeletion, deleteModal_state.entityID])
 
     // --------------- Fiscal Condition Edition --------------- //
     const fiscalConditionEdition = (id) => {

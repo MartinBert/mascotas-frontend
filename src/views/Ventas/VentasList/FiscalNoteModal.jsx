@@ -116,12 +116,14 @@ const FiscalNoteModal = () => {
   }
 
   // ---------------------- CALCULATE IVA --------------------------------------------------------------------- //
+  const calculateIva = async () => {
+    if (!fiscalNoteModal_state.params.fiscalNote) return
+    fiscalNoteModal_dispatch({ type: 'CALCULATE_IVA' })
+  }
+  
   useEffect(() => {
-    const calculateIva = async () => {
-      if (!fiscalNoteModal_state.params.fiscalNote) return
-      fiscalNoteModal_dispatch({ type: 'CALCULATE_IVA' })
-    }
     calculateIva()
+    // eslint-disable-next-line
   }, [
     fiscalNoteModal_state.params.amountGross,
     fiscalNoteModal_state.params.amountNet,
@@ -130,11 +132,13 @@ const FiscalNoteModal = () => {
   ])
 
   // ---------------------- GENERATE AFIP REQUEST DATA ---------------------------------------------------------- //
+  const generateAfipRequestData = async () => {
+    fiscalNoteModal_dispatch({ type: 'GENERATE_AFIP_REQUEST_DATA' })
+  }
+
   useEffect(() => {
-    const generateAfipRequestData = async () => {
-      fiscalNoteModal_dispatch({ type: 'GENERATE_AFIP_REQUEST_DATA' })
-    }
     generateAfipRequestData()
+    // eslint-disable-next-line
   }, [
     fiscalNoteModal_state.params.amountNet,
     fiscalNoteModal_state.params.fiscalNote,
@@ -165,42 +169,46 @@ const FiscalNoteModal = () => {
     fiscalNoteModal_dispatch({ type: 'SET_RENDER_CONDITION', payload: payload })
   }
 
-  useEffect(() => {
-    const updateFiscalNote = async () => {
-      fiscalNoteModal_dispatch({ type: 'SET_LOADING_FISCAL_NOTE', payload: true })
-      findAndSetVoucherNumber()
-      updateRenderCondition()
-      const params = {
-        ...fiscalNoteModal_state.params,
-        paymentMethod: null,
-        paymentMethodName: null,
-        paymentPlan: null,
-        paymentPlanName: null
-      }
-      fiscalNoteModal_dispatch({ type: 'SET_VALUES', payload: params })
-      fiscalNoteModal_dispatch({ type: 'SET_LOADING_FISCAL_NOTE', payload: false })
+  const updateFiscalNote = async () => {
+    fiscalNoteModal_dispatch({ type: 'SET_LOADING_FISCAL_NOTE', payload: true })
+    findAndSetVoucherNumber()
+    updateRenderCondition()
+    const params = {
+      ...fiscalNoteModal_state.params,
+      paymentMethod: null,
+      paymentMethodName: null,
+      paymentPlan: null,
+      paymentPlanName: null
     }
+    fiscalNoteModal_dispatch({ type: 'SET_VALUES', payload: params })
+    fiscalNoteModal_dispatch({ type: 'SET_LOADING_FISCAL_NOTE', payload: false })
+  }
+
+  useEffect(() => {
     updateFiscalNote()
+    // eslint-disable-next-line
   }, [fiscalNoteModal_state.params.fiscalNote])
 
   // ---------------------- UPDATE FORM FIELDS ----------------------------------------------------------------- //
+  const updateFormFields = async () => {
+    form.setFieldsValue({
+      amountGross: fiscalNoteModal_state.params.amountGross,
+      amountNet: fiscalNoteModal_state.params.amountNet,
+      client: fiscalNoteModal_state.params.referenceVoucher.clienteRazonSocial,
+      concept: fiscalNoteModal_state.params.concept,
+      date: fiscalNoteModal_state.params.referenceVoucher.fechaEmisionString,
+      fiscalNote: fiscalNoteModal_state.params.fiscalNote
+        ? fiscalNoteModal_state.params.fiscalNote.nombre
+        : null,
+      paymentMethods: fiscalNoteModal_state.params.paymentMethodName,
+      paymentPlans: fiscalNoteModal_state.params.paymentPlanName,
+      total: fiscalNoteModal_state.params.referenceVoucher.total,
+    })
+  }
+
   useEffect(() => {
-    const updateFormFields = async () => {
-      form.setFieldsValue({
-        amountGross: fiscalNoteModal_state.params.amountGross,
-        amountNet: fiscalNoteModal_state.params.amountNet,
-        client: fiscalNoteModal_state.params.referenceVoucher.clienteRazonSocial,
-        concept: fiscalNoteModal_state.params.concept,
-        date: fiscalNoteModal_state.params.referenceVoucher.fechaEmisionString,
-        fiscalNote: fiscalNoteModal_state.params.fiscalNote
-          ? fiscalNoteModal_state.params.fiscalNote.nombre
-          : null,
-        paymentMethods: fiscalNoteModal_state.params.paymentMethodName,
-        paymentPlans: fiscalNoteModal_state.params.paymentPlanName,
-        total: fiscalNoteModal_state.params.referenceVoucher.total,
-      })
-    }
     updateFormFields()
+    // eslint-disable-next-line
   }, [
     fiscalNoteModal_state.params.amountGross,
     fiscalNoteModal_state.params.referenceVoucher,
@@ -222,30 +230,32 @@ const FiscalNoteModal = () => {
   }
 
   // If CREDIT note, auto fill no-renderable fields with this values
-  useEffect(() => {
-    const setNoRenderableValues = async () => {
-      if (!fiscalNoteModal_state.params.fiscalNote) return
-      if (debitCodes.includes(fiscalNoteModal_state.params.fiscalNote.codigoUnico)) return
-      const amountGross = fiscalNoteModal_state.params.amountNet
-      const amountRounded = roundToMultiple(amountGross, 10)
-      const filters = JSON.stringify({ nombre: 'Efectivo' })
-      const findPaymentMethod = await api.mediospago.findAllByFilters(filters)
-      const paymentMethod = findPaymentMethod.docs
-      const [paymentPlan] = paymentMethod.map(method => method.planes)
-      const propsForCreditNote = {
-        amountDifference: amountRounded - amountGross,
-        amountGross: amountGross,
-        amountRounded: amountRounded,
-        paymentMethod: paymentMethod,
-        paymentMethodName: paymentMethod.map(method => method.nombre),
-        paymentPlan: paymentPlan,
-        paymentPlanName: paymentPlan.map(plan => plan.nombre)
-      }
-      const target = Object.keys(propsForCreditNote)
-      const value = Object.values(propsForCreditNote)
-      dispatchValues(target, value)
+  const setNoRenderableValues = async () => {
+    if (!fiscalNoteModal_state.params.fiscalNote) return
+    if (debitCodes.includes(fiscalNoteModal_state.params.fiscalNote.codigoUnico)) return
+    const amountGross = fiscalNoteModal_state.params.amountNet
+    const amountRounded = roundToMultiple(amountGross, 10)
+    const filters = JSON.stringify({ nombre: 'Efectivo' })
+    const findPaymentMethod = await api.mediospago.findAllByFilters(filters)
+    const paymentMethod = findPaymentMethod.docs
+    const [paymentPlan] = paymentMethod.map(method => method.planes)
+    const propsForCreditNote = {
+      amountDifference: amountRounded - amountGross,
+      amountGross: amountGross,
+      amountRounded: amountRounded,
+      paymentMethod: paymentMethod,
+      paymentMethodName: paymentMethod.map(method => method.nombre),
+      paymentPlan: paymentPlan,
+      paymentPlanName: paymentPlan.map(plan => plan.nombre)
     }
+    const target = Object.keys(propsForCreditNote)
+    const value = Object.values(propsForCreditNote)
+    dispatchValues(target, value)
+  }
+
+  useEffect(() => {
     setNoRenderableValues()
+    // eslint-disable-next-line
   }, [fiscalNoteModal_state.params.fiscalNote])
 
   const inputAmountGross = (e) => {
@@ -311,48 +321,52 @@ const FiscalNoteModal = () => {
   }
 
   // ---------------------- UPDATE PAYMENT METHOD -------------------------------------------------------------- //
+  const loadPaymentPlans = async () => {
+    const paymentMethodName = fiscalNoteModal_state.params.paymentMethodName
+    if (!paymentMethodName) return
+    fiscalNoteModal_dispatch({ type: 'SET_LOADING_PAYMENT_METHOD', payload: true })
+    const filters = JSON.stringify({ nombre: paymentMethodName })
+    const findSelectedPaymentMethod = await api.mediospago.findAllByFilters(filters)
+    const [selectedPaymentMethod] = findSelectedPaymentMethod.docs
+    const paymentPlans = selectedPaymentMethod.planes
+    const paymentPlansNames = paymentPlans.map(plan => plan.nombre)
+    fiscalNoteModal_dispatch({ type: 'SET_ALL_PAYMENT_PLANS', payload: { paymentPlans, paymentPlansNames } })
+    fiscalNoteModal_dispatch({ type: 'SET_LOADING_PAYMENT_METHOD', payload: false })
+  }
+
   useEffect(() => {
-    const loadPaymentPlans = async () => {
-      const paymentMethodName = fiscalNoteModal_state.params.paymentMethodName
-      if (!paymentMethodName) return
-      fiscalNoteModal_dispatch({ type: 'SET_LOADING_PAYMENT_METHOD', payload: true })
-      const filters = JSON.stringify({ nombre: paymentMethodName })
-      const findSelectedPaymentMethod = await api.mediospago.findAllByFilters(filters)
-      const [selectedPaymentMethod] = findSelectedPaymentMethod.docs
-      const paymentPlans = selectedPaymentMethod.planes
-      const paymentPlansNames = paymentPlans.map(plan => plan.nombre)
-      fiscalNoteModal_dispatch({ type: 'SET_ALL_PAYMENT_PLANS', payload: { paymentPlans, paymentPlansNames } })
-      fiscalNoteModal_dispatch({ type: 'SET_LOADING_PAYMENT_METHOD', payload: false })
-    }
     loadPaymentPlans()
+    // eslint-disable-next-line
   }, [fiscalNoteModal_state.params.paymentMethodName])
 
   // ---------------------- UPDATE REFERENCE VOUCHER ------------------------------------------------------------ //
+  const loadFiscalNotesData = async () => {
+    const referenceVoucher = fiscalNoteModal_state.params.referenceVoucher
+    if (!existsProperty(referenceVoucher, 'documento')) return
+
+    // Load User
+    const userId = localStorage.getItem('userId')
+    const loggedUser = await api.usuarios.findById(userId)
+    fiscalNoteModal_dispatch({ type: 'SET_USER', payload: loggedUser })
+
+    // Load Payment Methods
+    const findPaymentMethods = await api.mediospago.findAll()
+    const paymentMethods = findPaymentMethods.docs
+    const paymentMethodsNames = paymentMethods.map(method => method.nombre)
+    fiscalNoteModal_dispatch({ type: 'SET_ALL_PAYMENT_METHODS', payload: { paymentMethods, paymentMethodsNames } })
+
+    // Load Debit and Credit Notes
+    const referenceVoucherCode = fiscalNoteModal_state.params.referenceVoucher.documento.codigoUnico
+    const associatedFiscalNotesCodes = fiscalVouchersCodes[fiscalVouchersCodes.indexOf(referenceVoucherCode) + 1]
+    const creditNote = await api.documentos.findByCode(associatedFiscalNotesCodes.credit)
+    const debitNote = await api.documentos.findByCode(associatedFiscalNotesCodes.debit)
+    fiscalNoteModal_dispatch({ type: 'SET_CREDIT_NOTE', payload: creditNote })
+    fiscalNoteModal_dispatch({ type: 'SET_DEBIT_NOTE', payload: debitNote })
+  }
+
   useEffect(() => {
-    const loadFiscalNotesData = async () => {
-      const referenceVoucher = fiscalNoteModal_state.params.referenceVoucher
-      if (!existsProperty(referenceVoucher, 'documento')) return
-
-      // Load User
-      const userId = localStorage.getItem('userId')
-      const loggedUser = await api.usuarios.findById(userId)
-      fiscalNoteModal_dispatch({ type: 'SET_USER', payload: loggedUser })
-
-      // Load Payment Methods
-      const findPaymentMethods = await api.mediospago.findAll()
-      const paymentMethods = findPaymentMethods.docs
-      const paymentMethodsNames = paymentMethods.map(method => method.nombre)
-      fiscalNoteModal_dispatch({ type: 'SET_ALL_PAYMENT_METHODS', payload: { paymentMethods, paymentMethodsNames } })
-
-      // Load Debit and Credit Notes
-      const referenceVoucherCode = fiscalNoteModal_state.params.referenceVoucher.documento.codigoUnico
-      const associatedFiscalNotesCodes = fiscalVouchersCodes[fiscalVouchersCodes.indexOf(referenceVoucherCode) + 1]
-      const creditNote = await api.documentos.findByCode(associatedFiscalNotesCodes.credit)
-      const debitNote = await api.documentos.findByCode(associatedFiscalNotesCodes.debit)
-      fiscalNoteModal_dispatch({ type: 'SET_CREDIT_NOTE', payload: creditNote })
-      fiscalNoteModal_dispatch({ type: 'SET_DEBIT_NOTE', payload: debitNote })
-    }
     loadFiscalNotesData()
+    // eslint-disable-next-line
   }, [fiscalNoteModal_state.params.referenceVoucher])
 
   // ---------------------- RENDER DATA ------------------------------------------------------------------------ //

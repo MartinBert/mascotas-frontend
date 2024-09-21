@@ -11,14 +11,12 @@ import contexts from '../../contexts'
 import { Button, Col, Input, Modal, Row } from 'antd'
 
 // Helpers
-import actions from '../../actions'
 import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
 
 // Imports Destructuring
-const { formatFindParams } = actions.paginationParams
 const { useProductsContext } = contexts.Products
 const { regExp } = helpers.stringHelper
 const { ifNotNumber } = regExp
@@ -39,7 +37,10 @@ const FixStockHistoryModal = () => {
         products_dispatch({ type: 'SET_PARAMS_IN_FIX_STOCK_HISTORY_MODAL', payload: params })
     }
 
-    useEffect(() => { loadParams() }, [
+    useEffect(() => {
+        loadParams()
+        // eslint-disable-next-line
+    }, [
         products_state.stockHistory.fixStockHistoryModal.product,
         products_state.stockHistory.fixStockHistoryModal.stockHistoryToFix
     ])

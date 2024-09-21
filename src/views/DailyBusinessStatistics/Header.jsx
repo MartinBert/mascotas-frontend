@@ -180,10 +180,12 @@ const Header = () => {
 
     const updateRecords = async () => {
         // Generation of parameters to check if update is necessary.
+        // eslint-disable-next-line
         const { referenceDate, referenceDate_ms, validated } = await validateProcess()
         if (!validated) return
 
         // Generation of date array to update records. From 'referenceDate' until yesterday.
+        // eslint-disable-next-line
         const { dates, dates_ms } = generateDates(referenceDate_ms)
 
         // Get data to update records.
