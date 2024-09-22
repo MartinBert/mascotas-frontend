@@ -1,6 +1,5 @@
 // React Components and Hooks
 import React, { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 
 // Custom Components
 import generics from '../../components/generics'
@@ -19,6 +18,7 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
+const { useAuthContext } = contexts.Auth
 const { useBusinessContext } = contexts.Business
 const { useHomeContext } = contexts.Home
 const { useSalePointContext } = contexts.SalePoint
@@ -33,7 +33,7 @@ const { normalizeString } = helpers.stringHelper
 
 
 const FirstSteps = () => {
-    const navigate = useNavigate()
+    const [auth_state] = useAuthContext()
     const [business_state, business_dispatch] = useBusinessContext()
     const [home_state, home_dispatch] = useHomeContext()
     const [salePoint_state, salePoint_dispatch] = useSalePointContext()
@@ -67,6 +67,10 @@ const FirstSteps = () => {
         const findResult = await api.empresas.findAll()
         if (findResult.docs.length === 0) return false
         else return true
+    }
+
+    const reloadPage = () => {
+        window.location.reload()
     }
 
     const setSelectOptionsForStep2 = async () => {
@@ -107,8 +111,15 @@ const FirstSteps = () => {
         const verifyFinish = await isStep2Complete()
         if (!verifyFinish) return errorAlert('Debes registrar la empresa antes de finalizar.')
         else {
-            successAlert('¡Registros guardados exitosamente!')
-            navigate('/ventas')
+            const findBusiness = await api.empresas.findAll()
+            const findSalePoint = await api.puntosventa.findAll()
+            const business = findBusiness.docs[0]._id
+            const salePoint = findSalePoint.docs[0]._id
+            const updatedUser = { ...auth_state.user, empresa: business, puntoVenta: salePoint }
+            const res = await api.usuarios.edit(updatedUser)
+            if (res.code !== 200) return errorAlert('No se pudo completar el registro. Intente de nuevo.')
+            const alertRes = await successAlert('¡Registros guardados exitosamente!')
+            if (alertRes.isConfirmed) reloadPage()
         }
     }
 

@@ -84,7 +84,7 @@ const UsuariosForm = () => {
             const response = usuario._id
                 ? await api.usuarios.edit(usuario)
                 : await api.usuarios.save(usuario)
-            if (response === 'OK') return success()
+            if (response.code === 200) return success()
             return fail()
         }
         saveItem()

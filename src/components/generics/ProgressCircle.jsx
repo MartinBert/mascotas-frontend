@@ -149,7 +149,7 @@ const ProgressCircle = ({ data }) => {
 						failAlert()
 						return reloadPage()
 					}
-					newRecord[predataProp.prop] = res._id
+					newRecord[predataProp.prop] = res.docs[0]._id
 				}
 
 				const res = await api[modelService].save(newRecord)
@@ -170,7 +170,7 @@ const ProgressCircle = ({ data }) => {
 
 	const buttonToGenerateData = (
 		<Button
-			disabled={!predataIsCompleted}
+			disabled={!predataIsCompleted || dataIsSaved || dataIsCompleted}
 			onClick={saveData}
 			style={{ width: '100%' }}
 			type='primary'
@@ -284,7 +284,7 @@ const ProgressCircle = ({ data }) => {
 
 	const buttonToGeneratePredata = (
 		<Button
-			disabled={dataAndPredataAreCompleted}
+			disabled={dataIsSaved || predataIsCompleted}
 			onClick={savePredata}
 			style={{ width: '100%' }}
 			type='primary'

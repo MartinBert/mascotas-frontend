@@ -25,8 +25,7 @@ const LoginForm = () => {
         email: '',
         password: '',
     })
-    const loggedUserContext = useAuthContext()
-    const [, auth_dispatch] = loggedUserContext
+    const [auth_state, auth_dispatch] = useAuthContext()
 
     const loadCredentials = (e) => {
         setCredentials({
@@ -35,13 +34,21 @@ const LoginForm = () => {
         })
     }
 
-    const redirectToVentas = () => {
-        navigate('/venta')
+    const redirectToHome = () => {
+        navigate('/')
     }
 
     const redirectToLogin = () => {
         localStorage.clear()
         navigate('/login')
+    }
+
+    const redirectToVentas = () => {
+        navigate('/venta')
+    }
+
+    const reloadPage = () => {
+        window.location.reload()
     }
 
     const login = async () => {
@@ -58,8 +65,18 @@ const LoginForm = () => {
         localStorage.setItem('token', token)
         localStorage.setItem('userId', data)
         auth_dispatch({ type: 'SET_LOADING', payload: false })
-        return redirectToVentas()
+        verifyUserAndRedirect()
+        reloadPage()
     }
+
+    const verifyUserAndRedirect = () => {
+        if (!auth_state.user) return redirectToHome()
+        const existsBusiness = auth_state.user.empresa ? true : false
+        const existsSalePoint = auth_state.user.puntoVenta ? true : false
+        if (existsBusiness && existsSalePoint) return redirectToVentas()
+        else return redirectToHome()
+    }
+
 
     return (
         <Form
@@ -73,7 +90,7 @@ const LoginForm = () => {
                     type='email'
                     name='email'
                     placeholder='Usuario'
-                    onChange={e => loadCredentials(e)}
+                    onChange={loadCredentials}
                     required
                     style={{ marginTop: '25px' }}
                 />
@@ -84,7 +101,7 @@ const LoginForm = () => {
                     type='password'
                     name='password'
                     placeholder='Contraseña'
-                    onChange={e => loadCredentials(e)}
+                    onChange={loadCredentials}
                     required
                 />
             </Form.Item>

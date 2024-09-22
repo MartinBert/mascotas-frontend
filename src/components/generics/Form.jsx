@@ -56,7 +56,6 @@ const Form = ({ data }) => {
 			const field = data.fields[index]
 			params[field.key] = field.value
 		}
-		console.log(data.fields)
 		let res
 		if (data.isCompleted) {
 			const findPreviousData = await api[data.service].findAll()
@@ -92,13 +91,15 @@ const Form = ({ data }) => {
 	}
 
 	const buttonToSave = (
-		<Button
-			onClick={save}
-			style={{ width: '100%' }}
-			type='primary'
-		>
-			{data.isCompleted ? 'Editar' : 'Generar'}
-		</Button>
+			<Button
+				id='buttonToSave'
+				onClick={save}
+				style={{ backgroundColor: data.isCompleted ? '#52c41a' : null, width: '100%' }}
+				
+				type='primary'
+			>
+				{data.isCompleted ? 'Editar' : 'Generar'}
+			</Button>
 	)
 
 	// ------------------------------- Generate date picker ---------------------------------- //
@@ -316,11 +317,11 @@ const Form = ({ data }) => {
 					xs={{ span: responsiveGrid.span.xs }}
 					xxl={{ span: responsiveGrid.span.xxl }}
 				>
-					{field.props?.type === 'primary' ? buttonToSave : null}
-					{field.type === 'datePicker' ? generateDatePicker(field) : null}
-					{field.type === 'input' ? generateInput(field) : null}
-					{field.type === 'select' ? generateSelect(field) : null}
-					{field.type === 'uploader' ? generateUploader(field) : null}
+					{field?.props?.id === 'buttonToSave' ? buttonToSave : null}
+					{field?.type === 'datePicker' ? generateDatePicker(field) : null}
+					{field?.type === 'input' ? generateInput(field) : null}
+					{field?.type === 'select' ? generateSelect(field) : null}
+					{field?.type === 'uploader' ? generateUploader(field) : null}
 				</Col>
 			)
 			inputs.push(fieldCol)

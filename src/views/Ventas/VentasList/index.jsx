@@ -116,7 +116,7 @@ const VentasList = () => {
     const columnsForTable = [
         {
             dataIndex: 'salesList_user',
-            render: (_, venta) => (venta.usuario) ? venta.usuario.nombre : 'Usuario inexistente',
+            render: (_, venta) => venta.usuario.nombre,
             title: 'Usuario'
         },
         {

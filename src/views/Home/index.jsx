@@ -29,8 +29,8 @@ const Home = () => {
 
     // -------------------------------------- Actions ---------------------------------------- //
     const verifyDevToolsVisibility = () => {
-        const activeBusiness = auth_state.user.empresa !== null
-        const activeSalePoint = auth_state.user.puntoVenta !== null
+        const activeBusiness = auth_state.user.empresa ? true : false
+        const activeSalePoint = auth_state.user.puntoVenta ? true : false
         const activeDevPassword = home_state.devPassword === process.env.REACT_APP_DEV_PASSWORD
         const devToolsAreVisible = activeBusiness && activeSalePoint && activeDevPassword
         const firstStepsAreVisible = !activeBusiness || !activeSalePoint
@@ -194,6 +194,7 @@ const Home = () => {
     const deleteSeedData = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const res = await api.seed.deleteData()
+        console.log(res)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
