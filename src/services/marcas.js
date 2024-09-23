@@ -6,6 +6,17 @@ const checkStorageStatus = (err) => {
     }
 }
 
+const countRecords = async () => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas/recordsInfo/quantity`, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const deleteMarca = async(id) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
@@ -96,6 +107,7 @@ const save = async(marca) => {
 }
 
 const marcas = {
+    countRecords,
     deleteMarca,
     edit,
     findAll,

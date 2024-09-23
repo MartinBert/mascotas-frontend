@@ -21,6 +21,7 @@ const { HomeContext } = contexts.Home
 const { OutputsContext } = contexts.Outputs
 const { PrivateRouteContext } = contexts.PrivateRoute
 const { ProductsContext } = contexts.Products
+const { RenderConditionsContext } = contexts.RenderConditions
 const { SaleContext } = contexts.Sale
 const { SalesAreasContext } = contexts.SalesAreas
 const { SalePointContext } = contexts.SalePoint
@@ -40,15 +41,17 @@ function App() {
                                         <OutputsContext>
                                             <PrivateRouteContext>
                                                 <ProductsContext>
-                                                    <SaleContext>
-                                                        <SalesAreasContext>
-                                                            <SalePointContext>
-                                                                <Router>
-                                                                    <AppRouter />
-                                                                </Router>
-                                                            </SalePointContext>
-                                                        </SalesAreasContext>
-                                                    </SaleContext>
+                                                    <RenderConditionsContext>
+                                                        <SaleContext>
+                                                            <SalesAreasContext>
+                                                                <SalePointContext>
+                                                                    <Router>
+                                                                        <AppRouter />
+                                                                    </Router>
+                                                                </SalePointContext>
+                                                            </SalesAreasContext>
+                                                        </SaleContext>
+                                                    </RenderConditionsContext>
                                                 </ProductsContext>
                                             </PrivateRouteContext>
                                         </OutputsContext>

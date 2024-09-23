@@ -26,6 +26,7 @@ const { validateDeletion } = actions.deleteModal
 const { formatFindParams } = actions.paginationParams
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
+const { useRenderConditionsContext } = contexts.RenderConditions
 const { DeleteModal } = generics
 const { Delete, Details, Edit } = icons
 
@@ -87,8 +88,17 @@ const Entradas = () => {
     const navigate = useNavigate()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [entries_state, entries_dispatch] = useEntriesContext()
+    const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
     // ------------------ Fetch Entries ------------------ //
+    const loadRenderConditions = async () => {
+        const recordsQuantityOfProducts = await api.productos.countRecords()
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_PRODUCTS',
+            payload: recordsQuantityOfProducts < 1 ? false : true
+        })
+    }
+
     const fetchEntries_paginated = async () => {
         const findParams = formatFindParams(entries_state.paginationParams)
         const data = await api.entradas.findPaginated(findParams)
@@ -100,6 +110,28 @@ const Entradas = () => {
         fetchEntries_paginated()
         // eslint-disable-next-line
     }, [deleteModal_state.loading, entries_state.paginationParams])
+
+    useEffect(() => {
+        loadRenderConditions()
+        // eslint-disable-next-line
+    }, [])
+
+    // --------------------- Actions --------------------- //
+    const setLimit = (val) => {
+        const paginationParams = {
+            ...entries_state.paginationParams,
+            limit: parseInt(val)
+        }
+        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
+
+    const setPage = (e) => {
+        const paginationParams = {
+            ...entries_state.paginationParams,
+            page: parseInt(e)
+        }
+        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
+    }
 
     // ------------------ Entry Deletion ------------------ //
     const entryDeletion = (entry) => {
@@ -133,23 +165,6 @@ const Entradas = () => {
     // ------------------ Entry Edition ------------------ //
     const entryEdition = (entry) => {
         navigate(`/entradas/${entry._id}`)
-    }
-
-    // --------------------- Actions --------------------- //
-    const setLimit = (val) => {
-        const paginationParams = {
-            ...entries_state.paginationParams,
-            limit: parseInt(val)
-        }
-        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
-    }
-
-    const setPage = (e) => {
-        const paginationParams = {
-            ...entries_state.paginationParams,
-            page: parseInt(e)
-        }
-        entries_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
     }
 
     // ------------------ Product Details ------------------ //
@@ -213,32 +228,40 @@ const Entradas = () => {
     ]
 
     return (
-        <Row gutter={[0, 16]}>
-            <Col span={24}>
-                <Header />
-            </Col>
-            <Col span={24} >
-                <Table
-                    width={'100%'}
-                    dataSource={entries_state.entriesForRender}
-                    columns={columnsForTable}
-                    pagination={{
-                        defaultCurrent: entries_state.paginationParams.page,
-                        limit: entries_state.paginationParams.limit,
-                        total: entries_state.entriesTotalQuantity,
-                        showSizeChanger: true,
-                        onChange: e => setPage(e),
-                        onShowSizeChange: (e, val) => setLimit(val)
-                    }}
-                    loading={deleteModal_state.loading}
-                    rowKey='_id'
-                    tableLayout='auto'
-                    size='small'
-                />
-            </Col>
-            <DetailsModal />
-            <DeleteModal title='Eliminar entrada' />
-        </Row>
+        <>
+            {
+                !renderConditions_state.existsProducts
+                    ? <h1>Debes registrar al menos un producto antes de comenzar a utilizar esta función.</h1>
+                    : (
+                        <Row gutter={[0, 16]}>
+                            <Col span={24}>
+                                <Header />
+                            </Col>
+                            <Col span={24} >
+                                <Table
+                                    width={'100%'}
+                                    dataSource={entries_state.entriesForRender}
+                                    columns={columnsForTable}
+                                    pagination={{
+                                        defaultCurrent: entries_state.paginationParams.page,
+                                        limit: entries_state.paginationParams.limit,
+                                        total: entries_state.entriesTotalQuantity,
+                                        showSizeChanger: true,
+                                        onChange: e => setPage(e),
+                                        onShowSizeChange: (e, val) => setLimit(val)
+                                    }}
+                                    loading={deleteModal_state.loading}
+                                    rowKey='_id'
+                                    tableLayout='auto'
+                                    size='small'
+                                />
+                            </Col>
+                            <DetailsModal />
+                            <DeleteModal title='Eliminar entrada' />
+                        </Row>
+                    )
+            }
+        </>
     )
 }
 

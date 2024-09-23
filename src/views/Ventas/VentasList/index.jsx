@@ -23,6 +23,7 @@ import Header from './Header'
 
 // Imports Destructuring
 const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
+const { useRenderConditionsContext } = contexts.RenderConditions
 const { EmitDocument, PrintPdf } = icons
 const { fiscalVouchersCodes } = helpers.afipHelper
 const {
@@ -52,6 +53,8 @@ const ticketCodes = ['081', '082', '083', '111', '118']
 
 const VentasList = () => {
     const [, fiscalNoteModal_dispatch] = useFiscalNoteModalContext()
+    const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
+
     const [ventas, setVentas] = useState(null)
     const [documentos, setDocumentos] = useState(null)
     const [documentosNombres, setDocumentosNombres] = useState(null)
@@ -63,37 +66,58 @@ const VentasList = () => {
     const [limit, setLimit] = useState(10)
     const [filters, setFilters] = useState(null)
 
+    // ------------------------------------- Load data --------------------------------------- //
+    const loadRenderConditions = async () => {
+        const recordsQuantityOfSales = await api.ventas.countRecords()
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_SALES',
+            payload: recordsQuantityOfSales < 1 ? false : true
+        })
+    }
+
+    const fetchDocumentos = async () => {
+        const data = await api.documentos.findAll()
+        const todosLosDocumentos = data.docs.map(doc => { return { value: doc.nombre, label: doc.nombre } })
+        setDocumentos(data.docs)
+        setDocumentosNombres(todosLosDocumentos)
+    }
+
+    const fetchMediosPago = async () => {
+        const data = await api.mediospago.findAll()
+        const todosLosMediosDePago = data.docs.map(mp => { return { value: mp.nombre, label: mp.nombre } })
+        setMediosPago(data.docs)
+        setMediosPagoNombres(todosLosMediosDePago)
+    }
+
+    const fetchVentasList = async () => {
+        const stringFilters = JSON.stringify(filters)
+        const salesData = await api.ventas.findPaginated({ page, limit, filters: stringFilters })
+        setVentas(salesData.docs)
+        setTotalDocs(salesData.totalDocs)
+        setLoading(false)
+    }
+
     useEffect(() => {
-        const fetchVentasList = async () => {
-            const stringFilters = JSON.stringify(filters)
-            const salesData = await api.ventas.findPaginated({ page, limit, filters: stringFilters })
-            setVentas(salesData.docs)
-            setTotalDocs(salesData.totalDocs)
-            setLoading(false)
-        }
+        loadRenderConditions()
+        // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
         fetchVentasList()
+        // eslint-disable-next-line
     }, [page, limit, filters, loading])
 
     useEffect(() => {
-        const fetchDocumentos = async () => {
-            const data = await api.documentos.findAll()
-            const todosLosDocumentos = data.docs.map(doc => { return { value: doc.nombre, label: doc.nombre } })
-            setDocumentos(data.docs)
-            setDocumentosNombres(todosLosDocumentos)
-        }
+        // eslint-disable-next-line
         fetchDocumentos()
     }, [])
 
     useEffect(() => {
-        const fetchMediosPago = async () => {
-            const data = await api.mediospago.findAll()
-            const todosLosMediosDePago = data.docs.map(mp => { return { value: mp.nombre, label: mp.nombre } })
-            setMediosPago(data.docs)
-            setMediosPagoNombres(todosLosMediosDePago)
-        }
         fetchMediosPago()
+        // eslint-disable-next-line
     }, [])
 
+    // -------------------------------------- Actions ---------------------------------------- //
     const openFiscalNoteModal = async (ventaID) => {
         const referenceVoucher = await api.ventas.findById(ventaID)
         fiscalNoteModal_dispatch({ type: 'SET_REFERENCE_VOUCHER', payload: referenceVoucher })
@@ -180,42 +204,50 @@ const VentasList = () => {
     ]
 
     return (
-        <Row>
-            <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
-            <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
-            <Col span={24} style={{ marginBottom: '10px' }}>
-                <Header
-                    setFilters={setFilters}
-                    filters={filters}
-                    setPage={setPage}
-                    ventas={ventas}
-                    documentos={documentos}
-                    documentosNombres={documentosNombres}
-                    mediosPago={mediosPago}
-                    mediosPagoNombres={mediosPagoNombres}
-                />
-            </Col>
-            <Col span={24}>
-                <Table
-                    width={'100%'}
-                    dataSource={ventas}
-                    columns={columnsForTable}
-                    pagination={{
-                        current: page,
-                        limit: limit,
-                        total: totalDocs,
-                        showSizeChanger: true,
-                        onChange: e => setPage(e),
-                        onShowSizeChange: (e, val) => setLimit(val)
-                    }}
-                    rowKey='_id'
-                    tableLayout='auto'
-                    size='small'
-                    loading={loading}
-                />
-            </Col>
-            <FiscalNoteModal />
-        </Row>
+        <>
+            {
+                !renderConditions_state.existsSales
+                    ? <h1>Debes registrar al menos una venta antes de comenzar a utilizar esta función.</h1>
+                    : (
+                        <Row>
+                            <div id='voucher' style={{ width: '793px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
+                            <div id='ticket' style={{ width: '303px', height: '1122px', zIndex: -9999, position: 'absolute', top: 0, left: 0 }}></div>
+                            <Col span={24} style={{ marginBottom: '10px' }}>
+                                <Header
+                                    setFilters={setFilters}
+                                    filters={filters}
+                                    setPage={setPage}
+                                    ventas={ventas}
+                                    documentos={documentos}
+                                    documentosNombres={documentosNombres}
+                                    mediosPago={mediosPago}
+                                    mediosPagoNombres={mediosPagoNombres}
+                                />
+                            </Col>
+                            <Col span={24}>
+                                <Table
+                                    width={'100%'}
+                                    dataSource={ventas}
+                                    columns={columnsForTable}
+                                    pagination={{
+                                        current: page,
+                                        limit: limit,
+                                        total: totalDocs,
+                                        showSizeChanger: true,
+                                        onChange: e => setPage(e),
+                                        onShowSizeChange: (e, val) => setLimit(val)
+                                    }}
+                                    rowKey='_id'
+                                    tableLayout='auto'
+                                    size='small'
+                                    loading={loading}
+                                />
+                            </Col>
+                            <FiscalNoteModal />
+                        </Row>
+                    )
+            }
+        </>
     )
 }
 

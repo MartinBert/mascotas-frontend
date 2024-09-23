@@ -231,6 +231,25 @@ const FirstSteps = () => {
             },
             {
                 source: [
+                    {
+                        arqueoCaja: true,
+                        cierrez: true,
+                        nombre: 'Contado',
+                        normalizedName: normalizeString('Contado'),
+                        planes: [{
+                            _id: 1,
+                            cuotas: 1,
+                            nombre: 'Efectivo',
+                            normalizedName: normalizeString('Efectivo'),
+                            porcentaje: 0
+                        }]
+                    }
+                ],
+                service: 'mediospago',
+                title: 'Medios de pago'
+            },
+            {
+                source: [
                     { nombre: '1 Unid.', fraccionamiento: 1 }
                 ],
                 service: 'unidadesmedida',

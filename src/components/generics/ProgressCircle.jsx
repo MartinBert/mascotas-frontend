@@ -57,8 +57,15 @@ import { errorAlert } from '../../components/alerts'
 // Design components
 import { Button, Col, Progress, Row } from 'antd'
 
+// Helpers
+import helpers from '../../helpers'
+
 // Services
 import api from '../../services'
+
+// Imports destructuring
+const { nextInteger } = helpers.mathHelper
+
 
 const finalizedProcessTitleStyle = { color: 'green', fontWeight: 'bold' }
 
@@ -66,12 +73,12 @@ const finalizedProcessTitleStyle = { color: 'green', fontWeight: 'bold' }
 const ProgressCircle = ({ data }) => {
 	const dataIsSaved = data.isCompleted
 	const dataSourceLength = data.data.reduce((acc, val) => acc + val.source.length, 0)
-	const dataRenderProgressParam = 100 / dataSourceLength
-	const dataRenderTitlesParam = 100 / data.data.length
+	const dataRenderProgressParam = nextInteger(100 / dataSourceLength)
+	const dataRenderTitlesParam = nextInteger(100 / data.data.length)
 
 	const predataSourceLength = data.predata.reduce((acc, val) => acc + val.source.length, 0)
-	const predataRenderProgressParam = 100 / predataSourceLength
-	const predataRenderTitlesParam = 100 / data.predata.length
+	const predataRenderProgressParam = nextInteger(100 / predataSourceLength)
+	const predataRenderTitlesParam = nextInteger(100 / data.predata.length)
 
 	// -------------------------------------- Actions ---------------------------------------- //
 	const [dataAndPredataAreCompleted, setDataAndPredataAreCompleted] = useState(false)

@@ -26,6 +26,7 @@ const { validateDeletion } = actions.deleteModal
 const { formatFindParams } = actions.paginationParams
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
+const { useRenderConditionsContext } = contexts.RenderConditions
 const { DeleteModal } = generics
 const { Delete, Details, Edit } = icons
 
@@ -87,8 +88,17 @@ const Salidas = () => {
     const navigate = useNavigate()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [outputs_state, outputs_dispatch] = useOutputsContext()
+    const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
     // ------------------ Fetch Outputs ------------------ //
+    const loadRenderConditions = async () => {
+        const recordsQuantityOfProducts = await api.productos.countRecords()
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_PRODUCTS',
+            payload: recordsQuantityOfProducts < 1 ? false : true
+        })
+    }
+
     const fetchOutputs_paginated = async () => {
         const findParams = formatFindParams(outputs_state.paginationParams)
         const data = await api.salidas.findPaginated(findParams)
@@ -100,6 +110,11 @@ const Salidas = () => {
         fetchOutputs_paginated()
         // eslint-disable-next-line
     }, [deleteModal_state.loading, outputs_state.paginationParams])
+
+    useEffect(() => {
+        loadRenderConditions()
+        // eslint-disable-next-line
+    }, [])
 
     // ------------------ Output Deletion ------------------ //
     const outputDeletion = (output) => {
@@ -210,33 +225,42 @@ const Salidas = () => {
         }
     ]
 
+    
     return (
-        <Row gutter={[0, 16]}>
-            <Col span={24}>
-                <Header />
-            </Col>
-            <Col span={24} >
-                <Table
-                    width={'100%'}
-                    dataSource={outputs_state.outputsForRender}
-                    columns={columnsForTable}
-                    pagination={{
-                        defaultCurrent: outputs_state.paginationParams.page,
-                        limit: outputs_state.paginationParams.limit,
-                        total: outputs_state.outputsTotalQuantity,
-                        showSizeChanger: true,
-                        onChange: e => setPage(e),
-                        onShowSizeChange: (e, val) => setLimit(val)
-                    }}
-                    loading={deleteModal_state.loading}
-                    rowKey='_id'
-                    tableLayout='auto'
-                    size='small'
-                />
-            </Col>
-            <DetailsModal />
-            <DeleteModal title='Eliminar salida' />
-        </Row>
+        <>
+            {
+                !renderConditions_state.existsProducts
+                    ? <h1>Debes registrar al menos un producto antes de comenzar a utilizar esta función.</h1>
+                    : (
+                        <Row gutter={[0, 16]}>
+                            <Col span={24}>
+                                <Header />
+                            </Col>
+                            <Col span={24} >
+                                <Table
+                                    width={'100%'}
+                                    dataSource={outputs_state.outputsForRender}
+                                    columns={columnsForTable}
+                                    pagination={{
+                                        defaultCurrent: outputs_state.paginationParams.page,
+                                        limit: outputs_state.paginationParams.limit,
+                                        total: outputs_state.outputsTotalQuantity,
+                                        showSizeChanger: true,
+                                        onChange: e => setPage(e),
+                                        onShowSizeChange: (e, val) => setLimit(val)
+                                    }}
+                                    loading={deleteModal_state.loading}
+                                    rowKey='_id'
+                                    tableLayout='auto'
+                                    size='small'
+                                />
+                            </Col>
+                            <DetailsModal />
+                            <DeleteModal title='Eliminar salida' />
+                        </Row>
+                    )
+            }
+        </>
     )
 }
 

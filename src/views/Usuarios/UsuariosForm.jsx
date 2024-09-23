@@ -23,6 +23,7 @@ const { Error } = messages
 const UsuariosForm = () => {
     const navigate = useNavigate()
     const { id } = useParams()
+    const [emailError, setEmailError] = useState(false)
     const [error, setError] = useState(false)
     const [loading, setLoading] = useState(true)
     const [selectedCompany, setSelectedCompany] = useState(null)
@@ -75,10 +76,8 @@ const UsuariosForm = () => {
     }
 
     const save = () => {
-        if (!usuario.nombre || !usuario.email || !usuario.password) {
-            setError(true)
-            return
-        }
+        if (!usuario.nombre || !usuario.email || !usuario.password) return setError(true)
+        if (usuario.email === 'admin@test.com') return setEmailError(true)
 
         const saveItem = async () => {
             const response = usuario._id
@@ -113,6 +112,9 @@ const UsuariosForm = () => {
                     <h1>{id === 'nuevo' ? 'Crear nuevo usuario' : 'Editar usuario'}</h1>
                     {error ? (
                         <Error message='Debe completar todos los campos obligatorios *' />
+                    ) : null}
+                    {emailError ? (
+                        <Error message={`El email registrado no puede ser 'admin@test.com'`} />
                     ) : null}
                     <Form
                         name='basic'

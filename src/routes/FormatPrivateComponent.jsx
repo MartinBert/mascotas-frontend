@@ -115,20 +115,27 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
                     ? null
                     : (
                         <Sider
-                            trigger={null}
-                            collapsible
                             collapsed={privateRoute_state.collapsed}
+                            collapsible
                             style={{ background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)' }}
+                            trigger={null}
                         >
-                            <div style={{ height: '57px', background: 'transparent', marginTop: '3px', marginLeft: '3px' }}></div>
+                            <div
+                                style={{
+                                    height: '57px',
+                                    background: 'transparent',
+                                    marginTop: '3px',
+                                    marginLeft: '3px'
+                                }}
+                            ></div>
                             <Menu
-                                theme='dark'
-                                mode='inline'
-                                style={{ background: 'transparent' }}
                                 defaultSelectedKeys={[(activeKey) ? activeKey[0] : '1']}
                                 defaultOpenKeys={[(activeKey) ? activeKey[1] : 'sub1']}
-                                onSelect={(e) => redirectToPath(e)}
                                 items={subMenusToSidebar}
+                                mode='inline'
+                                onSelect={(e) => redirectToPath(e)}
+                                style={{ background: 'transparent' }}
+                                theme='dark'
                             />
                         </Sider>
                     )

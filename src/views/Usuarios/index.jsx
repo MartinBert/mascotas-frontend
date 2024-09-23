@@ -30,6 +30,7 @@ const { Edit, Delete } = icons
 const Usuarios = () => {
     const navigate = useNavigate()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
+
     const [usuarios, setUsuarios] = useState(null)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
@@ -99,22 +100,30 @@ const Usuarios = () => {
         {
             dataIndex: 'user_actions',
             render: (_, user) => (
-                <Row
-                    justify='start'
-                >
-                    <Col
-                        onClick={() => userEdition(user._id)}
-                        span={12}
-                    >
-                        <Edit />
-                    </Col>
-                    <Col
-                        onClick={() => userDeletion(user._id)}
-                        span={12}
-                    >
-                        <Delete />
-                    </Col>
-                </Row>
+                <>
+                    {
+                        user.email === 'admin@test.com'
+                            ? null
+                            : (
+                                <Row
+                                    justify='start'
+                                >
+                                    <Col
+                                        onClick={() => userEdition(user._id)}
+                                        span={12}
+                                    >
+                                        <Edit />
+                                    </Col>
+                                    <Col
+                                        onClick={() => userDeletion(user._id)}
+                                        span={12}
+                                    >
+                                        <Delete />
+                                    </Col>
+                                </Row>
+                            )
+                    }
+                </>
             ),
             title: 'Acciones',
         }

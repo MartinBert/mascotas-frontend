@@ -22,13 +22,50 @@ import ProductStockHistoryModal from './ProductStockHistoryModal'
 // Imports Destructurings
 const { formatFindParams } = actions.paginationParams
 const { useProductsContext } = contexts.Products
+const { useRenderConditionsContext } = contexts.RenderConditions
 const { OpenImage } = generics
 
 
 const ProductStockHistory = () => {
 	const [products_state, products_dispatch] = useProductsContext()
+	const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
-	// --------------------- Actions --------------------- //
+	// ------------------------------------- Load data --------------------------------------- //
+	const loadRenderConditions = async () => {
+        const recordsQuantityOfEntries = await api.entradas.countRecords()
+        const recordsQuantityOfOutputs = await api.salidas.countRecords()
+        const recordsQuantityOfSales = await api.ventas.countRecords()
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_ENTRIES',
+            payload: recordsQuantityOfEntries < 1 ? false : true
+        })
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_OUTPUTS',
+            payload: recordsQuantityOfOutputs < 1 ? false : true
+        })
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_SALES',
+            payload: recordsQuantityOfSales < 1 ? false : true
+        })
+    }
+
+	const fetchProducts = async () => {
+		const findParams = formatFindParams(products_state.stockHistory.productsToRender.paginationParams)
+		const data = await api.productos.findPaginated(findParams)
+		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
+	}
+
+	useEffect(() => {
+		fetchProducts()
+		// eslint-disable-next-line
+	}, [products_state.stockHistory.productsToRender.paginationParams])
+
+	useEffect(() => {
+        loadRenderConditions()
+        // eslint-disable-next-line
+    }, [])
+
+	// -------------------------------------- Actions ---------------------------------------- //
 	const getImageUrl = (product) => {
 		if (!product.imagenes) return '/no-image.png'
 		if (product.imagenes.length < 1) return '/no-image.png'
@@ -50,18 +87,6 @@ const ProductStockHistory = () => {
 			payload: paginationParams
 		})
 	}
-
-	// ------------------ Fetch Products ------------------ //
-	const fetchProducts = async () => {
-		const findParams = formatFindParams(products_state.stockHistory.productsToRender.paginationParams)
-		const data = await api.productos.findPaginated(findParams)
-		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
-	}
-
-	useEffect(() => {
-		fetchProducts()
-		// eslint-disable-next-line
-	}, [products_state.stockHistory.productsToRender.paginationParams])
 
 
 	const columnsForTable = [
@@ -109,33 +134,43 @@ const ProductStockHistory = () => {
 
 
 	return (
-		<Row gutter={[0, 8]}>
-			<Col span={24}>
-				<Header />
-			</Col>
-			<Col span={24}>
-				<Table
-					width={'100%'}
-					dataSource={products_state.stockHistory.productsToRender.products}
-					columns={columnsForTable}
-					pagination={{
-						defaultCurrent: products_state.stockHistory.productsToRender.paginationParams.page,
-						defaultPageSize: products_state.stockHistory.productsToRender.paginationParams.limit,
-						limit: products_state.stockHistory.productsToRender.paginationParams.limit,
-						onChange: (page, limit) => setPageAndLimit(page, limit),
-						pageSizeOptions: [5, 10, 15, 20],
-						showSizeChanger: true,
-						total: products_state.stockHistory.productsToRender.totalProducts
-					}}
-					rowKey='_id'
-					tableLayout='auto'
-					size='small'
-					loading={products_state.stockHistory.productsToRender.loading}
-				/>
-			</Col>
-			<FixStockHistoryModal />
-			<ProductStockHistoryModal />
-		</Row>
+		<>
+			{
+				!renderConditions_state.existsEntries
+					&& !renderConditions_state.existsOutputs
+					&& !renderConditions_state.existsSales
+					? <h1>Debes registrar al menos una entrada, salida o venta antes de comenzar a utilizar esta función.</h1>
+					: (
+						<Row gutter={[0, 8]}>
+							<Col span={24}>
+								<Header />
+							</Col>
+							<Col span={24}>
+								<Table
+									width={'100%'}
+									dataSource={products_state.stockHistory.productsToRender.products}
+									columns={columnsForTable}
+									pagination={{
+										defaultCurrent: products_state.stockHistory.productsToRender.paginationParams.page,
+										defaultPageSize: products_state.stockHistory.productsToRender.paginationParams.limit,
+										limit: products_state.stockHistory.productsToRender.paginationParams.limit,
+										onChange: (page, limit) => setPageAndLimit(page, limit),
+										pageSizeOptions: [5, 10, 15, 20],
+										showSizeChanger: true,
+										total: products_state.stockHistory.productsToRender.totalProducts
+									}}
+									rowKey='_id'
+									tableLayout='auto'
+									size='small'
+									loading={products_state.stockHistory.productsToRender.loading}
+								/>
+							</Col>
+							<FixStockHistoryModal />
+							<ProductStockHistoryModal />
+						</Row>
+					)
+			}
+		</>
 	)
 }
 

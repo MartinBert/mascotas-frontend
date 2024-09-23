@@ -8,6 +8,7 @@ import home from './home'
 import outputs from './outputs'
 import privateRoute from './privateRoute'
 import products from './products'
+import renderConditions from './renderConditions'
 import sale from './sale'
 import salesAreas from './salesAreas'
 import salePoint from './salePoint'
@@ -23,6 +24,7 @@ const reducers = {
     outputs,
     privateRoute,
     products,
+    renderConditions,
     sale,
     salesAreas,
     salePoint

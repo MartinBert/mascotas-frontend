@@ -26,6 +26,7 @@ import Header from './Header'
 // Imports Destructuring
 const { formatFindParams } = actions.paginationParams
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
+const { useRenderConditionsContext } = contexts.RenderConditions
 const { roundTwoDecimals } = helpers.mathHelper
 const { Edit, Details } = icons
 
@@ -37,6 +38,26 @@ const profitColorCss = (profit) => {
 
 const DailyBusinessStatistics = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
+    const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
+
+    // ------------------------------------- Load data --------------------------------------- //
+    const loadRenderConditions = async () => {
+        const recordsQuantityOfEntries = await api.entradas.countRecords()
+        const recordsQuantityOfOutputs = await api.salidas.countRecords()
+        const recordsQuantityOfSales = await api.ventas.countRecords()
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_ENTRIES',
+            payload: recordsQuantityOfEntries < 1 ? false : true
+        })
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_OUTPUTS',
+            payload: recordsQuantityOfOutputs < 1 ? false : true
+        })
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_SALES',
+            payload: recordsQuantityOfSales < 1 ? false : true
+        })
+    }
 
     const fetchDailyBusinessStatistics = async () => {
         const findParams = formatFindParams(dailyBusinessStatistics_state.paginationParams)
@@ -53,6 +74,12 @@ const DailyBusinessStatistics = () => {
         dailyBusinessStatistics_state.paginationParams
     ])
 
+    useEffect(() => {
+        loadRenderConditions()
+        // eslint-disable-next-line
+    }, [])
+
+    // -------------------------------------- Actions ---------------------------------------- //
     const openDetailsStatisticModal = (dailyBusinessStatistics) => {
         dailyBusinessStatistics_dispatch({ type: 'SET_STATISTIC_TO_VIEW_DETAILS', payload: dailyBusinessStatistics })
     }
@@ -135,39 +162,49 @@ const DailyBusinessStatistics = () => {
     ]
 
     return (
-        <Row gutter={[0, 16]}>
-            <Col span={24}>
-                <Header />
-            </Col>
-            <Col span={24}>
-                <Table
-                    columns={columnsForTable}
-                    dataSource={dailyBusinessStatistics_state.recordsToRender}
-                    loading={
-                        dailyBusinessStatistics_state.loading
-                        || dailyBusinessStatistics_state.loadingUpdatingRecords
-                    }
-                    pagination={{
-                        defaultCurrent: dailyBusinessStatistics_state.paginationParams.page,
-                        defaultPageSize: dailyBusinessStatistics_state.paginationParams.limit,
-                        limit: dailyBusinessStatistics_state.paginationParams.limit,
-                        onChange: (page, limit) => setPageAndLimit(page, limit),
-                        showSizeChanger: true,
-                        total: dailyBusinessStatistics_state.totalRecords
-                    }}
-                    rowKey='_id'
-                    size='small'
-                    tableLayout='auto'
-                    width={'100%'}
-                />
-                {
-                    dailyBusinessStatistics_state.detailsModal.statisticToViewDetails
-                        ? <DetailsModal />
-                        : null
-                }
-                <FixStatisticsModal />
-            </Col>
-        </Row>
+        <>
+            {
+                !renderConditions_state.existsEntries
+                    && !renderConditions_state.existsOutputs
+                    && !renderConditions_state.existsSales
+                    ? <h1>Debes registrar al menos una entrada, salida o venta antes de comenzar a utilizar esta función.</h1>
+                    : (
+                        <Row gutter={[0, 16]}>
+                            <Col span={24}>
+                                <Header />
+                            </Col>
+                            <Col span={24}>
+                                <Table
+                                    columns={columnsForTable}
+                                    dataSource={dailyBusinessStatistics_state.recordsToRender}
+                                    loading={
+                                        dailyBusinessStatistics_state.loading
+                                        || dailyBusinessStatistics_state.loadingUpdatingRecords
+                                    }
+                                    pagination={{
+                                        defaultCurrent: dailyBusinessStatistics_state.paginationParams.page,
+                                        defaultPageSize: dailyBusinessStatistics_state.paginationParams.limit,
+                                        limit: dailyBusinessStatistics_state.paginationParams.limit,
+                                        onChange: (page, limit) => setPageAndLimit(page, limit),
+                                        showSizeChanger: true,
+                                        total: dailyBusinessStatistics_state.totalRecords
+                                    }}
+                                    rowKey='_id'
+                                    size='small'
+                                    tableLayout='auto'
+                                    width={'100%'}
+                                />
+                                {
+                                    dailyBusinessStatistics_state.detailsModal.statisticToViewDetails
+                                        ? <DetailsModal />
+                                        : null
+                                }
+                                <FixStatisticsModal />
+                            </Col>
+                        </Row>
+                    )
+            }
+        </>
     )
 }
 

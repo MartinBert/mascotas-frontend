@@ -29,6 +29,7 @@ const { formatFindParams } = actions.paginationParams
 const { useAuthContext } = contexts.Auth
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useProductsContext } = contexts.Products
+const { useRenderConditionsContext } = contexts.RenderConditions
 const { DeleteModal, OpenImage } = generics
 const { Details, Edit, Delete } = icons
 
@@ -38,6 +39,7 @@ const Productos = () => {
     const [, auth_dispatch] = useAuthContext()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
     const [products_state, products_dispatch] = useProductsContext()
+    const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
     // --------------------- Actions --------------------- //
     const openDetailsModal = (productData) => {
@@ -75,8 +77,26 @@ const Productos = () => {
         })
     }
 
+    const loadRenderConditions = async () => {
+        const recordsQuantityOfBrands = await api.marcas.countRecords()
+        const recordsQuantityOfTypes = await api.rubros.countRecords()
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_BRANDS',
+            payload: recordsQuantityOfBrands < 1 ? false : true
+        })
+        renderConditions_dispatch({
+            type: 'SET_EXISTS_TYPES',
+            payload: recordsQuantityOfTypes < 1 ? false : true
+        })
+    }
+
     useEffect(() => {
         loadBrandsAndTypes()
+        // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
+        loadRenderConditions()
         // eslint-disable-next-line
     }, [])
 
@@ -123,7 +143,7 @@ const Productos = () => {
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })
     }
-    
+
     useEffect(() => {
         deleteProduct()
         // eslint-disable-next-line
@@ -210,39 +230,48 @@ const Productos = () => {
         .filter(item => item.open)
 
     return (
-        <Row gutter={[0, 16]}>
-            <Col span={24}>
-                <Header />
-            </Col>
-            <Col span={24}>
-                <Table
-                    width={'100%'}
-                    dataSource={products_state.index.productsToRender}
-                    columns={columnsForTable}
-                    pagination={{
-                        defaultCurrent: products_state.index.paginationParams.page,
-                        defaultPageSize: products_state.index.paginationParams.limit,
-                        limit: products_state.index.paginationParams.limit,
-                        onChange: (page, limit) => setPageAndLimit(page, limit),
-                        pageSizeOptions: [7, 14, 28, 56],
-                        showSizeChanger: true,
-                        total: products_state.index.productsTotalRecords
-                    }}
-                    loading={deleteModal_state.loading}
-                    rowKey='_id'
-                    tableLayout='auto'
-                    size='small'
-                />
-            </Col>
+        <>
             {
-                !products_state.detailsModal.product
-                    ? null
-                    : <GiselaDetailsModal />
+                !renderConditions_state.existsBrands
+                    || !renderConditions_state.existsTypes
+                    ? <h1>Debes registrar al menos una marca y un rubro antes de comenzar a utilizar esta función.</h1>
+                    : (
+                        <Row gutter={[0, 16]}>
+                            <Col span={24}>
+                                <Header />
+                            </Col>
+                            <Col span={24}>
+                                <Table
+                                    width={'100%'}
+                                    dataSource={products_state.index.productsToRender}
+                                    columns={columnsForTable}
+                                    pagination={{
+                                        defaultCurrent: products_state.index.paginationParams.page,
+                                        defaultPageSize: products_state.index.paginationParams.limit,
+                                        limit: products_state.index.paginationParams.limit,
+                                        onChange: (page, limit) => setPageAndLimit(page, limit),
+                                        pageSizeOptions: [7, 14, 28, 56],
+                                        showSizeChanger: true,
+                                        total: products_state.index.productsTotalRecords
+                                    }}
+                                    loading={deleteModal_state.loading}
+                                    rowKey='_id'
+                                    tableLayout='auto'
+                                    size='small'
+                                />
+                            </Col>
+                            {
+                                !products_state.detailsModal.product
+                                    ? null
+                                    : <GiselaDetailsModal />
+                            }
+                            <DeleteModal title='Eliminar producto' />
+                            <ExportProductListModal />
+                            <PriceModificatorModal />
+                        </Row>
+                    )
             }
-            <DeleteModal title='Eliminar producto' />
-            <ExportProductListModal />
-            <PriceModificatorModal />
-        </Row>
+        </>
     )
 }
 
