@@ -13,6 +13,7 @@ import Entradas from '../views/Entradas'
 import EntradasForm from '../views/Entradas/EntradasForm'
 import FormatPrivateComponent from './FormatPrivateComponent'
 import Home from '../views/Home'
+import InterfaceStyles from '../views/InterfaceStyles'
 import Marcas from '../views/Marcas'
 import MarcasForm from '../views/Marcas/MarcasForm'
 import MediosPago from '../views/MediosPago'
@@ -281,6 +282,13 @@ const privateRoutesPreData = [
         element: <CondicionesFiscales />,
         onlySuperadmin: true,
         path: '/condicionesfiscales',
+        private: true
+    },
+    {
+        activeKey: '21',
+        element: <InterfaceStyles />,
+        onlySuperadmin: true,
+        path: '/interfacestyles',
         private: true
     }
 ]

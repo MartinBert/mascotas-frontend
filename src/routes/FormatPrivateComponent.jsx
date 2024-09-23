@@ -1,5 +1,5 @@
 // React Components
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     FaAddressBook,
@@ -18,6 +18,7 @@ import {
     FaCubes,
     FaFile,
     FaFileInvoiceDollar,
+    FaHighlighter,
     FaInbox,
     FaList,
     FaMoneyBillWave,
@@ -29,14 +30,21 @@ import {
     FaWeightHanging,
 } from 'react-icons/fa'
 
+// Design components
+import { errorAlert, successAlert } from '../components/alerts'
+
 // Design Components
-import { Layout, Menu } from 'antd'
+import { Button, Layout, Menu } from 'antd'
 
 // Custom Context Providers
 import contexts from '../contexts'
 
+// Services
+import api from '../services'
+
 // Imports Destructurings
 const { useAuthContext } = contexts.Auth
+const { useInterfaceStylesContext } = contexts.InterfaceStyles
 const { usePrivateRouteContext } = contexts.PrivateRoute
 const { Header, Sider, Content } = Layout
 
@@ -44,10 +52,32 @@ const { Header, Sider, Content } = Layout
 const FormatPrivateComponent = ({ children, activeKey }) => {
     const navigate = useNavigate()
     const [auth_state] = useAuthContext()
+    const [interfaceStyles_state, interfaceStyles_dispatch] = useInterfaceStylesContext()
     const [privateRoute_state, privateRoute_dispatch] = usePrivateRouteContext()
+
+    // ------------------------------------- Load data --------------------------------------- //
+    const loadStyles = async () => {
+        const res = await api.interfaceStyles.findAll()
+        if (res.length < 1) interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: null })
+        else interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: res[0] })
+    }
+
+    useEffect(() => {
+        loadStyles()
+        // eslint-disable-next-line
+    }, [])
+
+    // -------------------------------------- Actions ---------------------------------------- //
+    const redirectToHome = (e) => {
+        navigate('/')
+    }
 
     const redirectToPath = (e) => {
         navigate(e.item.props.routepath)
+    }
+
+    const reloadPage = () => {
+        window.location.reload()
     }
 
     const toggle = () => {
@@ -60,6 +90,52 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const getItem = (key, label, icon, routepath, children) => {
         return { key, label, icon, routepath, children }
     }
+
+    // ------------------------------- Button to restart data -------------------------------- //
+    const restartData = async () => {
+        const res = await api.seed.deleteData()
+        if (res.code !== 200) errorAlert('Error al reiniciar los datos. Intente de nuevo.')
+        else {
+            const alertRes = await successAlert('¡Datos reiniciados!')
+            if (alertRes.isConfirmed) {
+                redirectToHome()
+                reloadPage()
+            }
+        }
+    }
+
+    const buttonToRestartData = (
+        <div
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: '20px'
+            }}
+        >
+            <Button
+                onClick={restartData}
+                type='primary'
+            >
+                Reiniciar datos
+            </Button>
+        </div>
+    )
+
+    // ---------------------------------------- Data ----------------------------------------- //
+    const backgroundColor = `
+        #020024 linear-gradient(180deg,
+        #020024 0%,
+        ${
+            interfaceStyles_state.isDarknessActive
+                ? interfaceStyles_state.darknessBackgroundPrimaryColor
+                : interfaceStyles_state.lightBackgroundPrimaryColor
+        } 0%,
+        ${
+            interfaceStyles_state.isDarknessActive
+                ? interfaceStyles_state.darknessBackgroundSecondaryColor
+                : interfaceStyles_state.lightBackgroundSecondaryColor
+        } 100%)
+    `
 
     const saleMenu = [
         getItem('1', 'Ventas', <FaShoppingCart />, '/venta'),
@@ -91,6 +167,7 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
         auth_state.user.perfil ? getItem('18', 'Empresas', <FaBusinessTime />, '/empresas') : null,
         auth_state.user.perfil ? getItem('19', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
         auth_state.user.perfil ? getItem('20', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
+        auth_state.user.perfil ? getItem('21', 'Estilos de interfaz', <FaHighlighter />, '/interfacestyles') : null,
     ]
 
     const subMenusToSidebar = [
@@ -117,7 +194,7 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
                         <Sider
                             collapsed={privateRoute_state.collapsed}
                             collapsible
-                            style={{ background: 'rgb(2,0,36) linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)' }}
+                            style={{ background: backgroundColor }}
                             trigger={null}
                         >
                             <div
@@ -137,11 +214,19 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
                                 style={{ background: 'transparent' }}
                                 theme='dark'
                             />
+                            {buttonToRestartData}
                         </Sider>
                     )
             }
             <Layout className='site-layout' style={{ height: '100%' }}>
-                <Header className='site-layout-background' style={{ padding: 0, background: 'rgb(2,0,36) linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(154,0,191,1) 0%, rgba(45,0,136,1) 100%)', display: 'flex', justifyContent: 'space-between' }}>
+                <Header className='site-layout-background'
+                    style={{
+                        background: backgroundColor,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: 0
+                    }}
+                >
                     <div>
                         <FaBars style={{ color: '#fff', marginLeft: '20px', cursor: 'pointer' }} onClick={() => { toggle() }} />
                     </div>

@@ -5,6 +5,7 @@ import deleteModal from './deleteModal'
 import entries from './entries'
 import fiscalNoteModal from './fiscalNoteModal'
 import home from './home'
+import interfaceStyles from './interfaceStyles'
 import outputs from './outputs'
 import privateRoute from './privateRoute'
 import products from './products'
@@ -21,6 +22,7 @@ const reducers = {
     entries,
     fiscalNoteModal,
     home,
+    interfaceStyles,
     outputs,
     privateRoute,
     products,

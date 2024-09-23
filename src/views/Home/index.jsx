@@ -670,7 +670,6 @@ const Home = () => {
 
     return (
         <Row gutter={[0, 16]}>
-            {buttonToDeleteDataFromSeed}
             <Col span={24}>
                 <Row align='middle'>
                     <Col

@@ -5,6 +5,7 @@ import DeleteModal from './DeleteModal'
 import Entries from './Entries'
 import FiscalNoteModal from './FiscalNoteModal'
 import Home from './Home'
+import InterfaceStyles from './InterfaceStyles'
 import Outputs from './Outputs'
 import PrivateRoute from './PrivateRoute'
 import Products from './Products'
@@ -21,6 +22,7 @@ const contexts = {
     Entries,
     FiscalNoteModal,
     Home,
+    InterfaceStyles,
     Outputs,
     PrivateRoute,
     Products,

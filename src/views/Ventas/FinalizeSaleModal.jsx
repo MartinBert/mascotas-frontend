@@ -200,6 +200,7 @@ const FinalizeSaleModal = () => {
     }
 
     const save = async () => {
+
         //Modify stock history of products
         saveStockHistoryOfProducts()
 

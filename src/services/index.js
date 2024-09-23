@@ -8,6 +8,7 @@ import empresas from './empresas'
 import entradas from './entradas'
 import fiscalNotes from './fiscalNotes'
 import genericos from './genericos'
+import interfaceStyles from './interfaceStyles'
 import marcas from './marcas'
 import mediospago from './mediospago'
 import productos from './productos'
@@ -34,6 +35,7 @@ const api = {
     entradas,
     fiscalNotes,
     genericos,
+    interfaceStyles,
     marcas,
     mediospago,
     productos,

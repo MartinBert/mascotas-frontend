@@ -14,7 +14,10 @@ const debitNoteTemplate = (debitData, qrImage) => {
             <div style='display: flex; width: 100%; height: 180px; text-align: center; padding: 10px; padding-bot: 8px; border: solid 2px; border-radius: 5px; border-color: #C2BDBC'>
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
-                        <img crossorigin='anonymous' src='${debitData.referenceVoucher.empresaLogo}' alt='voucher-logo' width='50' height='50'>
+                     ${
+                        debitData?.referenceVoucher?.empresaLogo
+                            ?? `<img crossorigin='anonymous' src='${debitData.referenceVoucher.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                    }
                     </div>
                     <div style='text-align: left;'>
                         <p style='margin: 0px; margin-top: 3px;'><i>Razón social:</i> ${debitData.referenceVoucher.empresaRazonSocial}</p>
