@@ -231,23 +231,6 @@ const Home = () => {
         </Button>
     )
 
-    // --------------------- Button to generate cert and key from AFIP ----------------------- //
-    const generateCertAndKey = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const res = await api.afip.generateCertAndKey()
-        console.log(res)
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToGenerateCertAndKeyFromAfip = (
-        <Button
-            onClick={generateCertAndKey}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
     // ------------------------- Button to generate data from SEED --------------------------- //
     const generateSeedData = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
@@ -577,12 +560,6 @@ const Home = () => {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
             key: 'home_buttonToConsoleSupportedVouchers',
             primaryAction: buttonToConsoleSupportedVouchersFromAfipController,
-            secondaryAction: null
-        },
-        {
-            description: 'Genera un certificado y llave privada para testing desde Afip y los muestra en consola.',
-            key: 'home_buttonToGenerateCertAndKeyFromAfip',
-            primaryAction: buttonToGenerateCertAndKeyFromAfip,
             secondaryAction: null
         },
         {

@@ -16,8 +16,9 @@ const creditNoteTemplate = (creditData, qrImage) => {
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
                     ${
-                        creditData?.referenceVoucher?.empresaLogo
-                            ?? `<img crossorigin='anonymous' src='${creditData.referenceVoucher.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                        creditData.referenceVoucher.empresaLogo
+                            ? `<img crossorigin='anonymous' src='${creditData.referenceVoucher.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                            : null
                     }
                     </div>
                     <div style='text-align: left;'>

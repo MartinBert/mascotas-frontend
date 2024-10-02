@@ -276,7 +276,7 @@ const FirstSteps = () => {
                     {
                         params: {
                             ciudad: '-',
-                            cuit: '-',
+                            cuit: '11111111111',
                             direccion: '-',
                             documentoReceptor: 86,
                             email: '-',

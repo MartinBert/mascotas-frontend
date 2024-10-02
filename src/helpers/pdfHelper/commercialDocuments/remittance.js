@@ -18,8 +18,9 @@ const remittanceTemplate = (qrImage = null, remittanceData) => {
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
                      ${
-                        remittanceData?.empresaLogo
-                            ?? `<img crossorigin='anonymous' src='${remittanceData.empresaLogo}' alt='budget-logo' width='50' height='50'>`
+                        remittanceData.empresaLogo
+                            ? `<img crossorigin='anonymous' src='${remittanceData.empresaLogo}' alt='budget-logo' width='50' height='50'>`
+                            : null
                     }
                     </div>
                     <div style='text-align: left;'>

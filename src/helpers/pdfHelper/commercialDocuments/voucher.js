@@ -17,8 +17,9 @@ const voucherTemplate = (billData, qrImage) => {
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
                      ${
-                        billData?.empresaLogo
-                            ?? `<img crossorigin='anonymous' src='${billData.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                        billData.empresaLogo
+                            ? `<img crossorigin='anonymous' src='${billData.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                            : null
                     }
                     </div>
                     <div style='text-align: left;'>

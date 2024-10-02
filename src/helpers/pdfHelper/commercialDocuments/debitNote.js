@@ -15,8 +15,9 @@ const debitNoteTemplate = (debitData, qrImage) => {
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
                      ${
-                        debitData?.referenceVoucher?.empresaLogo
-                            ?? `<img crossorigin='anonymous' src='${debitData.referenceVoucher.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                        debitData.referenceVoucher.empresaLogo
+                            ? `<img crossorigin='anonymous' src='${debitData.referenceVoucher.empresaLogo}' alt='voucher-logo' width='50' height='50'>`
+                            : null
                     }
                     </div>
                     <div style='text-align: left;'>

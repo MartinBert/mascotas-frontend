@@ -18,7 +18,7 @@ const delay = ms => new Promise(result => setTimeout(result, ms))
 
 const findNextVoucherNumber_fiscal = async (codigoUnico, empresaCuit, puntoVentaNumero) => {
     const lastVoucherNumber = await api.afip.findLastVoucherNumber(empresaCuit, puntoVentaNumero, codigoUnico)
-    if (lastVoucherNumber === undefined) {
+    if (typeof lastVoucherNumber !== 'number') {
         if (attemps === 10) {
             return errorAlert(`
                 No se pudo recuperar la correlación de AFIP del último comprobante emitido,
@@ -29,7 +29,6 @@ const findNextVoucherNumber_fiscal = async (codigoUnico, empresaCuit, puntoVenta
         attemps = 0
         return lastVoucherNumber + 1
     }
-
     attemps++
     await delay(800)
     await findNextVoucherNumber_fiscal(codigoUnico, empresaCuit, puntoVentaNumero)
@@ -37,7 +36,7 @@ const findNextVoucherNumber_fiscal = async (codigoUnico, empresaCuit, puntoVenta
 
 const findNextVoucherNumber_noFiscal = async (documentoCodigo) => {
     const lastVoucherNumber = await api.ventas.findLastVoucherNumber(documentoCodigo)
-    if (lastVoucherNumber === undefined) {
+    if (!lastVoucherNumber) {
         if (attemps === 10) {
             return errorAlert(`
                 No se pudo recuperar la correlación de AFIP del último comprobante emitido,
@@ -48,7 +47,6 @@ const findNextVoucherNumber_noFiscal = async (documentoCodigo) => {
         attemps = 0
         return lastVoucherNumber + 1
     }
-
     attemps++
     await delay(800)
     await findNextVoucherNumber_noFiscal(documentoCodigo)

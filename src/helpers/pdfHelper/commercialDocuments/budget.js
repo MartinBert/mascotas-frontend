@@ -17,8 +17,9 @@ const budgetTemplate = (budgetData) => {
                 <div style='width: 40%;'>
                     <div style='width: 100%; display: flex; justify-content: center;'>
                         ${
-                            budgetData?.empresaLogo
-                                ?? `<img crossorigin='anonymous' src='${budgetData.empresaLogo}' alt='budget-logo' width='50' height='50'>`
+                            budgetData.empresaLogo
+                                ? `<img crossorigin='anonymous' src='${budgetData.empresaLogo}' alt='budget-logo' width='50' height='50'>`
+                                : null
                         }
                     </div>
                     <div style='text-align: left;'>
