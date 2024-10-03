@@ -8,7 +8,7 @@ const { roundTwoDecimals } = mathHelper
 
 
 const createTicketTemplate = (templateData) => {
-    const { data, isFrontPage, pageNumber } = templateData
+    const { currentPage, data, isFrontPage, qrImage, totalPages } = templateData
 
     return `
         <div style='width: 283px; height: 1102px; display: inline-block; line-height: 1; margin: 10px; '>
@@ -24,7 +24,7 @@ const createTicketTemplate = (templateData) => {
                     <p style='margin-top: 3px;'><i>Razón social:</i> ${data.empresaRazonSocial}</p>
                     <p style='margin-top: 3px;'><i>Dirección:</i> ${data.empresaDireccion}</p>
                     <p style='margin-top: 3px;'><i>Fecha emisión:</i> ${simpleDateWithHours(data.fechaEmision)}</p>
-                    <p style='padding-right: 5px; margin-top: 3px; text-align: right; width: 100%;'>Página 1 de ${pageNumber}</p>
+                    <p style='padding-right: 5px; margin-top: 3px; text-align: right; width: 100%;'>Página ${currentPage} de ${totalPages}</p>
                 </div>
             </div>
             <div style='width: 100%; color: #C2BDBC;'>

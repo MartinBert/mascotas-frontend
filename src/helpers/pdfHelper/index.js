@@ -34,15 +34,18 @@ const createPdf = async (pdfData) => {
         sheetSize
     } = pdfData
 
-    let isFrontPage = true
-    let pageNumber = 1
+    let currentPage
+    let isFrontPage
     let templateData
+    const totalPages = 1 + (nextInteger((data.renglones.length - numberOfLinesInFrontPage) / numberOfLinesPerPage))
     const dataForPdf = []
 
     // Front page
+    currentPage = 1
+    isFrontPage = true
     if (!data.renglones) data.renglones = []
     const linesForFrontPage = data.renglones.slice(0, numberOfLinesInFrontPage)
-    templateData = { data: { ...data, renglones: linesForFrontPage }, isFrontPage, pageNumber, qrImage }
+    templateData = { currentPage, data: { ...data, renglones: linesForFrontPage }, isFrontPage, qrImage, totalPages }
     const frontPageContainer = document.createElement('div')
     frontPageContainer.innerHTML = createTemplate(templateData)
     dataForPdf.push(frontPageContainer)
@@ -53,16 +56,13 @@ const createPdf = async (pdfData) => {
     if (isLongerThanOnePage) {
         // Lines to add
         const linesToAdd = data.renglones.slice(numberOfLinesInFrontPage, linesLength)
-        // Calculate number of pages to generate
-        const totalLines = linesLength - numberOfLinesInFrontPage
-        const numberOfPagesToAdd = nextInteger(totalLines / numberOfLinesPerPage)
         // Generate data for pages
-        for (let index = 0; index < numberOfPagesToAdd; index++) {
+        for (let index = 0; index < totalPages - 1; index++) {
             const linesForPage = linesToAdd.slice(index * numberOfLinesPerPage, (index + 1) * numberOfLinesPerPage)
             data.renglones = linesForPage
             isFrontPage = false
-            pageNumber = index + 2
-            templateData = { data, isFrontPage, pageNumber }
+            currentPage = index + 2
+            templateData = { currentPage, data, isFrontPage, qrImage, totalPages }
             const pageContainer = document.createElement('div')
             pageContainer.innerHTML = createTemplate(templateData)
             dataForPdf.push(pageContainer)

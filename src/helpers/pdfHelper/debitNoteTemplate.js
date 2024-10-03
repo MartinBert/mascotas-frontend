@@ -9,7 +9,7 @@ const { completeLengthWithZero } = stringHelper
 const { existIva } = validations
 
 const createDebitNoteTemplate = (templateData) => {
-    const { data, isFrontPage, pageNumber, qrImage } = templateData
+    const { currentPage, data, isFrontPage, qrImage, totalPages } = templateData
 
     return `
         <div style='width: 753px; height: 1082px; display: inline-block; line-height: 1; margin: 20px;'>
@@ -55,7 +55,7 @@ const createDebitNoteTemplate = (templateData) => {
                         - Comp. nro: ${completeLengthWithZero(data.referenceVoucher.numeroFactura, 8)}
                     </p>
                     <p style='margin: 0px; margin-top: 3px;'>Fecha emisión: ${simpleDateWithHours(data.referenceVoucher.fechaEmision)}</p>
-                    <p style='margin: 0px; margin-top: 5px; text-align: right; width: 100%;'>Página 1 de ${pageNumber}</p>
+                    <p style='margin: 0px; margin-top: 5px; text-align: right; width: 100%;'>Página ${currentPage} de ${totalPages}</p>
                 </div>
             </div>
             <div style='width: 100%; height: 70px; background-color: #C2BDBC; padding: 10px; margin-top: 10px; border: solid 2px; border-radius: 5px; border-color: #C2BDBC'>
