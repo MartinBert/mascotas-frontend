@@ -383,7 +383,7 @@ const EntradasForm = () => {
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
         const options = productsNotYetSelected.map(product => {
             return {
-                label: product.nombre + ` (${product.codigoBarras})`,
+                label: product.codigoBarras + ` (${product.nombre})`,
                 value: product.normalizedBarcode
             }
         })
