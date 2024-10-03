@@ -36,7 +36,7 @@ const findNextVoucherNumber_fiscal = async (codigoUnico, empresaCuit, puntoVenta
 
 const findNextVoucherNumber_noFiscal = async (documentoCodigo) => {
     const lastVoucherNumber = await api.ventas.findLastVoucherNumber(documentoCodigo)
-    if (!lastVoucherNumber) {
+    if (typeof lastVoucherNumber !== 'number') {
         if (attemps === 10) {
             return errorAlert(`
                 No se pudo recuperar la correlación de AFIP del último comprobante emitido,

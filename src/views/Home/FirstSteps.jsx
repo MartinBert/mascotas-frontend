@@ -182,49 +182,71 @@ const FirstSteps = () => {
             {
                 source: [
                     {
-                        cashRegister: true,
-                        codigoUnico: '011',
-                        fiscal: true,
-                        letra: 'C',
-                        nombre: 'FACTURA',
-                        normalizedName: 'factura',
-                        presupuesto: false,
-                        remito: false,
-                        ticket: false
-                    },
-                    {
-                        cashRegister: true,
-                        codigoUnico: '111',
-                        fiscal: true,
-                        letra: 'C',
-                        nombre: 'TICKET',
-                        normalizedName: 'ticket',
-                        presupuesto: false,
-                        remito: false,
-                        ticket: true
-                    },
-                    {
                         cashRegister: false,
                         codigoUnico: '000',
                         fiscal: false,
                         letra: 'X',
                         nombre: 'PRESUPUESTO',
-                        normalizedName: 'presupuesto',
+                        normalizedName: normalizeString('PRESUPUESTO'),
                         presupuesto: true,
                         remito: false,
                         ticket: false
                     },
                     {
                         cashRegister: false,
-                        codigoUnico: '088',
-                        fiscal: true,
-                        letra: 'R',
+                        codigoUnico: '000',
+                        fiscal: false,
+                        letra: 'X',
                         nombre: 'REMITO',
-                        normalizedName: 'remito',
+                        normalizedName: normalizeString('REMITO'),
                         presupuesto: false,
                         remito: true,
                         ticket: false
                     },
+                    {
+                        cashRegister: true,
+                        codigoUnico: '000',
+                        fiscal: false,
+                        letra: 'X',
+                        nombre: 'TICKET',
+                        normalizedName: normalizeString('TICKET'),
+                        presupuesto: false,
+                        remito: false,
+                        ticket: true
+                    },
+                    {
+                        cashRegister: true,
+                        codigoUnico: '011',
+                        fiscal: true,
+                        letra: 'C',
+                        nombre: 'FACTURA',
+                        normalizedName: normalizeString('FACTURA'),
+                        presupuesto: false,
+                        remito: false,
+                        ticket: false
+                    },
+                    {
+                        cashRegister: true,
+                        codigoUnico: '012',
+                        fiscal: true,
+                        letra: 'C',
+                        nombre: 'NOTA DEBITO',
+                        normalizedName: normalizeString('NOTA DEBITO'),
+                        presupuesto: false,
+                        remito: false,
+                        ticket: false
+                    },
+                    {
+                        cashRegister: true,
+                        codigoUnico: '013',
+                        fiscal: true,
+                        letra: 'C',
+                        nombre: 'NOTA CREDITO',
+                        normalizedName: normalizeString('NOTA CREDITO'),
+                        presupuesto: false,
+                        remito: false,
+                        ticket: false
+                    }
                 ],
                 service: 'documentos',
                 title: 'Documentos'

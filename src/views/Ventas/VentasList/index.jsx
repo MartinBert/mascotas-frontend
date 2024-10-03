@@ -30,10 +30,10 @@ const {
     createBudgetPdf,
     createCreditNotePdf,
     createDebitNotePdf,
+    createInvoicePdf,
     createRemittancePdf,
-    createVoucherPdf,
     createTicketPdf
-} = helpers.pdfHelper.commercialDocumentsPDF
+} = helpers.pdfHelper
 
 
 const creditCodes = fiscalVouchersCodes
@@ -133,7 +133,7 @@ const VentasList = () => {
         ) return createTicketPdf(venta)
         else if (creditCodes.includes(venta.documento.codigoUnico)) return createCreditNotePdf(venta)
         else if (debitCodes.includes(venta.documento.codigoUnico)) return createDebitNotePdf(venta)
-        else if (voucherCodes.includes(venta.documento.codigoUnico)) return createVoucherPdf(venta)
+        else if (voucherCodes.includes(venta.documento.codigoUnico)) return createInvoicePdf(venta)
         else return errorAlert('El sistema no identificó el documento de la venta. Inténtelo de nuevo o contacte al proveedor del servicio.')
     }
 

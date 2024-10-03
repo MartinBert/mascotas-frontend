@@ -125,15 +125,13 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     const backgroundColor = `
         #020024 linear-gradient(180deg,
         #020024 0%,
-        ${
-            interfaceStyles_state.isDarknessActive
-                ? interfaceStyles_state.darknessBackgroundPrimaryColor
-                : interfaceStyles_state.lightBackgroundPrimaryColor
+        ${interfaceStyles_state.isDarknessActive
+            ? interfaceStyles_state.darknessBackgroundPrimaryColor
+            : interfaceStyles_state.lightBackgroundPrimaryColor
         } 0%,
-        ${
-            interfaceStyles_state.isDarknessActive
-                ? interfaceStyles_state.darknessBackgroundSecondaryColor
-                : interfaceStyles_state.lightBackgroundSecondaryColor
+        ${interfaceStyles_state.isDarknessActive
+            ? interfaceStyles_state.darknessBackgroundSecondaryColor
+            : interfaceStyles_state.lightBackgroundSecondaryColor
         } 100%)
     `
 
@@ -214,7 +212,11 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
                                 style={{ background: 'transparent' }}
                                 theme='dark'
                             />
-                            {buttonToRestartData}
+                            {
+                                auth_state.user.email === process.env.REACT_APP_EMAIL_ADMIN
+                                    ? buttonToRestartData
+                                    : null
+                            }
                         </Sider>
                     )
             }

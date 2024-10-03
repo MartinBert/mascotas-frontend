@@ -24,10 +24,11 @@ const { resetDate } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const {
     createBudgetPdf,
+    createInvoicePdf,
     createRemittancePdf,
-    createVoucherPdf,
     createTicketPdf
-} = helpers.pdfHelper.commercialDocumentsPDF
+} = helpers.pdfHelper
+
 
 const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
 const fiscalNotesCodes = fiscalVouchersCodes
@@ -147,7 +148,7 @@ const FinalizeSaleModal = () => {
             else if (sale_state.documento.nombre === 'REMITO') isCreated = await createRemittancePdf(sale_state)
             else if (sale_state.documento.nombre === 'TICKET') isCreated = await createTicketPdf(sale_state)
         } else { // Fiscal
-            if (billCodes.includes(sale_state.documento.codigoUnico)) isCreated = await createVoucherPdf(sale_state)
+            if (billCodes.includes(sale_state.documento.codigoUnico)) isCreated = await createInvoicePdf(sale_state)
         }
         if (!isCreated) return errorAlert('No se pudo generar el comprobante de la operación. Recupérelo desde la página de AFIP.')
     }

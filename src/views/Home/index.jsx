@@ -506,11 +506,14 @@ const Home = () => {
 
     const setDevToolsToRender = () => {
         const descriptionFilter = home_state.paginationParams.filters
-        const devTools = source.filter(devTool => {
+        let devTools
+        if (descriptionFilter === '') devTools = source
+        devTools = source.filter(devTool => {
             const devToolDescription = normalizeString(devTool.description).toLowerCase()
             if (devToolDescription.includes(descriptionFilter)) return true
             else return false
         })
+        devTools = devTools.filter(devTool => devTool.renderable)
         home_dispatch({ type: 'SET_DEV_TOOLS_TO_RENDER', payload: devTools })
     }
 
@@ -560,69 +563,81 @@ const Home = () => {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
             key: 'home_buttonToConsoleSupportedVouchers',
             primaryAction: buttonToConsoleSupportedVouchersFromAfipController,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Muestra en consola el número del último comprobante fiscal emitido.',
             key: 'home_buttonToGetLastVoucherNumber',
             primaryAction: buttonToGetLastVoucherNumberFromAFIP,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Genera o elimina datos iniciales para probar el sistema. ¡CUIDADO! Utilizar solo en modo desarrollo.',
             key: 'home_buttonsToGenerateAndDeleteSeedData',
             primaryAction: buttonToGenerateDataFromSeed,
+            renderable: auth_state.user.email === process.env.REACT_APP_EMAIL_ADMIN,
             secondaryAction: buttonToDeleteDataFromSeed
         },
         {
             description: 'Muestra en consola aquellos productos que no tienen marca o rubro asignado.',
             key: 'home_buttonToConsoleProductsWithoutAssignedBrandOrType',
             primaryAction: buttonToConsoleProductsWithoutAssignedBrandOrType,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Muestra en consola todos los productos registrados.',
             key: 'home_buttonToConsoleProducts',
             primaryAction: buttonToConsoleProducts,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Generar o eliminar Historial de Stock de todos los productos. Útil para corregir datos erróneos de manera limpia.',
             key: 'home_buttonsToGenerateAndDeleteStockHistories',
             primaryAction: buttonToGenerateStockHistories,
+            renderable: true,
             secondaryAction: buttonToDeleteStockHistories
         },
         {
             description: 'Muestra en consola todas las entradas de productos hasta la fecha.',
             key: 'home_buttonToConsoleEntries',
             primaryAction: buttonToConsoleEntries,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Muestra en consola todas las salidas de productos hasta la fecha.',
             key: 'home_buttonToConsoleOutputs',
             primaryAction: buttonToConsoleOutputs,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Muestra en consola todas los comprobantes generados hasta la fecha (facturas, tickets, presupuestos, etc.).',
             key: 'home_buttonToConsoleSales',
             primaryAction: buttonToConsoleSales,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Muestra en consola todas las estadísticas diarias de negocio registradas hasta la fecha.',
             key: 'home_buttonToConsoleDailyBusinessStatistics',
             primaryAction: buttonToConsoleDailyBusinessStatistics,
+            renderable: true,
             secondaryAction: null
         },
         {
             description: 'Muestra en consola el historial de stock de todos los productos registrados.',
             key: 'home_buttonToConsoleStockHistories',
             primaryAction: buttonToConsoleStockHistories,
+            renderable: true,
             secondaryAction: null
         }
     ]
+
 
     const tableOfDevTools = (
         <Table
