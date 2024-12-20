@@ -25,7 +25,7 @@ const { useProductsContext } = contexts.Products
 const { useSalesAreasContext } = contexts.SalesAreas
 const { generateExcel } = helpers.excel
 const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
-const { createProductsCataloguePdf } = helpers.pdfHelper.productsCatalogue
+const { createProductsCataloguePdf } = helpers.pdfHelper
 
 
 const ExportProductListModal = () => {
@@ -187,10 +187,10 @@ const ExportProductListModal = () => {
         const brands = products_state.exportProductList.brandsForSelect.selectedBrandsNames.map(brand => brand.value)
         const enterprise = auth_state.user.empresa
         const headers = generateHeaders()
-        const lines = await formatLines(headers)
+        const renglones = await formatLines(headers)
         const salesArea = salesAreas_state.selectedSalesAreaName.value
         const types = products_state.exportProductList.typesForSelect.selectedTypesNames.map(type => type.value)
-        const data = { brands, enterprise, headers, lines, salesArea, types }
+        const data = { brands, enterprise, headers, renglones, salesArea, types }
         const result = await createProductsCataloguePdf(data)
         return { isCreated: result.isCreated, docType: 'pdf' }
     }

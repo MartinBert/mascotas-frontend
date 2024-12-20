@@ -5,6 +5,7 @@ import qr from '../qr'
 import QRCode from 'qrcode'
 
 // Helpers
+import dateHelper from '../dateHelper'
 import mathHelper from '../mathHelper'
 
 // Templates
@@ -14,10 +15,11 @@ import createDebitNoteTemplate from './debitNoteTemplate'
 import createInvoiceTemplate from './invoiceTemplate'
 import createRemittanceTemplate from './remittanceTemplate'
 import createTicketTemplate from './ticketTemplate'
-import productsCatalogue from './productsCatalogue'
+import createProductsCatalogueTemplate from './productsCatalogueTemplate'
 import validations from './validations'
 
 // Imports Destructuring
+const { localFormat } = dateHelper
 const { nextInteger } = mathHelper
 const { AfipQR } = qr
 
@@ -68,7 +70,7 @@ const createPdf = async (pdfData) => {
             dataForPdf.push(pageContainer)
         }
     }
-
+    
     // Generate PDF
     const resultsOfLoop = []
     const doc = new jsPDF('p', 'mm', sheetSize) // 'sheetSize expresed in mm
@@ -174,6 +176,25 @@ const createInvoicePdf = async (invoiceData) => {
     return result
 }
 
+const createProductsCataloguePdf = async (productsCatalogueData) => {
+    const exportWithImages = productsCatalogueData.headers.includes('Ilustración')
+    const qrImage = null
+
+    const pdfData = {
+        createTemplate: createProductsCatalogueTemplate,
+        data: productsCatalogueData,
+        divFrame: 'catalogue',
+        docName: 'LISTA_PRECIOS_' + localFormat(new Date()),
+        numberOfLinesInFrontPage: exportWithImages ? 8 : 31,
+        numberOfLinesPerPage: exportWithImages ? 12 : 45,
+        qrImage,
+        sheetSize: [297, 210]
+    }
+
+    const result = await createPdf(pdfData)
+    return result
+}
+
 const createRemittancePdf = async (remittanceData) => {
     const qrImage = await getQrImage(remittanceData)
 
@@ -215,9 +236,9 @@ const pdfHelper = {
     createCreditNotePdf,
     createDebitNotePdf,
     createInvoicePdf,
+    createProductsCataloguePdf,
     createRemittancePdf,
     createTicketPdf,
-    productsCatalogue,
     validations
 }
 
