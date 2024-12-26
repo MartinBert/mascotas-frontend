@@ -167,7 +167,7 @@ const EntradasForm = () => {
                 saveResponseCode = saveNewRecord.code
             } else {
                 data._id = stockHistory[0]._id
-                data.entries = roundTwoDecimals(stockHistory[0].entries + entries_state.params.cantidad)
+                data.entries = roundTwoDecimals(stockHistory[0].entries) + roundTwoDecimals(entries_state.params.cantidad)
                 if (entryID !== 'nuevo') {
                     const entryToEdit = await api.entradas.findById(entryID)
                     const previousQuantity = roundTwoDecimals(entryToEdit.data.cantidad)

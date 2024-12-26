@@ -26,6 +26,7 @@ const { AfipQR } = qr
 
 const createPdf = async (pdfData) => {
     const {
+        associatedData,
         createTemplate,
         data,
         divFrame,
@@ -36,20 +37,29 @@ const createPdf = async (pdfData) => {
         sheetSize
     } = pdfData
 
+    if (!data.renglones) data.renglones = []
+    const totalQuantityOfPages = 1 + (nextInteger((data.renglones.length - numberOfLinesInFrontPage) / numberOfLinesPerPage))
+
     let currentPage
     let isFrontPage
     let templateData
-    const totalPages = 1 + (nextInteger((data.renglones.length - numberOfLinesInFrontPage) / numberOfLinesPerPage))
+    const totalPages = totalQuantityOfPages === 0 ? 1 : totalQuantityOfPages
     const dataForPdf = []
 
     // Front page
     currentPage = 1
     isFrontPage = true
-    if (!data.renglones) data.renglones = []
     const linesForFrontPage = data.renglones.slice(0, numberOfLinesInFrontPage)
-    templateData = { currentPage, data: { ...data, renglones: linesForFrontPage }, isFrontPage, qrImage, totalPages }
+    templateData = {
+        associatedData,
+        currentPage,
+        data: { ...data, renglones: linesForFrontPage },
+        isFrontPage,
+        qrImage,
+        totalPages
+    }
     const frontPageContainer = document.createElement('div')
-    frontPageContainer.innerHTML = createTemplate(templateData)
+    frontPageContainer.innerHTML = await createTemplate(templateData)
     dataForPdf.push(frontPageContainer)
 
     // Add more pages to pdf
@@ -64,9 +74,16 @@ const createPdf = async (pdfData) => {
             data.renglones = linesForPage
             isFrontPage = false
             currentPage = index + 2
-            templateData = { currentPage, data, isFrontPage, qrImage, totalPages }
+            templateData = {
+                associatedData,
+                currentPage,
+                data,
+                isFrontPage,
+                qrImage,
+                totalPages
+            }
             const pageContainer = document.createElement('div')
-            pageContainer.innerHTML = createTemplate(templateData)
+            pageContainer.innerHTML = await createTemplate(templateData)
             dataForPdf.push(pageContainer)
         }
     }
@@ -97,7 +114,7 @@ const createPdf = async (pdfData) => {
 
 const getQrImage = async (voucherData) => {
     let qrImage
-    if (voucherData.isFiscal || voucherData.documento.fiscal) {
+    if (voucherData.isFiscal || voucherData.documento.fiscal || voucherData.documentoFiscal) {
         const qrToVoucher = new AfipQR(voucherData)
         qrImage = await QRCode.toDataURL(qrToVoucher.url)
     } else qrImage = null
@@ -122,16 +139,17 @@ const createBudgetPdf = async (budgetData) => {
     return result
 }
 
-const createCreditNotePdf = async (creditNoteData) => {
+const createCreditNotePdf = async (creditNoteData, associatedData) => {
     const qrImage = await getQrImage(creditNoteData)
 
     const pdfData = {
+        associatedData,
         createTemplate: createCreditNoteTemplate,
         data: creditNoteData,
         divFrame: 'voucher',
         docName: 'NOTA_CREDITO_' + creditNoteData.numeroCompletoFactura,
-        numberOfLinesInFrontPage: 11,
-        numberOfLinesPerPage: 15,
+        numberOfLinesInFrontPage: 1,
+        numberOfLinesPerPage: 1,
         qrImage,
         sheetSize: [297, 210]
     }
@@ -140,16 +158,17 @@ const createCreditNotePdf = async (creditNoteData) => {
     return result
 }
 
-const createDebitNotePdf = async (debitNoteData) => {
+const createDebitNotePdf = async (debitNoteData, associatedData) => {
     const qrImage = await getQrImage(debitNoteData)
 
     const pdfData = {
+        associatedData,
         createTemplate: createDebitNoteTemplate,
         data: debitNoteData,
         divFrame: 'voucher',
         docName: 'NOTA_DEBITO_' + debitNoteData.numeroCompletoFactura,
-        numberOfLinesInFrontPage: 11,
-        numberOfLinesPerPage: 15,
+        numberOfLinesInFrontPage: 1,
+        numberOfLinesPerPage: 1,
         qrImage,
         sheetSize: [297, 210]
     }

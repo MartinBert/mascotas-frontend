@@ -210,12 +210,12 @@ const spanishVoucherDataToSave = (data) => {
         planesPagoNombres: Array.isArray(data.paymentPlanName) ? data.paymentPlanName : [data.paymentPlanName],
         porcentajeDescuentoGlobal: data.discountGlobal ? parseFloat(data.discountGlobal) : 0,
         porcentajeRecargoGlobal: data.surchargeGlobal ? parseFloat(data.surchargeGlobal) : 0,
-        productos: data.products ? data.products : [],
+        productos: data.products ?? [],
         profit: data.profit ? parseFloat(data.profit) : 0,
         puntoVenta: data.salePoint,
         puntoVentaNumero: parseInt(data.salePointNumber),
         puntoVentaNombre: data.salePointName,
-        renglones: data.lines ? data.lines : [],
+        renglones: data.lines ?? [],
         subTotal: parseFloat(data.subAmount),
         taxes: !data.taxes
             ? []

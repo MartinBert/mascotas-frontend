@@ -16,9 +16,9 @@ const findLastVoucherNumber = async (cuit, salePointNumber, voucherCode) => {
     }
 }
 
-const generateVoucher = async (cuit, voucher) => {
+const findTaxpayerData = async (userCuit, taxpayerCuit) => {
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST_AFIP}/generarComprobante/${cuit}`, voucher)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/buscarDatosContribuyente/${userCuit}/${taxpayerCuit}`)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -26,10 +26,10 @@ const generateVoucher = async (cuit, voucher) => {
     }
 }
 
-const findTaxpayerData = async (userCuit, taxpayerCuit) => {
+const generateVoucher = async (cuit, voucher) => {
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/buscarDatosContribuyente/${userCuit}/${taxpayerCuit}`)
-        return response.data
+        const response = await axios.post(`${process.env.REACT_APP_API_REST_AFIP}/generarComprobante/${cuit}`, voucher)
+        return response.data.responseOfAfip
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
@@ -45,11 +45,23 @@ const getDocumentsTypes = async (cuit) => {
     }
 }
 
-const marcas = {
+// queryData = { salePointNumber, voucherNumber, voucherTypeNumber }
+const getVoucherInfo = async (cuit, queryData) => {
+    try {
+        const response = await axios.post(`${process.env.REACT_APP_API_REST_AFIP}/obtenerDatosDelComprobante/${cuit}`, queryData)
+        return response.data.responseOfAfip
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const afip = {
     findLastVoucherNumber,
     findTaxpayerData,
     generateVoucher,
-    getDocumentsTypes
+    getDocumentsTypes,
+    getVoucherInfo
 }
 
-export default marcas
+export default afip

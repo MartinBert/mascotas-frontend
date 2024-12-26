@@ -1,8 +1,14 @@
 // Helpers
+import dateHelper from '../dateHelper'
 import objHelper from '../objHelper'
 
+// Services
+import api from '../../services'
+
 // Imports Destructuring
+const { afipDateToLocalFormat } = dateHelper
 const { existsProperty } = objHelper
+
 
 const existIva = (data) => {
     const iva10 = existsProperty(data, 'iva10') ? data.iva10 : 0
@@ -13,8 +19,43 @@ const existIva = (data) => {
     else return true
 }
 
+const getAssociatedData = async (fiscalData, getType = null) => {
+    const associatedVoucher = fiscalData.associatedVouchers[0]
+    let associatedData = {}
+
+    // Associated document data
+    const associatedDocument = await api.documentos.findByCode(associatedVoucher.Tipo)
+    associatedData.voucherLetter = associatedDocument.letra
+    associatedData.voucherName = associatedDocument.nombre
+
+    // Associated voucher data
+    const queryAssociatedData = {
+        salePointNumber: associatedVoucher.PtoVta,
+        voucherNumber: associatedVoucher.Nro,
+        voucherTypeNumber: associatedVoucher.Tipo
+    }
+    const associatedVoucherData = await api.afip.getVoucherInfo(associatedVoucher.Cuit, queryAssociatedData)
+    associatedData.voucherDate = afipDateToLocalFormat(associatedVoucherData.CbteFch)
+
+    if (getType === 'print') {
+        // Voucher data
+        const queryData = {
+            salePointNumber: fiscalData.puntoVentaNumero,
+            voucherNumber: fiscalData.numeroFactura,
+            voucherTypeNumber: parseFloat(fiscalData.documentoCodigo)
+        }
+        const voucherData = await api.afip.getVoucherInfo(fiscalData.empresaCuit, queryData)
+        associatedData.voucherCae = voucherData.CodAutorizacion
+        associatedData.voucherCaeExpiration = afipDateToLocalFormat(voucherData.FchVto)
+    }
+
+    return associatedData
+}
+
+
 const validations = {
-    existIva
+    existIva,
+    getAssociatedData
 }
 
 export default validations

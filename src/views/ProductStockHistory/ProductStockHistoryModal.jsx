@@ -181,22 +181,22 @@ const ProductStockHistoryModal = () => {
         const previousMonthStockHistories = await api.stockHistory.findAllByFilters(previousMonthFilter)
         const previousWeekStockHistories = await api.stockHistory.findAllByFilters(previousWeekFilter)
         const entriesOfPreviousFortnight = previousFortnightStockHistories.docs.reduce((accumulator, currentValue) =>
-            accumulator + currentValue.entries, 0
+            accumulator + parseFloat(currentValue.entries), 0
         )
         const entriesOfPreviousMonth = previousMonthStockHistories.docs.reduce((accumulator, currentValue) =>
-            accumulator + currentValue.entries, 0
+            accumulator + parseFloat(currentValue.entries), 0
         )
         const entriesOfPreviousWeek = previousWeekStockHistories.docs.reduce((accumulator, currentValue) =>
-            accumulator + currentValue.entries, 0
+            accumulator + parseFloat(currentValue.entries), 0
         )
         const outputsOfPreviousFortnight = previousFortnightStockHistories.docs.reduce((accumulator, currentValue) =>
-            accumulator + currentValue.outputs, 0
+            accumulator + parseFloat(currentValue.outputs), 0
         )
         const outputsOfPreviousMonth = previousMonthStockHistories.docs.reduce((accumulator, currentValue) =>
-            accumulator + currentValue.outputs, 0
+            accumulator + parseFloat(currentValue.outputs), 0
         )
         const outputsOfPreviousWeek = previousWeekStockHistories.docs.reduce((accumulator, currentValue) =>
-            accumulator + currentValue.outputs, 0
+            accumulator + parseFloat(currentValue.outputs), 0
         )
         const modalTitlesValues = {
             entriesOfPreviousFortnight,

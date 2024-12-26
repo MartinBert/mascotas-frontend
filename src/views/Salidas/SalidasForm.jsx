@@ -167,7 +167,7 @@ const SalidasForm = () => {
             } else {
                 data._id = stockHistory[0]._id
                 data.entries = roundTwoDecimals(stockHistory[0].entries)
-                data.outputs = roundTwoDecimals(stockHistory[0].outputs + outputs_state.params.cantidad)
+                data.outputs = roundTwoDecimals(stockHistory[0].outputs) + roundTwoDecimals(outputs_state.params.cantidad)
                 if (outputID !== 'nuevo') {
                     const outputToEdit = await api.salidas.findById(outputID)
                     const previousQuantity = roundTwoDecimals(outputToEdit.data.cantidad)

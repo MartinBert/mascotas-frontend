@@ -22,7 +22,9 @@ const { Item } = Form
 const { formatBody, findNextVoucherNumber_fiscal, fiscalVouchersCodes } = helpers.afipHelper
 const { existsProperty, spanishVoucherDataToSave } = helpers.objHelper
 const { roundToMultiple, decimalPercent } = helpers.mathHelper
-const { createCreditNotePdf, createDebitNotePdf } = helpers.pdfHelper
+const { createCreditNotePdf, createDebitNotePdf, validations } = helpers.pdfHelper
+
+const { getAssociatedData } = validations
 
 const creditCodes = fiscalVouchersCodes
     .filter(item => typeof item !== 'string')
@@ -90,6 +92,7 @@ const FiscalNoteModal = () => {
         const fiscalNoteParams = {
             ...spanishVoucherDataToSave(fiscalNoteModal_state.params),
             cae: responseOfAfip.CAE,
+            fiscalNoteConcept: fiscalNoteModal_state.params.concept,
             user: fiscalNoteModal_state.params.user._id,
             vencimientoCae: responseOfAfip.CAEFchVto
         }
@@ -98,14 +101,18 @@ const FiscalNoteModal = () => {
         if (result.code === 500) warningAlert('Se procesó exitosamente la solicitud con AFIP, pero no se pudo guardar el registro en el sistema. Sin embargo, es posible recuperarlo desde AFIP.')
 
         // Create document
+        const associatedData = await getAssociatedData(fiscalNoteModal_state.params)
+
         const fiscalNoteData = {
-            ...fiscalNoteModal_state.params,
+            ...spanishVoucherDataToSave(fiscalNoteModal_state.params),
             cae: responseOfAfip.CAE,
-            caeExpirationDate: responseOfAfip.CAEFchVto
+            caeExpirationDate: responseOfAfip.CAEFchVto,
+            fiscalNoteConcept: fiscalNoteModal_state.params.concept
         }
+
         const fiscalNoteCode = fiscalNoteModal_state.params.fiscalNote.codigoUnico
-        if (creditCodes.includes(fiscalNoteCode)) await createCreditNotePdf(fiscalNoteData)
-        else if (debitCodes.includes(fiscalNoteCode)) await createDebitNotePdf(fiscalNoteData)
+        if (creditCodes.includes(fiscalNoteCode)) await createCreditNotePdf(fiscalNoteData, associatedData)
+        else if (debitCodes.includes(fiscalNoteCode)) await createDebitNotePdf(fiscalNoteData, associatedData)
         else return (
             warningAlert('Se procesó exitosamente la solicitud con AFIP, pero no se pudo generar el comprobante de la operación. Intente generarlo desde el menú del sistema o recuperando el registro desde AFIP.')
                 .then(() => fiscalNoteModal_dispatch({ type: 'CLEAR_STATE' }))

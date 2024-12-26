@@ -458,7 +458,7 @@ const Home = () => {
 
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
-
+    
     const buttonToGenerateStockHistories = (
         <Button
             onClick={generateStockHistories}
@@ -501,18 +501,22 @@ const Home = () => {
     // ----------------------------- Input to filter dev tools ------------------------------- //
     const onChangeDescription = (e) => {
         const description = normalizeString(e.target.value).toLowerCase()
-        home_dispatch({ type: 'SET_FILTERS', payload: description })
+        const filters = { ...home_state.paginationParams.filters, description }
+        home_dispatch({ type: 'SET_FILTERS', payload: filters })
     }
 
     const setDevToolsToRender = () => {
-        const descriptionFilter = home_state.paginationParams.filters
+        if (home_state.devPassword !== process.env.REACT_APP_DEV_PASSWORD) return
+        const descriptionFilter = home_state.paginationParams.filters.description
         let devTools
-        if (descriptionFilter === '') devTools = source
-        devTools = source.filter(devTool => {
-            const devToolDescription = normalizeString(devTool.description).toLowerCase()
-            if (devToolDescription.includes(descriptionFilter)) return true
-            else return false
-        })
+        if (!descriptionFilter || descriptionFilter === '') devTools = source
+        else {
+            devTools = source.filter(devTool => {
+                const devToolDescription = normalizeString(devTool.description).toLowerCase()
+                if (devToolDescription.includes(descriptionFilter)) return true
+                else return false
+            })
+        }
         devTools = devTools.filter(devTool => devTool.renderable)
         home_dispatch({ type: 'SET_DEV_TOOLS_TO_RENDER', payload: devTools })
     }
@@ -520,7 +524,7 @@ const Home = () => {
     useEffect(() => {
         setDevToolsToRender()
         // eslint-disable-next-line
-    }, [home_state.paginationParams.filters])
+    }, [home_state.paginationParams.filters, home_state.devPassword])
 
     const inputToFilterDevTools = (
         <Input

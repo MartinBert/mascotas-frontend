@@ -23,6 +23,15 @@ const addDays = (
     return dateModified
 }
 
+const afipDateToLocalFormat = (stringAfipDate) => {
+    const parsedStringDate = stringAfipDate.slice(0, 8)
+    const year = parsedStringDate.slice(0, 4)
+    const month = parsedStringDate.slice(4, 6)
+    const day = parsedStringDate.slice(6, 8)
+    const localformat = day + '/' + month + '/' + year
+    return localformat
+}
+
 const dateToAfip = (unformattedDate) => {
     const date = new Date(unformattedDate)
     const year = date.getFullYear().toString()
@@ -114,6 +123,7 @@ const simpleDateWithHours = (unformattedDate) => {
 
 const dateHelper = {
     addDays,
+    afipDateToLocalFormat,
     dateToAfip,
     dateToQrAfip,
     getLastFortnight,

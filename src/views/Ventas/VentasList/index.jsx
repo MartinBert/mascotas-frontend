@@ -32,8 +32,10 @@ const {
     createDebitNotePdf,
     createInvoicePdf,
     createRemittancePdf,
-    createTicketPdf
+    createTicketPdf,
+    validations
 } = helpers.pdfHelper
+const { getAssociatedData } = validations
 
 
 const creditCodes = fiscalVouchersCodes
@@ -52,7 +54,7 @@ const ticketCodes = ['081', '082', '083', '111', '118']
 
 
 const VentasList = () => {
-    const [, fiscalNoteModal_dispatch] = useFiscalNoteModalContext()
+    const [fiscalNoteModal_state, fiscalNoteModal_dispatch] = useFiscalNoteModalContext()
     const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
     const [ventas, setVentas] = useState(null)
@@ -105,7 +107,7 @@ const VentasList = () => {
     useEffect(() => {
         fetchVentasList()
         // eslint-disable-next-line
-    }, [page, limit, filters, loading])
+    }, [page, limit, filters, loading, fiscalNoteModal_state.fiscalNoteModalIsVisible])
 
     useEffect(() => {
         // eslint-disable-next-line
@@ -124,15 +126,21 @@ const VentasList = () => {
         fiscalNoteModal_dispatch({ type: 'SHOW_FISCAL_NOTE_MODAL' })
     }
 
-    const printVoucher = (venta) => {
+    const printVoucher = async (venta) => {
         if (venta.documento.presupuesto) return createBudgetPdf(venta)
         else if (venta.documento.remito) return createRemittancePdf(venta)
         else if (
             venta.documento.ticket
             || ticketCodes.includes(venta.documento.codigoUnico)
         ) return createTicketPdf(venta)
-        else if (creditCodes.includes(venta.documento.codigoUnico)) return createCreditNotePdf(venta)
-        else if (debitCodes.includes(venta.documento.codigoUnico)) return createDebitNotePdf(venta)
+        else if (creditCodes.includes(venta.documento.codigoUnico)) {
+            const associatedData = await getAssociatedData(venta, 'print')
+            createCreditNotePdf(venta, associatedData)
+        }
+        else if (debitCodes.includes(venta.documento.codigoUnico)) {
+            const associatedData = await getAssociatedData(venta, 'print')
+            createDebitNotePdf(venta, associatedData)
+        }
         else if (voucherCodes.includes(venta.documento.codigoUnico)) return createInvoicePdf(venta)
         else return errorAlert('El sistema no identificó el documento de la venta. Inténtelo de nuevo o contacte al proveedor del servicio.')
     }
