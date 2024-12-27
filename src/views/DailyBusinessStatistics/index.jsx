@@ -19,9 +19,10 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Views
-import DetailsModal from './DetailsModal'
+import BalanceView from './BalanceView'
 import FixStatisticsModal from './FixStatisticsModal'
 import Header from './Header'
+import SalesView from './SalesView'
 
 // Imports Destructuring
 const { formatFindParams } = actions.paginationParams
@@ -81,7 +82,7 @@ const DailyBusinessStatistics = () => {
 
     // -------------------------------------- Actions ---------------------------------------- //
     const openDetailsStatisticModal = (dailyBusinessStatistics) => {
-        dailyBusinessStatistics_dispatch({ type: 'SET_STATISTIC_TO_VIEW_DETAILS', payload: dailyBusinessStatistics })
+        dailyBusinessStatistics_dispatch({ type: 'SET_STATISTIC_TO_BALANCE_VIEW', payload: dailyBusinessStatistics })
     }
 
     const openFixStatisticModal = async (dailyBusinessStatisticsID) => {
@@ -196,7 +197,7 @@ const DailyBusinessStatistics = () => {
                                 />
                                 {
                                     dailyBusinessStatistics_state.detailsModal.statisticToViewDetails
-                                        ? <DetailsModal />
+                                        ? <BalanceView />
                                         : null
                                 }
                                 <FixStatisticsModal />

@@ -327,22 +327,24 @@ const Home = () => {
                 return reduceValues
             })
 
-            const productSalesData = allSales.map(sale => {
-                const productsOfSaleIDs = sale.productos.map(productOfSale => productOfSale._id)
-                if (productsOfSaleIDs.includes(product._id)) {
-                    const [currentLineOfSale] = sale.renglones
-                        .filter(lineOfSale => lineOfSale.nombre === product.nombre)
-                    if (!currentLineOfSale) return null
-                    const productOfSale = {
-                        date: sale.fechaEmision,
-                        dateString: sale.fechaEmisionString.substring(0, 10),
-                        sales: currentLineOfSale.fraccionar
-                            ? currentLineOfSale.cantidadUnidades / currentLineOfSale.fraccionamiento
-                            : currentLineOfSale.cantidadUnidades
-                    }
-                    return productOfSale
-                } else return null
-            }).filter(record => record)
+            const productSalesData = allSales
+                .filter(sale => sale.documento.cashRegister)
+                .map(sale => {
+                    const productsOfSaleIDs = sale.productos.map(productOfSale => productOfSale._id)
+                    if (productsOfSaleIDs.includes(product._id)) {
+                        const [currentLineOfSale] = sale.renglones
+                            .filter(lineOfSale => lineOfSale.nombre === product.nombre)
+                        if (!currentLineOfSale) return null
+                        const productOfSale = {
+                            date: sale.fechaEmision,
+                            dateString: sale.fechaEmisionString.substring(0, 10),
+                            sales: currentLineOfSale.fraccionar
+                                ? currentLineOfSale.cantidadUnidades / currentLineOfSale.fraccionamiento
+                                : currentLineOfSale.cantidadUnidades
+                        }
+                        return productOfSale
+                    } else return null
+                }).filter(record => record)
 
             const findSalesDates = productSalesData.map(itemData => itemData.dateString)
             const salesDates = findSalesDates.filter((item, index) => {
@@ -458,7 +460,7 @@ const Home = () => {
 
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
-    
+
     const buttonToGenerateStockHistories = (
         <Button
             onClick={generateStockHistories}

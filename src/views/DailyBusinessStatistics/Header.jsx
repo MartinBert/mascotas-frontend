@@ -1,5 +1,5 @@
 // React Components and Hooks
-import React from 'react'
+import React, { useEffect } from 'react'
 
 // Custom Components
 import { errorAlert, successAlert } from '../../components/alerts'
@@ -9,7 +9,7 @@ import InputHidden from '../../components/generics/InputHidden'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, DatePicker, Row } from 'antd'
+import { Button, Col, DatePicker, Checkbox, Row } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -19,6 +19,7 @@ import api from '../../services'
 
 // Imports Destructurings
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
+const { useInterfaceStylesContext } = contexts.InterfaceStyles
 const { getYesterdayDate, localFormat, resetDate, simpleDateWithHours } = helpers.dateHelper
 const { fiscalVouchersCodes } = helpers.afipHelper
 const { roundTwoDecimals } = helpers.mathHelper
@@ -54,6 +55,7 @@ const generateFilters_sales = (date) => {
 
 const Header = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
+    const [interfaceStyles_state, interfaceStyles_dispatch] = useInterfaceStylesContext()
 
     // --------------------- Actions ------------------------ //
     const dispatchDateParams = ({ dateFilter, pickerValue, pickerType }) => {
@@ -62,6 +64,48 @@ const Header = () => {
         const paginationParams = { ...dailyBusinessStatistics_state.paginationParams, filters, page: 1 }
         dailyBusinessStatistics_dispatch({ type: 'SET_PAGINATION_PARAMS', payload: paginationParams })
         dailyBusinessStatistics_dispatch({ type: 'UPDATE_DATE_PICKERS_VALUES', payload: { pickerType, pickerValue } })
+    }
+
+    const loadStatisticsViewType = async () => {
+        let viewType
+        const findStyles = await api.interfaceStyles.findAll()
+        if (findStyles.length < 1) viewType = ''
+        else viewType = findStyles[0].typeOfDailyStatisticsView
+        interfaceStyles_dispatch({ type: 'SET_TYPE_OF_STATISTICS_VIEW', payload: viewType })
+    }
+
+    useEffect(() => {
+        loadStatisticsViewType()
+        // eslint-disable-next-line
+    }, [])
+
+    const onChangeBalanceView = (e) => {
+        let viewType
+        if (e.target.checked) viewType = 'balance'
+        else viewType = ''
+        interfaceStyles_dispatch({ type: 'SET_TYPE_OF_STATISTICS_VIEW', payload: viewType })
+        saveStatisticsViewType(viewType)
+
+    }
+
+    const onChangeSalesView = (e) => {
+        let viewType
+        if (e.target.checked) viewType = 'sales'
+        else viewType = ''
+        interfaceStyles_dispatch({ type: 'SET_TYPE_OF_STATISTICS_VIEW', payload: viewType })
+        saveStatisticsViewType(viewType)
+    }
+
+    const saveStatisticsViewType = async (viewType) => {
+        let res
+        const findStyles = await api.interfaceStyles.findAll()
+        const stylesToSave = { ...interfaceStyles_state, typeOfDailyStatisticsView: viewType }
+        if (findStyles.length < 1) res = await api.interfaceStyles.save(stylesToSave)
+        else {
+            stylesToSave._id = findStyles[0]._id
+            res = await api.interfaceStyles.edit(stylesToSave)
+        }
+        if (res.code !== 200) errorAlert('No pudieron registrarse los nuevos estilos. Intente de nuevo.')
     }
 
     // -------------- Button to clear filters --------------- //
@@ -467,11 +511,27 @@ const Header = () => {
         span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
     }
 
-
+    
     return (
         <Row gutter={[0, 8]}>
-            <Col span={24}>
+            <Col span={8}>
                 <h2>Estadísticas diarias de negocio</h2>
+            </Col>
+            <Col span={8}>
+                <Checkbox
+                    checked={interfaceStyles_state.typeOfStatisticsView === 'balance'}
+                    onChange={onChangeBalanceView}
+                >
+                    Vista balance
+                </Checkbox>
+            </Col>
+            <Col span={8}>
+                <Checkbox
+                    checked={interfaceStyles_state.typeOfStatisticsView === 'sales'}
+                    onChange={onChangeSalesView}
+                >
+                    Vista ventas
+                </Checkbox>
             </Col>
             <Col span={24}>
                 <Row gutter={[responsiveGrid.gutter.horizontal, responsiveGrid.gutter.vertical]}>

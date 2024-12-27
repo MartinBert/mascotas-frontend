@@ -6,21 +6,25 @@ const actions = {
     CLEAR_FILTERS: 'CLEAR_FILTERS',
     CLEAR_INPUTS: 'CLEAR_INPUTS',
     CLEAR_STATE: 'CLEAR_STATE',
-    HIDE_STATISTICS_DETAIL_MODAL: 'HIDE_STATISTICS_DETAIL_MODAL',
+    HIDE_BALANCE_VIEW_MODAL: 'HIDE_BALANCE_VIEW_MODAL',
     HIDE_FIX_STATISTICS_MODAL: 'HIDE_FIX_STATISTICS_MODAL',
     HIDE_NULL_RECORDS: 'HIDE_NULL_RECORDS',
+    HIDE_SALES_VIEW_MODAL: 'HIDE_SALES_VIEW_MODAL',
     SAVE_DAILY_STATISTICS: 'SAVE_DAILY_STATISTICS',
     SET_DAILY_STATISTICS_RECORDS: 'SET_DAILY_STATISTICS_RECORDS',
-    SET_EXPENSES_TO_VIEW_DETAILS: 'SET_EXPENSES_TO_VIEW_DETAILS',
-    SET_INCOMES_TO_VIEW_DETAILS: 'SET_INCOMES_TO_VIEW_DETAILS',
+    SET_EXPENSES_TO_BALANCE_VIEW: 'SET_EXPENSES_TO_BALANCE_VIEW',
+    SET_INCOMES_TO_BALANCE_VIEW: 'SET_INCOMES_TO_BALANCE_VIEW',
     SET_LOADING: 'SET_LOADING',
     SET_LOADING_SAVING_OPERATION: 'SET_LOADING_SAVING_OPERATION',
     SET_LOADING_UPDATING_RECORDS: 'SET_LOADING_UPDATING_RECORDS',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
-    SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_VIEW_DETAILS: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_VIEW_DETAILS',
-    SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_VIEW_DETAILS: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_VIEW_DETAILS',
+    SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW',
+    SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW',
+    SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW',
     SET_REFERENCE_STATISTICS: 'SET_REFERENCE_STATISTICS',
-    SET_STATISTIC_TO_VIEW_DETAILS: 'SET_STATISTIC_TO_VIEW_DETAILS',
+    SET_SALES_TO_SALES_VIEW: 'SET_SALES_TO_SALES_VIEW',
+    SET_STATISTIC_TO_BALANCE_VIEW: 'SET_STATISTIC_TO_BALANCE_VIEW',
+    SET_STATISTIC_TO_SALES_VIEW: 'SET_STATISTIC_TO_SALES_VIEW',
     SHOW_FIX_STATISTICS_MODAL: 'SHOW_FIX_STATISTICS_MODAL',
     SHOW_NULL_RECORDS: 'SHOW_NULL_RECORDS',
     UPDATE_DATE_PICKERS_VALUES: 'UPDATE_DATE_PICKERS_VALUES'
@@ -32,28 +36,6 @@ const initialState = {
         day_rangePicker: null,
         month_datePicker: null,
         month_rangePicker: null
-    },
-    detailsModal: {
-        tableOfExpenses: {
-            expenses: [],
-            loading: true,
-            paginationParams: {
-                limit: 5,
-                page: 1
-            },
-            totalExpensesRecord: 0
-        },
-        tableOfIncomes: {
-            incomes: [],
-            loading: true,
-            paginationParams: {
-                limit: 5,
-                page: 1
-            },
-            totalIncomesRecord: 0
-        },
-        statisticToViewDetails: null,
-        modalVisibility: false
     },
     fixStatisticsModalIsVisible: false,
     loading: true,
@@ -83,6 +65,43 @@ const initialState = {
         dateString: null
     },
     showNullRecords: false,
+    statisticsView: {
+        balanceView: {
+            tableOfExpenses: {
+                expenses: [],
+                loading: true,
+                paginationParams: {
+                    limit: 5,
+                    page: 1
+                },
+                totalExpensesRecords: 0
+            },
+            tableOfIncomes: {
+                incomes: [],
+                loading: true,
+                paginationParams: {
+                    limit: 5,
+                    page: 1
+                },
+                totalIncomesRecords: 0
+            },
+            statisticToViewDetails: null,
+            modalVisibility: false
+        },
+        salesView: {
+            tableOfSales: {
+                sales: [],
+                loading: true,
+                paginationParams: {
+                    limit: 5,
+                    page: 1
+                },
+                totalSalesRecords: 0
+            },
+            statisticToViewDetails: null,
+            modalVisibility: false
+        }
+    },
     totalRecords: 0
 }
 
@@ -120,13 +139,16 @@ const reducer = (state = initialState, action) => {
             }
         case actions.CLEAR_STATE:
             return initialState
-        case actions.HIDE_STATISTICS_DETAIL_MODAL:
+        case actions.HIDE_BALANCE_VIEW_MODAL:
             return {
                 ...state,
-                detailsModal: {
-                    ...state.detailsModal,
-                    statisticToViewDetails: null,
-                    modalVisibility: false
+                statisticsView: {
+                    ...state.statisticsView,
+                    balanceView: {
+                        ...state.statisticsView.balanceView,
+                        statisticToViewDetails: null,
+                        modalVisibility: false
+                    }
                 }
             }
         case actions.HIDE_FIX_STATISTICS_MODAL:
@@ -138,6 +160,18 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 showNullRecords: false
+            }
+            case actions.HIDE_SALES_VIEW_MODAL:
+            return {
+                ...state,
+                statisticsView: {
+                    ...state.statisticsView,
+                    salesView: {
+                        ...state.statisticsView.salesView,
+                        statisticToViewDetails: null,
+                        modalVisibility: false
+                    }
+                }
             }
         case actions.SAVE_DAILY_STATISTICS:
             return {
@@ -157,29 +191,35 @@ const reducer = (state = initialState, action) => {
                 totalRecords: parseInt(action.payload.totalDocs),
                 loading: false
             }
-        case actions.SET_EXPENSES_TO_VIEW_DETAILS:
+        case actions.SET_EXPENSES_TO_BALANCE_VIEW:
             return {
                 ...state,
-                detailsModal: {
-                    ...state.detailsModal,
-                    tableOfExpenses: {
-                        ...state.detailsModal.tableOfExpenses,
-                        expenses: action.payload.expenses,
-                        loading: false,
-                        totalExpensesRecord: action.payload.totalExpensesRecord
+                statisticsView: {
+                    ...state.statisticsView,
+                    balanceView: {
+                        ...state.statisticsView.balanceView,
+                        tableOfExpenses: {
+                            ...state.statisticsView.balanceView.tableOfExpenses,
+                            expenses: action.payload.expenses,
+                            loading: false,
+                            totalExpensesRecords: action.payload.totalExpensesRecords
+                        }
                     }
                 }
             }
-        case actions.SET_INCOMES_TO_VIEW_DETAILS:
+        case actions.SET_INCOMES_TO_BALANCE_VIEW:
             return {
                 ...state,
-                detailsModal: {
-                    ...state.detailsModal,
-                    tableOfIncomes: {
-                        ...state.detailsModal.tableOfIncomes,
-                        incomes: action.payload.incomes,
-                        loading: false,
-                        totalIncomesRecord: action.payload.totalIncomesRecord
+                statisticsView: {
+                    ...state.statisticsView,
+                    balanceView: {
+                        ...state.statisticsView.balanceView,
+                        tableOfIncomes: {
+                            ...state.statisticsView.balanceView.tableOfIncomes,
+                            incomes: action.payload.incomes,
+                            loading: false,
+                            totalIncomesRecords: action.payload.totalIncomesRecords
+                        }
                     }
                 }
             }
@@ -203,25 +243,45 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 paginationParams: action.payload
             }
-        case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_VIEW_DETAILS:
+        case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW:
             return {
                 ...state,
-                detailsModal: {
-                    ...state.detailsModal,
-                    tableOfExpenses: {
-                        ...state.detailsModal.tableOfExpenses,
-                        paginationParams: action.payload
+                statisticsView: {
+                    ...state.statisticsView,
+                    balanceView: {
+                        ...state.statisticsView.balanceView,
+                        tableOfExpenses: {
+                            ...state.statisticsView.balanceView.tableOfExpenses,
+                            paginationParams: action.payload
+                        }
                     }
                 }
             }
-        case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_VIEW_DETAILS:
+        case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW:
             return {
                 ...state,
-                detailsModal: {
-                    ...state.detailsModal,
-                    tableOfIncomes: {
-                        ...state.detailsModal.tableOfIncomes,
-                        paginationParams: action.payload
+                statisticsView: {
+                    ...state.statisticsView,
+                    balanceView: {
+                        ...state.statisticsView.balanceView,
+                        tableOfIncomes: {
+                            ...state.statisticsView.balanceView.tableOfIncomes,
+                            paginationParams: action.payload
+                        }
+                    }
+                }
+            }
+            case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW:
+            return {
+                ...state,
+                statisticsView: {
+                    ...state.statisticsView,
+                    salesView: {
+                        ...state.statisticsView.salesView,
+                        tableOfSales: {
+                            ...state.statisticsView.salesView.tableOfSales,
+                            paginationParams: action.payload
+                        }
                     }
                 }
             }
@@ -240,13 +300,44 @@ const reducer = (state = initialState, action) => {
                 },
                 referenceStatistics: referenceStatistics
             }
-        case actions.SET_STATISTIC_TO_VIEW_DETAILS:
+            case actions.SET_SALES_TO_SALES_VIEW:
             return {
                 ...state,
-                detailsModal: {
-                    ...state.detailsModal,
-                    statisticToViewDetails: action.payload,
-                    modalVisibility: true
+                statisticsView: {
+                    ...state.statisticsView,
+                    salesView: {
+                        ...state.statisticsView.salesView,
+                        tableOfSales: {
+                            ...state.statisticsView.salesView.tableOfSales,
+                            sales: action.payload.sales,
+                            loading: false,
+                            totalSalesRecords: action.payload.totalSalesRecords
+                        }
+                    }
+                }
+            }
+        case actions.SET_STATISTIC_TO_BALANCE_VIEW:
+            return {
+                ...state,
+                statisticsView: {
+                    ...state.statisticsView,
+                    balanceView: {
+                        ...state.statisticsView.balanceView,
+                        statisticToViewDetails: action.payload,
+                        modalVisibility: true
+                    }
+                }
+            }
+            case actions.SET_STATISTIC_TO_SALES_VIEW:
+            return {
+                ...state,
+                statisticsView: {
+                    ...state.statisticsView,
+                    salesView: {
+                        ...state.statisticsView.salesView,
+                        statisticToViewDetails: action.payload,
+                        modalVisibility: true
+                    }
                 }
             }
         case actions.SHOW_FIX_STATISTICS_MODAL:

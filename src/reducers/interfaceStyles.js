@@ -7,7 +7,8 @@ const initialState = {
     lightBackgroundPrimaryColor: '',
     lightBackgroundSecondaryColor: '',
     lightButtonsPrimaryColor: '',
-    lightButtonsSecondaryColor: ''
+    lightButtonsSecondaryColor: '',
+    typeOfStatisticsView: ''
 }
 
 const actions = {
@@ -20,7 +21,8 @@ const actions = {
     SET_LIGHT_BACKGROUND_PRIMARY_COLOR: 'SET_LIGHT_BACKGROUND_PRIMARY_COLOR',
     SET_LIGHT_BACKGROUND_SECONDARY_COLOR: 'SET_LIGHT_BACKGROUND_SECONDARY_COLOR',
     SET_LIGHT_BUTTONS_PRIMARY_COLOR: 'SET_LIGHT_BUTTONS_PRIMARY_COLOR',
-    SET_LIGHT_BUTTONS_SECONDARY_COLOR: 'SET_LIGHT_BUTTONS_SECONDARY_COLOR'
+    SET_LIGHT_BUTTONS_SECONDARY_COLOR: 'SET_LIGHT_BUTTONS_SECONDARY_COLOR',
+    SET_TYPE_OF_STATISTICS_VIEW: 'SET_TYPE_OF_STATISTICS_VIEW'
 }
 
 const reducer = (state = initialState, action) => {
@@ -82,6 +84,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lightButtonsSecondaryColor: action.payload
+            }
+        case actions.SET_TYPE_OF_STATISTICS_VIEW:
+            return {
+                ...state,
+                typeOfStatisticsView: action.payload
             }
         default:
             return state

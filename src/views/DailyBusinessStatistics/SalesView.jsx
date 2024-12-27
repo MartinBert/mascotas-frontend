@@ -29,12 +29,12 @@ const debitCodes = fiscalVouchersCodes
     .filter(code => code !== null)
 
 
-const DetailsModal = () => {
+const SalesView = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
 
     // ----------------- Button to close ----------------- //
     const closeModal = () => {
-        dailyBusinessStatistics_dispatch({ type: 'HIDE_STATISTICS_DETAIL_MODAL' })
+        dailyBusinessStatistics_dispatch({ type: 'HIDE_BALANCE_VIEW_MODAL' })
     }
 
     const buttonToClose = (
@@ -80,8 +80,8 @@ const DetailsModal = () => {
         })
         const preData = [...entriesData.flat(), ...creditNotesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'expenseItem' + i } })
-        const expensesData = { expenses: data, totalExpensesRecord: data.length }
-        dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_VIEW_DETAILS', payload: expensesData })
+        const expensesData = { expenses: data, totalExpensesRecords: data.length }
+        dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_BALANCE_VIEW', payload: expensesData })
     }
 
     useEffect(() => {
@@ -96,7 +96,7 @@ const DetailsModal = () => {
             limit: parseInt(limit)
         }
         dailyBusinessStatistics_dispatch({
-            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_VIEW_DETAILS',
+            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW',
             payload: paginationParams
         })
     }
@@ -137,7 +137,7 @@ const DetailsModal = () => {
                 pageSize: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
                 pageSizeOptions: [5, 10],
                 showSizeChanger: true,
-                total: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.totalExpensesRecord
+                total: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.totalExpensesRecords
             }}
             rowKey='key'
             size='small'
@@ -196,8 +196,8 @@ const DetailsModal = () => {
         })
         const preData = [...debitNotesData.flat(), ...outputsData.flat(), ...salesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'incomeItem' + i } })
-        const incomesData = { incomes: data, totalIncomesRecord: data.length }
-        dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_VIEW_DETAILS', payload: incomesData })
+        const incomesData = { incomes: data, totalIncomesRecords: data.length }
+        dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_BALANCE_VIEW', payload: incomesData })
     }
 
     useEffect(() => {
@@ -212,7 +212,7 @@ const DetailsModal = () => {
             limit: parseInt(limit)
         }
         dailyBusinessStatistics_dispatch({
-            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_VIEW_DETAILS',
+            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW',
             payload: paginationParams
         })
     }
@@ -253,7 +253,7 @@ const DetailsModal = () => {
                 pageSize: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
                 pageSizeOptions: [5, 10],
                 showSizeChanger: true,
-                total: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.totalIncomesRecord
+                total: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.totalIncomesRecords
             }}
             rowKey='key'
             size='small'
@@ -371,4 +371,4 @@ const DetailsModal = () => {
     )
 }
 
-export default DetailsModal
+export default SalesView

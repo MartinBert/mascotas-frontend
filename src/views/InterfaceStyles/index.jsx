@@ -35,12 +35,12 @@ const InterfaceStyles = () => {
     // ------------------------------- Button to save styles --------------------------------- //
     const saveStyles = async () => {
         let res
-        const findRes = await api.interfaceStyles.findAll()
-        if (findRes.length < 1) res = await api.interfaceStyles.save(interfaceStyles_state)
+        const findStyles = await api.interfaceStyles.findAll()
+        if (findStyles.length < 1) res = await api.interfaceStyles.save(interfaceStyles_state)
         else {
             const newStyles = {
                 ...interfaceStyles_state,
-                _id: findRes[0]._id
+                _id: findStyles[0]._id
             }
             res = await api.interfaceStyles.edit(newStyles)
         }
