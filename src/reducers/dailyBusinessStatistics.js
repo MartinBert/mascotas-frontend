@@ -23,6 +23,7 @@ const actions = {
     SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW',
     SET_REFERENCE_STATISTICS: 'SET_REFERENCE_STATISTICS',
     SET_SALES_TO_SALES_VIEW: 'SET_SALES_TO_SALES_VIEW',
+    SET_SALES_VIEW_TOTALS: 'SET_SALES_VIEW_TOTALS',
     SET_STATISTIC_TO_BALANCE_VIEW: 'SET_STATISTIC_TO_BALANCE_VIEW',
     SET_STATISTIC_TO_SALES_VIEW: 'SET_STATISTIC_TO_SALES_VIEW',
     SHOW_FIX_STATISTICS_MODAL: 'SHOW_FIX_STATISTICS_MODAL',
@@ -89,6 +90,8 @@ const initialState = {
             modalVisibility: false
         },
         salesView: {
+            modalVisibility: false,
+            statisticToViewDetails: null,
             tableOfSales: {
                 sales: [],
                 loading: true,
@@ -98,8 +101,9 @@ const initialState = {
                 },
                 totalSalesRecords: 0
             },
-            statisticToViewDetails: null,
-            modalVisibility: false
+            totalExpense: 0,
+            totalProfit: 0,
+            totalSalePrices: 0
         }
     },
     totalRecords: 0
@@ -313,6 +317,19 @@ const reducer = (state = initialState, action) => {
                             loading: false,
                             totalSalesRecords: action.payload.totalSalesRecords
                         }
+                    }
+                }
+            }
+            case actions.SET_SALES_VIEW_TOTALS:
+            return {
+                ...state,
+                statisticsView: {
+                    ...state.statisticsView,
+                    salesView: {
+                        ...state.statisticsView.salesView,
+                        totalExpense: action.payload.totalSalesViewExpense,
+                        totalProfit: action.payload.totalSalesViewProfit,
+                        totalSalePrices: action.payload.totalSalesViewSalePrices
                     }
                 }
             }

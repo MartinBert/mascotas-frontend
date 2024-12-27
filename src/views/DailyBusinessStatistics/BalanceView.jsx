@@ -50,7 +50,7 @@ const BalanceView = () => {
 
     // ---------------- Table of expenses ---------------- //
     const loadExpenses = async () => {
-        const statisticDate = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString
+        const statisticDate = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dateString
         const entriesFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
         const findEntries = await api.entradas.findAllByFilters(entriesFilters)
         const entries = findEntries.docs
@@ -87,11 +87,11 @@ const BalanceView = () => {
     useEffect(() => {
         loadExpenses()
         // eslint-disable-next-line
-    }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
+    }, [dailyBusinessStatistics_state.statisticsView.balanceView.modalVisibility])
 
     const setPageAndLimitOfTableOfExpenses = (page, limit) => {
         const paginationParams = {
-            ...dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams,
+            ...dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.paginationParams,
             page: parseInt(page),
             limit: parseInt(limit)
         }
@@ -127,17 +127,17 @@ const BalanceView = () => {
     const tableOfExpenses = (
         <Table
             columns={columnsOfExpensesTable}
-            dataSource={dailyBusinessStatistics_state.detailsModal.tableOfExpenses.expenses}
-            loading={dailyBusinessStatistics_state.detailsModal.tableOfExpenses.loading}
+            dataSource={dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.expenses}
+            loading={dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.loading}
             pagination={{
-                defaultCurrent: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.page,
-                defaultPageSize: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
-                limit: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
+                defaultCurrent: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.paginationParams.page,
+                defaultPageSize: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.paginationParams.limit,
+                limit: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.paginationParams.limit,
                 onChange: (page, limit) => setPageAndLimitOfTableOfExpenses(page, limit),
-                pageSize: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
+                pageSize: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.paginationParams.limit,
                 pageSizeOptions: [5, 10],
                 showSizeChanger: true,
-                total: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.totalExpensesRecords
+                total: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfExpenses.totalExpensesRecords
             }}
             rowKey='key'
             size='small'
@@ -149,7 +149,7 @@ const BalanceView = () => {
 
     // ---------------- Table of incomes ----------------- //
     const loadIncomes = async () => {
-        const statisticDate = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString
+        const statisticDate = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dateString
         const outputsFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
         const findOutputs = await api.salidas.findAllByFilters(outputsFilters)
         const outputs = findOutputs.docs
@@ -203,11 +203,11 @@ const BalanceView = () => {
     useEffect(() => {
         loadIncomes()
         // eslint-disable-next-line
-    }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
+    }, [dailyBusinessStatistics_state.statisticsView.balanceView.modalVisibility])
 
     const setPageAndLimitOfTableOfIncomes = (page, limit) => {
         const paginationParams = {
-            ...dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams,
+            ...dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.paginationParams,
             page: parseInt(page),
             limit: parseInt(limit)
         }
@@ -243,17 +243,17 @@ const BalanceView = () => {
     const tableOfIncomes = (
         <Table
             columns={columnsOfIncomesTable}
-            dataSource={dailyBusinessStatistics_state.detailsModal.tableOfIncomes.incomes}
-            loading={dailyBusinessStatistics_state.detailsModal.tableOfIncomes.loading}
+            dataSource={dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.incomes}
+            loading={dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.loading}
             pagination={{
-                defaultCurrent: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.page,
-                defaultPageSize: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
-                limit: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
+                defaultCurrent: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.paginationParams.page,
+                defaultPageSize: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.paginationParams.limit,
+                limit: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.paginationParams.limit,
                 onChange: (page, limit) => setPageAndLimitOfTableOfIncomes(page, limit),
-                pageSize: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
+                pageSize: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.paginationParams.limit,
                 pageSizeOptions: [5, 10],
                 showSizeChanger: true,
-                total: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.totalIncomesRecords
+                total: dailyBusinessStatistics_state.statisticsView.balanceView.tableOfIncomes.totalIncomesRecords
             }}
             rowKey='key'
             size='small'
@@ -265,16 +265,16 @@ const BalanceView = () => {
 
     // ---------------- Titles of totals ----------------- //
     const getBalanceColor = () => {
-        const dailyExpense = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense
-        const dailyIncome = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome
+        const dailyExpense = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyExpense
+        const dailyIncome = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyIncome
         const parameter = dailyIncome - dailyExpense
         if (parameter >= 0) return { color: '#15DC24' }
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome)}</b></h2>
-    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyProfit)}</b></h2>
+    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyExpense)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyIncome)}</b></h2>
+    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyProfit)}</b></h2>
 
 
     const tablesToRender = [
@@ -324,8 +324,8 @@ const BalanceView = () => {
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={dailyBusinessStatistics_state.detailsModal.modalVisibility}
-            title={`Detalle de movimientos del ${dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString.substring(0, 10)}`}
+            open={dailyBusinessStatistics_state.statisticsView.balanceView.modalVisibility}
+            title={`Detalle de movimientos del ${dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dateString.substring(0, 10)}`}
             width={1200}
         >
             <Row gutter={[responsiveGridOfTables.gutter.horizontal, responsiveGridOfTables.gutter.vertical]}>

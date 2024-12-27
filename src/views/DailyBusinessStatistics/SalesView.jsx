@@ -34,7 +34,7 @@ const SalesView = () => {
 
     // ----------------- Button to close ----------------- //
     const closeModal = () => {
-        dailyBusinessStatistics_dispatch({ type: 'HIDE_BALANCE_VIEW_MODAL' })
+        dailyBusinessStatistics_dispatch({ type: 'HIDE_SALES_VIEW_MODAL' })
     }
 
     const buttonToClose = (
@@ -48,108 +48,43 @@ const SalesView = () => {
         </Button>
     )
 
-    // ---------------- Table of expenses ---------------- //
-    const loadExpenses = async () => {
-        const statisticDate = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString
-        const entriesFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
-        const findEntries = await api.entradas.findAllByFilters(entriesFilters)
-        const entries = findEntries.docs
-        const entriesData = entries.map(entry => {
-            const data = entry.productos.map(product => {
-                const dataItem = {
-                    concept: 'Entrada',
-                    cost: product.cantidadesEntrantes * product.precioUnitario,
-                    productName: product.nombre,
-                    quantity: product.cantidadesEntrantes
-                }
-                return dataItem
-            })
-            return data
-        })
+    // ---------------- Table of sales ----------------- //
+    const loadSales = async () => {
+        const statisticDate = dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails.dateString
+
+        // Credit notes
         const creditNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: creditCodes })
         const findCreditNotes = await api.ventas.findAllByFilters(creditNotesFilters)
         const creditNotes = findCreditNotes.docs
         const creditNotesData = creditNotes.map(creditNote => {
             const dataItem = {
                 concept: 'Nota crédito',
-                cost: creditNote.total,
+                expense: parseFloat(creditNote.total),
                 productName: '-',
-                quantity: 1
+                profit: 0,
+                quantity: 1,
+                salePrice: 0
             }
             return dataItem
         })
-        const preData = [...entriesData.flat(), ...creditNotesData.flat()]
-        const data = preData.map((item, i) => { return { ...item, key: 'expenseItem' + i } })
-        const expensesData = { expenses: data, totalExpensesRecords: data.length }
-        dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_BALANCE_VIEW', payload: expensesData })
-    }
 
-    useEffect(() => {
-        loadExpenses()
-        // eslint-disable-next-line
-    }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
-
-    const setPageAndLimitOfTableOfExpenses = (page, limit) => {
-        const paginationParams = {
-            ...dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams,
-            page: parseInt(page),
-            limit: parseInt(limit)
-        }
-        dailyBusinessStatistics_dispatch({
-            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW',
-            payload: paginationParams
+        // Debit Notes
+        const debitNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: debitCodes })
+        const findDebitNotes = await api.ventas.findAllByFilters(debitNotesFilters)
+        const debitNotes = findDebitNotes.docs
+        const debitNotesData = debitNotes.map(debitNote => {
+            const dataItem = {
+                concept: 'Nota débito',
+                expense: 0,
+                productName: '-',
+                profit: parseFloat(debitNote.total),
+                quantity: 1,
+                salePrice: parseFloat(debitNote.total)
+            }
+            return dataItem
         })
-    }
 
-    const columnsOfExpensesTable = [
-        {
-            dataIndex: 'columnsOfExpensesTable_concept',
-            render: (_, record) => record.concept,
-            title: 'Concepto'
-        },
-        {
-            dataIndex: 'columnsOfExpensesTable_productName',
-            render: (_, record) => record.productName,
-            title: 'Producto'
-        },
-        {
-            dataIndex: 'columnsOfExpensesTable_productEntries',
-            render: (_, record) => roundTwoDecimals(record.quantity),
-            title: 'Cantidad'
-        },
-        {
-            dataIndex: 'columnsOfExpensesTable_productExpense',
-            render: (_, record) => roundTwoDecimals(record.cost),
-            title: 'Gasto'
-        }
-    ]
-
-    const tableOfExpenses = (
-        <Table
-            columns={columnsOfExpensesTable}
-            dataSource={dailyBusinessStatistics_state.detailsModal.tableOfExpenses.expenses}
-            loading={dailyBusinessStatistics_state.detailsModal.tableOfExpenses.loading}
-            pagination={{
-                defaultCurrent: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.page,
-                defaultPageSize: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
-                limit: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
-                onChange: (page, limit) => setPageAndLimitOfTableOfExpenses(page, limit),
-                pageSize: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.paginationParams.limit,
-                pageSizeOptions: [5, 10],
-                showSizeChanger: true,
-                total: dailyBusinessStatistics_state.detailsModal.tableOfExpenses.totalExpensesRecords
-            }}
-            rowKey='key'
-            size='small'
-            tableLayout='auto'
-            title={() => 'Gastos de la fecha'}
-            width={'100%'}
-        />
-    )
-
-    // ---------------- Table of incomes ----------------- //
-    const loadIncomes = async () => {
-        const statisticDate = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString
+        // Outputs
         const outputsFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
         const findOutputs = await api.salidas.findAllByFilters(outputsFilters)
         const outputs = findOutputs.docs
@@ -157,14 +92,18 @@ const SalesView = () => {
             const data = output.productos.map(product => {
                 const dataItem = {
                     concept: 'Salida',
+                    expense: 0,
                     productName: product.nombre,
-                    profit: product.cantidadesSalientes * product.precioVenta,
-                    quantity: product.cantidadesSalientes
+                    profit: parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta),
+                    quantity: parseFloat(product.cantidadesSalientes),
+                    salePrice: parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta),
                 }
                 return dataItem
             })
             return data
         })
+
+        // Sales
         const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
         const findSales = await api.ventas.findAllByFilters(salesFilters)
         const sales = findSales.docs
@@ -174,50 +113,52 @@ const SalesView = () => {
             const data = sale.renglones.map(line => {
                 const dataItem = {
                     concept: 'Venta',
+                    expense: parseFloat(line.precioUnitario),
                     productName: line.nombre,
-                    profit: line.precioNeto,
-                    quantity: line.cantidadUnidades
+                    profit: parseFloat(line.profit),
+                    quantity: parseFloat(line.cantidadUnidades),
+                    salePrice: parseFloat(line.precioNeto)
                 }
                 return dataItem
             })
             return data
         })
-        const debitNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: debitCodes })
-        const findDebitNotes = await api.ventas.findAllByFilters(debitNotesFilters)
-        const debitNotes = findDebitNotes.docs
-        const debitNotesData = debitNotes.map(debitNote => {
-            const dataItem = {
-                concept: 'Nota débito',
-                productName: '-',
-                profit: debitNote.total,
-                quantity: 1
-            }
-            return dataItem
-        })
-        const preData = [...debitNotesData.flat(), ...outputsData.flat(), ...salesData.flat()]
-        const data = preData.map((item, i) => { return { ...item, key: 'incomeItem' + i } })
-        const incomesData = { incomes: data, totalIncomesRecords: data.length }
-        dailyBusinessStatistics_dispatch({ type: 'SET_INCOMES_TO_BALANCE_VIEW', payload: incomesData })
+
+        const preData = [
+            ...creditNotesData.flat(),
+            ...debitNotesData.flat(),
+            ...outputsData.flat(),
+            ...salesData.flat()
+        ]
+        const data = preData.map((item, i) => { return { ...item, key: 'salesViewItem_' + i } })
+        const salesViewData = { sales: data, totalSalesRecords: data.length }
+        dailyBusinessStatistics_dispatch({ type: 'SET_SALES_TO_SALES_VIEW', payload: salesViewData })
+
+        const totalSalesViewExpense = data.reduce((acc, value) => acc + value.expense, 0)
+        const totalSalesViewProfit = data.reduce((acc, value) => acc + value.profit, 0)
+        const totalSalesViewSalePrices = data.reduce((acc, value) => acc + value.salePrice, 0)
+        const salesViewTotals = { totalSalesViewExpense, totalSalesViewProfit, totalSalesViewSalePrices }
+        dailyBusinessStatistics_dispatch({ type: 'SET_SALES_VIEW_TOTALS', payload: salesViewTotals })
     }
 
     useEffect(() => {
-        loadIncomes()
+        loadSales()
         // eslint-disable-next-line
-    }, [dailyBusinessStatistics_state.detailsModal.modalVisibility])
+    }, [dailyBusinessStatistics_state.statisticsView.salesView.modalVisibility])
 
-    const setPageAndLimitOfTableOfIncomes = (page, limit) => {
+    const setPageAndLimitOfTableOfSales = (page, limit) => {
         const paginationParams = {
-            ...dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams,
+            ...dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.paginationParams,
             page: parseInt(page),
             limit: parseInt(limit)
         }
         dailyBusinessStatistics_dispatch({
-            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW',
+            type: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW',
             payload: paginationParams
         })
     }
 
-    const columnsOfIncomesTable = [
+    const columnsOfTableOfSales = [
         {
             dataIndex: 'columnsOfIncomesTable_concept',
             render: (_, record) => record.concept,
@@ -235,64 +176,69 @@ const SalesView = () => {
         },
         {
             dataIndex: 'columnsOfIncomesTable_productIncome',
+            render: (_, record) => roundTwoDecimals(record.salePrice),
+            title: 'Precio Venta'
+        },
+        {
+            dataIndex: 'columnsOfIncomesTable_productIncome',
+            render: (_, record) => roundTwoDecimals(record.expense),
+            title: 'Precio Lista'
+        },
+        {
+            dataIndex: 'columnsOfIncomesTable_productIncome',
             render: (_, record) => roundTwoDecimals(record.profit),
-            title: 'Ingreso'
+            title: 'Ganancia'
         }
     ]
 
-    const tableOfIncomes = (
+    const tableOfSales = (
         <Table
-            columns={columnsOfIncomesTable}
-            dataSource={dailyBusinessStatistics_state.detailsModal.tableOfIncomes.incomes}
-            loading={dailyBusinessStatistics_state.detailsModal.tableOfIncomes.loading}
+            columns={columnsOfTableOfSales}
+            dataSource={dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.incomes}
+            loading={dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.loading}
             pagination={{
-                defaultCurrent: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.page,
-                defaultPageSize: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
-                limit: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
-                onChange: (page, limit) => setPageAndLimitOfTableOfIncomes(page, limit),
-                pageSize: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.paginationParams.limit,
+                defaultCurrent: dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.paginationParams.page,
+                defaultPageSize: dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.paginationParams.limit,
+                limit: dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.paginationParams.limit,
+                onChange: (page, limit) => setPageAndLimitOfTableOfSales(page, limit),
+                pageSize: dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.paginationParams.limit,
                 pageSizeOptions: [5, 10],
                 showSizeChanger: true,
-                total: dailyBusinessStatistics_state.detailsModal.tableOfIncomes.totalIncomesRecords
+                total: dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.totalSalesRecords
             }}
             rowKey='key'
             size='small'
             tableLayout='auto'
-            title={() => 'Ingresos de la fecha'}
+            title={() => 'Ventas de la fecha'}
             width={'100%'}
         />
     )
 
     // ---------------- Titles of totals ----------------- //
     const getBalanceColor = () => {
-        const dailyExpense = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense
-        const dailyIncome = dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome
+        const dailyExpense = dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails.dailyExpense
+        const dailyIncome = dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails.dailyIncome
         const parameter = dailyIncome - dailyExpense
         if (parameter >= 0) return { color: '#15DC24' }
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyExpense)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyIncome)}</b></h2>
-    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dailyProfit)}</b></h2>
+    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Total ventas: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalSalePrices)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Total precios lista: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalExpense)}</b></h2>
+    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Ganancia: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalProfit)}</b></h2>
 
 
     const tablesToRender = [
         {
-            element: tableOfExpenses,
-            name: 'detailsOfStockHistoryModal_tableOfExpenses',
-            order: { lg: 1, md: 1, sm: 1, xl: 1, xs: 1, xxl: 1 }
-        },
-        {
-            element: tableOfIncomes,
-            name: 'detailsOfStockHistoryModal_tableOfIncomes',
+            element: tableOfSales,
+            name: 'detailsOfStockHistoryModal_tableOfSales',
             order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
         }
     ]
 
     const responsiveGridOfTables = {
         gutter: { horizontal: 16, vertical: 8 },
-        span: { lg: 12, md: 12, sm: 24, xl: 12, xs: 24, xxl: 12 }
+        span: { lg: 24, md: 24, sm: 24, xl: 24, xs: 24, xxl: 24 }
     }
 
     const titlesToRender = [
@@ -324,8 +270,8 @@ const SalesView = () => {
             cancelButtonProps={{ style: { display: 'none' } }}
             closable={false}
             okButtonProps={{ style: { display: 'none' } }}
-            open={dailyBusinessStatistics_state.detailsModal.modalVisibility}
-            title={`Detalle de movimientos del ${dailyBusinessStatistics_state.detailsModal.statisticToViewDetails.dateString.substring(0, 10)}`}
+            open={dailyBusinessStatistics_state.statisticsView.salesView.modalVisibility}
+            title={`Detalle de ventas del ${dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails.dateString.substring(0, 10)}`}
             width={1200}
         >
             <Row gutter={[responsiveGridOfTables.gutter.horizontal, responsiveGridOfTables.gutter.vertical]}>

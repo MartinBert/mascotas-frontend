@@ -162,6 +162,16 @@ const DailyBusinessStatistics = () => {
         }
     ]
 
+    const satatisticsBalanceViewConditions = (
+        !!dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails
+        && dailyBusinessStatistics_state.statisticsView.balanceView.modalVisibility === true
+    )
+
+    const satatisticsSalesViewConditions = (
+        !!dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails
+        && dailyBusinessStatistics_state.statisticsView.salesView.modalVisibility === true
+    )
+
     return (
         <>
             {
@@ -196,9 +206,11 @@ const DailyBusinessStatistics = () => {
                                     width={'100%'}
                                 />
                                 {
-                                    dailyBusinessStatistics_state.detailsModal.statisticToViewDetails
+                                    satatisticsBalanceViewConditions
                                         ? <BalanceView />
-                                        : null
+                                        : satatisticsSalesViewConditions
+                                            ? <SalesView />
+                                            : null
                                 }
                                 <FixStatisticsModal />
                             </Col>
