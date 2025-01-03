@@ -27,6 +27,7 @@ import SalesView from './SalesView'
 // Imports Destructuring
 const { formatFindParams } = actions.paginationParams
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
+const { useInterfaceStylesContext } = contexts.InterfaceStyles
 const { useRenderConditionsContext } = contexts.RenderConditions
 const { roundTwoDecimals } = helpers.mathHelper
 const { Edit, Details } = icons
@@ -39,6 +40,7 @@ const profitColorCss = (profit) => {
 
 const DailyBusinessStatistics = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
+    const [interfaceStyles_state, interfaceStyles_dispatch] = useInterfaceStylesContext()
     const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
     // ------------------------------------- Load data --------------------------------------- //
@@ -82,7 +84,13 @@ const DailyBusinessStatistics = () => {
 
     // -------------------------------------- Actions ---------------------------------------- //
     const openDetailsStatisticModal = (dailyBusinessStatistics) => {
-        dailyBusinessStatistics_dispatch({ type: 'SET_STATISTIC_TO_BALANCE_VIEW', payload: dailyBusinessStatistics })
+        let dispatchType
+        if (interfaceStyles_state.typeOfStatisticsView === 'balance') {
+            dispatchType = 'SET_STATISTIC_TO_BALANCE_VIEW'
+        } else if (interfaceStyles_state.typeOfStatisticsView === 'sales') {
+            dispatchType = 'SET_STATISTIC_TO_SALES_VIEW'
+        } else dispatchType = ''
+        dailyBusinessStatistics_dispatch({ type: dispatchType, payload: dailyBusinessStatistics })
     }
 
     const openFixStatisticModal = async (dailyBusinessStatisticsID) => {

@@ -63,7 +63,7 @@ const SalesView = () => {
                 productName: '-',
                 profit: 0,
                 quantity: 1,
-                salePrice: 0
+                salePrice: parseFloat(creditNote.total)
             }
             return dataItem
         })
@@ -111,11 +111,12 @@ const SalesView = () => {
             .filter(sale => !creditCodes.includes(sale.documentoCodigo) && !debitCodes.includes(sale.documentoCodigo))
         const salesData = sales.map(sale => {
             const data = sale.renglones.map(line => {
+                const productLine = sale.productos.find(product => product.nombre === line.nombre)
                 const dataItem = {
                     concept: 'Venta',
-                    expense: parseFloat(line.precioUnitario),
+                    expense: parseFloat(productLine.precioUnitario ?? line.precioUnitario),
                     productName: line.nombre,
-                    profit: parseFloat(line.profit),
+                    profit: parseFloat(line.precioNeto) - parseFloat(productLine.precioUnitario) ?? parseFloat(line.profit),
                     quantity: parseFloat(line.cantidadUnidades),
                     salePrice: parseFloat(line.precioNeto)
                 }
@@ -194,7 +195,7 @@ const SalesView = () => {
     const tableOfSales = (
         <Table
             columns={columnsOfTableOfSales}
-            dataSource={dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.incomes}
+            dataSource={dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.sales}
             loading={dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.loading}
             pagination={{
                 defaultCurrent: dailyBusinessStatistics_state.statisticsView.salesView.tableOfSales.paginationParams.page,
@@ -215,17 +216,19 @@ const SalesView = () => {
     )
 
     // ---------------- Titles of totals ----------------- //
-    const getBalanceColor = () => {
-        const dailyExpense = dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails.dailyExpense
-        const dailyIncome = dailyBusinessStatistics_state.statisticsView.salesView.statisticToViewDetails.dailyIncome
-        const parameter = dailyIncome - dailyExpense
+    const getSalesProfitColor = () => {
+        const parameter = dailyBusinessStatistics_state.statisticsView.salesView.totalProfit
         if (parameter >= 0) return { color: '#15DC24' }
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Total ventas: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalSalePrices)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Total precios lista: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalExpense)}</b></h2>
-    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Ganancia: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalProfit)}</b></h2>
+    const titlesStyles = {
+        textAlign: 'center'
+    }
+
+    const titleOfTotalExpenses = <h2 style={titlesStyles}>Total ventas: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalSalePrices)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={titlesStyles}>Total precios lista: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalExpense)}</b></h2>
+    const titleOfBalance = <h2 style={titlesStyles}>Ganancia: <b style={getSalesProfitColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalProfit)}</b></h2>
 
 
     const tablesToRender = [

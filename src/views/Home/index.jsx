@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 
 // Design Components
 import { Button, Col, Input, Row, Table } from 'antd'
+import { errorAlert } from '../../components/alerts'
 
 // Custom Context Providers
 import contexts from '../../contexts'
@@ -19,7 +20,9 @@ import FirstSteps from './FirstSteps'
 // Imports Destructuring
 const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
-const { roundTwoDecimals } = helpers.mathHelper
+const { creditCodes, debitCodes, invoiceAndTicketCodes } = helpers.afipHelper
+const { localFormat } = helpers.dateHelper
+const { previousInteger, roundTwoDecimals } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
 
 
@@ -231,6 +234,133 @@ const Home = () => {
         </Button>
     )
 
+    // ------------------- Button to generate daily business statistics ---------------------- //
+    const oldestActivityErrorMessage = (activity) => {
+        const fixedActivity = activity.substring(0, activity.length - 1)
+        const message = `
+            No se pudo recuperar la fecha de la primera ${fixedActivity} para elaborar los registros.
+            Recargue la página para volver a intentar.
+        `
+        return message
+    }
+
+    const dateLabelsInActivitiesModels = (activity) => {
+        let label
+        if (activity === 'ventas') label = 'fechaEmision'
+        else label = 'fecha'
+        return label
+    }
+
+    const getOldestActivityDate = async () => {
+        const activitiesToCheckOldestDate = ['entradas', 'salidas', 'ventas']
+        const findOldestDatesInMs = []
+        for (let index = 0; index < activitiesToCheckOldestDate.length; index++) {
+            const activity = activitiesToCheckOldestDate[index];
+            const [oldestRecord] = await api[activity].findOldestRecord()
+            if (!oldestRecord) return errorAlert(oldestActivityErrorMessage(activity))
+            const oldestRecordDate = oldestRecord[dateLabelsInActivitiesModels(activity)]
+            const formattedOldestRecordDate = Date.parse(oldestRecordDate)
+            findOldestDatesInMs.push(formattedOldestRecordDate)
+        }
+        const oldestDatesInMs = findOldestDatesInMs.filter(dateInMs => !isNaN(dateInMs))
+        const orderedOldestDatesInMs = oldestDatesInMs.sort((date1, date2) => date1 - date2)
+        const oldestDateInMs = orderedOldestDatesInMs[0] - (orderedOldestDatesInMs[0] % 86400000) + 10800000
+        const data = {
+            date: new Date(oldestDateInMs),
+            dateInMs: oldestDateInMs,
+            stringDate: localFormat(new Date(oldestDateInMs))
+        }
+        return data
+    }
+
+    const generateDatesForCreateRecords = async () => {
+        const oldestActivityDateData = await getOldestActivityDate()
+        const oldestActivityDateInMs = oldestActivityDateData.dateInMs
+        const todayDateInMs = Date.parse(new Date()) - (Date.parse(new Date()) % 86400000) + 10800000
+        const loopLimit = previousInteger((todayDateInMs - oldestActivityDateInMs) / 86400000)
+
+        const dates = []
+        const datesInMs = []
+        const stringDates = []
+        for (let index = 0; index < loopLimit; index++) {
+            const currentDayInMs = oldestActivityDateInMs + index * 86400000
+            dates.push(new Date(currentDayInMs))
+            datesInMs.push(currentDayInMs)
+            stringDates.push(localFormat(new Date(currentDayInMs)))
+        }
+        const data = { dates, datesInMs, stringDates }
+        return data
+    }
+
+    const generateDailyBusinessStatistics = async () => {
+        const datesData = await generateDatesForCreateRecords()
+        const datesForCreateRecords = datesData.dates
+        const stringDatesForCreateRecords = datesData.stringDates
+        
+        const dailyBusinessStatisticsToSave = []
+        for (let index = 0; index < stringDatesForCreateRecords.length; index++) {
+            const date = datesForCreateRecords[index]
+            const stringDate = stringDatesForCreateRecords[index]
+            const findEntriesFilters = JSON.stringify({ fechaString: stringDate })
+            const findOutputsFilters = JSON.stringify({ fechaString: stringDate })
+            const findSalesFilters = JSON.stringify({ fechaEmisionString: stringDate })
+            const findEntries = await api.entradas.findAllByFilters(findEntriesFilters)
+            const findOutputs = await api.salidas.findAllByFilters(findOutputsFilters)
+            const findSales = await api.ventas.findAllByFilters(findSalesFilters)
+            const entriesRecords = findEntries.docs
+            const outputsRecords = findOutputs.docs
+            const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
+
+            const creditNotes = salesRecords
+                .filter(record => creditCodes.includes(record.documentoCodigo))
+                .reduce((acc, value) => acc + value.total, 0)
+            const debitNotesInvoicesAndTickets = salesRecords
+                .filter(record => !creditCodes.includes(record.documentoCodigo))
+                .reduce((acc, value) => acc + value.total, 0)
+            const debitNotesInvoicesAndTicketsIva = salesRecords
+                .filter(record => !creditCodes.includes(record.documentoCodigo))
+                .reduce((acc, value) => acc + value.importeIva, 0)
+            const entries = entriesRecords.reduce((acc, value) => acc + value.costoTotal, 0)
+            const outputs = outputsRecords.reduce((acc, value) => acc + value.ganancia, 0)
+            const salesListPrices = salesRecords
+                .filter(record => invoiceAndTicketCodes.includes(record.documentoCodigo))
+                .map(sale => sale.productos)
+                .flat()
+                .reduce((acc, product) => acc + product.precioUnitario, 0)
+
+            const balanceViewExpense = creditNotes + debitNotesInvoicesAndTicketsIva + entries
+            const balanceViewIncome = debitNotesInvoicesAndTickets + outputs
+            const balanceViewProfit = balanceViewIncome - balanceViewExpense
+            const salesViewExpense = creditNotes + debitNotesInvoicesAndTicketsIva + salesListPrices
+            const salesViewIncome = debitNotesInvoicesAndTickets
+            const salesViewProfit = salesViewIncome - salesViewExpense
+
+            const record = {
+                balanceViewExpense,
+                balanceViewIncome,
+                balanceViewProfit,
+                concept: 'Generado automáticamente',
+                date,
+                dateString: stringDate,
+                salesViewExpense,
+                salesViewIncome,
+                salesViewProfit
+            }
+            dailyBusinessStatisticsToSave.push(record)
+        }
+
+        console.log(dailyBusinessStatisticsToSave)
+    }
+
+    const buttonToGenerateDailyBusinessStatistics = (
+        <Button
+            onClick={generateDailyBusinessStatistics}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
     // ------------------------- Button to generate data from SEED --------------------------- //
     const generateSeedData = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
@@ -252,7 +382,7 @@ const Home = () => {
     const generateStockHistories = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
-        // Data para generar los registros
+        // Data to generate records
         const findAllEntries = await api.entradas.findAll()
         const findAllOutputs = await api.salidas.findAll()
         const findAllProducts = await api.productos.findAll()
@@ -262,9 +392,10 @@ const Home = () => {
         const allProducts = findAllProducts.docs
         const allSales = findAllSales.docs
 
-        // Generación de registros
+        // Generate records
         const generateStockHistoryData = allProducts.map(product => {
 
+            // Entries data
             const productEntriesData = allEntries.map(entry => {
                 const productsOfEntryIDs = entry.productos.map(productOfEntry => productOfEntry._id)
                 if (productsOfEntryIDs.includes(product._id)) {
@@ -296,6 +427,7 @@ const Home = () => {
                 return reduceValues
             })
 
+            // Outputs data
             const productOutputsData = allOutputs.map(output => {
                 const productsOfOutputIDs = output.productos.map(productOfOutput => productOfOutput._id)
                 if (productsOfOutputIDs.includes(product._id)) {
@@ -327,6 +459,7 @@ const Home = () => {
                 return reduceValues
             })
 
+            // Sales data
             const productSalesData = allSales
                 .filter(sale => sale.documento.cashRegister)
                 .map(sale => {
@@ -400,6 +533,7 @@ const Home = () => {
             return stockHistory
         })
 
+        // Save records
         const dataForSave = []
         for (let index = 0; index < generateStockHistoryData.length; index++) {
             const productData = generateStockHistoryData[index]
@@ -431,33 +565,6 @@ const Home = () => {
         }
 
         console.log('ready')
-
-        // VERIFY IN CONSOLE
-        // const quantityOfEntriesToSave = dataForSave.reduce((acc, val) => acc + val.entries, 0)
-        // const quantityOfOutputsToSave = dataForSave.reduce((acc, val) => acc + val.outputs, 0)
-        // const savedEntries = allEntries.reduce((acc, val) => acc + val.cantidad, 0)
-        // const savedOutputs = allOutputs.reduce((acc, val) => acc + val.cantidad, 0)
-        // const calcVal = (sale) => {
-        //     const prodIDs = sale.productos.map(prod => prod.nombre)
-        //     if (prodIDs.length === 0) return null
-        //     const valToReturnArray = sale.renglones.map(line => {
-        //         if(prodIDs.includes(line.nombre)) {
-        //             const quantity = line.fraccionar
-        //                 ? line.cantidadUnidades / line.fraccionamiento
-        //                 : line.cantidadUnidades
-        //             return quantity
-        //         }
-        //         else return null
-        //     }).filter(record => record)
-        //     const valToReturn = valToReturnArray.reduce((acc, rec) => acc + rec, 0)
-        //     return valToReturn
-        // }
-        // const savedSales = allSales.reduce((acc, sale) => acc + calcVal(sale), 0 )
-        // const fixedSavedOutputs = savedOutputs + savedSales
-
-        // console.log('VALORES A GUARDAR: ', quantityOfEntriesToSave + quantityOfOutputsToSave)
-        // console.log('VALORES GUARDADOS: ', savedEntries + fixedSavedOutputs)
-
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -580,13 +687,6 @@ const Home = () => {
             secondaryAction: null
         },
         {
-            description: 'Genera o elimina datos iniciales para probar el sistema. ¡CUIDADO! Utilizar solo en modo desarrollo.',
-            key: 'home_buttonsToGenerateAndDeleteSeedData',
-            primaryAction: buttonToGenerateDataFromSeed,
-            renderable: auth_state.user.email === process.env.REACT_APP_EMAIL_ADMIN,
-            secondaryAction: buttonToDeleteDataFromSeed
-        },
-        {
             description: 'Muestra en consola aquellos productos que no tienen marca o rubro asignado.',
             key: 'home_buttonToConsoleProductsWithoutAssignedBrandOrType',
             primaryAction: buttonToConsoleProductsWithoutAssignedBrandOrType,
@@ -601,11 +701,25 @@ const Home = () => {
             secondaryAction: null
         },
         {
+            description: 'Generar o eliminar las estadísticas diarias de negocio.',
+            key: 'home_buttonToGenerateDailyBusinessStatistics',
+            primaryAction: buttonToGenerateDailyBusinessStatistics,
+            renderable: true,
+            secondaryAction: null
+        },
+        {
             description: 'Generar o eliminar Historial de Stock de todos los productos. Útil para corregir datos erróneos de manera limpia.',
             key: 'home_buttonsToGenerateAndDeleteStockHistories',
             primaryAction: buttonToGenerateStockHistories,
             renderable: true,
             secondaryAction: buttonToDeleteStockHistories
+        },
+        {
+            description: 'Genera o elimina datos iniciales para probar el sistema. ¡CUIDADO! Utilizar solo en modo desarrollo.',
+            key: 'home_buttonsToGenerateAndDeleteSeedData',
+            primaryAction: buttonToGenerateDataFromSeed,
+            renderable: auth_state.user.email === process.env.REACT_APP_EMAIL_ADMIN,
+            secondaryAction: buttonToDeleteDataFromSeed
         },
         {
             description: 'Muestra en consola todas las entradas de productos hasta la fecha.',

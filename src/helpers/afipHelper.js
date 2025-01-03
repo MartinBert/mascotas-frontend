@@ -66,6 +66,27 @@ const fiscalVouchersCodes = [
     // Más info en https://www.afip.gob.ar/fe/documentos/TABLACOMPROBANTES.xls
 ]
 
+const creditCodes = fiscalVouchersCodes
+    .filter(item => typeof item !== 'string')
+    .map(code => code.credit)
+    .filter(code => code !== null)
+
+const debitCodes = fiscalVouchersCodes
+    .filter(item => typeof item !== 'string')
+    .map(code => code.debit)
+    .filter(code => code !== null)
+
+const invoiceCodes = fiscalVouchersCodes
+    .filter(item => typeof item === 'string')
+    .filter(code => parseFloat(code) < 81)
+
+const invoiceAndTicketCodes = fiscalVouchersCodes
+    .filter(item => typeof item === 'string')
+
+const ticketCodes = fiscalVouchersCodes
+    .filter(item => typeof item === 'string')
+    .filter(code => parseFloat(code) >= 81)
+
 const formatBody = (saleData) => {
     const associatedVouchers = () => {
         if (!saleData.comprobantesAsociados) return []
@@ -213,12 +234,17 @@ const getReferenceVoucher = (state) => {
 }
 
 const afipHelper = {
+    creditCodes,
+    debitCodes,
     findNextVoucherNumber_fiscal,
     findNextVoucherNumber_noFiscal,
     fiscalVouchersCodes,
     formatBody,
     formatToCompleteVoucherNumber,
-    getReferenceVoucher
+    getReferenceVoucher,
+    invoiceCodes,
+    invoiceAndTicketCodes,
+    ticketCodes
 }
 
 export default afipHelper
