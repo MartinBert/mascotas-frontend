@@ -100,6 +100,42 @@ const FiscalNoteModal = () => {
         const result = await api.ventas.save(fiscalNoteParams)
         if (result.code === 500) warningAlert('Se procesó exitosamente la solicitud con AFIP, pero no se pudo guardar el registro en el sistema. Sin embargo, es posible recuperarlo desde AFIP.')
 
+        // Save daily business statistic
+        const filters = JSON.stringify({ dateString: fiscalNoteModal_state.params.dateString.substring(0, 10) })
+        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+        const statisticToEdit = findStatisticToEdit.docs[0] || null
+        const addedExpense = fiscalNoteModal_state.creditNote !== null
+            ? fiscalNoteModal_state.params.amountNet
+            : fiscalNoteModal_state.params.ivaTotal
+        const addedIncome = fiscalNoteModal_state.debitNote !== null
+            ? fiscalNoteModal_state.params.amountNet - fiscalNoteModal_state.params.ivaTotal
+            : 0
+        if (statisticToEdit) {
+            const editedStatistic = {
+                ...statisticToEdit,
+                balanceViewExpense: statisticToEdit.balanceViewExpense + addedExpense,
+                balanceViewIncome: statisticToEdit.balanceViewIncome + addedIncome,
+                balanceViewProfit: statisticToEdit.balanceViewProfit - addedExpense + addedIncome,
+                salesViewExpense: statisticToEdit.salesViewExpense + addedExpense,
+                salesViewIncome: statisticToEdit.salesViewIncome + addedIncome,
+                salesViewProfit: statisticToEdit.salesViewProfit - addedExpense + addedIncome,
+            }
+            await api.dailyBusinessStatistics.edit(editedStatistic)
+        } else {
+            const newStatistic = {
+                balanceViewExpense: addedExpense,
+                balanceViewIncome: addedIncome,
+                balanceViewProfit: addedIncome - addedExpense,
+                concept: 'Generado automáticamente',
+                date: new Date(fiscalNoteModal_state.params.dateString.substring(0, 10)),
+                dateString: fiscalNoteModal_state.params.dateString.substring(0, 10),
+                salesViewExpense: addedExpense,
+                salesViewIncome: addedIncome,
+                salesViewProfit: addedIncome - addedExpense,
+            }
+            await api.dailyBusinessStatistics.save(newStatistic)
+        }
+
         // Create document
         const associatedData = await getAssociatedData(fiscalNoteModal_state.params)
 

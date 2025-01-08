@@ -40,11 +40,11 @@ const fixDailyBusinessStatistics = async (outputToDelete) => {
     const findStatisticToFix = await api.dailyBusinessStatistics.findAllByFilters(filters)
     const [statisticToFix] = findStatisticToFix.docs
     if (!statisticToFix) return
-    const fixedDailyIncome = statisticToFix.dailyIncome - outputToDelete.ganancia
+    const fixedDailyIncome = statisticToFix.balanceViewIncome - outputToDelete.ganancia
     const fixedStatistic = {
         ...statisticToFix,
-        dailyIncome: fixedDailyIncome,
-        dailyProfit: fixedDailyIncome - statisticToFix.dailyExpense
+        balanceViewIncome: fixedDailyIncome,
+        balanceViewProfit: fixedDailyIncome - statisticToFix.balanceViewExpense
     }
     const result = await api.dailyBusinessStatistics.edit(fixedStatistic)
     if (result.code !== 200) errorAlert('No se pudo corregir la estadística diaria. Hágalo manualmente en "Estadísticas de negocio" / "Balance diario" / "Acciones" / "Editar".')

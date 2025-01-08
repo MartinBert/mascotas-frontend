@@ -153,6 +153,42 @@ const FinalizeSaleModal = () => {
         if (!isCreated) return errorAlert('No se pudo generar el comprobante de la operación. Recupérelo desde la página de AFIP.')
     }
 
+    const saveDailyBusinessStatistic = async () => {
+        const filters = JSON.stringify({ dateString: sale_state.fechaEmisionString.substring(0, 10) })
+        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+        const statisticToEdit = findStatisticToEdit.docs[0] || null
+        const saleListPricesAndIva = (
+            sale_state.productos.reduce((acc, product) => acc + product.precioUnitario, 0)
+            + sale_state.renglones
+                .filter(line => line._id.startsWith('customProduct_'))
+                .reduce((acc, line) => acc + line.importeIva, 0)
+        )
+        if (statisticToEdit) {
+            const editedStatistic = {
+                ...statisticToEdit,
+                balanceViewIncome: statisticToEdit.balanceViewIncome + sale_state.total,
+                balanceViewProfit: statisticToEdit.balanceViewProfit + sale_state.total - sale_state.importeIva,
+                salesViewExpense: statisticToEdit.salesViewExpense + saleListPricesAndIva,
+                salesViewIncome: statisticToEdit.salesViewIncome + sale_state.total,
+                salesViewProfit: statisticToEdit.salesViewProfit + sale_state.total - saleListPricesAndIva,
+            }
+            await api.dailyBusinessStatistics.edit(editedStatistic)
+        } else {
+            const newStatistic = {
+                balanceViewExpense: 0,
+                balanceViewIncome: sale_state.total,
+                balanceViewProfit: sale_state.total - sale_state.importeIva,
+                concept: 'Generado automáticamente',
+                date: new Date(sale_state.fechaEmisionString.substring(0, 10)),
+                dateString: sale_state.fechaEmisionString.substring(0, 10),
+                salesViewExpense: saleListPricesAndIva,
+                salesViewIncome: sale_state.total,
+                salesViewProfit: sale_state.total - saleListPricesAndIva
+            }
+            await api.dailyBusinessStatistics.save(newStatistic)
+        }
+    }
+
     const saveSaleData = async () => {
         const fixedLines = sale_state.renglones.map(renglon => {
             const { _id, ...lineData } = renglon
@@ -201,21 +237,24 @@ const FinalizeSaleModal = () => {
     }
 
     const save = async () => {
+        const itsASale = sale_state.documento.cashRegister
+
+        // Save daily business statistic
+        if (itsASale) await saveDailyBusinessStatistic()
 
         //Modify stock history of products
         saveStockHistoryOfProducts()
 
         //Modify stock of products
-        const itsASale = sale_state.documento.cashRegister
         const isNotFiscalNote = !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
         const conditionsToModifyStock = itsASale && isNotFiscalNote
-        if (conditionsToModifyStock) applyStockModification()
+        if (conditionsToModifyStock) await applyStockModification()
 
         //Save sale data in sales list
-        saveSaleData()
+        await saveSaleData()
 
         //Create document
-        createSaleDocument()
+        await createSaleDocument()
 
         return successAlert('Comprobante emitido con éxito').then(reload)
     }

@@ -40,7 +40,7 @@ const profitColorCss = (profit) => {
 
 const DailyBusinessStatistics = () => {
     const [dailyBusinessStatistics_state, dailyBusinessStatistics_dispatch] = useDailyBusinessStatisticsContext()
-    const [interfaceStyles_state, interfaceStyles_dispatch] = useInterfaceStylesContext()
+    const [interfaceStyles_state] = useInterfaceStylesContext()
     const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
     // ------------------------------------- Load data --------------------------------------- //
@@ -67,14 +67,15 @@ const DailyBusinessStatistics = () => {
         const data = await api.dailyBusinessStatistics.findPaginated(findParams)
         dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: data })
     }
-
+    
     useEffect(() => {
         fetchDailyBusinessStatistics()
         // eslint-disable-next-line
     }, [
         dailyBusinessStatistics_state.loading,
         dailyBusinessStatistics_state.loadingUpdatingRecords,
-        dailyBusinessStatistics_state.paginationParams
+        dailyBusinessStatistics_state.paginationParams,
+        interfaceStyles_state.typeOfStatisticsView
     ])
 
     useEffect(() => {
@@ -89,7 +90,10 @@ const DailyBusinessStatistics = () => {
             dispatchType = 'SET_STATISTIC_TO_BALANCE_VIEW'
         } else if (interfaceStyles_state.typeOfStatisticsView === 'sales') {
             dispatchType = 'SET_STATISTIC_TO_SALES_VIEW'
-        } else dispatchType = ''
+        } else {
+            console.log(`views/DailyBusinessStatistics/index.jsx -- Incorrectly configuration of 'interfaceStyles_state.typeOfStatisticsView'. This should be 'balance' or 'sales'.`)
+            return errorAlert('No se pudo abrir la ventana de detalles. Consulte con su proveedor.')
+        }
         dailyBusinessStatistics_dispatch({ type: dispatchType, payload: dailyBusinessStatistics })
     }
 
@@ -99,7 +103,8 @@ const DailyBusinessStatistics = () => {
         if (!response) errorAlert('No se pudo recuperar las estadìsticas diarias de referencia para realizar la corrección. Recargue la página para volver a intentar.')
         const referenceData = {
             concept: response.data.concept,
-            dailyProfit: response.data.dailyProfit,
+            balanceViewProfit: response.data.balanceViewProfit,
+            salesViewProfit: response.data.salesViewProfit,
             date: response.data.date,
             dateString: response.data.dateString
         }
@@ -124,25 +129,41 @@ const DailyBusinessStatistics = () => {
         },
         {
             dataIndex: 'dailyBusinessStatistics_date',
-            render: (_, dailyBusinessStatistics) => dailyBusinessStatistics.dateString.substring(0, 10),
+            render: (_, dailyBusinessStatistics) => dailyBusinessStatistics.dateString,
             title: 'Fecha',
         },
         {
             dataIndex: 'dailyBusinessStatistics_dailyIncome',
-            render: (_, dailyBusinessStatistics) => roundTwoDecimals(dailyBusinessStatistics.dailyIncome),
+            render: (_, dailyBusinessStatistics) => roundTwoDecimals(
+                interfaceStyles_state.typeOfStatisticsView === 'balance'
+                    ? dailyBusinessStatistics.balanceViewIncome
+                    : dailyBusinessStatistics.salesViewIncome
+            ),
             title: 'Ingreso',
         },
         {
             dataIndex: 'dailyBusinessStatistics_dailyExpense',
-            render: (_, dailyBusinessStatistics) => roundTwoDecimals(dailyBusinessStatistics.dailyExpense),
+            render: (_, dailyBusinessStatistics) => roundTwoDecimals(
+                interfaceStyles_state.typeOfStatisticsView === 'balance'
+                    ? dailyBusinessStatistics.balanceViewExpense
+                    : dailyBusinessStatistics.salesViewExpense
+            ),
             title: 'Gasto',
         },
         {
             dataIndex: 'dailyBusinessStatistics_dailyBalance',
             render: (_, dailyBusinessStatistics) => {
                 return (
-                    <div style={{ color: profitColorCss(dailyBusinessStatistics.dailyProfit), fontSize: '18px' }}>
-                        <b>{roundTwoDecimals(dailyBusinessStatistics.dailyProfit)}</b>
+                    <div style={{ color: profitColorCss(
+                        interfaceStyles_state.typeOfStatisticsView === 'balance'
+                            ? dailyBusinessStatistics.balanceViewProfit
+                            : dailyBusinessStatistics.salesViewProfit
+                    ), fontSize: '18px' }}>
+                        <b>{roundTwoDecimals(
+                            interfaceStyles_state.typeOfStatisticsView === 'balance'
+                                ? dailyBusinessStatistics.balanceViewProfit
+                                : dailyBusinessStatistics.salesViewProfit
+                        )}</b>
                     </div>
                 )
             },

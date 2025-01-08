@@ -193,6 +193,29 @@ const Home = () => {
         </Button>
     )
 
+    // -------------------- Button to delete daily business statistics ----------------------- //
+    const deleteDailyBusinessStatistics = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const dailyBusinessStatistics = findDailyBusinessStatistics.docs
+        for (let index = 0; index < dailyBusinessStatistics.length; index++) {
+            const dailyBusinessStatistic = dailyBusinessStatistics[index]
+            await api.dailyBusinessStatistics.deleteDailyBusinessStatistics(dailyBusinessStatistic._id)
+        }
+        console.log('Daily business statistics was deleted.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToDeleteDailyBusinessStatistics = (
+        <Button
+            danger
+            onClick={deleteDailyBusinessStatistics}
+            type='primary'
+        >
+            Eliminar
+        </Button>
+    )
+
     // -------------------------- Button to delete data from SEED ---------------------------- //
     const deleteSeedData = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
@@ -297,6 +320,7 @@ const Home = () => {
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
         
+        // Generate records
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < stringDatesForCreateRecords.length; index++) {
             const date = datesForCreateRecords[index]
@@ -313,15 +337,15 @@ const Home = () => {
 
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
-                .reduce((acc, value) => acc + value.total, 0)
+                .reduce((acc, creditNote) => acc + creditNote.total, 0)
             const debitNotesInvoicesAndTickets = salesRecords
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
-                .reduce((acc, value) => acc + value.total, 0)
+                .reduce((acc, voucher) => acc + voucher.total, 0)
             const debitNotesInvoicesAndTicketsIva = salesRecords
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
-                .reduce((acc, value) => acc + value.importeIva, 0)
-            const entries = entriesRecords.reduce((acc, value) => acc + value.costoTotal, 0)
-            const outputs = outputsRecords.reduce((acc, value) => acc + value.ganancia, 0)
+                .reduce((acc, voucher) => acc + voucher.importeIva, 0)
+            const entries = entriesRecords.reduce((acc, entry) => acc + entry.costoTotal, 0)
+            const outputs = outputsRecords.reduce((acc, output) => acc + output.ganancia, 0)
             const salesListPrices = salesRecords
                 .filter(record => invoiceAndTicketCodes.includes(record.documentoCodigo))
                 .map(sale => sale.productos)
@@ -349,7 +373,13 @@ const Home = () => {
             dailyBusinessStatisticsToSave.push(record)
         }
 
-        console.log(dailyBusinessStatisticsToSave)
+        // Save records
+        for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
+            const record = dailyBusinessStatisticsToSave[index]
+            await api.dailyBusinessStatistics.save(record)
+        }
+
+        console.log('ready')
     }
 
     const buttonToGenerateDailyBusinessStatistics = (
@@ -705,7 +735,7 @@ const Home = () => {
             key: 'home_buttonToGenerateDailyBusinessStatistics',
             primaryAction: buttonToGenerateDailyBusinessStatistics,
             renderable: true,
-            secondaryAction: null
+            secondaryAction: buttonToDeleteDailyBusinessStatistics
         },
         {
             description: 'Generar o eliminar Historial de Stock de todos los productos. Útil para corregir datos erróneos de manera limpia.',

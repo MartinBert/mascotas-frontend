@@ -61,9 +61,9 @@ const SalesView = () => {
                 concept: 'Nota crédito',
                 expense: parseFloat(creditNote.total),
                 productName: '-',
-                profit: 0,
+                profit: - parseFloat(creditNote.total),
                 quantity: 1,
-                salePrice: parseFloat(creditNote.total)
+                salePrice: 0
             }
             return dataItem
         })
@@ -177,16 +177,16 @@ const SalesView = () => {
         },
         {
             dataIndex: 'columnsOfIncomesTable_productIncome',
-            render: (_, record) => roundTwoDecimals(record.salePrice),
+            render: (_, record) => record.productName === '-' ? '-' : roundTwoDecimals(record.salePrice),
             title: 'Precio Venta'
         },
         {
-            dataIndex: 'columnsOfIncomesTable_productIncome',
-            render: (_, record) => roundTwoDecimals(record.expense),
+            dataIndex: 'columnsOfIncomesTable_productExpense',
+            render: (_, record) => record.productName === '-' ? '-' : roundTwoDecimals(record.expense),
             title: 'Precio Lista'
         },
         {
-            dataIndex: 'columnsOfIncomesTable_productIncome',
+            dataIndex: 'columnsOfIncomesTable_productProfit',
             render: (_, record) => roundTwoDecimals(record.profit),
             title: 'Ganancia'
         }

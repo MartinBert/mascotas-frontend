@@ -27,6 +27,13 @@ const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.st
 const { Delete } = icons
 const { ifNotNumbersCommaAndPoint } = regExp
 
+const findStatisticByStringDate = async (stringDate) => {
+    const filters = JSON.stringify({ dateString: stringDate.substring(0, 10) })
+    const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
+    const statisticToEdit = findStatisticToEdit.docs[0] || null
+    return statisticToEdit
+}
+
 
 const EntradasForm = () => {
     const entryID = useLocation().pathname.replace('/entradas/', '')
@@ -147,6 +154,21 @@ const EntradasForm = () => {
         return 'OK'
     }
 
+    const generateNewStatistic = () => {
+        const newStatistic = {
+            balanceViewExpense: parseFloat(entries_state.params.costoTotal),
+            balanceViewIncome: 0,
+            balanceViewProfit: - parseFloat(entries_state.params.costoTotal),
+            concept: 'Generado automáticamente',
+            date: new Date(entries_state.params.fechaString.substring(0, 10)),
+            dateString: entries_state.params.fechaString.substring(0, 10),
+            salesViewExpense: 0,
+            salesViewIncome: 0,
+            salesViewProfit: 0
+        }
+        return newStatistic
+    }
+
     const generateStockHistory = async () => {
         for (const product of entries_state.params.productos) {
             const dateString = entries_state.params.fechaString.substring(0, 10)
@@ -185,11 +207,6 @@ const EntradasForm = () => {
         const result = validateSave()
         if (result === 'FAIL') return
 
-        // Datos necesarios para corregir el stock y las estadísticas diarias
-        const filters = JSON.stringify({ dateString: entries_state.params.fechaString.substring(0, 10) })
-        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
-        const statisticToEdit = findStatisticToEdit.docs[0] || null
-
         // Corregir historial de stock de productos pertenecientes a la salida
         generateStockHistory()
 
@@ -202,18 +219,23 @@ const EntradasForm = () => {
             })
         }
 
-        // Corregir la estadística diaria correspondiente a la fecha de la entrada
+        // Corregir o crear la estadística diaria correspondiente a la fecha de la entrada
+        const statisticToEdit = findStatisticByStringDate(entries_state.params.fechaString)
         if (statisticToEdit) {
-            const currentExpense = statisticToEdit.dailyExpense
-            const newExpense = entries_state.params.costoTotal
-            const updatedExpense = currentExpense + newExpense
-            const updatedProfit = statisticToEdit.dailyIncome - updatedExpense
+            const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
+            const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
+            const newAddedBalanceViewExpense = parseFloat(entries_state.params.costoTotal)
+            const balanceViewExpense = roundTwoDecimals(currentBalanceViewExpense + newAddedBalanceViewExpense)
+            const balanceViewProfit = roundTwoDecimals(currentBalanceViewIncome - balanceViewExpense)
             const updatedStatistic = {
                 ...statisticToEdit,
-                dailyExpense: roundTwoDecimals(updatedExpense),
-                dailyProfit: roundTwoDecimals(updatedProfit)
+                balanceViewExpense,
+                balanceViewProfit
             }
             await api.dailyBusinessStatistics.edit(updatedStatistic)
+        } else {
+            const newStatistic = generateNewStatistic()
+            await api.dailyBusinessStatistics.save(newStatistic)
         }
 
         // Guardar la entrada nueva
@@ -232,9 +254,6 @@ const EntradasForm = () => {
         // Datos necesarios para corregir el stock y las estadísticas diarias
         const findEntryToEdit = await api.entradas.findById(entryID)
         const entryToEdit = findEntryToEdit.data
-        const filters = JSON.stringify({ dateString: entryToEdit.fechaString.substring(0, 10) })
-        const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
-        const statisticToEdit = findStatisticToEdit.docs[0] || null
 
         // Corregir historial de stock de productos pertenecientes a la salida
         generateStockHistory()
@@ -258,19 +277,34 @@ const EntradasForm = () => {
         }
 
         // Corregir la estadística diaria correspondiente a la fecha de la entrada
-        if (statisticToEdit) {
-            const currentStatisticExpense = statisticToEdit.dailyExpense
-            const currentStatisticIncome = statisticToEdit.dailyIncome
-            const currentExpenseOfEntry = entryToEdit.costoTotal
-            const newExpenseOfEntry = entries_state.params.costoTotal
-            const newStatisticDailyExpense = currentStatisticExpense - currentExpenseOfEntry + newExpenseOfEntry
-            const newStatisticDailyProfit = currentStatisticIncome - newStatisticDailyExpense
-            const newStatisticToSave = {
-                ...statisticToEdit,
-                dailyExpense: roundTwoDecimals(newStatisticDailyExpense),
-                dailyProfit: roundTwoDecimals(newStatisticDailyProfit)
+        const previousStatisticToEdit = await findStatisticByStringDate(entryToEdit.fechaString)
+        if (previousStatisticToEdit) {
+            const balanceViewExpense = parseFloat(previousStatisticToEdit.balanceViewExpense) - parseFloat(entries_state.params.costoTotal)
+            const balanceViewProfit = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(balanceViewExpense)
+            const edittedPreviousStatistic = {
+                ...previousStatisticToEdit,
+                balanceViewExpense,
+                balanceViewProfit
             }
-            await api.dailyBusinessStatistics.edit(newStatisticToSave)
+            await api.dailyBusinessStatistics.edit(edittedPreviousStatistic)
+        }
+        const statisticToEdit = await findStatisticByStringDate(entries_state.params.fechaString)
+        if (statisticToEdit) {
+            const expenseFromEntryToEdit = parseFloat(entryToEdit.costoTotal)
+            const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
+            const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
+            const newAddedBalanceViewExpense = parseFloat(entries_state.params.costoTotal)
+            const balanceViewExpense = roundTwoDecimals(currentBalanceViewExpense - expenseFromEntryToEdit + newAddedBalanceViewExpense)
+            const balanceViewProfit = roundTwoDecimals(currentBalanceViewIncome - balanceViewExpense)
+            const editedStatistic = {
+                ...statisticToEdit,
+                balanceViewExpense,
+                balanceViewProfit
+            }
+            await api.dailyBusinessStatistics.edit(editedStatistic)
+        } else {
+            const newStatistic = generateNewStatistic()
+            await api.dailyBusinessStatistics.save(newStatistic)
         }
 
         // Guardar la entrada editada

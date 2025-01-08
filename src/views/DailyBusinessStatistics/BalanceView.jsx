@@ -265,16 +265,16 @@ const BalanceView = () => {
 
     // ---------------- Titles of totals ----------------- //
     const getBalanceColor = () => {
-        const dailyExpense = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyExpense
-        const dailyIncome = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyIncome
-        const parameter = dailyIncome - dailyExpense
+        const balanceViewExpense = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewExpense
+        const balanceViewIncome = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewIncome
+        const parameter = balanceViewIncome - balanceViewExpense
         if (parameter >= 0) return { color: '#15DC24' }
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyExpense)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyIncome)}</b></h2>
-    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dailyProfit)}</b></h2>
+    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewExpense)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewIncome)}</b></h2>
+    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewProfit)}</b></h2>
 
 
     const tablesToRender = [

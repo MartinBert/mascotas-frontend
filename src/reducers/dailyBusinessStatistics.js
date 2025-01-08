@@ -44,25 +44,29 @@ const initialState = {
     loadingUpdatingRecords: false,
     paginationParams: {
         filters: {
-            dailyProfit: { $ne: 0 },
+            balanceViewProfit: { $ne: 0 },
             date: null,
-            dateString: null
+            dateString: null,
+            salesViewProfit: { $ne: 0 }
         },
         limit: 10,
         page: 1
     },
     params: {
+        balanceViewExpense: 0,
+        balanceViewIncome: 0,
+        balanceViewProfit: 0,
         concept: '',
-        dailyExpense: 0,
-        dailyIncome: 0,
-        dailyProfit: 0,
         date: null,
-        dateString: null
+        dateString: null,
+        salesViewExpense: 0,
+        salesViewIncome: 0,
+        salesViewProfit: 0
     },
     recordsToRender: null,
     referenceStatistics: {
         concept: '',
-        dailyProfit: 0,
+        balanceViewProfit: 0,
         dateString: null
     },
     showNullRecords: false,
@@ -122,7 +126,7 @@ const reducer = (state = initialState, action) => {
                 },
                 paginationParams: {
                     filters: {
-                        dailyProfit: { $ne: 0 },
+                        balanceViewProfit: { $ne: 0 },
                         date: null,
                         dateString: null
                     },
@@ -136,9 +140,9 @@ const reducer = (state = initialState, action) => {
                 params: {
                     ...state.params,
                     concept: '',
-                    dailyExpense: 0,
-                    dailyIncome: 0,
-                    dailyProfit: 0
+                    balanceViewExpense: 0,
+                    balanceViewIncome: 0,
+                    balanceViewProfit: 0
                 }
             }
         case actions.CLEAR_STATE:
@@ -183,9 +187,9 @@ const reducer = (state = initialState, action) => {
                 params: {
                     ...state.params,
                     concept: action.payload.concept,
-                    dailyExpense: action.payload.dailyExpense,
-                    dailyIncome: action.payload.dailyIncome,
-                    dailyProfit: action.payload.dailyIncome - action.payload.dailyExpense
+                    balanceViewExpense: action.payload.balanceViewExpense,
+                    balanceViewIncome: action.payload.balanceViewIncome,
+                    balanceViewProfit: action.payload.balanceViewIncome - action.payload.balanceViewExpense
                 }
             }
         case actions.SET_DAILY_STATISTICS_RECORDS:
@@ -292,8 +296,9 @@ const reducer = (state = initialState, action) => {
         case actions.SET_REFERENCE_STATISTICS:
             const referenceStatistics = {
                 concept: action.payload.concept,
-                dailyProfit: action.payload.dailyProfit,
-                dateString: action.payload.dateString
+                balanceViewProfit: action.payload.balanceViewProfit,
+                dateString: action.payload.dateString,
+                salesViewProfit: action.payload.salesViewProfit
             }
             return {
                 ...state,
@@ -302,7 +307,7 @@ const reducer = (state = initialState, action) => {
                     date: action.payload.date,
                     dateString: action.payload.dateString
                 },
-                referenceStatistics: referenceStatistics
+                referenceStatistics
             }
             case actions.SET_SALES_TO_SALES_VIEW:
             return {
