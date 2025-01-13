@@ -59,7 +59,8 @@ const createPdf = async (pdfData) => {
         totalPages
     }
     const frontPageContainer = document.createElement('div')
-    frontPageContainer.innerHTML = await createTemplate(templateData)
+    const createdTemplate = await createTemplate(templateData)
+    frontPageContainer.innerHTML = createdTemplate
     dataForPdf.push(frontPageContainer)
 
     // Add more pages to pdf
@@ -83,7 +84,8 @@ const createPdf = async (pdfData) => {
                 totalPages
             }
             const pageContainer = document.createElement('div')
-            pageContainer.innerHTML = await createTemplate(templateData)
+            const createdTemplate = await createTemplate(templateData)
+            pageContainer.innerHTML = createdTemplate
             dataForPdf.push(pageContainer)
         }
     }

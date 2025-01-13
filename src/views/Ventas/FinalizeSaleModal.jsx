@@ -19,7 +19,7 @@ import api from '../../services'
 // Imports Destructurings
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
-const { fiscalVouchersCodes, formatBody } = helpers.afipHelper
+const { fiscalNotesCodes, formatBody, invoiceCodes, ticketCodes } = helpers.afipHelper
 const { resetDate } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const {
@@ -28,14 +28,6 @@ const {
     createRemittancePdf,
     createTicketPdf
 } = helpers.pdfHelper
-
-
-const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
-const fiscalNotesCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => [code.credit, code.debit])
-    .flat(1)
-    .filter(code => code !== null)
 
 
 const FinalizeSaleModal = () => {
@@ -142,15 +134,18 @@ const FinalizeSaleModal = () => {
     }
 
     const createSaleDocument = async () => {
-        let isCreated
+        let response
         if (sale_state.documento.codigoUnico === '000') { // No fiscal
-            if (sale_state.documento.nombre === 'PRESUPUESTO') isCreated = await createBudgetPdf(sale_state)
-            else if (sale_state.documento.nombre === 'REMITO') isCreated = await createRemittancePdf(sale_state)
-            else if (sale_state.documento.nombre === 'TICKET') isCreated = await createTicketPdf(sale_state)
+            if (sale_state.documento.presupuesto) response = await createBudgetPdf(sale_state)
+            else if (sale_state.documento.remito) response = await createRemittancePdf(sale_state)
+            else if (sale_state.documento.ticket) response = await createTicketPdf(sale_state)
+            else response = { isCreated: false }
         } else { // Fiscal
-            if (billCodes.includes(sale_state.documento.codigoUnico)) isCreated = await createInvoicePdf(sale_state)
+            if (invoiceCodes.includes(sale_state.documento.codigoUnico)) response = await createInvoicePdf(sale_state)
+            else if (ticketCodes.includes(sale_state.documento.codigoUnico)) response = await createTicketPdf(sale_state)
+            else response = { isCreated: false }
         }
-        if (!isCreated) return errorAlert('No se pudo generar el comprobante de la operación. Recupérelo desde la página de AFIP.')
+        if (!response.isCreated) return errorAlert('No se pudo generar el comprobante de la operación. Recupérelo desde la página de AFIP.')
     }
 
     const saveDailyBusinessStatistic = async () => {
@@ -237,10 +232,11 @@ const FinalizeSaleModal = () => {
     }
 
     const save = async () => {
+        sale_dispatch({ type: 'LOADING_VIEW' })
         const itsASale = sale_state.documento.cashRegister
 
         // Save daily business statistic
-        if (itsASale) await saveDailyBusinessStatistic()
+        if (itsASale) saveDailyBusinessStatistic()
 
         //Modify stock history of products
         saveStockHistoryOfProducts()
@@ -248,14 +244,15 @@ const FinalizeSaleModal = () => {
         //Modify stock of products
         const isNotFiscalNote = !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
         const conditionsToModifyStock = itsASale && isNotFiscalNote
-        if (conditionsToModifyStock) await applyStockModification()
+        if (conditionsToModifyStock) applyStockModification()
 
         //Save sale data in sales list
-        await saveSaleData()
+        saveSaleData()
 
         //Create document
-        await createSaleDocument()
+        createSaleDocument()
 
+        sale_dispatch({ type: 'LOADING_VIEW' })
         return successAlert('Comprobante emitido con éxito').then(reload)
     }
 

@@ -21,7 +21,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
-const { resetDate, simpleDateWithHours } = helpers.dateHelper
+const { localFormatToDateObj, resetDate, simpleDateWithHours } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
@@ -160,7 +160,7 @@ const SalidasForm = () => {
             balanceViewIncome: parseFloat(outputs_state.params.ganancia),
             balanceViewProfit: parseFloat(outputs_state.params.ganancia),
             concept: 'Generado automáticamente',
-            date: new Date(outputs_state.params.fechaString.substring(0, 10)),
+            date: localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10)),
             dateString: outputs_state.params.fechaString.substring(0, 10),
             salesViewExpense: 0,
             salesViewIncome: 0,
@@ -206,8 +206,7 @@ const SalidasForm = () => {
     const saveNew = async () => {
         const result = validateSave()
         if (result === 'FAIL') return
-        const statisticToEdit = await findStatisticByStringDate(outputs_state.params.fechaString)
-
+        
         // Corregir historial de stock de productos pertenecientes a la salida
         generateStockHistory()
 
@@ -221,6 +220,7 @@ const SalidasForm = () => {
         }
 
         // Corregir o crear la estadística diaria correspondiente a la fecha de la salida
+        const statisticToEdit = await findStatisticByStringDate(outputs_state.params.fechaString)
         if (statisticToEdit) {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
@@ -277,8 +277,9 @@ const SalidasForm = () => {
         }
         
         // Corregir la estadística diaria correspondiente a la fecha de la salida
+        const dateChanged = outputToEdit.fechaString.substring(0, 10) !== outputs_state.params.fechaString.substring(0, 10)
         const previousStatisticToEdit = await findStatisticByStringDate(outputToEdit.fechaString)
-        if (previousStatisticToEdit) {
+        if (previousStatisticToEdit && dateChanged) {
             const balanceViewIncome = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(outputs_state.params.ganancia)
             const balanceViewProfit = parseFloat(balanceViewIncome) - parseFloat(previousStatisticToEdit.balanceViewExpense)
             const edittedPreviousStatistic = {
@@ -294,7 +295,11 @@ const SalidasForm = () => {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
             const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ganancia)
-            const balanceViewIncome = roundTwoDecimals(currentBalanceViewIncome - incomeFromOutputToEdit + newAddedBalanceViewIncome)
+            const balanceViewIncome = roundTwoDecimals(
+                currentBalanceViewIncome
+                - (!dateChanged ? incomeFromOutputToEdit : 0)
+                + newAddedBalanceViewIncome
+            )
             const balanceViewProfit = roundTwoDecimals(balanceViewIncome - currentBalanceViewExpense)
             const editedStatistic = {
                 ...statisticToEdit,

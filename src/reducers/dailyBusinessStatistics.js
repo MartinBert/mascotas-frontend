@@ -15,8 +15,6 @@ const actions = {
     SET_EXPENSES_TO_BALANCE_VIEW: 'SET_EXPENSES_TO_BALANCE_VIEW',
     SET_INCOMES_TO_BALANCE_VIEW: 'SET_INCOMES_TO_BALANCE_VIEW',
     SET_LOADING: 'SET_LOADING',
-    SET_LOADING_SAVING_OPERATION: 'SET_LOADING_SAVING_OPERATION',
-    SET_LOADING_UPDATING_RECORDS: 'SET_LOADING_UPDATING_RECORDS',
     SET_PAGINATION_PARAMS: 'SET_PAGINATION_PARAMS',
     SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW',
     SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW',
@@ -40,8 +38,6 @@ const initialState = {
     },
     fixStatisticsModalIsVisible: false,
     loading: true,
-    loadingSavingOperation: false,
-    loadingUpdatingRecords: false,
     paginationParams: {
         filters: {
             balanceViewProfit: { $ne: 0 },
@@ -235,16 +231,6 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: action.payload
-            }
-        case actions.SET_LOADING_SAVING_OPERATION:
-            return {
-                ...state,
-                loadingSavingOperation: action.payload
-            }
-        case actions.SET_LOADING_UPDATING_RECORDS:
-            return {
-                ...state,
-                loadingUpdatingRecords: action.payload
             }
         case actions.SET_PAGINATION_PARAMS:
             return {

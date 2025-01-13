@@ -15,18 +15,8 @@ import api from '../../services'
 
 // Imports Destructuring
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
-const { fiscalVouchersCodes } = helpers.afipHelper
+const { creditCodes, debitCodes } = helpers.afipHelper
 const { roundTwoDecimals } = helpers.mathHelper
-
-const creditCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.credit)
-    .filter(code => code !== null)
-
-const debitCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.debit)
-    .filter(code => code !== null)
 
 
 const BalanceView = () => {
@@ -52,6 +42,7 @@ const BalanceView = () => {
     const loadExpenses = async () => {
         const statisticDate = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dateString
         const entriesFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
+        // Entries data
         const findEntries = await api.entradas.findAllByFilters(entriesFilters)
         const entries = findEntries.docs
         const entriesData = entries.map(entry => {
@@ -66,6 +57,7 @@ const BalanceView = () => {
             })
             return data
         })
+        // Credit notes data
         const creditNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: creditCodes })
         const findCreditNotes = await api.ventas.findAllByFilters(creditNotesFilters)
         const creditNotes = findCreditNotes.docs
@@ -78,7 +70,26 @@ const BalanceView = () => {
             }
             return dataItem
         })
-        const preData = [...entriesData.flat(), ...creditNotesData.flat()]
+        // IVA of sales and debit notes
+        const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
+        const findSales = await api.ventas.findAllByFilters(salesFilters)
+        const sales = findSales.docs
+            .filter(sale => sale.documento.cashRegister === true)
+            .filter(sale => !creditCodes.includes(sale.documentoCodigo))
+        const ivaOfSalesAndDebitNotesData = sales.map(sale => {
+            const isDebitNote = debitCodes.includes(sale.documentoCodigo)
+            const data = sale.renglones.map(line => {
+                const dataItem = {
+                    concept: isDebitNote ? 'Nota débito IVA' : 'Venta IVA',
+                    cost: line.importeIva,
+                    productName: isDebitNote ? '-' : line.nombre,
+                    quantity: isDebitNote ? 1 : line.cantidadUnidades
+                }
+                return dataItem
+            })
+            return data
+        }).flat().filter(dataItem => dataItem.cost !== 0)
+        const preData = [...creditNotesData.flat(), ...entriesData.flat(), ...ivaOfSalesAndDebitNotesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'expenseItem' + i } })
         const expensesData = { expenses: data, totalExpensesRecords: data.length }
         dailyBusinessStatistics_dispatch({ type: 'SET_EXPENSES_TO_BALANCE_VIEW', payload: expensesData })
@@ -150,7 +161,22 @@ const BalanceView = () => {
     // ---------------- Table of incomes ----------------- //
     const loadIncomes = async () => {
         const statisticDate = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dateString
+        const debitNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: debitCodes })
         const outputsFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
+        const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
+        // Debit notes
+        const findDebitNotes = await api.ventas.findAllByFilters(debitNotesFilters)
+        const debitNotes = findDebitNotes.docs
+        const debitNotesData = debitNotes.map(debitNote => {
+            const dataItem = {
+                concept: 'Nota débito',
+                productName: '-',
+                profit: debitNote.total,
+                quantity: 1
+            }
+            return dataItem
+        })
+        // Outputs
         const findOutputs = await api.salidas.findAllByFilters(outputsFilters)
         const outputs = findOutputs.docs
         const outputsData = outputs.map(output => {
@@ -165,7 +191,7 @@ const BalanceView = () => {
             })
             return data
         })
-        const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
+        // Sales
         const findSales = await api.ventas.findAllByFilters(salesFilters)
         const sales = findSales.docs
             .filter(sale => sale.documento.cashRegister === true)
@@ -181,18 +207,6 @@ const BalanceView = () => {
                 return dataItem
             })
             return data
-        })
-        const debitNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: debitCodes })
-        const findDebitNotes = await api.ventas.findAllByFilters(debitNotesFilters)
-        const debitNotes = findDebitNotes.docs
-        const debitNotesData = debitNotes.map(debitNote => {
-            const dataItem = {
-                concept: 'Nota débito',
-                productName: '-',
-                profit: debitNote.total,
-                quantity: 1
-            }
-            return dataItem
         })
         const preData = [...debitNotesData.flat(), ...outputsData.flat(), ...salesData.flat()]
         const data = preData.map((item, i) => { return { ...item, key: 'incomeItem' + i } })

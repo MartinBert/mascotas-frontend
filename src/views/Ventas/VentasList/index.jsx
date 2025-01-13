@@ -25,7 +25,7 @@ import Header from './Header'
 const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
 const { useRenderConditionsContext } = contexts.RenderConditions
 const { EmitDocument, PrintPdf } = icons
-const { fiscalVouchersCodes } = helpers.afipHelper
+const { creditCodes, debitCodes, invoiceCodes, invoiceAndTicketCodes, ticketCodes } = helpers.afipHelper
 const {
     createBudgetPdf,
     createCreditNotePdf,
@@ -36,21 +36,6 @@ const {
     validations
 } = helpers.pdfHelper
 const { getAssociatedData } = validations
-
-
-const creditCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.credit)
-    .filter(code => code !== null)
-
-const debitCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.debit)
-    .filter(code => code !== null)
-
-const voucherCodes = ['001', '016', '011', '051']
-
-const ticketCodes = ['081', '082', '083', '111', '118']
 
 
 const VentasList = () => {
@@ -141,7 +126,7 @@ const VentasList = () => {
             const associatedData = await getAssociatedData(venta, 'print')
             createDebitNotePdf(venta, associatedData)
         }
-        else if (voucherCodes.includes(venta.documento.codigoUnico)) return createInvoicePdf(venta)
+        else if (invoiceCodes.includes(venta.documento.codigoUnico)) return createInvoicePdf(venta)
         else return errorAlert('El sistema no identificó el documento de la venta. Inténtelo de nuevo o contacte al proveedor del servicio.')
     }
 
@@ -194,7 +179,7 @@ const VentasList = () => {
                         <PrintPdf />
                     </Col>
                     {
-                        fiscalVouchersCodes.includes(venta.documento.codigoUnico)
+                        invoiceAndTicketCodes.includes(venta.documento.codigoUnico)
                             ? (
                                 <Col
                                     onClick={() => openFiscalNoteModal(venta._id)}

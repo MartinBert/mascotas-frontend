@@ -23,7 +23,7 @@ const { publicRoutesData } = PublicRouter
 const { privateRoutesData } = PrivateRouter
 const { useAuthContext } = contexts.Auth
 const { usePrivateRouteContext } = contexts.PrivateRoute
-const { findNextVoucherNumber_fiscal, fiscalVouchersCodes } = helpers.afipHelper
+const { findNextVoucherNumber_fiscal, invoiceAndTicketCodes } = helpers.afipHelper
 
 // Load Afip services
 const getUserData = async () => {
@@ -35,9 +35,8 @@ const getUserData = async () => {
 const refreshAfipServices = async () => {
     const { loggedUser, isVerified } = verifyRefresh()
     if (!isVerified) return
-    const billCodes = fiscalVouchersCodes.filter(code => typeof code === 'string')
-    for (let index = 0; index < billCodes.length; index++) {
-        const code = billCodes[index]
+    for (let index = 0; index < invoiceAndTicketCodes.length; index++) {
+        const code = invoiceAndTicketCodes[index]
         const { empresa, puntoVenta } = loggedUser
         const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(code, empresa.cuit, puntoVenta.numero)
         if (!fiscalVoucherNumber) window.location.reload()

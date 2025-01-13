@@ -109,6 +109,15 @@ const localFormat = (unformattedDate) => {
     return fixedDay + '/' + fixedMonth + '/' + year
 }
 
+const localFormatToDateObj = (localFormatDate) => {
+    // localFormatDate is 'yyyy/mm/dd'
+    const day = parseFloat(localFormatDate.slice(0, 2))
+    const month = parseFloat(localFormatDate.slice(3, 5)) - 1
+    const year = parseFloat(localFormatDate.slice(6, 10))
+    const dateObj = new Date(year, month, day)
+    return dateObj
+}
+
 const simpleDateWithHours = (unformattedDate) => {
     const date = new Date(unformattedDate)
     const year = date.getFullYear().toString()
@@ -133,6 +142,7 @@ const dateHelper = {
     getYesterdayDate,
     isItLater,
     localFormat,
+    localFormatToDateObj,
     resetDate,
     simpleDateWithHours
 }

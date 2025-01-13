@@ -33,7 +33,6 @@ const FixStatisticsModal = () => {
     }
 
     const save = async () => {
-        dailyBusinessStatistics_dispatch({ type: 'SET_LOADING_SAVING_OPERATION', payload: true })
         const result = await api.dailyBusinessStatistics.save(dailyBusinessStatistics_state.params)
         dailyBusinessStatistics_dispatch({ type: 'CLEAR_STATE' })
         if (result.code === 500) return errorAlert('No se pudo guardar el registro, intente de nuevo más tarde.')
@@ -267,10 +266,7 @@ const FixStatisticsModal = () => {
                     <Col span={6}>
                         <Button
                             danger
-                            disabled={
-                                dailyBusinessStatistics_state.loading
-                                || dailyBusinessStatistics_state.loadingSavingOperation
-                            }
+                            disabled={dailyBusinessStatistics_state.loading}
                             onClick={() => cancel()}
                             style={{ width: '100%' }}
                             type='primary'
@@ -281,10 +277,7 @@ const FixStatisticsModal = () => {
                     <Col span={6}>
                         <Button
                             danger
-                            disabled={
-                                dailyBusinessStatistics_state.loading
-                                || dailyBusinessStatistics_state.loadingSavingOperation
-                            }
+                            disabled={dailyBusinessStatistics_state.loading}
                             htmlType='reset'
                             style={{ width: '100%' }}
                             type='default'
@@ -294,10 +287,7 @@ const FixStatisticsModal = () => {
                     </Col>
                     <Col span={6}>
                         <Button
-                            disabled={
-                                dailyBusinessStatistics_state.loading
-                                || dailyBusinessStatistics_state.loadingSavingOperation
-                            }
+                            disabled={dailyBusinessStatistics_state.loading}
                             htmlType='submit'
                             style={{ width: '100%' }}
                             type='primary'

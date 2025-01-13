@@ -18,14 +18,11 @@ import api from '../../services'
 
 // Imports Destructurings
 const { useSaleContext } = contexts.Sale
-const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, fiscalVouchersCodes } = helpers.afipHelper
+const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, creditCodes, debitCodes } = helpers.afipHelper
 const { dateToAfip, isItLater } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const { sortArrayOfSelectOptions } = helpers.objHelper
 const { fixInputNumber, fixInputNumberValue, nonCaseSensitive, normalizeString } = helpers.stringHelper
-
-const creditCodes = fiscalVouchersCodes.filter(item => typeof item !== 'string').map(code => code.credit).filter(code => code)
-const debitCodes = fiscalVouchersCodes.filter(item => typeof item !== 'string').map(code => code.debit).filter(code => code)
 
 
 const Header = () => {
@@ -50,6 +47,7 @@ const Header = () => {
             )
             number = noFiscalVoucherNumber
         }
+        if (isNaN(number)) return sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
         sale_dispatch({ type: 'SET_VOUCHER_NUMBERS', payload: number })
         sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
     }

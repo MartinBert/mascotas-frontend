@@ -68,9 +68,9 @@ const Header = () => {
     }
 
     const saveStatisticsViewType = async (viewType) => {
-        let res
-        const findStyles = await api.interfaceStyles.findAll()
         const stylesToSave = { ...interfaceStyles_state, typeOfDailyStatisticsView: viewType }
+        const findStyles = await api.interfaceStyles.findAll()
+        let res
         if (findStyles.length < 1) res = await api.interfaceStyles.save(stylesToSave)
         else {
             stylesToSave._id = findStyles[0]._id

@@ -63,11 +63,33 @@ const DailyBusinessStatistics = () => {
     }
 
     const fetchDailyBusinessStatistics = async () => {
-        const findParams = formatFindParams(dailyBusinessStatistics_state.paginationParams)
-        const data = await api.dailyBusinessStatistics.findPaginated(findParams)
+        const currentPaginationParams = dailyBusinessStatistics_state.paginationParams
+        const currentFilters = currentPaginationParams.filters
+        const typeOfStatisticsView = interfaceStyles_state.typeOfStatisticsView
+        if (!['balance', 'sales'].includes(typeOfStatisticsView)) {
+            return dailyBusinessStatistics_dispatch({ type: 'SET_LOADING', payload: true })
+        } else dailyBusinessStatistics_dispatch({ type: 'SET_LOADING', payload: false })
+
+        let filters
+        if (typeOfStatisticsView === 'balance') {
+            filters = {
+                ...currentFilters,
+                balanceViewProfit: !currentFilters.balanceViewProfit ? null : { $ne: 0 },
+                salesViewProfit: null
+            }
+        } else {
+            filters = {
+                ...currentFilters,
+                balanceViewProfit: null,
+                salesViewProfit: !currentFilters.salesViewProfit ? null : { $ne: 0 }
+            }
+        }
+        const paginationParams = { ...currentPaginationParams, filters }
+        const params = formatFindParams(paginationParams)
+        const data = await api.dailyBusinessStatistics.findPaginated(params)
         dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: data })
     }
-    
+
     useEffect(() => {
         fetchDailyBusinessStatistics()
         // eslint-disable-next-line
@@ -154,11 +176,13 @@ const DailyBusinessStatistics = () => {
             dataIndex: 'dailyBusinessStatistics_dailyBalance',
             render: (_, dailyBusinessStatistics) => {
                 return (
-                    <div style={{ color: profitColorCss(
-                        interfaceStyles_state.typeOfStatisticsView === 'balance'
-                            ? dailyBusinessStatistics.balanceViewProfit
-                            : dailyBusinessStatistics.salesViewProfit
-                    ), fontSize: '18px' }}>
+                    <div style={{
+                        color: profitColorCss(
+                            interfaceStyles_state.typeOfStatisticsView === 'balance'
+                                ? dailyBusinessStatistics.balanceViewProfit
+                                : dailyBusinessStatistics.salesViewProfit
+                        ), fontSize: '18px'
+                    }}>
                         <b>{roundTwoDecimals(
                             interfaceStyles_state.typeOfStatisticsView === 'balance'
                                 ? dailyBusinessStatistics.balanceViewProfit
@@ -214,26 +238,32 @@ const DailyBusinessStatistics = () => {
                                 <Header />
                             </Col>
                             <Col span={24}>
-                                <Table
-                                    columns={columnsForTable}
-                                    dataSource={dailyBusinessStatistics_state.recordsToRender}
-                                    loading={
-                                        dailyBusinessStatistics_state.loading
-                                        || dailyBusinessStatistics_state.loadingUpdatingRecords
-                                    }
-                                    pagination={{
-                                        defaultCurrent: dailyBusinessStatistics_state.paginationParams.page,
-                                        defaultPageSize: dailyBusinessStatistics_state.paginationParams.limit,
-                                        limit: dailyBusinessStatistics_state.paginationParams.limit,
-                                        onChange: (page, limit) => setPageAndLimit(page, limit),
-                                        showSizeChanger: true,
-                                        total: dailyBusinessStatistics_state.totalRecords
-                                    }}
-                                    rowKey='_id'
-                                    size='small'
-                                    tableLayout='auto'
-                                    width={'100%'}
-                                />
+                                {
+                                    dailyBusinessStatistics_state.loading
+                                        ? <div>Elija si desea ver los registros en formato "balance" o "ventas".</div>
+                                        : (
+                                            <Table
+                                                columns={columnsForTable}
+                                                dataSource={dailyBusinessStatistics_state.recordsToRender}
+                                                loading={
+                                                    dailyBusinessStatistics_state.loading
+                                                    || dailyBusinessStatistics_state.loadingUpdatingRecords
+                                                }
+                                                pagination={{
+                                                    defaultCurrent: dailyBusinessStatistics_state.paginationParams.page,
+                                                    defaultPageSize: dailyBusinessStatistics_state.paginationParams.limit,
+                                                    limit: dailyBusinessStatistics_state.paginationParams.limit,
+                                                    onChange: (page, limit) => setPageAndLimit(page, limit),
+                                                    showSizeChanger: true,
+                                                    total: dailyBusinessStatistics_state.totalRecords
+                                                }}
+                                                rowKey='_id'
+                                                size='small'
+                                                tableLayout='auto'
+                                                width={'100%'}
+                                            />
+                                        )
+                                }
                                 {
                                     satatisticsBalanceViewConditions
                                         ? <BalanceView />

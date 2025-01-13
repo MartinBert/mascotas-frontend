@@ -125,7 +125,10 @@ const sortArray = (elements, reversedKeysToCompare = null) => {
     if (typeOfElements === 'string') {
         const elementsWithLowerCaseInitial = elements.map(element => element.toLowerCase())
         return elementsWithLowerCaseInitial.sort()
+    } else if (typeOfElements === 'number') {
+        elements.sort((a, b) => a - b)
     }
+    
     const typesForLoopSort = ['array', 'object']
     if (typesForLoopSort.includes(typeOfElements)) {
         for (let index = 0; index < keysToCompare.length; index++) {
@@ -138,7 +141,7 @@ const sortArray = (elements, reversedKeysToCompare = null) => {
                 else return 0
             })
         }
-    } else if (typeOfElements === 'number') elements.sort((a, b) => a - b)
+    }
     return elements
 }
 

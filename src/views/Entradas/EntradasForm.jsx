@@ -21,7 +21,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
-const { resetDate, simpleDateWithHours } = helpers.dateHelper
+const { localFormatToDateObj, resetDate, simpleDateWithHours } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
@@ -160,7 +160,7 @@ const EntradasForm = () => {
             balanceViewIncome: 0,
             balanceViewProfit: - parseFloat(entries_state.params.costoTotal),
             concept: 'Generado automáticamente',
-            date: new Date(entries_state.params.fechaString.substring(0, 10)),
+            date: localFormatToDateObj(entries_state.params.fechaString.substring(0, 10)),
             dateString: entries_state.params.fechaString.substring(0, 10),
             salesViewExpense: 0,
             salesViewIncome: 0,
@@ -220,7 +220,7 @@ const EntradasForm = () => {
         }
 
         // Corregir o crear la estadística diaria correspondiente a la fecha de la entrada
-        const statisticToEdit = findStatisticByStringDate(entries_state.params.fechaString)
+        const statisticToEdit = await findStatisticByStringDate(entries_state.params.fechaString)
         if (statisticToEdit) {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
@@ -277,8 +277,9 @@ const EntradasForm = () => {
         }
 
         // Corregir la estadística diaria correspondiente a la fecha de la entrada
+        const dateChanged = entryToEdit.fechaString.substring(0, 10) !== entries_state.params.fechaString.substring(0, 10)
         const previousStatisticToEdit = await findStatisticByStringDate(entryToEdit.fechaString)
-        if (previousStatisticToEdit) {
+        if (previousStatisticToEdit && dateChanged) {
             const balanceViewExpense = parseFloat(previousStatisticToEdit.balanceViewExpense) - parseFloat(entries_state.params.costoTotal)
             const balanceViewProfit = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(balanceViewExpense)
             const edittedPreviousStatistic = {
@@ -294,7 +295,11 @@ const EntradasForm = () => {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
             const newAddedBalanceViewExpense = parseFloat(entries_state.params.costoTotal)
-            const balanceViewExpense = roundTwoDecimals(currentBalanceViewExpense - expenseFromEntryToEdit + newAddedBalanceViewExpense)
+            const balanceViewExpense = roundTwoDecimals(
+                currentBalanceViewExpense
+                - (!dateChanged ? expenseFromEntryToEdit : 0)
+                + newAddedBalanceViewExpense
+            )
             const balanceViewProfit = roundTwoDecimals(currentBalanceViewIncome - balanceViewExpense)
             const editedStatistic = {
                 ...statisticToEdit,

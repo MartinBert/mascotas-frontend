@@ -15,18 +15,8 @@ import api from '../../services'
 
 // Imports Destructuring
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
-const { fiscalVouchersCodes } = helpers.afipHelper
+const { creditCodes, debitCodes } = helpers.afipHelper
 const { roundTwoDecimals } = helpers.mathHelper
-
-const creditCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.credit)
-    .filter(code => code !== null)
-
-const debitCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.debit)
-    .filter(code => code !== null)
 
 
 const SalesView = () => {

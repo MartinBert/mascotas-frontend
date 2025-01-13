@@ -19,9 +19,11 @@ import api from '../../services'
 // Views
 import Header from './Header'
 import FinalizeSaleModal from './FinalizeSaleModal'
+import { errorAlert } from '../../components/alerts'
 
 // Imports Destructurings
 const { useSaleContext } = contexts.Sale
+const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal } = helpers.afipHelper
 const { round, roundTwoDecimals } = helpers.mathHelper
 const { fixInputNumber, fixInputNumberValue } = helpers.stringHelper
 
@@ -169,11 +171,39 @@ const Ventas = () => {
     }
 
     // ---------- Button to start finalize sale ---------- //
+    const loadNextVoucherNumber = async () => {
+        if (!sale_state.documento) return 'error'
+        if (!sale_state.empresa) return 'error'
+        sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
+        let number
+        if (sale_state.documento.fiscal) {
+            const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(
+                sale_state.documentoCodigo,
+                sale_state.empresaCuit,
+                sale_state.puntoVentaNumero
+            )
+            number = fiscalVoucherNumber
+        } else {
+            const noFiscalVoucherNumber = await findNextVoucherNumber_noFiscal(
+                sale_state.documentoCodigo
+            )
+            number = noFiscalVoucherNumber
+        }
+        if (isNaN(number)) {
+            sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
+            return 'error'
+        } else {
+            sale_dispatch({ type: 'SET_VOUCHER_NUMBERS', payload: number })
+            sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
+            return 'success'
+        }
+    }
+
     const restartErrorIfNotExistsProducts = () => {
         return sale_dispatch({ type: 'SET_ERROR_IF_NOT_EXISTS_PRODUCTS', payload: false })
     }
 
-    const startFinalizeSale = () => {
+    const startFinalizeSale = async () => {
         if (sale_state.renglones.length < 1) {
             sale_dispatch({ type: 'SET_ERROR_IF_NOT_EXISTS_PRODUCTS', payload: true })
             setTimeout(restartErrorIfNotExistsProducts, 2000)
@@ -189,6 +219,8 @@ const Ventas = () => {
         sale_dispatch({ type: 'SET_STATUS_TO_FINALIZE_SALE', payload: status })
         const errorAtStartFinalizeSale = Object.values(status).includes('error') || sale_state.existsLineError
         if (errorAtStartFinalizeSale) return
+        const loadVoucherNumber = await loadNextVoucherNumber()
+        if (loadVoucherNumber === 'error') errorAlert('Problemas al recuperar la correlación fiscal desde AFIP. Recargue la página.')
         sale_dispatch({ type: 'SHOW_FINALIZE_SALE_MODAL' })
     }
 

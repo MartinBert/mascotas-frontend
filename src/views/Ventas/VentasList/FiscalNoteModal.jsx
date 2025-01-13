@@ -19,22 +19,13 @@ import api from '../../../services'
 // Imports Destructuring
 const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
 const { Item } = Form
-const { formatBody, findNextVoucherNumber_fiscal, fiscalVouchersCodes } = helpers.afipHelper
+const { formatBody, findNextVoucherNumber_fiscal, fiscalVouchersCodes, creditCodes, debitCodes } = helpers.afipHelper
 const { existsProperty, spanishVoucherDataToSave } = helpers.objHelper
 const { roundToMultiple, decimalPercent } = helpers.mathHelper
 const { createCreditNotePdf, createDebitNotePdf, validations } = helpers.pdfHelper
 
 const { getAssociatedData } = validations
 
-const creditCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.credit)
-    .filter(code => code !== null)
-
-const debitCodes = fiscalVouchersCodes
-    .filter(item => typeof item !== 'string')
-    .map(code => code.debit)
-    .filter(code => code !== null)
 
 const existsFiscalNoteParams = (state) => {
     if (

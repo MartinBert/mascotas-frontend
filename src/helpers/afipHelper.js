@@ -76,6 +76,12 @@ const debitCodes = fiscalVouchersCodes
     .map(code => code.debit)
     .filter(code => code !== null)
 
+const fiscalNotesCodes = fiscalVouchersCodes
+    .filter(item => typeof item !== 'string')
+    .map(code => [code.credit, code.debit])
+    .flat(1)
+    .filter(code => code !== null)
+
 const invoiceCodes = fiscalVouchersCodes
     .filter(item => typeof item === 'string')
     .filter(code => parseFloat(code) < 81)
@@ -238,6 +244,7 @@ const afipHelper = {
     debitCodes,
     findNextVoucherNumber_fiscal,
     findNextVoucherNumber_noFiscal,
+    fiscalNotesCodes,
     fiscalVouchersCodes,
     formatBody,
     formatToCompleteVoucherNumber,
