@@ -316,6 +316,7 @@ const Home = () => {
     }
 
     const generateDailyBusinessStatistics = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
         const datesData = await generateDatesForCreateRecords()
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
@@ -338,25 +339,40 @@ const Home = () => {
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
-            const debitNotesInvoicesAndTickets = salesRecords
+            const cashRegisterVouchersExceptCreditNotes = salesRecords
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, voucher) => acc + voucher.total, 0)
-            const debitNotesInvoicesAndTicketsIva = salesRecords
+            const cashRegisterVouchersIVAExceptCreditNotes = salesRecords
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, voucher) => acc + voucher.importeIva, 0)
             const entries = entriesRecords.reduce((acc, entry) => acc + entry.costoTotal, 0)
             const outputs = outputsRecords.reduce((acc, output) => acc + output.ganancia, 0)
-            const salesListPrices = salesRecords
-                .filter(record => invoiceAndTicketCodes.includes(record.documentoCodigo))
-                .map(sale => sale.productos)
-                .flat()
-                .reduce((acc, product) => acc + product.precioUnitario, 0)
+            const salesListPricesData = salesRecords
+                .filter(record =>
+                    !creditCodes.includes(record.documentoCodigo)
+                    && !debitCodes.includes(record.documentoCodigo)
+                )
+                .map(sale => {
+                    const data = sale.productos.map(product => {
+                        const productLine = sale.renglones.find(line => line.nombre === product.nombre)
+                        const data = {
+                            productUnitPrice: product.precioUnitario,
+                            proportion: productLine.cantidadUnidades / productLine.fraccionamiento
+                        }
+                        return data
+                    })
+                    return data
+                })
 
-            const balanceViewExpense = creditNotes + debitNotesInvoicesAndTicketsIva + entries
-            const balanceViewIncome = debitNotesInvoicesAndTickets + outputs
+            const salesListPrices = salesListPricesData
+                .flat()
+                .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
+
+            const balanceViewExpense = creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries
+            const balanceViewIncome = cashRegisterVouchersExceptCreditNotes + outputs
             const balanceViewProfit = balanceViewIncome - balanceViewExpense
-            const salesViewExpense = creditNotes + debitNotesInvoicesAndTicketsIva + salesListPrices
-            const salesViewIncome = debitNotesInvoicesAndTickets
+            const salesViewExpense = creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices
+            const salesViewIncome = cashRegisterVouchersExceptCreditNotes
             const salesViewProfit = salesViewIncome - salesViewExpense
 
             const record = {
@@ -380,6 +396,7 @@ const Home = () => {
         }
 
         console.log('ready')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     const buttonToGenerateDailyBusinessStatistics = (
