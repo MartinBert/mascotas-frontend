@@ -20,7 +20,7 @@ import FirstSteps from './FirstSteps'
 // Imports Destructuring
 const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
-const { creditCodes, debitCodes, invoiceAndTicketCodes } = helpers.afipHelper
+const { creditCodes, debitCodes } = helpers.afipHelper
 const { localFormat } = helpers.dateHelper
 const { previousInteger, roundTwoDecimals } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
@@ -355,15 +355,18 @@ const Home = () => {
                 .map(sale => {
                     const data = sale.productos.map(product => {
                         const productLine = sale.renglones.find(line => line.nombre === product.nombre)
+                        const productQuantity = (
+                            productLine.cantidadUnidades
+                            ?? productLine.precioBruto / product.precioUnitario
+                        )
                         const data = {
                             productUnitPrice: product.precioUnitario,
-                            proportion: productLine.cantidadUnidades / productLine.fraccionamiento
+                            proportion: productQuantity / productLine.fraccionamiento
                         }
                         return data
                     })
                     return data
                 })
-
             const salesListPrices = salesListPricesData
                 .flat()
                 .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
@@ -388,7 +391,7 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-
+        
         // Save records
         for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
             const record = dailyBusinessStatisticsToSave[index]

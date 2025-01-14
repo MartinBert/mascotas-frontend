@@ -6,7 +6,7 @@ import helpers from '../helpers'
 
 const { decimalPercent, previousInteger, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
 const { formatToCompleteVoucherNumber } = helpers.afipHelper
-const { localFormat, simpleDateWithHours } = helpers.dateHelper
+const { afipDateToLocalFormat, localFormat, simpleDateWithHours } = helpers.dateHelper
 
 
 const actions = {
@@ -531,7 +531,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 cae: action.payload.CAE,
-                vencimientoCae: action.payload.CAEFchVto,
+                vencimientoCae: afipDateToLocalFormat(action.payload.CAEFchVto),
                 closedSale: true
             }
         case actions.CLOSE_NO_FISCAL_OPERATION:

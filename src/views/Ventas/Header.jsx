@@ -720,7 +720,16 @@ const Header = () => {
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
         const options = productsNotYetSelected.map(product => {
             return {
-                label: product.codigoBarras + ` (${product.nombre})`,
+                label: (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ fontWeight: 'bold', width: '50%' }}>
+                            {product.codigoBarras}
+                        </div>
+                        <div style={{ width: '50%' }}>
+                            {'(' + product.nombre + ')'}
+                        </div>
+                    </div>
+                ),
                 value: product.normalizedBarcode
             }
         })

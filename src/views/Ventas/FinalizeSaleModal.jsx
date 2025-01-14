@@ -82,7 +82,7 @@ const FinalizeSaleModal = () => {
         const responseOfAfip = await api.afip.generateVoucher(auth_state.user.empresa.cuit, bodyToAfip)
         if (!responseOfAfip) {
             return (
-                errorAlert('Ocurrió un error al solicitar la creción del comprobante a AFIP. Intente de nuevo.')
+                errorAlert('Ocurrió un error al solicitar la creación del comprobante a AFIP. Intente de nuevo.')
                     .then(() => sale_dispatch({ type: 'SET_LOADING_TO_FINALIZE_SALE' }))
             )
         }

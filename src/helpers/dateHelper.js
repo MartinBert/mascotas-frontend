@@ -24,10 +24,12 @@ const addDays = (
 }
 
 const afipDateToLocalFormat = (stringAfipDate) => {
-    const parsedStringDate = stringAfipDate.slice(0, 8)
+    if (!stringAfipDate) return 'no-data'
+    const includesHyphen = stringAfipDate.includes('-')
+    const parsedStringDate = includesHyphen ? stringAfipDate.slice(0, 10) : stringAfipDate.slice(0, 8)
     const year = parsedStringDate.slice(0, 4)
-    const month = parsedStringDate.slice(4, 6)
-    const day = parsedStringDate.slice(6, 8)
+    const month = includesHyphen ? parsedStringDate.slice(5, 7) : parsedStringDate.slice(4, 6)
+    const day = includesHyphen ? parsedStringDate.slice(8, 10) : parsedStringDate.slice(6, 8)
     const localformat = day + '/' + month + '/' + year
     return localformat
 }

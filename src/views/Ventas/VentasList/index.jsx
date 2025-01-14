@@ -26,6 +26,7 @@ const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
 const { useRenderConditionsContext } = contexts.RenderConditions
 const { EmitDocument, PrintPdf } = icons
 const { creditCodes, debitCodes, invoiceCodes, invoiceAndTicketCodes, ticketCodes } = helpers.afipHelper
+const { afipDateToLocalFormat } = helpers.dateHelper
 const {
     createBudgetPdf,
     createCreditNotePdf,
@@ -110,14 +111,32 @@ const VentasList = () => {
         fiscalNoteModal_dispatch({ type: 'SET_REFERENCE_VOUCHER', payload: referenceVoucher })
         fiscalNoteModal_dispatch({ type: 'SHOW_FISCAL_NOTE_MODAL' })
     }
-
+    
     const printVoucher = async (venta) => {
-        if (venta.documento.presupuesto) return createBudgetPdf(venta)
-        else if (venta.documento.remito) return createRemittancePdf(venta)
+        if (venta.documento.presupuesto) {
+            if (venta.documento.fiscal) {
+                venta.cae = venta.cae ?? 'no-data'
+                venta.vencimientoCae = afipDateToLocalFormat(venta.vencimientoCae)
+            }
+            return createBudgetPdf(venta)
+        }
+        else if (venta.documento.remito) {
+            if (venta.documento.fiscal) {
+                venta.cae = venta.cae ?? 'no-data'
+                venta.vencimientoCae = afipDateToLocalFormat(venta.vencimientoCae)
+            }
+            return createRemittancePdf(venta)
+        }
         else if (
             venta.documento.ticket
             || ticketCodes.includes(venta.documento.codigoUnico)
-        ) return createTicketPdf(venta)
+        ) {
+            if (venta.documento.fiscal) {
+                venta.cae = venta.cae ?? 'no-data'
+                venta.vencimientoCae = afipDateToLocalFormat(venta.vencimientoCae)
+            }
+            return createTicketPdf(venta)
+        }
         else if (creditCodes.includes(venta.documento.codigoUnico)) {
             const associatedData = await getAssociatedData(venta, 'print')
             createCreditNotePdf(venta, associatedData)
@@ -126,7 +145,13 @@ const VentasList = () => {
             const associatedData = await getAssociatedData(venta, 'print')
             createDebitNotePdf(venta, associatedData)
         }
-        else if (invoiceCodes.includes(venta.documento.codigoUnico)) return createInvoicePdf(venta)
+        else if (invoiceCodes.includes(venta.documento.codigoUnico)) {
+            if (venta.documento.fiscal) {
+                venta.cae = venta.cae ?? 'no-data'
+                venta.vencimientoCae = afipDateToLocalFormat(venta.vencimientoCae)
+            }
+            return createInvoicePdf(venta)
+        }
         else return errorAlert('El sistema no identificó el documento de la venta. Inténtelo de nuevo o contacte al proveedor del servicio.')
     }
 
