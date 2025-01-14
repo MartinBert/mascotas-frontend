@@ -335,7 +335,7 @@ const Home = () => {
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
             const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
-
+            console.log(salesRecords)
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
@@ -354,6 +354,8 @@ const Home = () => {
                 )
                 .map(sale => {
                     const data = sale.productos.map(product => {
+                        console.log(product)
+                        console.log(sale)
                         const productLine = sale.renglones.find(line => line.nombre === product.nombre)
                         console.log(productLine)
                         const productQuantity = (
