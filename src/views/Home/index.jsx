@@ -335,6 +335,8 @@ const Home = () => {
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
             const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
+            console.log(findSalesFilters)
+            console.log(findSales)
             console.log(findSales.docs)
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
@@ -354,8 +356,6 @@ const Home = () => {
                 )
                 .map(sale => {
                     const data = sale.productos.map(product => {
-                        console.log(product)
-                        console.log(sale)
                         const productLine = sale.renglones.find(line => line.nombre === product.nombre)
                         console.log(productLine)
                         const productQuantity = (
@@ -394,7 +394,7 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-        console.log(dailyBusinessStatisticsToSave)
+
         // Save records
         for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
             const record = dailyBusinessStatisticsToSave[index]
