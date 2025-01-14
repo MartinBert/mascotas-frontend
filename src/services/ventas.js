@@ -49,10 +49,10 @@ const findAll = async () => {
     }
 }
 
-const findAllByFilters = async (dateFilters) => {
+const findAllByFilters = async (filters) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?filters=${dateFilters}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/ventas?filters=${filters}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)

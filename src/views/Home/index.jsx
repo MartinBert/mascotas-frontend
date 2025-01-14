@@ -335,44 +335,105 @@ const Home = () => {
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
             const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
-            console.log(findSalesFilters)
-            console.log(findEntries)
-            console.log(findSales.docs)
-            const creditNotes = salesRecords
-                .filter(record => creditCodes.includes(record.documentoCodigo))
-                .reduce((acc, creditNote) => acc + creditNote.total, 0)
-            const cashRegisterVouchersExceptCreditNotes = salesRecords
-                .filter(record => !creditCodes.includes(record.documentoCodigo))
-                .reduce((acc, voucher) => acc + voucher.total, 0)
-            const cashRegisterVouchersIVAExceptCreditNotes = salesRecords
-                .filter(record => !creditCodes.includes(record.documentoCodigo))
-                .reduce((acc, voucher) => acc + voucher.importeIva, 0)
-            const entries = entriesRecords.reduce((acc, entry) => acc + entry.costoTotal, 0)
-            const outputs = outputsRecords.reduce((acc, output) => acc + output.ganancia, 0)
-            const salesListPricesData = salesRecords
-                .filter(record =>
-                    !creditCodes.includes(record.documentoCodigo)
-                    && !debitCodes.includes(record.documentoCodigo)
-                )
-                .map(sale => {
-                    const data = sale.productos.map(product => {
-                        const productLine = sale.renglones.find(line => line.nombre === product.nombre)
-                        console.log(productLine)
-                        const productQuantity = (
-                            productLine.cantidadUnidades
-                            ?? productLine.precioBruto / product.precioUnitario
-                        )
-                        const data = {
-                            productUnitPrice: product.precioUnitario,
-                            proportion: productQuantity / productLine.fraccionamiento
-                        }
-                        return data
-                    })
-                    return data
-                })
-            const salesListPrices = salesListPricesData
-                .flat()
-                .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
+
+            const existsCashRegisterVouchersExceptCreditNotes = (
+                salesRecords.length < 1
+                    ? false
+                    : salesRecords.filter(record => !creditCodes.includes(record.documentoCodigo)).length < 1
+                        ? false
+                        : true
+            )
+            const existsCashRegisterVouchersExceptCreditAndDebitNotes = (
+                salesRecords.length < 1
+                    ? false
+                    : salesRecords.filter(record => 
+                        !creditCodes.includes(record.documentoCodigo)
+                        && !debitCodes.includes(record.documentoCodigo)
+                    ).length < 1
+                        ? false
+                        : true
+            )
+            const existsCreditNotes = (
+                salesRecords.length < 1
+                    ? false
+                    : salesRecords.filter(record => creditCodes.includes(record.documentoCodigo)).length < 1
+                        ? false
+                        : true
+            )
+
+            const creditNotes = (
+                existsCreditNotes
+                    ? (
+                        salesRecords
+                            .filter(record => creditCodes.includes(record.documentoCodigo))
+                            .reduce((acc, creditNote) => acc + creditNote.total, 0)
+                    )
+                    : 0
+            )
+            const cashRegisterVouchersExceptCreditNotes = (
+                existsCashRegisterVouchersExceptCreditNotes
+                    ? (
+                        salesRecords
+                            .filter(record => !creditCodes.includes(record.documentoCodigo))
+                            .reduce((acc, voucher) => acc + voucher.total, 0)
+                    )
+                    : 0
+            )
+            const cashRegisterVouchersIVAExceptCreditNotes = (
+                existsCashRegisterVouchersExceptCreditNotes
+                    ? (
+                        salesRecords
+                            .filter(record => !creditCodes.includes(record.documentoCodigo))
+                            .reduce((acc, voucher) => acc + voucher.importeIva, 0)
+                    )
+                    : 0
+            )
+            const entries = (
+                entriesRecords.length > 0
+                    ? entriesRecords.reduce((acc, entry) => acc + entry.costoTotal, 0)
+                    : 0
+            )
+            const outputs = (
+                outputsRecords.length > 0
+                    ? outputsRecords.reduce((acc, output) => acc + output.ganancia, 0)
+                    : 0
+            )
+            const salesListPricesData = (
+                existsCashRegisterVouchersExceptCreditAndDebitNotes
+                    ? (
+                        salesRecords
+                            .filter(record =>
+                                !creditCodes.includes(record.documentoCodigo)
+                                && !debitCodes.includes(record.documentoCodigo)
+                            )
+                            .map(sale => {
+                                const data = sale.productos.map(product => {
+                                    const productLine = sale.renglones.find(line => line.nombre === product.nombre)
+                                    console.log(productLine)
+                                    const productQuantity = (
+                                        productLine.cantidadUnidades
+                                        ?? productLine.precioBruto / product.precioUnitario
+                                    )
+                                    const data = {
+                                        productUnitPrice: product.precioUnitario,
+                                        proportion: productQuantity / productLine.fraccionamiento
+                                    }
+                                    return data
+                                })
+                                return data
+                            })
+                    )
+                    : []
+            )
+            const salesListPrices = (
+                salesListPricesData.length > 0
+                    ? (
+                        salesListPricesData
+                            .flat()
+                            .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
+                    )
+                    : 0
+            )
 
             const balanceViewExpense = creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries
             const balanceViewIncome = cashRegisterVouchersExceptCreditNotes + outputs
