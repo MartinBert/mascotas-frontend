@@ -355,6 +355,7 @@ const Home = () => {
                 .map(sale => {
                     const data = sale.productos.map(product => {
                         const productLine = sale.renglones.find(line => line.nombre === product.nombre)
+                        console.log(productLine)
                         const productQuantity = (
                             productLine.cantidadUnidades
                             ?? productLine.precioBruto / product.precioUnitario
@@ -391,7 +392,7 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-        
+        console.log(dailyBusinessStatisticsToSave)
         // Save records
         for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
             const record = dailyBusinessStatisticsToSave[index]
