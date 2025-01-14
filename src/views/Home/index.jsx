@@ -331,7 +331,7 @@ const Home = () => {
             const findSalesFilters = JSON.stringify({ fechaEmisionString: stringDate })
             const findEntries = await api.entradas.findAllByFilters(findEntriesFilters)
             const findOutputs = await api.salidas.findAllByFilters(findOutputsFilters)
-            const findSales = await api.ventas.findAllByFilters(findSalesFilters)
+            const findSales = await api.ventas.findAll()
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
             const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
