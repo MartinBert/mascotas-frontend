@@ -335,7 +335,7 @@ const Home = () => {
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
             const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
-            console.log(salesRecords)
+            console.log(findSales.docs)
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
