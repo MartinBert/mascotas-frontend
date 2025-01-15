@@ -320,12 +320,14 @@ const Home = () => {
         const datesData = await generateDatesForCreateRecords()
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
-        const documentsx = await api.documentos.findAll()
-        const ventasx = await api.ventas.findAll()
-        console.log('DOCUMENTOS')
-        console.log(documentsx.docs)
-        console.log('VENTAS')
-        console.log(ventasx.docs)
+
+        const filtersss = JSON.stringify({ fechaEmisionString: '15/01/2025' })
+        const findSale = await api.ventas.findAllByFilters(filtersss)
+        const findSaless = await api.ventas.findAllByFilters({ fechaEmisionString: '15/01/2025' })
+
+        console.log(findSale)
+        console.log(findSaless)
+
         // Generate records
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < stringDatesForCreateRecords.length; index++) {
@@ -339,8 +341,8 @@ const Home = () => {
             const findSales = await api.ventas.findAllByFilters(findSalesFilters)
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
-            const salesRecords = findSales.docs.filter(record => record.documento.cashRegister === true)
-            console.log(findSales)
+            const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
+
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
