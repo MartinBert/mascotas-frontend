@@ -320,7 +320,12 @@ const Home = () => {
         const datesData = await generateDatesForCreateRecords()
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
-        
+        const documentsx = await api.documentos.findAll()
+        const ventasx = await api.ventas.findAll()
+        console.log('DOCUMENTOS')
+        console.log(documentsx.docs)
+        console.log('VENTAS')
+        console.log(ventasx.docs)
         // Generate records
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < stringDatesForCreateRecords.length; index++) {
@@ -335,10 +340,7 @@ const Home = () => {
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
             const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
-            console.log('RECORDS ------------------------')
-            console.log(salesRecords)
-            console.log('FILTERED RECORDS ---------------')
-            console.log(salesRecords)
+
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
