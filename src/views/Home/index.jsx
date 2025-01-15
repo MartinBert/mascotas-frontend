@@ -339,8 +339,8 @@ const Home = () => {
             const findSales = await api.ventas.findAllByFilters(findSalesFilters)
             const entriesRecords = findEntries.docs
             const outputsRecords = findOutputs.docs
-            const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
-
+            const salesRecords = findSales.docs.filter(record => record.documento.cashRegister === true)
+            console.log(findSales)
             const creditNotes = salesRecords
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
