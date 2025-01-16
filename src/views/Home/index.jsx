@@ -361,19 +361,10 @@ const Home = () => {
                 )
                 .map(sale => {
                     const data = sale.productos.map(product => {
-                        const productLine = sale.renglones.find(line =>
-                            (line.nombre ?? line.productoNombre) === product.nombre
-                        )
-                        const productQuantity = (
-                            productLine.cantidadUnidades
-                            ?? ((
-                                productLine.precioBruto
-                                ?? productLine.productoPrecioUnitario * productLine.cantidadUnidades
-                            ) / product.precioUnitario)
-                        )
+                        const productLine = sale.renglones.find(line => line.nombre === product.nombre)
                         const data = {
                             productUnitPrice: product.precioUnitario,
-                            proportion: productQuantity / (productLine.fraccionamiento ?? productLine.productoFraccionamiento)
+                            proportion: productLine.cantidadUnidades / productLine.fraccionamiento
                         }
                         return data
                     })
@@ -423,14 +414,62 @@ const Home = () => {
     )
 
     // ------------------------- AAAAAAAAAAAAAAAAAAAAAAAAA --------------------------- //
+    const numberAndRound = (value) => {
+        const parsedValue = roundTwoDecimals(parseFloat(value))
+        return parsedValue
+    }
+
     const updateLinesOfSales = async () => {
         const findSales = await api.ventas.findAll()
         const sales = findSales.docs
 
+        const salesWithUpdatedLines = sales.map(sale => {
+            const updatedLines = sale.renglones.map(line => {
+                const productLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
+                const precioNeto = numberAndRound(line.precioNeto) ?? numberAndRound(line.totalRenglon)
 
+                const updatedLine = {
+                    cantidadAgregadaPorDescuento_enKg: numberAndRound(line.cantidadAgregadaPorDescuento_enKg) ?? 0,
+                    cantidadKg: numberAndRound(line.cantidadKg) ?? 0,
+                    cantidadQuitadaPorRecargo_enKg: numberAndRound(line.cantidadQuitadaPorRecargo_enKg) ?? 0,
+                    cantidadUnidades: numberAndRound(line.cantidadUnidades),
+                    cantidadg: numberAndRound(line.cantidadg) ?? 0,
+                    codigoBarras: line.codigoBarras ?? line.productoCodigoBarras,
+                    createdAt: line.createdAt,
+                    descuento: numberAndRound(line.descuento) ?? numberAndRound(line.importeDescuentoRenglon),
+                    fraccionamiento: numberAndRound(line.fraccionamiento) ?? numberAndRound(line.productoFraccionamiento),
+                    fraccionar: line.fraccionar,
+                    importeIva: numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva),
+                    nombre: line.nombre ?? line.productoNombre,
+                    nota: line.nota ?? '',
+                    porcentajeDescuentoRenglon: numberAndRound(line.porcentajeDescuentoRenglon),
+                    porcentajeIva: numberAndRound(line.porcentajeIva) ?? numberAndRound(line.productoPorcentajeIva),
+                    porcentajeRecargoRenglon: numberAndRound(line.porcentajeRecargoRenglon),
+                    precioBruto: numberAndRound(line.precioBruto) ?? numberAndRound(parseFloat(line.cantidadUnidades) * parseFloat(line.productoPrecioUnitario)),
+                    precioNeto,
+                    precioNetoFijo: line.precioNetoFijo ?? false,
+                    precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
+                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - parseFloat(productLine.precioUnitario)),
+                    recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon),
+                    updatedAt: line.updatedAt,
+                    __v: line.__v,
+                    _id: line._id
+                }
+                return updatedLine
+            })
 
+            const calculatedSaleProfit = updatedLines.reduce((acc, line) => acc + line.profit, 0)
+            const updatedSale = {
+                ...sale,
+                profit: sale.profit ?? calculatedSaleProfit,
+                renglones: updatedLines
+            }
+            return updatedSale
+        })
 
-        console.log(sales)
+        console.log(salesWithUpdatedLines)
+        // const res = await api.ventas.saveAll(salesWithUpdatedLines)
+        // if (res.code !== 200) return errorAlert('No se pudo actualizar las ventas.')
     }
 
     const buttonToUpdateLinesOfSales = (

@@ -38,6 +38,17 @@ const edit = async (venta) => {
     }
 }
 
+const editAll = async (ventas) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/edit_all`, ventas, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findAll = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -171,10 +182,22 @@ const save = async (venta) => {
     }
 }
 
+const saveAll = async (ventas) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/ventas/save_all`, ventas, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const ventas = {
     countRecords,
     deleteVenta,
     edit,
+    editAll,
     findAll,
     findAllByFilters,
     findById,
@@ -186,7 +209,8 @@ const ventas = {
     findOldestRecord,
     findOldestSale,
     findPaginated,
-    save
+    save,
+    saveAll
 }
 
 export default ventas
