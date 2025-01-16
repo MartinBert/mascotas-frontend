@@ -342,7 +342,7 @@ const Home = () => {
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < dataForCreateRecords.length; index++) {
             const dataItem = dataForCreateRecords[index]
-
+            console.log(dataItem)
             const creditNotes = dataItem.sales
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
@@ -400,10 +400,10 @@ const Home = () => {
         }
         console.log(dailyBusinessStatisticsToSave)
         // Save records
-        for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
-            const record = dailyBusinessStatisticsToSave[index]
-            await api.dailyBusinessStatistics.save(record)
-        }
+        // for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
+        //     const record = dailyBusinessStatisticsToSave[index]
+        //     await api.dailyBusinessStatistics.save(record)
+        // }
 
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
