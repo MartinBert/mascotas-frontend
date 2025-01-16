@@ -450,7 +450,7 @@ const Home = () => {
                     precioNeto,
                     precioNetoFijo: line.precioNetoFijo ?? false,
                     precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
-                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - parseFloat(productLine.precioUnitario)),
+                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - parseFloat(productLine.precioUnitario ?? productLine.productoPrecioUnitario)),
                     recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon),
                     updatedAt: line.updatedAt,
                     __v: line.__v,
