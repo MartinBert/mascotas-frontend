@@ -426,7 +426,10 @@ const Home = () => {
 
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
-                const productLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
+                const productLine = sale.productos.find(product => line.nombre
+                    ? product.nombre === line.nombre
+                    : product.nombre === line.productoNombre
+                )
                 const precioNeto = numberAndRound(line.precioNeto) ?? numberAndRound(line.totalRenglon)
 
                 const updatedLine = {
@@ -450,7 +453,7 @@ const Home = () => {
                     precioNeto,
                     precioNetoFijo: line.precioNetoFijo ?? false,
                     precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
-                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - parseFloat(productLine.precioUnitario ?? productLine.productoPrecioUnitario)),
+                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - parseFloat(productLine.precioUnitario)),
                     recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon),
                     updatedAt: line.updatedAt,
                     __v: line.__v,
