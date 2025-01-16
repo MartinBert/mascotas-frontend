@@ -426,9 +426,11 @@ const Home = () => {
 
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
-                const productLine = sale.productos.find(product => line.nombre
-                    ? product.nombre === line.nombre
-                    : product.nombre === line.productoNombre
+                const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva)
+                const precioLista = numberAndRound(
+                    parseFloat(line.productoPrecioUnitario)
+                    * parseFloat(line.cantidadUnidades)
+                    / parseFloat(line.fraccionar ? line.productoFraccionamiento : 1)
                 )
                 const precioNeto = numberAndRound(line.precioNeto) ?? numberAndRound(line.totalRenglon)
 
@@ -443,7 +445,7 @@ const Home = () => {
                     descuento: numberAndRound(line.descuento) ?? numberAndRound(line.importeDescuentoRenglon),
                     fraccionamiento: numberAndRound(line.fraccionamiento) ?? numberAndRound(line.productoFraccionamiento),
                     fraccionar: line.fraccionar,
-                    importeIva: numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva),
+                    importeIva,
                     nombre: line.nombre ?? line.productoNombre,
                     nota: line.nota ?? '',
                     porcentajeDescuentoRenglon: numberAndRound(line.porcentajeDescuentoRenglon),
@@ -453,7 +455,7 @@ const Home = () => {
                     precioNeto,
                     precioNetoFijo: line.precioNetoFijo ?? false,
                     precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
-                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - parseFloat(productLine.precioUnitario)),
+                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - precioLista - importeIva),
                     recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon),
                     updatedAt: line.updatedAt,
                     __v: line.__v,
