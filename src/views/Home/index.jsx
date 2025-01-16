@@ -415,6 +415,7 @@ const Home = () => {
 
     // ------------------------- AAAAAAAAAAAAAAAAAAAAAAAAA --------------------------- //
     const numberAndRound = (value) => {
+        if (!value) return null
         const parsedValue = roundTwoDecimals(parseFloat(value))
         return parsedValue
     }
