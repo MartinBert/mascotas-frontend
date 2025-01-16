@@ -337,7 +337,7 @@ const Home = () => {
             }
             return dataItem
         })
-        console.log(findSales.docs)
+
         // Generate records
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < dataForCreateRecords.length; index++) {
@@ -421,6 +421,27 @@ const Home = () => {
             Generar
         </Button>
     )
+
+    // ------------------------- AAAAAAAAAAAAAAAAAAAAAAAAA --------------------------- //
+    const updateLinesOfSales = async () => {
+        const findSales = await api.ventas.findAll()
+        const sales = findSales.docs
+
+
+
+
+        console.log(sales)
+    }
+
+    const buttonToUpdateLinesOfSales = (
+        <Button
+            onClick={updateLinesOfSales}
+            type='primary'
+        >
+            Generar
+        </Button>
+    )
+
 
     // ------------------------- Button to generate data from SEED --------------------------- //
     const generateSeedData = async () => {
@@ -733,6 +754,13 @@ const Home = () => {
     ]
 
     const source = [
+        {
+            description: 'Actualizar registro de renglones de ventas.',
+            key: 'home_buttonToUpdateLinesOfSales',
+            primaryAction: buttonToUpdateLinesOfSales,
+            renderable: true,
+            secondaryAction: null
+        },
         {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
             key: 'home_buttonToConsoleSupportedVouchers',
