@@ -321,40 +321,40 @@ const Home = () => {
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
 
-        const stringDate = '15/01/2025'
-        const filtersss = JSON.stringify({ fechaEmisionString: stringDate })
-        const findSale = await api.ventas.findAllByFilters(filtersss)
-
-        console.log(findSale)
-        console.log(stringDatesForCreateRecords)
+        const findEntries = await api.entradas.findAll()
+        const findOutputs = await api.salidas.findAll()
+        const findSales = await api.ventas.findAll()
+        const entriesRecords = findEntries.docs
+        const outputsRecords = findOutputs.docs
+        const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
+        const dataForCreateRecords = stringDatesForCreateRecords.map((stringDate, index) => {
+            const dataItem = {
+                date: datesForCreateRecords[index],
+                entries: entriesRecords.filter(record => record.fechaString === stringDate),
+                outputs: outputsRecords.filter(record => record.fechaString === stringDate),
+                stringDate,
+                sales: salesRecords.filter(record => record.fechaEmisionString === stringDate)
+            }
+            return dataItem
+        })
 
         // Generate records
         const dailyBusinessStatisticsToSave = []
-        for (let index = 0; index < stringDatesForCreateRecords.length; index++) {
-            const date = datesForCreateRecords[index]
-            const stringDate = stringDatesForCreateRecords[index]
-            const findEntriesFilters = JSON.stringify({ fechaString: stringDate })
-            const findOutputsFilters = JSON.stringify({ fechaString: stringDate })
-            const findSalesFilters = JSON.stringify({ fechaEmisionString: stringDate })
-            const findEntries = await api.entradas.findAllByFilters(findEntriesFilters)
-            const findOutputs = await api.salidas.findAllByFilters(findOutputsFilters)
-            const findSales = await api.ventas.findAllByFilters(findSalesFilters)
-            const entriesRecords = findEntries.docs
-            const outputsRecords = findOutputs.docs
-            const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
+        for (let index = 0; index < dataForCreateRecords.length; index++) {
+            const dataItem = dataForCreateRecords[index]
 
-            const creditNotes = salesRecords
+            const creditNotes = dataItem.sales
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
-            const cashRegisterVouchersExceptCreditNotes = salesRecords
+            const cashRegisterVouchersExceptCreditNotes = dataItem.sales
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, voucher) => acc + voucher.total, 0)
-            const cashRegisterVouchersIVAExceptCreditNotes = salesRecords
+            const cashRegisterVouchersIVAExceptCreditNotes = dataItem.sales
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, voucher) => acc + voucher.importeIva, 0)
-            const entries = entriesRecords.reduce((acc, entry) => acc + entry.costoTotal, 0)
-            const outputs = outputsRecords.reduce((acc, output) => acc + output.ganancia, 0)
-            const salesListPricesData = salesRecords
+            const entries = dataItem.entries.reduce((acc, entry) => acc + entry.costoTotal, 0)
+            const outputs = dataItem.outputs.reduce((acc, output) => acc + output.ganancia, 0)
+            const salesListPricesData = dataItem.sales
                 .filter(record =>
                     !creditCodes.includes(record.documentoCodigo)
                     && !debitCodes.includes(record.documentoCodigo)
@@ -390,8 +390,8 @@ const Home = () => {
                 balanceViewIncome,
                 balanceViewProfit,
                 concept: 'Generado automáticamente',
-                date,
-                dateString: stringDate,
+                date: dataItem.date,
+                dateString: dataItem.stringDate,
                 salesViewExpense,
                 salesViewIncome,
                 salesViewProfit
@@ -400,10 +400,10 @@ const Home = () => {
         }
 
         // Save records
-        // for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
-        //     const record = dailyBusinessStatisticsToSave[index]
-        //     await api.dailyBusinessStatistics.save(record)
-        // }
+        for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
+            const record = dailyBusinessStatisticsToSave[index]
+            await api.dailyBusinessStatistics.save(record)
+        }
 
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
