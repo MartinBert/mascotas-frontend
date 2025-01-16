@@ -361,17 +361,19 @@ const Home = () => {
                 )
                 .map(sale => {
                     const data = sale.productos.map(product => {
-                        console.log(product)
-                        console.log(sale.renglones)
-                        console.log(sale.renglones.find(line => line.nombre === product.nombre))
-                        const productLine = sale.renglones.find(line => line.nombre === product.nombre)
+                        const productLine = sale.renglones.find(line =>
+                            (line.nombre ?? line.productoNombre) === product.nombre
+                        )
                         const productQuantity = (
                             productLine.cantidadUnidades
-                            ?? productLine.precioBruto / product.precioUnitario
+                            ?? ((
+                                productLine.precioBruto
+                                ?? productLine.productoPrecioUnitario * productLine.cantidadUnidades
+                            ) / product.precioUnitario)
                         )
                         const data = {
                             productUnitPrice: product.precioUnitario,
-                            proportion: productQuantity / productLine.fraccionamiento
+                            proportion: productQuantity / (productLine.fraccionamiento ?? productLine.productoFraccionamiento)
                         }
                         return data
                     })
@@ -402,7 +404,7 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-
+        console.log(dailyBusinessStatisticsToSave)
         // Save records
         // const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
         // if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
