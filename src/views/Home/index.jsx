@@ -400,9 +400,20 @@ const Home = () => {
             dailyBusinessStatisticsToSave.push(record)
         }
 
+        console.log('ENTRADAS')
+        console.log(entriesRecords)
+        console.log('SALIDAS')
+        console.log(outputsRecords)
+        console.log('VENTAS')
+        console.log(salesRecords)
+        console.log('DATA')
+        console.log(dataForCreateRecords)
+        console.log('REGISTROS PARA GUARDAR')
+        console.log(dailyBusinessStatisticsToSave)
+
         // Save records
-        const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
-        if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
+        // const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
+        // if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
 
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
