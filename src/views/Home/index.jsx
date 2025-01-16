@@ -398,7 +398,7 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-
+        console.log(dailyBusinessStatisticsToSave)
         // Save records
         for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
             const record = dailyBusinessStatisticsToSave[index]
