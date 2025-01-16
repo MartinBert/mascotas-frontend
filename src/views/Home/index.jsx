@@ -321,12 +321,12 @@ const Home = () => {
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
 
-        const filtersss = JSON.stringify({ fechaEmisionString: '15/01/2025' })
+        const stringDate = '15/01/2025
+        const filtersss = JSON.stringify({ fechaEmisionString: stringDate })
         const findSale = await api.ventas.findAllByFilters(filtersss)
-        const findSaless = await api.ventas.findAllByFilters({ fechaEmisionString: '15/01/2025' })
 
         console.log(findSale)
-        console.log(findSaless)
+        console.log(stringDatesForCreateRecords)
 
         // Generate records
         const dailyBusinessStatisticsToSave = []
