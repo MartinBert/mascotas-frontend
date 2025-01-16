@@ -321,7 +321,7 @@ const Home = () => {
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
 
-        const stringDate = '15/01/2025
+        const stringDate = '15/01/2025'
         const filtersss = JSON.stringify({ fechaEmisionString: stringDate })
         const findSale = await api.ventas.findAllByFilters(filtersss)
 
