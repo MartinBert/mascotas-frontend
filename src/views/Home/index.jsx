@@ -426,7 +426,14 @@ const Home = () => {
 
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
-                const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva)
+                const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
+                const existsProductOfLine = !productOfLine ? false : true
+                console.log('----------------------')
+                console.log(line.nombre ?? line.productoNombre)
+                console.log(productOfLine)
+                console.log(existsProductOfLine)
+                console.log('----------------------')
+                const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
                 const precioLista = numberAndRound(
                     parseFloat(line.productoPrecioUnitario)
                     * parseFloat(line.cantidadUnidades)
@@ -442,21 +449,21 @@ const Home = () => {
                     cantidadg: numberAndRound(line.cantidadg) ?? 0,
                     codigoBarras: line.codigoBarras ?? line.productoCodigoBarras,
                     createdAt: line.createdAt,
-                    descuento: numberAndRound(line.descuento) ?? numberAndRound(line.importeDescuentoRenglon),
-                    fraccionamiento: numberAndRound(line.fraccionamiento) ?? numberAndRound(line.productoFraccionamiento),
+                    descuento: numberAndRound(line.descuento) ?? numberAndRound(line.importeDescuentoRenglon) ?? 0,
+                    fraccionamiento: numberAndRound(line.fraccionamiento) ?? numberAndRound(line.productoFraccionamiento) ?? 1,
                     fraccionar: line.fraccionar,
                     importeIva,
                     nombre: line.nombre ?? line.productoNombre,
                     nota: line.nota ?? '',
-                    porcentajeDescuentoRenglon: numberAndRound(line.porcentajeDescuentoRenglon),
-                    porcentajeIva: numberAndRound(line.porcentajeIva) ?? numberAndRound(line.productoPorcentajeIva),
-                    porcentajeRecargoRenglon: numberAndRound(line.porcentajeRecargoRenglon),
+                    porcentajeDescuentoRenglon: numberAndRound(line.porcentajeDescuentoRenglon) ?? 0,
+                    porcentajeIva: numberAndRound(line.porcentajeIva) ?? numberAndRound(line.productoPorcentajeIva) ?? 0,
+                    porcentajeRecargoRenglon: numberAndRound(line.porcentajeRecargoRenglon) ?? 0,
                     precioBruto: numberAndRound(line.precioBruto) ?? numberAndRound(parseFloat(line.cantidadUnidades) * parseFloat(line.productoPrecioUnitario)),
                     precioNeto,
                     precioNetoFijo: line.precioNetoFijo ?? false,
                     precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
                     profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - precioLista - importeIva),
-                    recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon),
+                    recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon) ?? 0,
                     updatedAt: line.updatedAt,
                     __v: line.__v,
                     _id: line._id
