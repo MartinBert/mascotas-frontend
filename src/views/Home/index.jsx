@@ -337,7 +337,7 @@ const Home = () => {
             }
             return dataItem
         })
-
+        console.log(findSales.docs)
         // Generate records
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < dataForCreateRecords.length; index++) {
