@@ -338,6 +338,15 @@ const Home = () => {
             return dataItem
         })
 
+        console.log('ENTRADAS')
+        console.log(entriesRecords)
+        console.log('SALIDAS')
+        console.log(outputsRecords)
+        console.log('VENTAS')
+        console.log(salesRecords)
+        console.log('DATA')
+        console.log(dataForCreateRecords)
+
         // Generate records
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < dataForCreateRecords.length; index++) {
@@ -400,14 +409,7 @@ const Home = () => {
             dailyBusinessStatisticsToSave.push(record)
         }
 
-        console.log('ENTRADAS')
-        console.log(entriesRecords)
-        console.log('SALIDAS')
-        console.log(outputsRecords)
-        console.log('VENTAS')
-        console.log(salesRecords)
-        console.log('DATA')
-        console.log(dataForCreateRecords)
+        
         console.log('REGISTROS PARA GUARDAR')
         console.log(dailyBusinessStatisticsToSave)
 
