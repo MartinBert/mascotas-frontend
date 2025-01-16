@@ -120,6 +120,15 @@ const localFormatToDateObj = (localFormatDate) => {
     return dateObj
 }
 
+const numberOrderDate = (stringDateInLocalFormat) => { // local format: dd/mm/yyyy
+    const day = stringDateInLocalFormat.slice(0, 2)
+    const month = stringDateInLocalFormat.slice(3, 5)
+    const year = stringDateInLocalFormat.slice(6, 10)
+    const stringOrderDate = year + month + day
+    const numberOrderDate = parseFloat(stringOrderDate)
+    return numberOrderDate // yyyymmdd
+}
+
 const simpleDateWithHours = (unformattedDate) => {
     const date = new Date(unformattedDate)
     const year = date.getFullYear().toString()
@@ -145,6 +154,7 @@ const dateHelper = {
     isItLater,
     localFormat,
     localFormatToDateObj,
+    numberOrderDate,
     resetDate,
     simpleDateWithHours
 }

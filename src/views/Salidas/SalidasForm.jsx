@@ -21,7 +21,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
-const { localFormatToDateObj, resetDate, simpleDateWithHours } = helpers.dateHelper
+const { localFormatToDateObj, numberOrderDate, resetDate, simpleDateWithHours } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
@@ -161,6 +161,7 @@ const SalidasForm = () => {
             balanceViewProfit: parseFloat(outputs_state.params.ganancia),
             concept: 'Generado automáticamente',
             date: localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10)),
+            dateOrder: numberOrderDate(outputs_state.params.fechaString.substring(0, 10)),
             dateString: outputs_state.params.fechaString.substring(0, 10),
             salesViewExpense: 0,
             salesViewIncome: 0,

@@ -20,7 +20,7 @@ import api from '../../services'
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalNotesCodes, formatBody, invoiceCodes, ticketCodes } = helpers.afipHelper
-const { resetDate } = helpers.dateHelper
+const { numberOrderDate, resetDate } = helpers.dateHelper
 const { roundTwoDecimals } = helpers.mathHelper
 const {
     createBudgetPdf,
@@ -175,6 +175,7 @@ const FinalizeSaleModal = () => {
                 balanceViewProfit: sale_state.total - sale_state.importeIva,
                 concept: 'Generado automáticamente',
                 date: new Date(sale_state.fechaEmisionString.substring(0, 10)),
+                dateOrder: numberOrderDate(sale_state.fechaEmisionString.substring(0, 10)),
                 dateString: sale_state.fechaEmisionString.substring(0, 10),
                 salesViewExpense: saleListPricesAndIva,
                 salesViewIncome: sale_state.total,

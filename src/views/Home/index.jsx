@@ -21,7 +21,7 @@ import FirstSteps from './FirstSteps'
 const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
 const { creditCodes, debitCodes } = helpers.afipHelper
-const { localFormat } = helpers.dateHelper
+const { localFormat, numberOrderDate } = helpers.dateHelper
 const { previousInteger, roundTwoDecimals } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
 
@@ -330,10 +330,10 @@ const Home = () => {
         const dataForCreateRecords = stringDatesForCreateRecords.map((stringDate, index) => {
             const dataItem = {
                 date: datesForCreateRecords[index],
-                entries: entriesRecords.filter(record => record.fechaString === stringDate),
-                outputs: outputsRecords.filter(record => record.fechaString === stringDate),
+                entries: entriesRecords.filter(record => record.fechaString.substring(0,10) === stringDate),
+                outputs: outputsRecords.filter(record => record.fechaString.substring(0,10) === stringDate),
                 stringDate,
-                sales: salesRecords.filter(record => record.fechaEmisionString === stringDate)
+                sales: salesRecords.filter(record => record.fechaEmisionString.substring(0,10) === stringDate)
             }
             return dataItem
         })
@@ -342,7 +342,7 @@ const Home = () => {
         const dailyBusinessStatisticsToSave = []
         for (let index = 0; index < dataForCreateRecords.length; index++) {
             const dataItem = dataForCreateRecords[index]
-            console.log(dataItem)
+
             const creditNotes = dataItem.sales
                 .filter(record => creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, creditNote) => acc + creditNote.total, 0)
@@ -391,6 +391,7 @@ const Home = () => {
                 balanceViewProfit,
                 concept: 'Generado automáticamente',
                 date: dataItem.date,
+                dateOrder: numberOrderDate(dataItem.stringDate),
                 dateString: dataItem.stringDate,
                 salesViewExpense,
                 salesViewIncome,
@@ -398,12 +399,10 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-        console.log(dailyBusinessStatisticsToSave)
+
         // Save records
-        // for (let index = 0; index < dailyBusinessStatisticsToSave.length; index++) {
-        //     const record = dailyBusinessStatisticsToSave[index]
-        //     await api.dailyBusinessStatistics.save(record)
-        // }
+        const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
+        if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
 
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })

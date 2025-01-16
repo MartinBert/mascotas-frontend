@@ -1,5 +1,8 @@
 // Helpers
 import dayjs from 'dayjs'
+import helpers from '../helpers'
+
+const { numberOrderDate } = helpers.dateHelper
 
 
 const actions = {
@@ -54,6 +57,7 @@ const initialState = {
         balanceViewProfit: 0,
         concept: '',
         date: null,
+        dateOrder: null,
         dateString: null,
         salesViewExpense: 0,
         salesViewIncome: 0,
@@ -291,6 +295,7 @@ const reducer = (state = initialState, action) => {
                 params: {
                     ...state.params,
                     date: action.payload.date,
+                    dateOrder: numberOrderDate(action.payload.dateString.substring(0,10)),
                     dateString: action.payload.dateString
                 },
                 referenceStatistics
