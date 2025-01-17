@@ -427,15 +427,10 @@ const Home = () => {
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
-                const existsProductOfLine = !productOfLine ? false : true
-                console.log('----------------------')
-                console.log(line.nombre ?? line.productoNombre)
-                console.log(productOfLine)
-                console.log(existsProductOfLine)
-                console.log('----------------------')
+
                 const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
                 const precioLista = numberAndRound(
-                    parseFloat(line.productoPrecioUnitario)
+                    parseFloat(productOfLine.precioUnitario)
                     * parseFloat(line.cantidadUnidades)
                     / parseFloat(line.fraccionar ? line.productoFraccionamiento : 1)
                 )
@@ -462,7 +457,7 @@ const Home = () => {
                     precioNeto,
                     precioNetoFijo: line.precioNetoFijo ?? false,
                     precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
-                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - precioLista - importeIva),
+                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - precioLista - productOfLine.ivaVenta),
                     recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon) ?? 0,
                     updatedAt: line.updatedAt,
                     __v: line.__v,
