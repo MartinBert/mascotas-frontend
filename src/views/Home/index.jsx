@@ -427,10 +427,10 @@ const Home = () => {
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
-                console.log(!productOfLine ? false : true)
+
                 const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
                 const precioLista = numberAndRound(
-                    parseFloat(productOfLine.precioUnitario ?? line.productoPrecioUnitario)
+                    parseFloat(productOfLine?.precioUnitario ?? line.productoPrecioUnitario)
                     * parseFloat(line.cantidadUnidades)
                     / parseFloat(line.fraccionar ? line.productoFraccionamiento : 1)
                 )
