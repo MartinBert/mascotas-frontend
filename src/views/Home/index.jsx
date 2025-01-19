@@ -427,14 +427,15 @@ const Home = () => {
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
+                const productOfLineProfitPercentage = line.fraccionar ? productOfLine.margenGanancia : productOfLine.margenGananciaFraccionado
                 console.log('---------------------------------------')
                 console.log(line)
                 console.log(productOfLine)
                 const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
+                const precioBruto = numberAndRound(line.precioBruto) ?? numberAndRound(parseFloat(line.cantidadUnidades) * parseFloat(line.productoPrecioUnitario))
                 const precioLista = numberAndRound(
-                    parseFloat(productOfLine?.precioUnitario ?? line.productoPrecioUnitario)
-                    * parseFloat(line.cantidadUnidades)
-                    / parseFloat(line.fraccionar ? line.productoFraccionamiento : 1)
+                    (parseFloat(precioBruto) - parseFloat(importeIva))
+                    / (1 + productOfLineProfitPercentage)
                 )
                 const precioNeto = numberAndRound(line.precioNeto) ?? numberAndRound(line.totalRenglon)
 
@@ -455,11 +456,11 @@ const Home = () => {
                     porcentajeDescuentoRenglon: numberAndRound(line.porcentajeDescuentoRenglon) ?? 0,
                     porcentajeIva: numberAndRound(line.porcentajeIva) ?? numberAndRound(line.productoPorcentajeIva) ?? 0,
                     porcentajeRecargoRenglon: numberAndRound(line.porcentajeRecargoRenglon) ?? 0,
-                    precioBruto: numberAndRound(line.precioBruto) ?? numberAndRound(parseFloat(line.cantidadUnidades) * parseFloat(line.productoPrecioUnitario)),
+                    precioBruto,
                     precioNeto,
                     precioNetoFijo: line.precioNetoFijo ?? false,
                     precioUnitario: numberAndRound(line.precioUnitario) ?? numberAndRound(line.productoPrecioUnitario),
-                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - precioLista - importeIva),
+                    profit: numberAndRound(line.profit) ?? numberAndRound(precioNeto - precioLista),
                     recargo: numberAndRound(line.recargo) ?? numberAndRound(line.importeRecargoRenglon) ?? 0,
                     updatedAt: line.updatedAt,
                     __v: line.__v,
