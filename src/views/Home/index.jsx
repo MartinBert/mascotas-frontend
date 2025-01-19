@@ -427,12 +427,14 @@ const Home = () => {
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
-                const productOfLineProfitPercentage = (line.fraccionar === true && !!productOfLine.margenGananciaFraccionado)
-                    ? productOfLine.margenGananciaFraccionado
-                    : productOfLine.margenGanancia
                 console.log('---------------------------------------')
                 console.log(line)
                 console.log(productOfLine)
+                const productOfLineProfitPercentage = (line.fraccionar === true && !!productOfLine.margenGananciaFraccionado)
+                    ? productOfLine.margenGananciaFraccionado
+                    : productOfLine.margenGanancia
+                
+                console.log(productOfLineProfitPercentage)
                 const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
                 const precioBruto = (
                     numberAndRound(line.precioBruto)
