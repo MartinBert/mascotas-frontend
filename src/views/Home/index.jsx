@@ -427,7 +427,7 @@ const Home = () => {
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
-                const productOfLineProfitPercentage = line.fraccionar ? productOfLine.margenGanancia : productOfLine.margenGananciaFraccionado
+                const productOfLineProfitPercentage = (line.fraccionar ? productOfLine.margenGanancia : productOfLine.margenGananciaFraccionado) ?? productOfLine.margenGanancia
                 console.log('---------------------------------------')
                 console.log(line)
                 console.log(productOfLine)
