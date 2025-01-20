@@ -431,6 +431,34 @@ const Home = () => {
                 return productOfLineProfitPercentage = 60
             case 'comisión por servicio venta estacionamiento Noviembre':
                 return productOfLineProfitPercentage = 9999999
+            case 'COLLAR ISABELINO N 5 Y 6':
+                return productOfLineProfitPercentage = 50
+            case 'LABIAL VOLUMINIZADOR VITAMINA E 70093':
+                return productOfLineProfitPercentage = 150
+            case 'comisión por servicio venta estacionamiento Octubre':
+                return productOfLineProfitPercentage = 9999999
+            case 'comisión por servicio venta estacionamiento Septiembre':
+                return productOfLineProfitPercentage = 9999999
+            case 'LAPIZ PARA OJOS USHAS NEGRO':
+                return productOfLineProfitPercentage = 150
+            case 'Test 1':
+                return productOfLineProfitPercentage = 0
+            case 'Nuevo producto test':
+                return productOfLineProfitPercentage = 0
+            case 'KIT DE CABLE foco -cable- portafoco':
+                return productOfLineProfitPercentage = 100
+            case 'CASCADA AFRICA 20 CM':
+                return productOfLineProfitPercentage = 150
+            case 'CASCADA AFRICA 20 CM':
+                return productOfLineProfitPercentage = 150
+            case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
+                return productOfLineProfitPercentage = 150
+            case 'comisión por servicio venta estacionamiento Agosto':
+                return productOfLineProfitPercentage = 0
+            case 'PALO SANTO NATURAL':
+                return productOfLineProfitPercentage = 150
+            case 'COLLAR ISABELINO N 1 Y 2':
+                return productOfLineProfitPercentage = 50
         }
 
         // Exceptions

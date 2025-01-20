@@ -114,9 +114,7 @@ const Productos = () => {
     const fetchProducts = async () => {
         const findParamsForRender = formatFindParams(products_state.index.paginationParams)
         const dataForRender = await api.productos.findPaginated(findParamsForRender)
-        const dataForExport = await api.productos.findAllByFilters(findParamsForRender.filters)
         products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
-        products_dispatch({ type: 'SET_PRODUCTS_FOR_EXCEL_REPORT', payload: dataForExport.docs })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
