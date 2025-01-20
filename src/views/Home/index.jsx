@@ -425,40 +425,60 @@ const Home = () => {
 
         // Particular cases
         switch (line.nombre) {
-            case 'comisión por servicio venta estacionamiento Diciembre':
-                return productOfLineProfitPercentage = 9999999
-            case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
-                return productOfLineProfitPercentage = 60
-            case 'comisión por servicio venta estacionamiento Noviembre':
-                return productOfLineProfitPercentage = 9999999
-            case 'COLLAR ISABELINO N 5 Y 6':
-                return productOfLineProfitPercentage = 50
-            case 'LABIAL VOLUMINIZADOR VITAMINA E 70093':
-                return productOfLineProfitPercentage = 150
-            case 'comisión por servicio venta estacionamiento Octubre':
-                return productOfLineProfitPercentage = 9999999
-            case 'comisión por servicio venta estacionamiento Septiembre':
-                return productOfLineProfitPercentage = 9999999
-            case 'LAPIZ PARA OJOS USHAS NEGRO':
-                return productOfLineProfitPercentage = 150
-            case 'Test 1':
-                return productOfLineProfitPercentage = 0
-            case 'Nuevo producto test':
-                return productOfLineProfitPercentage = 0
-            case 'KIT DE CABLE foco -cable- portafoco':
-                return productOfLineProfitPercentage = 100
             case 'CASCADA AFRICA 20 CM':
-                return productOfLineProfitPercentage = 150
-            case 'CASCADA AFRICA 20 CM':
-                return productOfLineProfitPercentage = 150
-            case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
-                return productOfLineProfitPercentage = 150
-            case 'comisión por servicio venta estacionamiento Agosto':
-                return productOfLineProfitPercentage = 0
-            case 'PALO SANTO NATURAL':
                 return productOfLineProfitPercentage = 150
             case 'COLLAR ISABELINO N 1 Y 2':
                 return productOfLineProfitPercentage = 50
+            case 'COLLAR ISABELINO N 5 Y 6':
+                return productOfLineProfitPercentage = 50
+            case 'comisión por servicio venta estacionamiento Agosto':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Diciembre':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Julio':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Noviembre':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Octubre':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Septiembre':
+                return productOfLineProfitPercentage = 999999
+            case 'EXCELLENT DOG PUPPY SMALL C&R X 15KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'EXCELLENT CAT CHICKET & RICE X 15KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'ABONCITOS C/GLICERINA':
+                return productOfLineProfitPercentage = 60
+            case 'KIT DE CABLE foco -cable- portafoco':
+                return productOfLineProfitPercentage = 100
+            case 'LAPIZ PARA OJOS USHAS NEGRO':
+                return productOfLineProfitPercentage = 150
+            case 'LABIAL VOLUMINIZADOR VITAMINA E 70093':
+                return productOfLineProfitPercentage = 150
+            case 'Nuevo producto test':
+                return productOfLineProfitPercentage = 0
+            case 'PALO SANTO NATURAL':
+                return productOfLineProfitPercentage = 150
+            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N1':
+                return productOfLineProfitPercentage = 115
+            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N2':
+                return productOfLineProfitPercentage = 100
+            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N3':
+                return productOfLineProfitPercentage = 100
+            case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
+                return productOfLineProfitPercentage = 60
+            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N5':
+                return productOfLineProfitPercentage = 60
+            case 'SAHUMERIO AROMANZA 40 TIBETANO ENCANTO FLORAL X 8 UN':
+                return productOfLineProfitPercentage = 150
+            case 'SAHUMERIO TIBETANO SENSACIONES DIVINAS AROMANZA X 8 UN':
+                return productOfLineProfitPercentage = 150
+            case 'SAHUMERIO TIBETANO SENSACIONES DIVINAS AROMANZA X 8 UN':
+                return productOfLineProfitPercentage = 150
+            case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
+                return productOfLineProfitPercentage = 150
+            case 'Test 1':
+                return productOfLineProfitPercentage = 0
         }
 
         // Exceptions
