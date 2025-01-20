@@ -421,15 +421,31 @@ const Home = () => {
     }
 
     const calculateProductOfLineProfitPercentage = (line, productOfLine) => {
+        let productOfLineProfitPercentage
+
+        // Particular cases
+        switch (line.nombre) {
+            case 'comisión por servicio venta estacionamiento Diciembre':
+                return productOfLineProfitPercentage = 9999999
+            case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
+                return productOfLineProfitPercentage = 60
+            case 'comisión por servicio venta estacionamiento Noviembre':
+                return productOfLineProfitPercentage = 9999999
+        }
+
+        // Exceptions
         if (!productOfLine) return null
         if (
             typeof line.fraccionar === undefined
             || typeof productOfLine.margenGanancia === undefined
             || typeof productOfLine.margenGananciaFraccionado === undefined
         ) return null
-        const productOfLineProfitPercentage = line.fraccionar
+
+        // Regular cases
+        productOfLineProfitPercentage = line.fraccionar
             ? productOfLine.margenGananciaFraccionado
             : productOfLine.margenGanancia
+
         return productOfLineProfitPercentage
     }
 
@@ -455,7 +471,7 @@ const Home = () => {
                 )
                 const precioLista = numberAndRound(
                     (parseFloat(precioBruto) - parseFloat(importeIva))
-                    / (1 + productOfLineProfitPercentage)
+                    / (1 + productOfLineProfitPercentage / 100)
                 )
                 const precioNeto = numberAndRound(line.precioNeto) ?? numberAndRound(line.totalRenglon)
 
