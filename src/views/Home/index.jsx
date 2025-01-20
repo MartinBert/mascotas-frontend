@@ -444,7 +444,7 @@ const Home = () => {
                 const productOfLineProfitPercentage = calculateProductOfLineProfitPercentage(line, productOfLine)
 
                 if (!productOfLineProfitPercentage) {
-                    const aaadata = {product, productOfLine}
+                    const aaadata = {line, productOfLine}
                     return aaa.push(aaadata)
                 }
 
