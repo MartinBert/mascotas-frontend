@@ -420,21 +420,34 @@ const Home = () => {
         return parsedValue
     }
 
+    const calculateProductOfLineProfitPercentage = (line, productOfLine) => {
+        if (!productOfLine) return null
+        if (
+            typeof line.fraccionar === undefined
+            || typeof productOfLine.margenGanancia === undefined
+            || typeof productOfLine.margenGananciaFraccionado === undefined
+        ) return null
+        const productOfLineProfitPercentage = line.fraccionar
+            ? productOfLine.margenGananciaFraccionado
+            : productOfLine.margenGanancia
+        return productOfLineProfitPercentage
+    }
+
     const updateLinesOfSales = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
         const sales = findSales.docs
-
+        const aaa = []
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
-                console.log('---------------------------------------')
-                console.log(line)
-                console.log(productOfLine)
-                const productOfLineProfitPercentage = (line.fraccionar === true && !!productOfLine.margenGananciaFraccionado)
-                    ? productOfLine.margenGananciaFraccionado
-                    : productOfLine.margenGanancia
-                
-                console.log(productOfLineProfitPercentage)
+                const productOfLineProfitPercentage = calculateProductOfLineProfitPercentage(line, productOfLine)
+
+                if (!productOfLineProfitPercentage) {
+                    const aaadata = {product, productOfLine}
+                    return aaa.push(aaadata)
+                }
+
                 const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
                 const precioBruto = (
                     numberAndRound(line.precioBruto)
@@ -475,7 +488,7 @@ const Home = () => {
                 }
                 return updatedLine
             })
-
+            
             const calculatedSaleProfit = updatedLines.reduce((acc, line) => acc + line.profit, 0)
             const updatedSale = {
                 ...sale,
@@ -484,10 +497,11 @@ const Home = () => {
             }
             return updatedSale
         })
-
+        console.log(aaa)
         console.log(salesWithUpdatedLines)
         // const res = await api.ventas.saveAll(salesWithUpdatedLines)
         // if (res.code !== 200) return errorAlert('No se pudo actualizar las ventas.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     const buttonToUpdateLinesOfSales = (
