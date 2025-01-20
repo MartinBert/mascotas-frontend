@@ -112,6 +112,7 @@ const Productos = () => {
 
     // ------------------ Fetch Products ------------------ //
     const fetchProducts = async () => {
+        if (!products_state.index.paginationParams) return
         const findParamsForRender = formatFindParams(products_state.index.paginationParams)
         const dataForRender = await api.productos.findPaginated(findParamsForRender)
         products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
