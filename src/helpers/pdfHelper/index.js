@@ -207,7 +207,7 @@ const createProductsCataloguePdf = async (productsCatalogueData) => {
         divFrame: 'catalogue',
         docName: 'LISTA_PRECIOS_' + localFormat(new Date()),
         numberOfLinesInFrontPage: exportWithImages ? 8 : 31,
-        numberOfLinesPerPage: exportWithImages ? 12 : 45,
+        numberOfLinesPerPage: exportWithImages ? 10 : 42,
         qrImage,
         sheetSize: [297, 210]
     }

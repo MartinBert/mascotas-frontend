@@ -425,17 +425,33 @@ const Home = () => {
 
         // Particular cases
         switch (line.nombre) {
+            case 'BUDA ALTAR CASCADA/PORTA VELA':
+                return productOfLineProfitPercentage = 150
+            case 'BUZO CON CAPUCHA T10-70CM':
+                return productOfLineProfitPercentage = 90
             case 'CASCADA AFRICA 20 CM':
                 return productOfLineProfitPercentage = 150
             case 'COLLAR ISABELINO N 1 Y 2':
                 return productOfLineProfitPercentage = 50
             case 'COLLAR ISABELINO N 5 Y 6':
                 return productOfLineProfitPercentage = 50
+            case 'comisión por servicio venta estacionamiento Abril':
+                return productOfLineProfitPercentage = 999999
             case 'comisión por servicio venta estacionamiento Agosto':
                 return productOfLineProfitPercentage = 999999
             case 'comisión por servicio venta estacionamiento Diciembre':
                 return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Enero':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento  Febrero':
+                return productOfLineProfitPercentage = 999999
             case 'comisión por servicio venta estacionamiento Julio':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Junio':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento  Marzo':
+                return productOfLineProfitPercentage = 999999
+            case 'comisión por servicio venta estacionamiento Mayo':
                 return productOfLineProfitPercentage = 999999
             case 'comisión por servicio venta estacionamiento Noviembre':
                 return productOfLineProfitPercentage = 999999
@@ -443,11 +459,19 @@ const Home = () => {
                 return productOfLineProfitPercentage = 999999
             case 'comisión por servicio venta estacionamiento Septiembre':
                 return productOfLineProfitPercentage = 999999
-            case 'EXCELLENT DOG PUPPY SMALL C&R X 15KG':
-                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'DHOOP INCENSE - MIRRA':
+                return productOfLineProfitPercentage = 150
             case 'EXCELLENT CAT CHICKET & RICE X 15KG':
                 return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
-            case 'ABONCITOS C/GLICERINA':
+            case 'EXCELLENT CAT CHICKET & RICE X 7,5KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'EXCELLENT DOG PUPPY MED/LGE C&R X 15KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'EXCELLENT DOG PUPPY MED/LGE C&R X 20KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'EXCELLENT DOG PUPPY SMALL C&R X 15KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'JABONCITOS C/GLICERINA':
                 return productOfLineProfitPercentage = 60
             case 'KIT DE CABLE foco -cable- portafoco':
                 return productOfLineProfitPercentage = 100
@@ -455,34 +479,60 @@ const Home = () => {
                 return productOfLineProfitPercentage = 150
             case 'LABIAL VOLUMINIZADOR VITAMINA E 70093':
                 return productOfLineProfitPercentage = 150
+            case 'MATE TERMICO CCON BOMBILLA Y PACKAGING':
+                return productOfLineProfitPercentage = 150
             case 'Nuevo producto test':
                 return productOfLineProfitPercentage = 0
+            case 'NUTRIBON PLUS CACHORRO X 8KG':
+                return productOfLineProfitPercentage = line.fraccionar ? 35 : 27
             case 'PALO SANTO NATURAL':
                 return productOfLineProfitPercentage = 150
+            case 'PORTA SAHUMERIO REDONDO DE LATA':
+                return productOfLineProfitPercentage = 140
+            case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
+                return productOfLineProfitPercentage = 60
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N1':
+                return productOfLineProfitPercentage = 115
+            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N1 ':
                 return productOfLineProfitPercentage = 115
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N2':
                 return productOfLineProfitPercentage = 100
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N3':
                 return productOfLineProfitPercentage = 100
-            case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
-                return productOfLineProfitPercentage = 60
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N5':
                 return productOfLineProfitPercentage = 60
+            case 'PRETAL Y CORREA SUBLIMADO N3':
+                return productOfLineProfitPercentage = 100
+            case 'SAHUMERIOS ABRE CAMINOS - PARIMAL':
+                return productOfLineProfitPercentage = 150
             case 'SAHUMERIO AROMANZA 40 TIBETANO ENCANTO FLORAL X 8 UN':
                 return productOfLineProfitPercentage = 150
+            case 'SAHUMERIO AROMANZA TIBETANOS SLIM VAINILLA':
+                return productOfLineProfitPercentage = 150
+            case 'SAHUMERIO TIBETANO MIX RESINA AROMANZA X 8 UN':
+                return productOfLineProfitPercentage = 150
             case 'SAHUMERIO TIBETANO SENSACIONES DIVINAS AROMANZA X 8 UN':
                 return productOfLineProfitPercentage = 150
             case 'SAHUMERIO TIBETANO SENSACIONES DIVINAS AROMANZA X 8 UN':
+                return productOfLineProfitPercentage = 150
+            case 'SAHUMERIO ULLAS PALO SANTO-AMBER':
+                return productOfLineProfitPercentage = 150
+            case 'SAHUMERIO ULLAS PALO SANTO-JAZMIN':
                 return productOfLineProfitPercentage = 150
             case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
                 return productOfLineProfitPercentage = 150
+            case 'TEST':
+                return productOfLineProfitPercentage = 0
+            case 'test':
+                return productOfLineProfitPercentage = 0
             case 'Test 1':
+                return productOfLineProfitPercentage = 0
+            case 'Venta test para comprobar la zona horaria':
                 return productOfLineProfitPercentage = 0
         }
 
         // Exceptions
-        if (!productOfLine) return null
+        if (!productOfLine && typeof productOfLine !== 'number') return null
         if (
             typeof line.fraccionar === undefined
             || typeof productOfLine.margenGanancia === undefined
