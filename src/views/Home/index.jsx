@@ -561,8 +561,8 @@ const Home = () => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
                 const productOfLineProfitPercentage = calculateProductOfLineProfitPercentage(line, productOfLine)
 
-                if (productOfLineProfitPercentage === null) {
-                    const aaadata = {line, productOfLine}
+                if (!productOfLineProfitPercentage && typeof productOfLineProfitPercentage !== 'number') {
+                    const aaadata = { line, productOfLine }
                     return aaa.push(aaadata)
                 }
 
