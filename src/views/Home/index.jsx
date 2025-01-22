@@ -471,6 +471,8 @@ const Home = () => {
                 return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
             case 'EXCELLENT DOG PUPPY SMALL C&R X 15KG':
                 return productOfLineProfitPercentage = line.fraccionar ? 38 : 29
+            case 'GASTOS VARIOS':
+                return productOfLineProfitPercentage = 0
             case 'JABONCITOS C/GLICERINA':
                 return productOfLineProfitPercentage = 60
             case 'KIT DE CABLE foco -cable- portafoco':
@@ -491,8 +493,6 @@ const Home = () => {
                 return productOfLineProfitPercentage = 140
             case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
                 return productOfLineProfitPercentage = 60
-            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N1':
-                return productOfLineProfitPercentage = 115
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N1 ':
                 return productOfLineProfitPercentage = 115
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N2':
@@ -501,6 +501,8 @@ const Home = () => {
                 return productOfLineProfitPercentage = 100
             case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N5':
                 return productOfLineProfitPercentage = 60
+            case 'PRETAL Y CORREA SUBLIMADO N1 ':
+                return productOfLineProfitPercentage = 115
             case 'PRETAL Y CORREA SUBLIMADO N3':
                 return productOfLineProfitPercentage = 100
             case 'SAHUMERIOS ABRE CAMINOS - PARIMAL':
@@ -525,6 +527,8 @@ const Home = () => {
                 return productOfLineProfitPercentage = 0
             case 'test':
                 return productOfLineProfitPercentage = 0
+            case 'Test  1':
+                return productOfLineProfitPercentage = 0
             case 'Test 1':
                 return productOfLineProfitPercentage = 0
             case 'Venta test para comprobar la zona horaria':
@@ -532,7 +536,7 @@ const Home = () => {
         }
 
         // Exceptions
-        if (!productOfLine && typeof productOfLine !== 'number') return null
+        if (productOfLine === null || productOfLine === undefined) return null
         if (
             typeof line.fraccionar === undefined
             || typeof productOfLine.margenGanancia === undefined
@@ -557,7 +561,7 @@ const Home = () => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
                 const productOfLineProfitPercentage = calculateProductOfLineProfitPercentage(line, productOfLine)
 
-                if (!productOfLineProfitPercentage) {
+                if (productOfLineProfitPercentage === null) {
                     const aaadata = {line, productOfLine}
                     return aaa.push(aaadata)
                 }
