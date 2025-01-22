@@ -424,6 +424,8 @@ const Home = () => {
 
         // Particular cases
         switch (line.nombre) {
+            case 'ARROCIN GRANEL X 20KG':
+                return 50
             case 'BUDA ALTAR CASCADA/PORTA VELA':
                 return 150
             case 'BUZO CON CAPUCHA T10-70CM':
@@ -444,13 +446,19 @@ const Home = () => {
                 return 999999
             case 'comisión por servicio venta estacionamiento Diciembre':
                 return 999999
+            case 'comision por servicio venta estacionamiento Enero':
+                return 999999
             case 'comisión por servicio venta estacionamiento Enero':
+                return 999999
+            case 'comision por servicio venta estacionamiento Febrero':
                 return 999999
             case 'comisión por servicio venta estacionamiento  Febrero':
                 return 999999
             case 'comisión por servicio venta estacionamiento Julio':
                 return 999999
             case 'comisión por servicio venta estacionamiento Junio':
+                return 999999
+            case 'comision por servicio venta estacionamiento Marzo':
                 return 999999
             case 'comisión por servicio venta estacionamiento  Marzo':
                 return 999999
@@ -466,6 +474,12 @@ const Home = () => {
                 return 999999
             case 'DHOOP INCENSE - MIRRA':
                 return 150
+            case 'DOGUI ADULTO MIX X 24KG':
+                return line.fraccionar ? 44 : 29
+            case 'DOGUI CACHORRO X 24 KG':
+                return line.fraccionar ? 44 : 29
+            case 'EXCELLENT CAT ADULTO X 3KG':
+                return line.fraccionar ? 31 : 28
             case 'EXCELLENT CAT CHICKET & RICE X 15KG':
                 return line.fraccionar ? 38 : 29
             case 'EXCELLENT CAT CHICKEN & RICE X 3KG':
@@ -484,6 +498,8 @@ const Home = () => {
                 return line.fraccionar ? 38 : 29
             case 'GASTOS VARIOS':
                 return 0
+            case 'HIERBA GATERA X 80GRS':
+                return line.fraccionar ? 70.37 : 70
             case 'JABONCITOS C/GLICERINA':
                 return 60
             case 'KIT DE CABLE foco -cable- portafoco':
@@ -492,8 +508,12 @@ const Home = () => {
                 return 150
             case 'LABIAL VOLUMINIZADOR VITAMINA E 70093':
                 return 150
+            case 'MAIZ ENTERO X 25KG':
+                return line.fraccionar ? 50 : 32
             case 'MATE TERMICO CCON BOMBILLA Y PACKAGING':
                 return 150
+            case 'MOCHILA TRANSPORTADORA TM':
+                return 70
             case 'MOCHILA TRANSPORTADORA TXL':
                 return 70
             case 'Nuevo producto test':
@@ -530,6 +550,10 @@ const Home = () => {
                 return 100
             case 'Producto test':
                 return 0
+            case 'RATON DE HILO':
+                return 100
+            case 'RC URINARY CAT H/O X 7.5KG':
+                return line.fraccionar ? 40 : 29
             case 'SAHUMERIOS ABRE CAMINOS - PARIMAL':
                 return 150
             case 'SAHUMERIO AROMANZA 40 TIBETANO ENCANTO FLORAL X 8 UN':
