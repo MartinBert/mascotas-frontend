@@ -428,8 +428,12 @@ const Home = () => {
                 return 150
             case 'BUZO CON CAPUCHA T10-70CM':
                 return 90
+            case 'CARDINA pequeña PLASTICO':
+                return 80
             case 'CASCADA AFRICA 20 CM':
                 return 150
+            case 'CEPILLO NEUMATICO CHICO':
+                return 100
             case 'COLLAR ISABELINO N 1 Y 2':
                 return 50
             case 'COLLAR ISABELINO N 5 Y 6':
@@ -458,12 +462,20 @@ const Home = () => {
                 return 999999
             case 'comisión por servicio venta estacionamiento Septiembre':
                 return 999999
+            case 'comisión por servicio venta estacionamiento septiembre':
+                return 999999
             case 'DHOOP INCENSE - MIRRA':
                 return 150
             case 'EXCELLENT CAT CHICKET & RICE X 15KG':
                 return line.fraccionar ? 38 : 29
+            case 'EXCELLENT CAT CHICKEN & RICE X 3KG':
+                return line.fraccionar ? 31 : 28
             case 'EXCELLENT CAT CHICKET & RICE X 7,5KG':
                 return line.fraccionar ? 38 : 29
+            case 'EXCELLENT CAT KITTEN C& R 1KG':
+                return line.fraccionar ? 31 : 29
+            case 'EXCELLENT CAT KITTEN C& R 7.5KG':
+                return line.fraccionar ? 35 : 26
             case 'EXCELLENT DOG PUPPY MED/LGE C&R X 15KG':
                 return line.fraccionar ? 38 : 29
             case 'EXCELLENT DOG PUPPY MED/LGE C&R X 20KG':
@@ -482,12 +494,22 @@ const Home = () => {
                 return 150
             case 'MATE TERMICO CCON BOMBILLA Y PACKAGING':
                 return 150
+            case 'MOCHILA TRANSPORTADORA TXL':
+                return 70
             case 'Nuevo producto test':
                 return 0
             case 'NUTRIBON PLUS CACHORRO X 8KG':
                 return line.fraccionar ? 35 : 27
             case 'PALO SANTO NATURAL':
                 return 150
+            case 'PELOTA DE HILO':
+                return 90
+            case 'PELOTAS PARA GATOS CON CASCABEL ':
+                return 90
+            case 'PELOTITAS DE SISAL ':
+                return 100
+            case 'PEZ DE FELPA PARA GATO':
+                return 80
             case 'PORTA SAHUMERIO REDONDO DE LATA':
                 return 140
             case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
@@ -502,8 +524,12 @@ const Home = () => {
                 return 60
             case 'PRETAL Y CORREA SUBLIMADO N1 ':
                 return 115
+            case 'PRETAL Y CORREA SUBLIMADO N2':
+                return 100
             case 'PRETAL Y CORREA SUBLIMADO N3':
                 return 100
+            case 'Producto test':
+                return 0
             case 'SAHUMERIOS ABRE CAMINOS - PARIMAL':
                 return 150
             case 'SAHUMERIO AROMANZA 40 TIBETANO ENCANTO FLORAL X 8 UN':
@@ -520,15 +546,21 @@ const Home = () => {
                 return 150
             case 'SAHUMERIO ULLAS PALO SANTO-JAZMIN':
                 return 150
+            case 'SHAMPOO OSSPRET ':
+                return 70
             case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
                 return 150
             case 'TEST':
+                return 0
+            case 'Test':
                 return 0
             case 'test':
                 return 0
             case 'Test  1':
                 return 0
             case 'Test 1':
+                return 0
+            case 'Venta TEST':
                 return 0
             case 'Venta test para comprobar la zona horaria':
                 return 0
