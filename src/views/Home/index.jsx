@@ -421,7 +421,8 @@ const Home = () => {
     }
 
     const calculateProductOfLineProfitPercentage = (line, productOfLine) => {
-
+        line.nombre = line.nombre ?? line.productoNombre
+        
         // Particular cases
         switch (line.nombre) {
             case 'ARROCIN GRANEL X 20KG':
