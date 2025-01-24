@@ -362,6 +362,7 @@ const Home = () => {
                 .map(sale => {
                     const data = sale.productos.map(product => {
                         console.log('--------------------------------')
+                        console.log(sale)
                         console.log(product)
                         const productLine = sale.renglones.find(line => line.nombre === product.nombre)
                         console.log(productLine)
