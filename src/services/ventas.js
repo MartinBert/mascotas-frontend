@@ -41,7 +41,7 @@ const edit = async (venta) => {
 const editAll = async (ventas) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/edit_all`, ventas, headers)
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/sales/edit_all`, ventas, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)

@@ -649,7 +649,7 @@ const Home = () => {
                 const precioNeto = numberAndRound(line.precioNeto) ?? numberAndRound(line.totalRenglon)
 
                 const updatedLine = {
-                    cantidadAgregadaPorDescuento_enKg: numberAndRound(line.cantidadAgregadaPorDescuento_enKg) ?? 0,
+                    cantidadAgregadaPorDescuento_enKg: 0,
                     cantidadKg: numberAndRound(line.cantidadKg) ?? 0,
                     cantidadQuitadaPorRecargo_enKg: numberAndRound(line.cantidadQuitadaPorRecargo_enKg) ?? 0,
                     cantidadUnidades: numberAndRound(line.cantidadUnidades),
@@ -681,15 +681,22 @@ const Home = () => {
             const calculatedSaleProfit = updatedLines.reduce((acc, line) => acc + line.profit, 0)
             const updatedSale = {
                 ...sale,
-                profit: sale.profit ?? calculatedSaleProfit,
+                profit: calculatedSaleProfit,
                 renglones: updatedLines
             }
             return updatedSale
         })
-        console.log(sales)
-        console.log(salesWithUpdatedLines)
-        // const res = await api.ventas.saveAll(salesWithUpdatedLines)
-        // if (res.code !== 200) return errorAlert('No se pudo actualizar las ventas.')
+
+        const lotsLimit = 10
+        const loopLimit = salesWithUpdatedLines.length / lotsLimit
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = salesWithUpdatedLines.slice(index * lotsLimit, (index + 1) * lotsLimit);
+            const res = await api.ventas.editAll(lot)
+            if (res.code !== 200) {
+                home_dispatch({ type: 'SET_LOADING', payload: false })
+                return errorAlert('No se pudo actualizar las ventas.')
+            }
+        }
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
