@@ -422,11 +422,15 @@ const Home = () => {
 
     const calculateProductOfLineProfitPercentage = (line, productOfLine) => {
         line.nombre = line.nombre ?? line.productoNombre
-        
+
         // Particular cases
         switch (line.nombre) {
+            case 'ALPISTE CON VIT X 30KG':
+                return 50
             case 'ARROCIN GRANEL X 20KG':
                 return 50
+            case 'BLISTER 4 PELOTAS PARA GATOS':
+                return 80
             case 'BUDA ALTAR CASCADA/PORTA VELA':
                 return 150
             case 'BUZO CON CAPUCHA T10-70CM':
@@ -473,6 +477,8 @@ const Home = () => {
                 return 999999
             case 'comisión por servicio venta estacionamiento septiembre':
                 return 999999
+            case 'CORREA Y PRETAL ESTAMPADO':
+                return 100
             case 'DHOOP INCENSE - MIRRA':
                 return 150
             case 'DOGUI ADULTO MIX X 24KG':
@@ -513,6 +519,8 @@ const Home = () => {
                 return line.fraccionar ? 50 : 32
             case 'MATE TERMICO CCON BOMBILLA Y PACKAGING':
                 return 150
+            case 'MIJO X 20KG':
+                return 80
             case 'MOCHILA TRANSPORTADORA TM':
                 return 70
             case 'MOCHILA TRANSPORTADORA TXL':
@@ -525,6 +533,8 @@ const Home = () => {
                 return 150
             case 'PELOTA DE HILO':
                 return 90
+            case 'PELOTA DE HILO CON PLUMAS':
+                return 100
             case 'PELOTAS PARA GATOS CON CASCABEL ':
                 return 90
             case 'PELOTITAS DE SISAL ':
@@ -575,6 +585,8 @@ const Home = () => {
                 return 70
             case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
                 return 150
+            case 'TEA POLVO ':
+                return line.fraccionar ? 100 : 80
             case 'TEST':
                 return 0
             case 'Test':
