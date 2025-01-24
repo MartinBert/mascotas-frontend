@@ -109,7 +109,7 @@ const save = async (dailyBusinessStatistics) => {
 const saveAll = async (dailyBusinessStatistics) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/daily_business_statistics/save_all`, dailyBusinessStatistics, headers)
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/daily_business_statistics/statistics/save_all`, dailyBusinessStatistics, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)

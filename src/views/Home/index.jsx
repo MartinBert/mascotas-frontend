@@ -420,6 +420,10 @@ const Home = () => {
         return parsedValue
     }
 
+    const calculateQuatity = () => {
+
+    }
+
     const calculateProductOfLineProfitPercentage = (line, productOfLine) => {
         line.nombre = line.nombre ?? line.productoNombre
 
@@ -624,21 +628,19 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
         const sales = findSales.docs
-        const aaa = []
+
         const salesWithUpdatedLines = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
                 const productOfLine = sale.productos.find(product => product.nombre === (line.nombre ?? line.productoNombre))
                 const productOfLineProfitPercentage = calculateProductOfLineProfitPercentage(line, productOfLine)
-
-                if (typeof productOfLineProfitPercentage !== 'number') {
-                    const aaadata = { line, productOfLine }
-                    return aaa.push(aaadata)
-                }
-
+                
                 const importeIva = numberAndRound(line.importeIva) ?? numberAndRound(line.productoImporteIva) ?? 0
                 const precioBruto = (
                     numberAndRound(line.precioBruto)
-                    ?? numberAndRound(parseFloat(line.cantidadUnidades) * parseFloat(line.productoPrecioUnitario))
+                    ?? numberAndRound(
+                        (parseFloat(line.cantidadUnidades) / parseFloat(line.productoFraccionamiento))
+                        * parseFloat(line.productoPrecioUnitario)
+                    )
                 )
                 const precioLista = numberAndRound(
                     (parseFloat(precioBruto) - parseFloat(importeIva))
@@ -684,7 +686,7 @@ const Home = () => {
             }
             return updatedSale
         })
-        console.log(aaa)
+        console.log(sales)
         console.log(salesWithUpdatedLines)
         // const res = await api.ventas.saveAll(salesWithUpdatedLines)
         // if (res.code !== 200) return errorAlert('No se pudo actualizar las ventas.')
