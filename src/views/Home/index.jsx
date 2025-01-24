@@ -420,10 +420,6 @@ const Home = () => {
         return parsedValue
     }
 
-    const calculateQuatity = () => {
-
-    }
-
     const calculateProductOfLineProfitPercentage = (line, productOfLine) => {
         line.nombre = line.nombre ?? line.productoNombre
 
@@ -697,6 +693,8 @@ const Home = () => {
                 return errorAlert('No se pudo actualizar las ventas.')
             }
         }
+
+        console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
