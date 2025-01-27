@@ -403,9 +403,16 @@ const Home = () => {
         }
 
         // Save records
-        const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
-        if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
-
+        const lotsLimit = 10
+        const loopLimit = dailyBusinessStatisticsToSave.length / lotsLimit
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = dailyBusinessStatisticsToSave.slice(index * lotsLimit, (index + 1) * lotsLimit);
+            const res = await api.dailyBusinessStatistics.saveAll(lot)
+            if (res.code !== 200) {
+                home_dispatch({ type: 'SET_LOADING', payload: false })
+                return errorAlert('No se pudo generar las estadísticas diarias.')
+            }
+        }
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
