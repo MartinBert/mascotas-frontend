@@ -16,7 +16,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { creditCodes, debitCodes } = helpers.afipHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 
 
 const BalanceView = () => {
@@ -125,12 +125,12 @@ const BalanceView = () => {
         },
         {
             dataIndex: 'columnsOfExpensesTable_productEntries',
-            render: (_, record) => roundTwoDecimals(record.quantity),
+            render: (_, record) => round(record.quantity),
             title: 'Cantidad'
         },
         {
             dataIndex: 'columnsOfExpensesTable_productExpense',
-            render: (_, record) => roundTwoDecimals(record.cost),
+            render: (_, record) => round(record.cost),
             title: 'Gasto'
         }
     ]
@@ -244,12 +244,12 @@ const BalanceView = () => {
         },
         {
             dataIndex: 'columnsOfIncomesTable_productOutputs',
-            render: (_, record) => roundTwoDecimals(record.quantity),
+            render: (_, record) => round(record.quantity),
             title: 'Cantidad'
         },
         {
             dataIndex: 'columnsOfIncomesTable_productIncome',
-            render: (_, record) => roundTwoDecimals(record.profit),
+            render: (_, record) => round(record.profit),
             title: 'Ingreso'
         }
     ]
@@ -286,9 +286,9 @@ const BalanceView = () => {
         else return { color: '#FF3C3C' }
     }
 
-    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewExpense)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewIncome)}</b></h2>
-    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewProfit)}</b></h2>
+    const titleOfTotalExpenses = <h2 style={{ textAlign: 'center' }}>Gasto total: <b style={{ color: '#FF3C3C' }}>{round(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewExpense)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={{ textAlign: 'center' }}>Ingreso total: <b style={{ color: '#15DC24' }}>{round(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewIncome)}</b></h2>
+    const titleOfBalance = <h2 style={{ textAlign: 'center' }}>Balance: <b style={getBalanceColor()}>{round(dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.balanceViewProfit)}</b></h2>
 
 
     const tablesToRender = [

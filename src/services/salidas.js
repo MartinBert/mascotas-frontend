@@ -39,6 +39,29 @@ const edit = async (salida) => {
     }
 }
 
+const editAll = async (outputs) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const lotsLimit = 10
+        const loopLimit = outputs.length / lotsLimit
+        const responseData = []
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = outputs.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, lot, headers)
+            responseData.push(response.data)
+        }
+        const response = {
+            code: 200,
+            data: responseData,
+            status: 'OK'
+        }
+        return response
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findAll = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -132,6 +155,7 @@ const salidas = {
     countRecords,
     deleteById,
     edit,
+    editAll,
     findAll,
     findAllByFilters,
     findById,

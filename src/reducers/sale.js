@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 // Helpers
 import helpers from '../helpers'
 
-const { decimalPercent, previousInteger, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { decimalPercent, previousInteger, roundToMultiple, round } = helpers.mathHelper
 const { formatToCompleteVoucherNumber } = helpers.afipHelper
 const { afipDateToLocalFormat, localFormat, simpleDateWithHours } = helpers.dateHelper
 
@@ -243,7 +243,7 @@ const calculateLineDiscount = (line, stateData) => {
         const netPrice = grossPrice * factor
         lineDiscount = grossPrice - netPrice
     }
-    const roundedLineDiscount = roundTwoDecimals(lineDiscount)
+    const roundedLineDiscount = round(lineDiscount)
     return roundedLineDiscount
 }
 
@@ -258,7 +258,7 @@ const calculateLineSurcharge = (line, stateData) => {
         const netPrice = grossPrice * factor
         lineSurcharge = netPrice - grossPrice
     }
-    const roundedLineSurcharge = roundTwoDecimals(lineSurcharge)
+    const roundedLineSurcharge = round(lineSurcharge)
     return roundedLineSurcharge
 }
 
@@ -278,7 +278,7 @@ const calculateGrossPriceFromNetPrice = (line, stateData) => {
     const discountVariation = getDiscountVariation(line, stateData)
     const surchargeVariation = getSurchargeVariation(line, stateData)
     const grossPrice = line.precioNeto / (1 - discountVariation + surchargeVariation)
-    const roundedGrossPrice = roundTwoDecimals(grossPrice)
+    const roundedGrossPrice = round(grossPrice)
     return roundedGrossPrice
 }
 
@@ -287,7 +287,7 @@ const calculateGrossPriceFromQuantity = (line) => {
         ? line.cantidadUnidades / line.fraccionamiento
         : line.cantidadUnidades
     const grossPrice = quantity * line.precioUnitario
-    const roundedGrossPrice = roundTwoDecimals(grossPrice)
+    const roundedGrossPrice = round(grossPrice)
     return roundedGrossPrice
 }
 
@@ -310,9 +310,9 @@ const calculateQuantities = (line, stateData) => {
         ? factorOfQuantity * line.fraccionamiento
         : factorOfQuantity
     const data = {
-        quantityAddedByDiscount: roundTwoDecimals(currentQuantity * discountVariation),
-        quantityRemovedBySurcharge: roundTwoDecimals(currentQuantity * surchargeVariation),
-        updatedQuantity: roundTwoDecimals(updateQuantity)
+        quantityAddedByDiscount: round(currentQuantity * discountVariation),
+        quantityRemovedBySurcharge: round(currentQuantity * surchargeVariation),
+        updatedQuantity: round(updateQuantity)
     }
     return data
 }
@@ -325,26 +325,26 @@ const calculateSpanQuantity = (line) => {
     let updatedGrQuantity
     if (line.fraccionar) {
         if (line.fraccionamiento < 1000 && !isUnitMeasureGramsToGrams) {
-            updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades))
+            updatedKgQuantity = round(previousInteger(line.cantidadUnidades))
             updatedGrQuantity = 0
         } else {
-            updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades / 1000))
-            updatedGrQuantity = roundTwoDecimals(line.cantidadUnidades % 1000)
+            updatedKgQuantity = round(previousInteger(line.cantidadUnidades / 1000))
+            updatedGrQuantity = round(line.cantidadUnidades % 1000)
         }
     } else {
         if (line.fraccionamiento < 1000) {
             if (isUnitMeasureGramsToGrams) {
                 const remainder = (line.cantidadUnidades % 1000)
-                updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades * line.fraccionamiento / 1000))
-                updatedGrQuantity = roundTwoDecimals(remainder * line.fraccionamiento % 1000)
+                updatedKgQuantity = round(previousInteger(line.cantidadUnidades * line.fraccionamiento / 1000))
+                updatedGrQuantity = round(remainder * line.fraccionamiento % 1000)
             } else {
                 const remainder = line.cantidadUnidades * line.fraccionamiento - previousInteger(line.cantidadUnidades * line.fraccionamiento)
-                updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades * line.fraccionamiento))
-                updatedGrQuantity = roundTwoDecimals(remainder * 1000)
+                updatedKgQuantity = round(previousInteger(line.cantidadUnidades * line.fraccionamiento))
+                updatedGrQuantity = round(remainder * 1000)
             }
         } else {
-            updatedKgQuantity = roundTwoDecimals(previousInteger(line.cantidadUnidades))
-            updatedGrQuantity = roundTwoDecimals((line.cantidadUnidades - previousInteger(line.cantidadUnidades)) * 1000)
+            updatedKgQuantity = round(previousInteger(line.cantidadUnidades))
+            updatedGrQuantity = round((line.cantidadUnidades - previousInteger(line.cantidadUnidades)) * 1000)
         }
     }
     const data = { updatedKgQuantity, updatedGrQuantity }
@@ -374,11 +374,11 @@ const updateLinesValues = (state) => {
         const { quantityAddedByDiscount, quantityRemovedBySurcharge, updatedQuantity } = calculateQuantities(line, stateData)
         const { updatedKgQuantity, updatedGrQuantity } = calculateSpanQuantity(line)
         const updatedGrossPrice = calculateGrossPriceFromNetPrice(line, stateData)
-        const updatedIvaImport = roundTwoDecimals(decimalPercent(line.porcentajeIva) * line.precioBruto)
+        const updatedIvaImport = round(decimalPercent(line.porcentajeIva) * line.precioBruto)
         const updatedLineDiscount = calculateLineDiscount(line, stateData)
         const updatedLineSurcharge = calculateLineSurcharge(line, stateData)
-        const updatedProfit = roundTwoDecimals(line.precioNeto - line.importeIva)
-        const updatedUnitPrice = line.fraccionar ? roundTwoDecimals(productFractionedPrice) : roundTwoDecimals(productUnfractionedPrice)
+        const updatedProfit = round(line.precioNeto - line.importeIva)
+        const updatedUnitPrice = line.fraccionar ? round(productFractionedPrice) : round(productUnfractionedPrice)
         // Line update
         if (conditionsToEditNetPrice) {
             const updatedNetPrice = calculateNetPrice(line, updatedLineDiscount, updatedLineSurcharge)
@@ -443,15 +443,15 @@ const updateTotals = (state) => {
 
     // ---------------- Cálculos correspondientes a ítems de precio VARIABLE ---------------- //
     const variableAmountLines = state.renglones.filter(renglon => !renglon.precioNetoFijo)
-    const variableLinesSumBasePrice = roundTwoDecimals(variableAmountLines.reduce((acc, line) => acc + fixNetPrice(line), 0))
-    const totalDescuentoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.descuento), 0))
-    const totalRecargoVariable = roundTwoDecimals(variableAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.recargo), 0))
+    const variableLinesSumBasePrice = round(variableAmountLines.reduce((acc, line) => acc + fixNetPrice(line), 0))
+    const totalDescuentoVariable = round(variableAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.descuento), 0))
+    const totalRecargoVariable = round(variableAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.recargo), 0))
 
     // ---------------- Cálculos correspondientes a ítems de precio FIJADO ---------------- //
     const fixedAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo)
-    const fixedLinesSumBasePrice = roundTwoDecimals(fixedAmountLines.reduce((acc, line) => acc + fixNetPrice(line), 0))
-    const totalDescuentoFijo = roundTwoDecimals(fixedAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.descuento), 0))
-    const totalRecargoFijo = roundTwoDecimals(fixedAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.recargo), 0))
+    const fixedLinesSumBasePrice = round(fixedAmountLines.reduce((acc, line) => acc + fixNetPrice(line), 0))
+    const totalDescuentoFijo = round(fixedAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.descuento), 0))
+    const totalRecargoFijo = round(fixedAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.recargo), 0))
 
     // ---------------- TOTALES (ítems de precio VARIABLE + ítems de precio FIJADO) ---------------- //
     const totalLinesSum = variableLinesSumBasePrice + fixedLinesSumBasePrice
@@ -465,29 +465,29 @@ const updateTotals = (state) => {
     const iva10productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 10.5)
     const iva27productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 27)
     const iva27productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 27)
-    const iva21Total = roundTwoDecimals(
+    const iva21Total = round(
         iva21productosMontoVariable.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
         + iva21productosMontoFijo.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
     )
-    const iva10Total = roundTwoDecimals(
+    const iva10Total = round(
         iva10productosMontoVariable.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
         + iva10productosMontoFijo.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
     )
-    const iva27Total = roundTwoDecimals(
+    const iva27Total = round(
         iva27productosMontoVariable.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
         + iva27productosMontoFijo.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
     )
-    const baseImponible21 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva21Total / 1.21) : iva21Total)
-    const baseImponible10 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva10Total / 1.105) : iva10Total)
-    const baseImponible27 = roundTwoDecimals((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva27Total / 1.27) : iva27Total)
-    const iva21 = roundTwoDecimals(iva21Total - baseImponible21)
-    const iva10 = roundTwoDecimals(iva10Total - baseImponible10)
-    const iva27 = roundTwoDecimals(iva27Total - baseImponible27)
-    const importeIva = roundTwoDecimals(iva21 + iva10 + iva27)
-    const total = roundTwoDecimals(totalLinesSum)
+    const baseImponible21 = round((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva21Total / 1.21) : iva21Total)
+    const baseImponible10 = round((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva10Total / 1.105) : iva10Total)
+    const baseImponible27 = round((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva27Total / 1.27) : iva27Total)
+    const iva21 = round(iva21Total - baseImponible21)
+    const iva10 = round(iva10Total - baseImponible10)
+    const iva27 = round(iva27Total - baseImponible27)
+    const importeIva = round(iva21 + iva10 + iva27)
+    const total = round(totalLinesSum)
     const totalRedondeado = roundToMultiple(total, 10)
-    const totalDiferencia = roundTwoDecimals(totalRedondeado - total)
-    const subTotal = roundTwoDecimals(total - importeIva)
+    const totalDiferencia = round(totalRedondeado - total)
+    const subTotal = round(total - importeIva)
     const profit = state.renglones.reduce((acc, el) => acc + parseFloat(el.profit), 0)
 
     state.baseImponible21 = baseImponible21

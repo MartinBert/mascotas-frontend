@@ -24,7 +24,7 @@ const { useAuthContext } = contexts.Auth
 const { useProductsContext } = contexts.Products
 const { useSalesAreasContext } = contexts.SalesAreas
 const { generateExcel } = helpers.excel
-const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { decimalPercent, roundToMultiple, round } = helpers.mathHelper
 const { createProductsCataloguePdf } = helpers.pdfHelper
 
 
@@ -121,7 +121,7 @@ const ExportProductListModal = () => {
             precioVenta: roundToMultiple(unfractionedSalePrice, 10),
             precioVentaFraccionado: roundToMultiple(fractionedSalePrice, 10),
             salePricePerUnit: roundToMultiple(salePricePerUnit, 10),
-            saleProfitPerUnit: roundTwoDecimals(saleProfitPerUnit)
+            saleProfitPerUnit: round(saleProfitPerUnit)
         }
         return fixedProduct
     }

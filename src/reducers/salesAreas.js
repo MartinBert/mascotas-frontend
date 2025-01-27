@@ -2,7 +2,7 @@
 import helpers from '../helpers'
 
 // Imports Destructuring
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 
 const actions = {
     CLEAN_SALES_AREA_STATE: 'CLEAN_SALES_AREA_STATE',
@@ -55,8 +55,8 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 currentSalesArea: {
                     ...action.payload,
-                    discountDecimal: roundTwoDecimals(action.payload.discountPercentage / 100),
-                    surchargeDecimal: roundTwoDecimals(action.payload.surchargePercentage / 100),
+                    discountDecimal: round(action.payload.discountPercentage / 100),
+                    surchargeDecimal: round(action.payload.surchargePercentage / 100),
                 },
                 loading: true
             }

@@ -22,7 +22,7 @@ import api from '../../services'
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
 const { localFormatToDateObj, numberOrderDate, resetDate, simpleDateWithHours } = helpers.dateHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
 const { ifNotNumbersCommaAndPoint } = regExp
@@ -185,16 +185,16 @@ const SalidasForm = () => {
             }
             if (stockHistory.length < 1) {
                 data.entries = 0
-                data.outputs = roundTwoDecimals(outputs_state.params.cantidad)
+                data.outputs = round(outputs_state.params.cantidad)
                 const saveNewRecord = await api.stockHistory.save(data)
                 saveResponseCode = saveNewRecord.code
             } else {
                 data._id = stockHistory[0]._id
-                data.entries = roundTwoDecimals(stockHistory[0].entries)
-                data.outputs = roundTwoDecimals(stockHistory[0].outputs) + roundTwoDecimals(outputs_state.params.cantidad)
+                data.entries = round(stockHistory[0].entries)
+                data.outputs = round(stockHistory[0].outputs) + round(outputs_state.params.cantidad)
                 if (outputID !== 'nuevo') {
                     const outputToEdit = await api.salidas.findById(outputID)
-                    const previousQuantity = roundTwoDecimals(outputToEdit.data.cantidad)
+                    const previousQuantity = round(outputToEdit.data.cantidad)
                     data.outputs -= previousQuantity
                 }
                 const editRecord = await api.stockHistory.edit(data)
@@ -216,7 +216,7 @@ const SalidasForm = () => {
             await api.productos.modifyStock({
                 product,
                 isIncrement: false,
-                quantity: roundTwoDecimals(product.cantidadesSalientes)
+                quantity: round(product.cantidadesSalientes)
             })
         }
 
@@ -226,8 +226,8 @@ const SalidasForm = () => {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
             const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ganancia)
-            const balanceViewIncome = roundTwoDecimals(currentBalanceViewIncome + newAddedBalanceViewIncome)
-            const balanceViewProfit = roundTwoDecimals(balanceViewIncome - currentBalanceViewExpense)
+            const balanceViewIncome = round(currentBalanceViewIncome + newAddedBalanceViewIncome)
+            const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
             const updatedStatistic = {
                 ...statisticToEdit,
                 balanceViewIncome,
@@ -272,7 +272,7 @@ const SalidasForm = () => {
                 await api.productos.modifyStock({
                     product,
                     isIncrement: false,
-                    quantity: roundTwoDecimals(product.cantidadesSalientes)
+                    quantity: round(product.cantidadesSalientes)
                 })
             }
         }
@@ -296,12 +296,12 @@ const SalidasForm = () => {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
             const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ganancia)
-            const balanceViewIncome = roundTwoDecimals(
+            const balanceViewIncome = round(
                 currentBalanceViewIncome
                 - (!dateChanged ? incomeFromOutputToEdit : 0)
                 + newAddedBalanceViewIncome
             )
-            const balanceViewProfit = roundTwoDecimals(balanceViewIncome - currentBalanceViewExpense)
+            const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
             const editedStatistic = {
                 ...statisticToEdit,
                 balanceViewIncome,
@@ -583,7 +583,7 @@ const SalidasForm = () => {
     )
 
     // -------------- Title of total cost  --------------- //
-    const titleOfNetProfit = <h1>Ingreso Total: {roundTwoDecimals(outputs_state.params.ganancia)}</h1>
+    const titleOfNetProfit = <h1>Ingreso Total: {round(outputs_state.params.ganancia)}</h1>
 
 
     const itemsToRender = [

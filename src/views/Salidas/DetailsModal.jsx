@@ -18,7 +18,7 @@ import mathHelper from '../../helpers/mathHelper'
 const { useOutputsContext } = contexts.Outputs
 const { useProductsContext } = contexts.Products
 const { Details } = icons
-const { roundTwoDecimals } = mathHelper
+const { round } = mathHelper
 
 
 const DetailsModal = () => {
@@ -68,7 +68,7 @@ const DetailsModal = () => {
         },
         {
             title: 'Ingreso total',
-            render: (_, product) => roundTwoDecimals(
+            render: (_, product) => round(
                 product.cantidadesSalientes * product.precioVenta
             )
         },

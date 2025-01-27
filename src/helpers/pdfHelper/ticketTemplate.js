@@ -4,7 +4,7 @@ import mathHelper from '../mathHelper'
 
 // Imports Destruvturing
 const { simpleDateWithHours } = dateHelper
-const { roundTwoDecimals } = mathHelper
+const { round } = mathHelper
 
 
 const createTicketTemplate = (templateData) => {
@@ -44,11 +44,11 @@ const createTicketTemplate = (templateData) => {
                                     <div style='width: 15%;'>
                                         ${
                                             renglon.fraccionar
-                                                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                                                : roundTwoDecimals(renglon.cantidadUnidades)}
+                                                ? round(renglon.cantidadUnidades / renglon.fraccionamiento)
+                                                : round(renglon.cantidadUnidades)}
                                     </div>
                                     <div style='width: 60%;'>${renglon.nombre}</div>
-                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(renglon.precioBruto)}</div>
+                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>${round(renglon.precioBruto)}</div>
                                 </div>
                                 ${
                                     renglon.nota === (null || '')
@@ -73,7 +73,7 @@ const createTicketTemplate = (templateData) => {
                                 <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
                                     <div style='width: 15%;'>1</div>
                                     <div style='width: 60%;'>Recargo aplicado</div>
-                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>${roundTwoDecimals(data.totalRecargo)}</div>
+                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>${round(data.totalRecargo)}</div>
                                 </div>
                             `)
                     }
@@ -85,7 +85,7 @@ const createTicketTemplate = (templateData) => {
                                 <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
                                     <div style='width: 15%;'>1</div>
                                     <div style='width: 60%;'>Descuento aplicado</div>
-                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>- ${roundTwoDecimals(data.totalDescuento)}</div>
+                                    <div style='width: 25%; text-align: right; padding-right: 5px;'>- ${round(data.totalDescuento)}</div>
                                 </div>
                             `)
                     }

@@ -22,7 +22,7 @@ import api from '../../services'
 // Imports Destructuring
 const { formatFindParams } = actions.paginationParams
 const { useProductsContext } = contexts.Products
-const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { decimalPercent, roundToMultiple, round } = helpers.mathHelper
 const { ifNotNumber } = helpers.stringHelper.regExp
 const { Delete } = icons
 
@@ -135,22 +135,22 @@ const PriceModificatorModal = () => {
             const decimalMargenGananciaFraccionado = decimalPercent(parseFloat(product.margenGananciaFraccionado))
 
             const newPrecioUnitario = modificationType === 'Porcentual'
-                ? roundTwoDecimals(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
-                : roundTwoDecimals(Number(product.precioUnitario) + Number(modificationValue))
-            const newGananciaNeta = roundTwoDecimals(newPrecioUnitario * decimalMargenGanancia)
-            const newGananciaNetaFraccionado = roundTwoDecimals(newPrecioUnitario * decimalMargenGananciaFraccionado)
-            const newIvaCompra = roundTwoDecimals(newPrecioUnitario - (newPrecioUnitario / (1 + decimalIvaCompra)))
-            const newIvaVenta = roundTwoDecimals(newPrecioUnitario * decimalIvaVenta)
-            const newPrecioVentaSinRedondear = roundTwoDecimals(newPrecioUnitario + newIvaVenta + newGananciaNeta)
+                ? round(Number(product.precioUnitario) * (1 + decimalPercent(modificationValue)))
+                : round(Number(product.precioUnitario) + Number(modificationValue))
+            const newGananciaNeta = round(newPrecioUnitario * decimalMargenGanancia)
+            const newGananciaNetaFraccionado = round(newPrecioUnitario * decimalMargenGananciaFraccionado)
+            const newIvaCompra = round(newPrecioUnitario - (newPrecioUnitario / (1 + decimalIvaCompra)))
+            const newIvaVenta = round(newPrecioUnitario * decimalIvaVenta)
+            const newPrecioVentaSinRedondear = round(newPrecioUnitario + newIvaVenta + newGananciaNeta)
             const newPrecioVenta = roundToMultiple(newPrecioVentaSinRedondear, 10)
-            const newPrecioVentaFraccionadoSinRedondear = roundTwoDecimals(newPrecioUnitario + newIvaVenta + newGananciaNetaFraccionado)
+            const newPrecioVentaFraccionadoSinRedondear = round(newPrecioUnitario + newIvaVenta + newGananciaNetaFraccionado)
             const newPrecioVentaFraccionado = roundToMultiple(newPrecioVentaFraccionadoSinRedondear, 10)
 
             product.precioUnitario = newPrecioUnitario
             product.ivaCompra = newIvaCompra
             product.ivaVenta = newIvaVenta
-            product.gananciaNeta = roundTwoDecimals(newGananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear)
-            product.gananciaNetaFraccionado = roundTwoDecimals(newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear)
+            product.gananciaNeta = round(newGananciaNeta + newPrecioVenta - newPrecioVentaSinRedondear)
+            product.gananciaNetaFraccionado = round(newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear)
             product.precioVenta = newPrecioVenta
             product.precioVentaFraccionado = newPrecioVentaFraccionado
             api.productos.edit(product)

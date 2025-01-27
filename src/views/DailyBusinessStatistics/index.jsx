@@ -29,7 +29,7 @@ const { formatFindParams } = actions.paginationParams
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { useInterfaceStylesContext } = contexts.InterfaceStyles
 const { useRenderConditionsContext } = contexts.RenderConditions
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 const { Edit, Details } = icons
 
 const profitColorCss = (profit) => {
@@ -156,7 +156,7 @@ const DailyBusinessStatistics = () => {
         },
         {
             dataIndex: 'dailyBusinessStatistics_dailyIncome',
-            render: (_, dailyBusinessStatistics) => roundTwoDecimals(
+            render: (_, dailyBusinessStatistics) => round(
                 interfaceStyles_state.typeOfStatisticsView === 'balance'
                     ? dailyBusinessStatistics.balanceViewIncome
                     : dailyBusinessStatistics.salesViewIncome
@@ -165,7 +165,7 @@ const DailyBusinessStatistics = () => {
         },
         {
             dataIndex: 'dailyBusinessStatistics_dailyExpense',
-            render: (_, dailyBusinessStatistics) => roundTwoDecimals(
+            render: (_, dailyBusinessStatistics) => round(
                 interfaceStyles_state.typeOfStatisticsView === 'balance'
                     ? dailyBusinessStatistics.balanceViewExpense
                     : dailyBusinessStatistics.salesViewExpense
@@ -183,7 +183,7 @@ const DailyBusinessStatistics = () => {
                                 : dailyBusinessStatistics.salesViewProfit
                         ), fontSize: '18px'
                     }}>
-                        <b>{roundTwoDecimals(
+                        <b>{round(
                             interfaceStyles_state.typeOfStatisticsView === 'balance'
                                 ? dailyBusinessStatistics.balanceViewProfit
                                 : dailyBusinessStatistics.salesViewProfit

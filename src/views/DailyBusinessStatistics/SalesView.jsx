@@ -16,7 +16,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { creditCodes, debitCodes } = helpers.afipHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 
 
 const SalesView = () => {
@@ -162,22 +162,22 @@ const SalesView = () => {
         },
         {
             dataIndex: 'columnsOfIncomesTable_productOutputs',
-            render: (_, record) => roundTwoDecimals(record.quantity),
+            render: (_, record) => round(record.quantity),
             title: 'Cantidad'
         },
         {
             dataIndex: 'columnsOfIncomesTable_productIncome',
-            render: (_, record) => record.productName === '-' ? '-' : roundTwoDecimals(record.salePrice),
+            render: (_, record) => record.productName === '-' ? '-' : round(record.salePrice),
             title: 'Precio Venta'
         },
         {
             dataIndex: 'columnsOfIncomesTable_productExpense',
-            render: (_, record) => record.productName === '-' ? '-' : roundTwoDecimals(record.expense),
+            render: (_, record) => record.productName === '-' ? '-' : round(record.expense),
             title: 'Precio Lista'
         },
         {
             dataIndex: 'columnsOfIncomesTable_productProfit',
-            render: (_, record) => roundTwoDecimals(record.profit),
+            render: (_, record) => round(record.profit),
             title: 'Ganancia'
         }
     ]
@@ -216,9 +216,9 @@ const SalesView = () => {
         textAlign: 'center'
     }
 
-    const titleOfTotalExpenses = <h2 style={titlesStyles}>Total ventas: <b style={{ color: '#15DC24' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalSalePrices)}</b></h2>
-    const titleOfTotalIncomes = <h2 style={titlesStyles}>Total precios lista: <b style={{ color: '#FF3C3C' }}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalExpense)}</b></h2>
-    const titleOfBalance = <h2 style={titlesStyles}>Ganancia: <b style={getSalesProfitColor()}>{roundTwoDecimals(dailyBusinessStatistics_state.statisticsView.salesView.totalProfit)}</b></h2>
+    const titleOfTotalExpenses = <h2 style={titlesStyles}>Total ventas: <b style={{ color: '#15DC24' }}>{round(dailyBusinessStatistics_state.statisticsView.salesView.totalSalePrices)}</b></h2>
+    const titleOfTotalIncomes = <h2 style={titlesStyles}>Total precios lista: <b style={{ color: '#FF3C3C' }}>{round(dailyBusinessStatistics_state.statisticsView.salesView.totalExpense)}</b></h2>
+    const titleOfBalance = <h2 style={titlesStyles}>Ganancia: <b style={getSalesProfitColor()}>{round(dailyBusinessStatistics_state.statisticsView.salesView.totalProfit)}</b></h2>
 
 
     const tablesToRender = [

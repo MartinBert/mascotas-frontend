@@ -21,7 +21,7 @@ const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalNotesCodes, formatBody, invoiceCodes, ticketCodes } = helpers.afipHelper
 const { numberOrderDate, resetDate } = helpers.dateHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 const {
     createBudgetPdf,
     createInvoicePdf,
@@ -90,15 +90,15 @@ const FinalizeSaleModal = () => {
     }
 
     const startCloseSale = async () => {
-        sale_state.generalPercentage = roundTwoDecimals(sale_state.generalPercentage)
-        sale_state.porcentajeDescuentoGlobal = roundTwoDecimals(sale_state.porcentajeDescuentoGlobal)
-        sale_state.porcentajeRecargoGlobal = roundTwoDecimals(sale_state.porcentajeRecargoGlobal)
+        sale_state.generalPercentage = round(sale_state.generalPercentage)
+        sale_state.porcentajeDescuentoGlobal = round(sale_state.porcentajeDescuentoGlobal)
+        sale_state.porcentajeRecargoGlobal = round(sale_state.porcentajeRecargoGlobal)
         sale_state.renglones = sale_state.renglones.map(line => {
             const fixedLine = {
                 ...line,
-                cantidadUnidades: roundTwoDecimals(line.cantidadUnidades),
-                porcentajeDescuentoRenglon: roundTwoDecimals(line.porcentajeDescuentoRenglon),
-                porcentajeRecargoRenglon: roundTwoDecimals(line.porcentajeRecargoRenglon)
+                cantidadUnidades: round(line.cantidadUnidades),
+                porcentajeDescuentoRenglon: round(line.porcentajeDescuentoRenglon),
+                porcentajeRecargoRenglon: round(line.porcentajeRecargoRenglon)
             }
             return fixedLine
         })
@@ -124,7 +124,7 @@ const FinalizeSaleModal = () => {
                         lineOfProduct.fraccionar
                             ? 'fractionedQuantity'
                             : 'quantity'
-                    ]: roundTwoDecimals(lineOfProduct.cantidadUnidades)
+                    ]: round(lineOfProduct.cantidadUnidades)
                 }
             if (productToModifyInStock) {
                 const response = await api.productos.modifyStock(productToModifyInStock)
@@ -219,12 +219,12 @@ const FinalizeSaleModal = () => {
                 }
                 if (stockHistory.length < 1) {
                     data.entries = 0
-                    data.outputs = roundTwoDecimals(productOutputs)
+                    data.outputs = round(productOutputs)
                     saveResponse = await api.stockHistory.save(data)
                 } else {
                     data._id = stockHistory[0]._id
-                    data.entries = roundTwoDecimals(stockHistory[0].entries)
-                    data.outputs = roundTwoDecimals(stockHistory[0].outputs + productOutputs)
+                    data.entries = round(stockHistory[0].entries)
+                    data.outputs = round(stockHistory[0].outputs + productOutputs)
                     saveResponse = await api.stockHistory.edit(data)
                 }
                 if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)

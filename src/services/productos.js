@@ -1,7 +1,7 @@
 import axios from 'axios'
 import mathHelper from '../helpers/mathHelper'
 
-const { roundTwoDecimals } = mathHelper
+const { round } = mathHelper
 
 
 const checkStorageStatus = (err) => {
@@ -128,8 +128,8 @@ const modifyStock = async (body) => {
         ...body,
         product: {
             ...body.product,
-            cantidadStock: roundTwoDecimals(body.product.cantidadStock),
-            cantidadFraccionadaStock: roundTwoDecimals(body.product.cantidadFraccionadaStock)
+            cantidadStock: round(body.product.cantidadStock),
+            cantidadFraccionadaStock: round(body.product.cantidadFraccionadaStock)
         }
     }
     try {

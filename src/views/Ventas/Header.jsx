@@ -20,7 +20,7 @@ import api from '../../services'
 const { useSaleContext } = contexts.Sale
 const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, creditCodes, debitCodes } = helpers.afipHelper
 const { dateToAfip, isItLater } = helpers.dateHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 const { sortArrayOfSelectOptions } = helpers.objHelper
 const { fixInputNumber, fixInputNumberValue, nonCaseSensitive, normalizeString } = helpers.stringHelper
 
@@ -172,12 +172,12 @@ const Header = () => {
         const customProduct = {
             _id,
             codigoBarras: _id,
-            ivaVenta: roundTwoDecimals(ivaVenta),
+            ivaVenta: round(ivaVenta),
             key: _id,
             nombre: sale_state.customProductParams.concept,
-            precioVenta: roundTwoDecimals(precioVenta),
-            porcentajeIvaVenta: roundTwoDecimals(porcentajeIvaVenta),
-            profit: roundTwoDecimals(precioVenta - ivaVenta),
+            precioVenta: round(precioVenta),
+            porcentajeIvaVenta: round(porcentajeIvaVenta),
+            profit: round(precioVenta - ivaVenta),
             unidadMedida: { fraccionamiento: 1, nombre: 'Unid.' }
         }
         return customProduct

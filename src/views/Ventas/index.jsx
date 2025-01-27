@@ -24,7 +24,7 @@ import { errorAlert } from '../../components/alerts'
 // Imports Destructurings
 const { useSaleContext } = contexts.Sale
 const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal } = helpers.afipHelper
-const { round, roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 const { fixInputNumber, fixInputNumberValue } = helpers.stringHelper
 
 
@@ -326,7 +326,7 @@ const Ventas = () => {
             <Input
                 disabled={true}
                 key={line.key}
-                value={roundTwoDecimals(line.precioBruto)}
+                value={round(line.precioBruto)}
             />
         )
         return element

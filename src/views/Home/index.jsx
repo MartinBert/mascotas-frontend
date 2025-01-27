@@ -22,7 +22,7 @@ const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
 const { creditCodes, debitCodes } = helpers.afipHelper
 const { localFormat, numberOrderDate } = helpers.dateHelper
-const { previousInteger, roundTwoDecimals } = helpers.mathHelper
+const { previousInteger, round } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
 
 
@@ -258,8 +258,63 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const fixDataBaseRecords = () => {
+    const fixDataBaseRecords = async () => {
+        const findEntries = await api.entradas.findAll()
+        const findOutputs = await api.salidas.findAll()
+        const entries = findEntries.docs
+        const outputs = findOutputs.docs
 
+        // Update and save entries
+        const updatedEntries = entries.map(entry => {
+            const productos = entry.productos.map(product => {
+                const updatedProduct = {
+                    ...product,
+                    cantidadFraccionadaStock: round(product.cantidadFraccionadaStock),
+                    cantidadStock: round(product.cantidadStock),
+                    gananciaNeta: round(product.gananciaNeta),
+                    gananciaNetaFraccionado: round(product.gananciaNetaFraccionado ?? 0),
+                    iva: round(product.iva),
+                    ivaCompra: round(product.ivaCompra),
+                    ivaVenta: round(product.ivaVenta),
+                    margenGanancia: round(product.margenGanancia),
+                    margenGananciaFraccionado: round(product.margenGananciaFraccionado),
+                    porcentajeIvaCompra: round(product.porcentajeIvaCompra),
+                    porcentajeIvaVenta: round(product.porcentajeIvaVenta),
+                    precioUnitario: round(product.precioUnitario),
+                    precioVenta: round(product.precioVenta),
+                    precioVentaFraccionado: round(product.precioVentaFraccionado)
+                }
+                return updatedProduct
+            })
+            const updatedEntry = {
+                ...entry,
+                cantidad: entry.productos.reduce((acc, product) => acc + parseFloat(product.cantidadesEntrantes), 0),
+                costoTotal: round(entry.costoTotal),
+                productos
+            }
+            return updatedEntry
+        })
+        const entriesSavingRes = await api.entradas.editAll(updatedEntries)
+        if (!entriesSavingRes || entriesSavingRes.code !== 200) {
+            home_dispatch({ type: 'SET_LOADING', payload: false })
+            return errorAlert('No se pudo corregir las entradas.')
+        }
+
+        // Update and save outputs
+        const updatedOutputs = outputs.map(output => {
+            const updatedOutput = {
+                ...output,
+                cantidad: output.productos.reduce((acc, product) => acc + parseFloat(product.cantidadesSalientes), 0),
+                ganancia: round(output.ganancia),
+                gananciaNeta: round(output.gananciaNeta)
+            }
+            return updatedOutput
+        })
+        const outputsSavingRes = await api.salidas.editAll(updatedOutputs)
+        if (!outputsSavingRes || outputsSavingRes.code !== 200) {
+            home_dispatch({ type: 'SET_LOADING', payload: false })
+            return errorAlert('No se pudo corregir las salidas.')
+        }
     }
 
     const buttonToFixDataBaseRecords = (
@@ -272,12 +327,6 @@ const Home = () => {
     )
 
     // ------------------- Button to generate daily business statistics ---------------------- //
-    const numberAndRound = (value) => {
-        const numberValue = parseFloat(value)
-        const roundedValue = roundTwoDecimals(numberValue)
-        return roundedValue
-    }
-
     const oldestActivityErrorMessage = (activity) => {
         const fixedActivity = activity.substring(0, activity.length - 1)
         const message = `
@@ -394,12 +443,12 @@ const Home = () => {
                 .flat()
                 .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
 
-            const balanceViewExpense = numberAndRound(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries)
-            const balanceViewIncome = numberAndRound(cashRegisterVouchersExceptCreditNotes + outputs)
-            const balanceViewProfit = numberAndRound(balanceViewIncome - balanceViewExpense)
-            const salesViewExpense = numberAndRound(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices)
-            const salesViewIncome = numberAndRound(cashRegisterVouchersExceptCreditNotes)
-            const salesViewProfit = numberAndRound(salesViewIncome - salesViewExpense)
+            const balanceViewExpense = round(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries)
+            const balanceViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputs)
+            const balanceViewProfit = round(balanceViewIncome - balanceViewExpense)
+            const salesViewExpense = round(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices)
+            const salesViewIncome = round(cashRegisterVouchersExceptCreditNotes)
+            const salesViewProfit = round(salesViewIncome - salesViewExpense)
 
             const record = {
                 balanceViewExpense,
@@ -417,17 +466,12 @@ const Home = () => {
         }
 
         // Save records
-        const lotsLimit = 10
-        const loopLimit = dailyBusinessStatisticsToSave.length / lotsLimit
-        for (let index = 0; index < loopLimit; index++) {
-            const lot = dailyBusinessStatisticsToSave.slice(index * lotsLimit, (index + 1) * lotsLimit);
-            console.log(lot)
-            const res = await api.dailyBusinessStatistics.saveAll(lot)
-            if (!res || res.code !== 200) {
-                home_dispatch({ type: 'SET_LOADING', payload: false })
-                return errorAlert('No se pudo generar las estadísticas diarias.')
-            }
+        const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
+        if (!res || res.code !== 200) {
+            home_dispatch({ type: 'SET_LOADING', payload: false })
+            return errorAlert('No se pudo generar las estadísticas diarias.')
         }
+
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -582,7 +626,7 @@ const Home = () => {
                 const outputsDates = reduceOutputsData.map(outputRecord => outputRecord.dateString)
                 if (!outputsDates.includes(saleRecord.dateString)) {
                     record.dateString = saleRecord.dateString
-                    record.outputs = roundTwoDecimals(saleRecord.sales)
+                    record.outputs = round(saleRecord.sales)
                 } else record = null
                 return record
             }).filter(record => record)
@@ -596,10 +640,10 @@ const Home = () => {
                                 else return null
                             }).filter(record => record)
                             record.dateString = outputRecord.dateString
-                            record.outputs = roundTwoDecimals(salesOfRecordSales + outputRecord.outputs)
+                            record.outputs = round(salesOfRecordSales + outputRecord.outputs)
                         } else {
                             record.dateString = outputRecord.dateString
-                            record.outputs = roundTwoDecimals(outputRecord.outputs)
+                            record.outputs = round(outputRecord.outputs)
                         }
                         return record
                     })

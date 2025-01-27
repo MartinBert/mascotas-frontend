@@ -1,3 +1,5 @@
+import { errorAlert } from "../components/alerts"
+
 const decimalPercent = (value) => {
     return Number(value) / 100
 }
@@ -24,8 +26,23 @@ const randomFiveDecimals = () => {
     return Math.floor(Math.random() * 90000) + 10000
 }
 
-const round = (value) => {
-    return Math.round(value)
+function round (valueToRound, decimals = 2) {
+    let numberValue = parseFloat(valueToRound)
+    if (isNaN(numberValue)) {
+        errorAlert('Error al redondear valor numérico. Contacte a su proveedor de sistema.')
+        throw Error(`Function 'round': Value can't be converted to numeric.`)
+    }
+    let signo = (numberValue >= 0 ? 1 : -1)
+    numberValue = numberValue * signo
+    if (decimals === 0) //with 0 decimals
+        return signo * Math.round(numberValue)
+    // round(x * 10 ^ decimals)
+    numberValue = numberValue.toString().split('e')
+    numberValue = Math.round(+(numberValue[0] + 'e' + (numberValue[1] ? (+numberValue[1] + decimals) : decimals)))
+    // x * 10 ^ (-decimals)
+    numberValue = numberValue.toString().split('e')
+    const roundedValue = signo * (numberValue[0] + 'e' + (numberValue[1] ? (+numberValue[1] - decimals) : -decimals))
+    return roundedValue
 }
 
 const roundToMultiple = (value, multipleOf) => {
@@ -34,21 +51,8 @@ const roundToMultiple = (value, multipleOf) => {
     const roundedValue = (rest >= roundingReference)
         ? value + multipleOf - rest
         : value - rest
-    const roundedValueFixed = roundTwoDecimals(roundedValue)
+    const roundedValueFixed = round(roundedValue)
     return roundedValueFixed
-}
-
-function roundTwoDecimals (num, decimals = 2) {
-    var signo = (num >= 0 ? 1 : -1)
-    num = num * signo
-    if (decimals === 0) //with 0 decimals
-        return signo * Math.round(num)
-    // round(x * 10 ^ decimals)
-    num = num.toString().split('e')
-    num = Math.round(+(num[0] + 'e' + (num[1] ? (+num[1] + decimals) : decimals)))
-    // x * 10 ^ (-decimals)
-    num = num.toString().split('e')
-    return signo * (num[0] + 'e' + (num[1] ? (+num[1] - decimals) : -decimals))
 }
 
 const mathHelper = {
@@ -59,8 +63,7 @@ const mathHelper = {
     previousInteger,
     randomFiveDecimals,
     round,
-    roundToMultiple,
-    roundTwoDecimals
+    roundToMultiple
 }
 
 export default mathHelper

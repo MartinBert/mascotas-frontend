@@ -21,7 +21,7 @@ import api from '../../services'
 // Imports Destructuring
 const { GenericAutocomplete } = generics
 const { Spinner } = graphics
-const { decimalPercent, roundToMultiple, roundTwoDecimals } = helpers.mathHelper
+const { decimalPercent, roundToMultiple, round } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
 
 
@@ -85,22 +85,22 @@ const ProductosForm = () => {
         const precioUnitario = parseFloat(product.precioUnitario)
         const porcentajeIvaCompra = decimalPercent(product.porcentajeIvaCompra)
         const porcentajeIvaVenta = decimalPercent(product.porcentajeIvaVenta)
-        const gananciaNeta = roundTwoDecimals(precioUnitario * margenGanancia)
-        const gananciaNetaFraccionado = roundTwoDecimals(precioUnitario * margenGananciaFraccionado)
-        const ivaCompra = roundTwoDecimals(precioUnitario - (precioUnitario / (1 + porcentajeIvaCompra)))
-        const ivaVenta = roundTwoDecimals(precioUnitario * porcentajeIvaVenta)
-        const precioVentaSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNeta)
-        const precioVenta = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNeta), 10)
+        const gananciaNeta = round(precioUnitario * margenGanancia)
+        const gananciaNetaFraccionado = round(precioUnitario * margenGananciaFraccionado)
+        const ivaCompra = round(precioUnitario - (precioUnitario / (1 + porcentajeIvaCompra)))
+        const ivaVenta = round(precioUnitario * porcentajeIvaVenta)
+        const precioVentaSinRedondear = round(precioUnitario + ivaVenta + gananciaNeta)
+        const precioVenta = roundToMultiple(round(precioUnitario + ivaVenta + gananciaNeta), 10)
         const diferenciaPrecioVenta = precioVenta - precioVentaSinRedondear
-        const precioVentaFraccionadoSinRedondear = roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado)
-        const precioVentaFraccionado = roundToMultiple(roundTwoDecimals(precioUnitario + ivaVenta + gananciaNetaFraccionado), 10)
+        const precioVentaFraccionadoSinRedondear = round(precioUnitario + ivaVenta + gananciaNetaFraccionado)
+        const precioVentaFraccionado = roundToMultiple(round(precioUnitario + ivaVenta + gananciaNetaFraccionado), 10)
         const diferenciaPrecioVentaFraccionado = precioVentaFraccionado - precioVentaFraccionadoSinRedondear
         setProduct({
             ...product,
             ivaCompra,
             ivaVenta,
-            gananciaNeta: roundTwoDecimals(gananciaNeta + diferenciaPrecioVenta),
-            gananciaNetaFraccionado: roundTwoDecimals(gananciaNetaFraccionado + diferenciaPrecioVentaFraccionado),
+            gananciaNeta: round(gananciaNeta + diferenciaPrecioVenta),
+            gananciaNetaFraccionado: round(gananciaNetaFraccionado + diferenciaPrecioVentaFraccionado),
             precioVenta,
             precioVentaFraccionado
         })

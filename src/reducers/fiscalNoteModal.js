@@ -4,7 +4,7 @@ import helpers from '../helpers'
 // Imports Destructuring
 const { formatToCompleteVoucherNumber, getReferenceVoucher } = helpers.afipHelper
 const { simpleDateWithHours } = helpers.dateHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 
 
 const actions = {
@@ -106,18 +106,18 @@ const reducer = (state = initialState, action) => {
             const iva = [
                 {
                     Id: 4,
-                    BaseImp: roundTwoDecimals(proportion * getReferenceVoucher(state).baseImponible10),
-                    Importe: roundTwoDecimals(proportion * getReferenceVoucher(state).iva10)
+                    BaseImp: round(proportion * getReferenceVoucher(state).baseImponible10),
+                    Importe: round(proportion * getReferenceVoucher(state).iva10)
                 },
                 {
                     Id: 5,
-                    BaseImp: roundTwoDecimals(proportion * getReferenceVoucher(state).baseImponible21),
-                    Importe: roundTwoDecimals(proportion * getReferenceVoucher(state).iva21)
+                    BaseImp: round(proportion * getReferenceVoucher(state).baseImponible21),
+                    Importe: round(proportion * getReferenceVoucher(state).iva21)
                 },
                 {
                     Id: 6,
-                    BaseImp: roundTwoDecimals(proportion * getReferenceVoucher(state).baseImponible27),
-                    Importe: roundTwoDecimals(proportion * getReferenceVoucher(state).iva27)
+                    BaseImp: round(proportion * getReferenceVoucher(state).baseImponible27),
+                    Importe: round(proportion * getReferenceVoucher(state).iva27)
                 }
             ]
             const ivaTotal = iva.reduce((accumulator, currentValue) => accumulator + currentValue.Importe, 0)
@@ -133,7 +133,7 @@ const reducer = (state = initialState, action) => {
                     ivaTaxBase21: iva[1].BaseImp,
                     ivaTaxBase27: iva[2].BaseImp,
                     ivaTotal: ivaTotal,
-                    subAmount: roundTwoDecimals(state.params.amountNet - ivaTotal)
+                    subAmount: round(state.params.amountNet - ivaTotal)
                 }
             }
         case actions.CLEAR_INPUTS:
@@ -298,10 +298,10 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 params: {
                     ...state.params,
-                    amountGross: roundTwoDecimals(action.payload.amountGross),
-                    amountNet: roundTwoDecimals(action.payload.amountNet),
-                    amountDifference: roundTwoDecimals(action.payload.amountDifference),
-                    amountRounded: roundTwoDecimals(action.payload.amountRounded),
+                    amountGross: round(action.payload.amountGross),
+                    amountNet: round(action.payload.amountNet),
+                    amountDifference: round(action.payload.amountDifference),
+                    amountRounded: round(action.payload.amountRounded),
                     concept: action.payload.concept,
                     fiscalNote: action.payload.fiscalNote,
                     fiscalNoteCode: action.payload.fiscalNote ? action.payload.fiscalNote.codigoUnico : null,

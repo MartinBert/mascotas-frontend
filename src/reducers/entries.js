@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 
 // Imports Destructuring
 const { localFormat, simpleDateWithHours } = helpers.dateHelper
-const { roundTwoDecimals } = helpers.mathHelper
+const { round } = helpers.mathHelper
 
 
 const actions = {
@@ -90,7 +90,7 @@ const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actions.CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY:
             const cantidad = state.params.productos.reduce((acc, item) => acc + parseFloat(item.cantidadesEntrantes), 0)
-            const costoTotal = roundTwoDecimals(
+            const costoTotal = round(
                 state.params.productos.reduce(
                     (acc, item) =>
                         acc + (

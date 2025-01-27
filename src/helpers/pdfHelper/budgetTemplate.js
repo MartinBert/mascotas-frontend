@@ -6,7 +6,7 @@ import validations from './validations'
 
 // Imports Destructuring
 const { localFormat, simpleDateWithHours } = dateHelper
-const { roundTwoDecimals } = mathHelper
+const { round } = mathHelper
 const { completeLengthWithZero } = stringHelper
 const { existIva } = validations
 
@@ -80,16 +80,16 @@ const createBudgetTemplate = (templateData) => {
                                     <div style='width: 12%;'>
                                         ${
                                             renglon.fraccionar
-                                                ? roundTwoDecimals(renglon.cantidadUnidades / renglon.fraccionamiento)
-                                                : roundTwoDecimals(renglon.cantidadUnidades)
+                                                ? round(renglon.cantidadUnidades / renglon.fraccionamiento)
+                                                : round(renglon.cantidadUnidades)
                                         }
                                     </div>
                                     <div style='width: 34%;'>${renglon.nombre}</div>
                                     <div style='width: 10%;'>${renglon.precioUnitario}</div>
-                                    <div style='width: 10%;'>${roundTwoDecimals(renglon.precioBruto)}</div>
-                                    <div style='width: 12%;'>${roundTwoDecimals(renglon.descuento)}</div>
-                                    <div style='width: 12%;'>${roundTwoDecimals(renglon.recargo)}</div>
-                                    <div style='width: 10%; text-align: right;'>${roundTwoDecimals(renglon.precioNeto)}</div>
+                                    <div style='width: 10%;'>${round(renglon.precioBruto)}</div>
+                                    <div style='width: 12%;'>${round(renglon.descuento)}</div>
+                                    <div style='width: 12%;'>${round(renglon.recargo)}</div>
+                                    <div style='width: 10%; text-align: right;'>${round(renglon.precioNeto)}</div>
                                 </div>
                                 ${
                                     renglon.nota === (null || '')

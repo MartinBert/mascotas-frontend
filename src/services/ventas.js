@@ -38,11 +38,23 @@ const edit = async (venta) => {
     }
 }
 
-const editAll = async (ventas) => {
+const editAll = async (sales) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/sales/edit_all`, ventas, headers)
-        return response.data
+        const lotsLimit = 10
+        const loopLimit = sales.length / lotsLimit
+        const responseData = []
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = sales.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/sales/edit_all`, lot, headers)
+            responseData.push(response.data)
+        }
+        const response = {
+            code: 200,
+            data: responseData,
+            status: 'OK'
+        }
+        return response
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
@@ -182,11 +194,23 @@ const save = async (venta) => {
     }
 }
 
-const saveAll = async (ventas) => {
+const saveAll = async (sales) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/ventas/sales/save_all`, ventas, headers)
-        return response.data
+        const lotsLimit = 10
+        const loopLimit = sales.length / lotsLimit
+        const responseData = []
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = sales.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const response = await axios.post(`${process.env.REACT_APP_API_REST}/ventas/sales/save_all`, lot, headers)
+            responseData.push(response.data)
+        }
+        const response = {
+            code: 200,
+            data: responseData,
+            status: 'OK'
+        }
+        return response
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
