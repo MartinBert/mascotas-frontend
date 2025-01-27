@@ -408,6 +408,8 @@ const Home = () => {
         for (let index = 0; index < loopLimit; index++) {
             const lot = dailyBusinessStatisticsToSave.slice(index * lotsLimit, (index + 1) * lotsLimit);
             const res = await api.dailyBusinessStatistics.saveAll(lot)
+            console.log(lot)
+            console.log(res)
             if (res.code !== 200) {
                 home_dispatch({ type: 'SET_LOADING', payload: false })
                 return errorAlert('No se pudo generar las estadísticas diarias.')
