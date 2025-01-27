@@ -91,13 +91,13 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actions.CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY:
-            const cantidad = state.params.productos.reduce((acc, item) => acc + item.cantidadesSalientes, 0)
+            const cantidad = state.params.productos.reduce((acc, item) => acc + parseFloat(item.cantidadesSalientes), 0)
             const ganancia = roundTwoDecimals(
                 state.params.productos.reduce(
                     (acc, item) =>
                         acc + (
-                            item.cantidadesSalientes
-                                ? item.precioVenta * item.cantidadesSalientes
+                            parseFloat(item.cantidadesSalientes)
+                                ? parseFloat(item.precioVenta) * parseFloat(item.cantidadesSalientes)
                                 : 0
                         ), 0
                 )
@@ -106,8 +106,8 @@ const reducer = (state = initialState, action) => {
                 state.params.productos.reduce(
                     (acc, item) =>
                         acc + (
-                            item.cantidadesSalientes
-                                ? (item.precioVenta - item.precioUnitario) * item.cantidadesSalientes
+                            parseFloat(item.cantidadesSalientes)
+                                ? (parseFloat(item.precioVenta) - parseFloat(item.precioUnitario)) * parseFloat(item.cantidadesSalientes)
                                 : 0
                         ), 0
                 )

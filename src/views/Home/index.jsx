@@ -257,6 +257,20 @@ const Home = () => {
         </Button>
     )
 
+    // -------------------------- Button to fix data base records ---------------------------- //
+    const fixDataBaseRecords = () => {
+
+    }
+
+    const buttonToFixDataBaseRecords = (
+        <Button
+            onClick={fixDataBaseRecords}
+            type='primary'
+        >
+            Reparar
+        </Button>
+    )
+
     // ------------------- Button to generate daily business statistics ---------------------- //
     const numberAndRound = (value) => {
         const numberValue = parseFloat(value)
@@ -738,6 +752,13 @@ const Home = () => {
     ]
 
     const source = [
+        {
+            description: 'Reparar los registros establecidos.',
+            key: 'home_buttonToFixDataBaseRecords',
+            primaryAction: buttonToFixDataBaseRecords,
+            renderable: true,
+            secondaryAction: null
+        },
         {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
             key: 'home_buttonToConsoleSupportedVouchers',

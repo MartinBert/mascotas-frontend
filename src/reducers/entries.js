@@ -89,13 +89,13 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actions.CALCULATE_ENTRY_TOTAL_COST_AND_PRODUCTS_QUANTITY:
-            const cantidad = state.params.productos.reduce((acc, item) => acc + item.cantidadesEntrantes, 0)
+            const cantidad = state.params.productos.reduce((acc, item) => acc + parseFloat(item.cantidadesEntrantes), 0)
             const costoTotal = roundTwoDecimals(
                 state.params.productos.reduce(
                     (acc, item) =>
                         acc + (
-                            item.cantidadesEntrantes
-                                ? item.precioUnitario * item.cantidadesEntrantes
+                            parseFloat(item.cantidadesEntrantes)
+                                ? parseFloat(item.precioUnitario) * parseFloat(item.cantidadesEntrantes)
                                 : 0
                         ), 0
                 )
@@ -197,7 +197,7 @@ const reducer = (state = initialState, action) => {
                     productos
                 }
             }
-            case actions.SET_REFS:
+        case actions.SET_REFS:
             return {
                 ...state,
                 refs: action.payload
