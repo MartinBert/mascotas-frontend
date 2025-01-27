@@ -258,6 +258,12 @@ const Home = () => {
     )
 
     // ------------------- Button to generate daily business statistics ---------------------- //
+    const numberAndRound = (value) => {
+        const numberValue = parseFloat(value)
+        const roundedValue = roundTwoDecimals(numberValue)
+        return roundedValue
+    }
+
     const oldestActivityErrorMessage = (activity) => {
         const fixedActivity = activity.substring(0, activity.length - 1)
         const message = `
@@ -374,12 +380,12 @@ const Home = () => {
                 .flat()
                 .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
 
-            const balanceViewExpense = creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries
-            const balanceViewIncome = cashRegisterVouchersExceptCreditNotes + outputs
-            const balanceViewProfit = balanceViewIncome - balanceViewExpense
-            const salesViewExpense = creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices
-            const salesViewIncome = cashRegisterVouchersExceptCreditNotes
-            const salesViewProfit = salesViewIncome - salesViewExpense
+            const balanceViewExpense = numberAndRound(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries)
+            const balanceViewIncome = numberAndRound(cashRegisterVouchersExceptCreditNotes + outputs)
+            const balanceViewProfit = numberAndRound(balanceViewIncome - balanceViewExpense)
+            const salesViewExpense = numberAndRound(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices)
+            const salesViewIncome = numberAndRound(cashRegisterVouchersExceptCreditNotes)
+            const salesViewProfit = numberAndRound(salesViewIncome - salesViewExpense)
 
             const record = {
                 balanceViewExpense,
@@ -395,10 +401,10 @@ const Home = () => {
             }
             dailyBusinessStatisticsToSave.push(record)
         }
-        console.log(dailyBusinessStatisticsToSave)
+
         // Save records
-        // const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
-        // if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
+        const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
+        if (res.code !== 200) return errorAlert('No se pudo generar las estadísticas diarias.')
 
         console.log('ready')
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -412,177 +418,6 @@ const Home = () => {
             Generar
         </Button>
     )
-
-    // ------------------------- AAAAAAAAAAAAAAAAAAAAAAAAA --------------------------- //
-    const changeName = (line) => {
-        switch (line.nombre) {
-            case 'ALPISTE CON VIT X 30KG':
-                return 'ALPISTE CON VIT X 1KG'
-            case 'ARROCIN GRANEL X 20KG':
-                return 'ARROCIN GRANEL X KG'
-            case 'BLISTER 4 PELOTAS PARA GATOS':
-                return 'BLISTER 4 JUGUETES PARA GATOS'
-            case 'BUDA ALTAR CASCADA/PORTA VELA':
-                return 'CASCADA BUDA ALTAR PORTA VELA'
-            case 'BUZO CON CAPUCHA T10-70CM':
-                return 'BUZOS CON CAPUCHA T10-70CM'
-            case 'CARDINA pequeña PLASTICO':
-                return 'CARDINA chica PLASTICO'
-            case 'CASCADA AFRICA 20 CM':
-                return 'CASCADA AFRICANA 20 CM'
-            case 'CEPILLO NEUMATICO CHICO':
-                return 'CEPILLO NEUMATICO GRANDE'
-            case 'COLLAR ISABELINO N 1 Y 2':
-                return 'COLLAR ISABELINO N 1 Y2'
-            case 'COLLAR ISABELINO N 5 Y 6':
-                return 'COLLAR ISABELINO N 5, 6 Y 7'
-            case 'CORREA Y PRETAL ESTAMPADO':
-                return 'PRETAL Y CORREA SUBLIMADO/ESTAMP N4'
-            case 'DHOOP INCENSE - MIRRA':
-                return 'SAHUMERIO AROMANZA TIBETANOS SLIM MIRRA CONSAGRADA - OFRENDA'
-            case 'DOGUI ADULTO MIX X 24KG':
-                return 'DOGUI PERRO ADULTO X 21KG'
-            case 'DOGUI CACHORRO X 24 KG':
-                return 'DOGUI CACHORRO X 21 KG'
-            case 'EXCELLENT CAT ADULTO X 3KG':
-                return 'EXCELLENT CAT CHICKEN y RICE X 3KG'
-            case 'EXCELLENT CAT CHICKET & RICE X 15KG':
-                return 'EXCELLENT CAT CHICKET y RICE X 15KG'
-            case 'EXCELLENT CAT CHICKEN & RICE X 3KG':
-                return 'EXCELLENT CAT CHICKEN y RICE X 3KG'
-            case 'EXCELLENT CAT CHICKET & RICE X 7,5KG':
-                return 'EXCELLENT CAT CHICKET y RICE X 7,5KG'
-            case 'EXCELLENT CAT KITTEN C& R 1KG':
-                return 'EXCELLENT CAT KITTEN Cy R 1KG'
-            case 'EXCELLENT CAT KITTEN C& R 7.5KG':
-                return 'EXCELLENT CAT KITTEN Cy R 7.5KG'
-            case 'EXCELLENT DOG PUPPY MED/LGE C&R X 15KG':
-                return 'EXCELLENT DOG PUPPY MED/LGE CyR X 15KG'
-            case 'EXCELLENT DOG PUPPY MED/LGE C&R X 20KG':
-                return 'EXCELLENT DOG AD MED/LGE X 20KG'
-            case 'EXCELLENT DOG PUPPY SMALL C&R X 15KG':
-                return 'EXCELLENT DOG AD SMALL CH X 15KG'
-            case 'HIERBA GATERA X 80GRS':
-                return 'HIERBA GATO PARA PLANTAR'
-            case 'JABONCITOS C/GLICERINA':
-                return 'JABONCITOS C/GLICERINA BRISA NESA'
-            case 'KIT DE CABLE foco -cable- portafoco':
-                return 'KIT DE CABLE PARA LAMPARA foco -cable- portafoco'
-            case 'LAPIZ PARA OJOS USHAS NEGRO':
-                return 'LAPIZ DELINEADOR PARA OJOS USHAS NEGRO'
-            case 'LABIAL VOLUMINIZADOR VITAMINA E 70093':
-                return 'LABIAL CORAZON LOVE DORADO'
-            case 'MAIZ ENTERO X 25KG':
-                return 'MAIZ ENTERO X 30KG'
-            case 'MATE TERMICO CCON BOMBILLA Y PACKAGING':
-                return 'MATE TERMICO CON BOMBILLA Y PACKAGING matermico'
-            case 'MIJO X 20KG':
-                return 'MIJO X 1KG'
-            case 'MOCHILA TRANSPORTADORA TM':
-                return 'MOCHILA TRANSPORTADORA TM hasta 4kg, 35cm largo'
-            case 'MOCHILA TRANSPORTADORA TXL':
-                return 'MOCHILA TRANSPORTADORA TXL hasta 10kg, 45cm largo'
-            case 'NUTRIBON PLUS CACHORRO X 8KG':
-                return 'NUTRIBON PLUS PERRO CACHORRO X 15KG'
-            case 'PALO SANTO NATURAL':
-                return 'PALO SANTO NATURAL X10 GR'
-            case 'PELOTA DE HILO':
-                return 'PELOTA HILO COLORES'
-            case 'PELOTA DE HILO CON PLUMAS':
-                return 'PELOTA HILO CON PLUMAS'
-            case 'PELOTAS PARA GATOS CON CASCABEL ':
-                return 'PELOTA GATOS CON CASCABEL'
-            case 'PELOTITAS DE SISAL ':
-                return 'PELOTITAS Y JUGUETES DE SISAL'
-            case 'PEZ DE FELPA PARA GATO':
-                return 'JUGUETES DE FELPA PARA GATO'
-            case 'PORTA SAHUMERIO REDONDO DE LATA':
-                return 'PORTA SAHUMERIO REDONDO DE METALICO'
-            case 'PRETAL Y CORREA SUBL/ESTAMP N4 y 5':
-                return 'PRETAL Y CORREA SUBLIMADO/ESTAMP N4'
-            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N1 ':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N1'
-            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N2':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N2 y 3'
-            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N3':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N2 y 3'
-            case 'PRETAL Y CORREA SUBLIMADO/ESTAMP N5':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N5'
-            case 'PRETAL Y CORREA SUBLIMADO N1 ':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N1'
-            case 'PRETAL Y CORREA SUBLIMADO N2':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N2 y 3'
-            case 'PRETAL Y CORREA SUBLIMADO N3':
-                return 'PRETAL Y CORREA SUBL/ESTAMP N2 y 3'
-            case 'RATON DE HILO':
-                return 'RATON CHICO'
-            case 'RC URINARY CAT H/O X 7.5KG':
-                return 'MASTER CROCK GATO URINARY X 7KG'
-            case 'SAHUMERIOS ABRE CAMINOS - PARIMAL':
-                return 'SAHUMERIOS HEXAGONAL ABRE CAMINOS - PARIMAL'
-            case 'SAHUMERIO AROMANZA 40 TIBETANO ENCANTO FLORAL X 8 UN':
-                return 'SAHUMERIO AROMANZA 40 TIBETANOS SENSACIONES DIVINAS X 8 UN'
-            case 'SAHUMERIO AROMANZA TIBETANOS SLIM VAINILLA':
-                return 'SAHUMERIO AROMANZA TIBETANOS SLIM VAINILLA - FELICIDAD'
-            case 'SAHUMERIO TIBETANO MIX RESINA AROMANZA X 8 UN':
-                return 'SAHUMERIO AROMANZA 40 TIBETANOS MIX RESINA X 8 UN'
-            case 'SAHUMERIO TIBETANO SENSACIONES DIVINAS AROMANZA X 8 UN':
-                return 'SAHUMERIO AROMANZA 40 TIBETANOS SENSACIONES DIVINAS X 8 UN'
-            case 'SAHUMERIO ULLAS PALO SANTO-AMBER':
-                return 'SAHUMERIO ULLAS PALO SANTO - AMBAR'
-            case 'SAHUMERIO ULLAS PALO SANTO-JAZMIN':
-                return 'SAHUMERIO ULLAS PALO SANTO - JAZMIN'
-            case 'SHAMPOO OSSPRET ':
-                return 'SHAMPOO OSSPRET DOUBLE 2 X 1'
-            case 'SPRAY ETEREO REGENERADOR DE AURA - ROCIO AURICO':
-                return 'SPRAY ETEREO ROCIO AURICO - REGENERADOR DE AURA'
-            case 'TEA POLVO ':
-                return 'TEA TALCO POLVO'
-            default:
-                return line.nombre
-        }
-    }
-
-    const updateLinesOfSales = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findSales = await api.ventas.findAll()
-        const sales = findSales.docs
-
-        const salesWithUpdatedLines = sales.map(sale => {
-            const updatedLines = sale.renglones.map(line => {
-                const nombre = changeName(line)
-
-                const updatedLine = { ...line, nombre }
-                return updatedLine
-            })
-            
-            const updatedSale = { ...sale, renglones: updatedLines }
-            return updatedSale
-        })
-
-        const lotsLimit = 10
-        const loopLimit = salesWithUpdatedLines.length / lotsLimit
-        for (let index = 0; index < loopLimit; index++) {
-            const lot = salesWithUpdatedLines.slice(index * lotsLimit, (index + 1) * lotsLimit);
-            const res = await api.ventas.editAll(lot)
-            if (res.code !== 200) {
-                home_dispatch({ type: 'SET_LOADING', payload: false })
-                return errorAlert('No se pudo actualizar las ventas.')
-            }
-        }
-        console.log('ready')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const buttonToUpdateLinesOfSales = (
-        <Button
-            onClick={updateLinesOfSales}
-            type='primary'
-        >
-            Generar
-        </Button>
-    )
-
 
     // ------------------------- Button to generate data from SEED --------------------------- //
     const generateSeedData = async () => {
@@ -895,13 +730,6 @@ const Home = () => {
     ]
 
     const source = [
-        {
-            description: 'Actualizar registro de renglones de ventas.',
-            key: 'home_buttonToUpdateLinesOfSales',
-            primaryAction: buttonToUpdateLinesOfSales,
-            renderable: true,
-            secondaryAction: null
-        },
         {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
             key: 'home_buttonToConsoleSupportedVouchers',
