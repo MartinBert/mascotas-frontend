@@ -259,6 +259,7 @@ const Home = () => {
 
     // -------------------------- Button to fix data base records ---------------------------- //
     const fixDataBaseRecords = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
         const findEntries = await api.entradas.findAll()
         const findOutputs = await api.salidas.findAll()
         const entries = findEntries.docs
@@ -339,6 +340,9 @@ const Home = () => {
             home_dispatch({ type: 'SET_LOADING', payload: false })
             return errorAlert('No se pudo corregir las salidas.')
         }
+
+        console.log('Records fixed.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     const buttonToFixDataBaseRecords = (

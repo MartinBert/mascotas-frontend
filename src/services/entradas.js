@@ -42,7 +42,7 @@ const edit = async (entrada) => {
 const editAll = async (entries) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const lotsLimit = 10
+        const lotsLimit = 5
         const loopLimit = entries.length / lotsLimit
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
