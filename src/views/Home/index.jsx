@@ -275,14 +275,14 @@ const Home = () => {
                     cantidadesEntrantes: round(product.cantidadesEntrantes) ?? 0,
                     cantidadFraccionadaStock: round(product.cantidadFraccionadaStock) ?? 0,
                     cantidadStock: round(product.cantidadStock) ?? 0,
-                    fraccionamiento: product?.unidadMedida.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
+                    fraccionamiento: product?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
                     gananciaNeta: round(product.gananciaNeta) ?? 0,
                     gananciaNetaFraccionado: round(product.gananciaNetaFraccionado) ?? 0,
                     imagenes: product?.imagenes.map(image => image._id) ?? null,
                     iva: round(product.iva) ?? 0,
                     ivaCompra: round(product.ivaCompra) ?? 0,
                     ivaVenta: round(product.ivaVenta) ?? 0,
-                    marca: product?.marca._id ?? null,
+                    marca: product?.marca?._id ?? null,
                     margenGanancia: round(product.margenGanancia) ?? 0,
                     margenGananciaFraccionado: round(product.margenGananciaFraccionado) ?? 0,
                     porcentajeIvaCompra: round(product.porcentajeIvaCompra) ?? 0,
@@ -290,8 +290,8 @@ const Home = () => {
                     precioUnitario: round(product.precioUnitario) ?? 0,
                     precioVenta: round(product.precioVenta) ?? 0,
                     precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0,
-                    rubro: product?.rubro._id ?? null,
-                    unidadMedida: product?.unidadMedida._id ?? defaultUnitOfMeasure._id
+                    rubro: product?.rubro?._id ?? null,
+                    unidadMedida: product?.unidadMedida?._id ?? defaultUnitOfMeasure._id
                 }
                 return updatedProduct
             })
@@ -317,14 +317,14 @@ const Home = () => {
                     cantidadesSalientes: round(product.cantidadesSalientes) ?? 0,
                     cantidadFraccionadaStock: round(product.cantidadFraccionadaStock) ?? 0,
                     cantidadStock: round(product.cantidadStock) ?? 0,
-                    fraccionamiento: product?.unidadMedida.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
+                    fraccionamiento: product?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
                     gananciaNeta: round(product.gananciaNeta) ?? 0,
                     gananciaNetaFraccionado: round(product.gananciaNetaFraccionado) ?? 0,
                     imagenes: product?.imagenes.map(image => image._id) ?? null,
                     iva: round(product.iva) ?? 0,
                     ivaCompra: round(product.ivaCompra) ?? 0,
                     ivaVenta: round(product.ivaVenta) ?? 0,
-                    marca: product?.marca._id ?? null,
+                    marca: product?.marca?._id ?? null,
                     margenGanancia: round(product.margenGanancia) ?? 0,
                     margenGananciaFraccionado: round(product.margenGananciaFraccionado) ?? 0,
                     porcentajeIvaCompra: round(product.porcentajeIvaCompra) ?? 0,
@@ -332,8 +332,8 @@ const Home = () => {
                     precioUnitario: round(product.precioUnitario) ?? 0,
                     precioVenta: round(product.precioVenta) ?? 0,
                     precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0,
-                    rubro: product?.rubro._id ?? null,
-                    unidadMedida: product?.unidadMedida._id ?? defaultUnitOfMeasure._id
+                    rubro: product?.rubro?._id ?? null,
+                    unidadMedida: product?.unidadMedida?._id ?? defaultUnitOfMeasure._id
                 }
                 return updatedProduct
             })
