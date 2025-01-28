@@ -29,8 +29,9 @@ const randomFiveDecimals = () => {
 function round (valueToRound, decimals = 2) {
     let numberValue = parseFloat(valueToRound)
     if (isNaN(numberValue)) {
-        errorAlert('Error al redondear valor numérico. Contacte a su proveedor de sistema.')
-        throw Error(`Function 'round': Value can't be converted to numeric.`)
+        return
+        // errorAlert('Error al redondear valor numérico. Contacte a su proveedor de sistema.')
+        // throw Error(`Function 'round': Value can't be converted to numeric.`)
     }
     let signo = (numberValue >= 0 ? 1 : -1)
     numberValue = numberValue * signo
