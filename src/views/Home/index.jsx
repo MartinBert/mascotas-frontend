@@ -269,20 +269,21 @@ const Home = () => {
             const productos = entry.productos.map(product => {
                 const updatedProduct = {
                     ...product,
-                    cantidadFraccionadaStock: round(product.cantidadFraccionadaStock),
-                    cantidadStock: round(product.cantidadStock),
-                    gananciaNeta: round(product.gananciaNeta),
-                    gananciaNetaFraccionado: round(product.gananciaNetaFraccionado ?? 0),
-                    iva: round(product.iva),
-                    ivaCompra: round(product.ivaCompra),
-                    ivaVenta: round(product.ivaVenta),
-                    margenGanancia: round(product.margenGanancia),
-                    margenGananciaFraccionado: round(product.margenGananciaFraccionado),
-                    porcentajeIvaCompra: round(product.porcentajeIvaCompra),
-                    porcentajeIvaVenta: round(product.porcentajeIvaVenta),
-                    precioUnitario: round(product.precioUnitario),
-                    precioVenta: round(product.precioVenta),
-                    precioVentaFraccionado: round(product.precioVentaFraccionado)
+                    cantidadesEntrantes: round(product.cantidadesEntrantes) ?? 0,
+                    cantidadFraccionadaStock: round(product.cantidadFraccionadaStock) ?? 0,
+                    cantidadStock: round(product.cantidadStock) ?? 0,
+                    gananciaNeta: round(product.gananciaNeta) ?? 0,
+                    gananciaNetaFraccionado: round(product.gananciaNetaFraccionado) ?? 0,
+                    iva: round(product.iva) ?? 0,
+                    ivaCompra: round(product.ivaCompra) ?? 0,
+                    ivaVenta: round(product.ivaVenta) ?? 0,
+                    margenGanancia: round(product.margenGanancia) ?? 0,
+                    margenGananciaFraccionado: round(product.margenGananciaFraccionado) ?? 0,
+                    porcentajeIvaCompra: round(product.porcentajeIvaCompra) ?? 0,
+                    porcentajeIvaVenta: round(product.porcentajeIvaVenta) ?? 0,
+                    precioUnitario: round(product.precioUnitario) ?? 0,
+                    precioVenta: round(product.precioVenta) ?? 0,
+                    precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0
                 }
                 return updatedProduct
             })
@@ -302,11 +303,34 @@ const Home = () => {
 
         // Update and save outputs
         const updatedOutputs = outputs.map(output => {
+            const productos = output.productos.map(product => {
+                const updatedProduct = {
+                    ...product,
+                    cantidadesSalientes: round(product.cantidadesSalientes) ?? 0,
+                    cantidadFraccionadaStock: round(product.cantidadFraccionadaStock) ?? 0,
+                    cantidadStock: round(product.cantidadStock) ?? 0,
+                    gananciaNeta: round(product.gananciaNeta) ?? 0,
+                    gananciaNetaFraccionado: round(product.gananciaNetaFraccionado) ?? 0,
+                    gananciaNetaTotal: round(product.gananciaNetaTotal) ?? 0,
+                    iva: round(product.iva) ?? 0,
+                    ivaCompra: round(product.ivaCompra) ?? 0,
+                    ivaVenta: round(product.ivaVenta) ?? 0,
+                    margenGanancia: round(product.margenGanancia) ?? 0,
+                    margenGananciaFraccionado: round(product.margenGananciaFraccionado) ?? 0,
+                    porcentajeIvaCompra: round(product.porcentajeIvaCompra) ?? 0,
+                    porcentajeIvaVenta: round(product.porcentajeIvaVenta) ?? 0,
+                    precioUnitario: round(product.precioUnitario) ?? 0,
+                    precioVenta: round(product.precioVenta) ?? 0,
+                    precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0
+                }
+                return updatedProduct
+            })
             const updatedOutput = {
                 ...output,
                 cantidad: output.productos.reduce((acc, product) => acc + parseFloat(product.cantidadesSalientes), 0),
                 ganancia: round(output.ganancia),
-                gananciaNeta: round(output.gananciaNeta)
+                gananciaNeta: round(output.gananciaNeta),
+                productos
             }
             return updatedOutput
         })
