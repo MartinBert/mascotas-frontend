@@ -268,61 +268,75 @@ const Home = () => {
         const defaultUnitOfMeasure = findDefaultUnitOfMeasure.docs[0]
 
         // Update and save entries
-        const updatedEntries = entries.map(entry => {
-            const entryExpense = entry.productos.reduce(
-                (acc, product) => acc + (parseFloat(product.cantidadesEntrantes) * parseFloat(product.precioUnitario)), 0
-            )
-            const productos = entry.productos.map(product => {
+        const updatedEntries = []
+        for (let index = 0; index < entries.length; index++) {
+            const entry = entries[index]
+            const entryExpense = entry.productos.reduce((acc, product) => acc + (parseFloat(product.cantidadesEntrantes) * parseFloat(product.precioUnitario)), 0)
+            const productos = []
+            for (let index = 0; index < entry.productos.length; index++) {
+                const product = entry.productos[index]
+                const findProduct = await api.productos.findById(product._id)
+                const productInDb = findProduct._id
                 const updatedProduct = {
                     ...product,
-                    fraccionamiento: product?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
-                    unidadMedida: product?.unidadMedida?._id ?? defaultUnitOfMeasure._id
+                    fraccionamiento: productInDb?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
+                    unidadMedida: productInDb?.unidadMedida?._id ?? defaultUnitOfMeasure._id
                 }
-                return updatedProduct
-            })
+                productos.push(updatedProduct)
+            }
             const updatedEntry = {
                 ...entry,
-                cantidad: entry.productos.reduce((acc, product) => acc + parseFloat(product.cantidadesEntrantes), 0),
+                cantidad: productos.reduce((acc, product) => acc + parseFloat(product.cantidadesEntrantes), 0),
                 costoTotal: round(entry.costoTotal) ?? round(entryExpense),
                 productos
             }
-            return updatedEntry
-        })
-        const entriesSavingRes = await api.entradas.editAll(updatedEntries)
-        if (!entriesSavingRes || entriesSavingRes.code !== 200) {
-            home_dispatch({ type: 'SET_LOADING', payload: false })
-            return errorAlert('No se pudo corregir las entradas.')
+            updatedEntries.push(updatedEntry)
         }
 
         // Update and save outputs
-        const updatedOutputs = outputs.map(output => {
-            const outputIncome = output.productos.reduce(
-                (acc, product) => acc + (parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta)), 0
-            )
-            const productos = output.productos.map(product => {
+        const updatedOutputs = []
+        for (let index = 0; index < outputs.length; index++) {
+            const output = outputs[index]
+            const outputIncome = output.productos.reduce((acc, product) => acc + (parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta)), 0)
+
+            const productos = []
+            for (let index = 0; index < output.productos.length; index++) {
+                const product = output.productos[index]
+                const findProduct = await api.productos.findById(product._id)
+                const productInDb = findProduct._id
                 const updatedProduct = {
                     ...product,
-                    fraccionamiento: product?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
-                    unidadMedida: product?.unidadMedida?._id ?? defaultUnitOfMeasure._id
+                    fraccionamiento: productInDb?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
+                    unidadMedida: productInDb?.unidadMedida?._id ?? defaultUnitOfMeasure._id
                 }
-                return updatedProduct
-            })
+                productos.push(updatedProduct)
+            }
+
             const updatedOutput = {
                 ...output,
-                cantidad: output.productos.reduce((acc, product) => acc + parseFloat(product.cantidadesSalientes), 0),
+                cantidad: productos.reduce((acc, product) => acc + parseFloat(product.cantidadesSalientes), 0),
                 gananciaNeta: round(output.gananciaNeta),
                 ingreso: round(output.ingreso) ?? round(outputIncome),
                 productos
             }
-            return updatedOutput
-        })
-        const outputsSavingRes = await api.salidas.editAll(updatedOutputs)
-        if (!outputsSavingRes || outputsSavingRes.code !== 200) {
-            home_dispatch({ type: 'SET_LOADING', payload: false })
-            return errorAlert('No se pudo corregir las salidas.')
+            updatedOutputs.push(updatedOutput)
         }
 
-        console.log('Records fixed.')
+        console.log(updatedEntries)
+        console.log(updatedOutputs)
+        // const entriesSavingRes = await api.entradas.editAll(updatedEntries)
+        // if (!entriesSavingRes || entriesSavingRes.code !== 200) {
+        //     home_dispatch({ type: 'SET_LOADING', payload: false })
+        //     return errorAlert('No se pudo corregir las entradas.')
+        // }
+
+        // const outputsSavingRes = await api.salidas.editAll(updatedOutputs)
+        // if (!outputsSavingRes || outputsSavingRes.code !== 200) {
+        //     home_dispatch({ type: 'SET_LOADING', payload: false })
+        //     return errorAlert('No se pudo corregir las salidas.')
+        // }
+
+        // console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

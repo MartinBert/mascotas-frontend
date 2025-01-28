@@ -109,7 +109,7 @@ const save = async (dailyBusinessStatistics) => {
 const saveAll = async (dailyBusinessStatistics) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const lotsLimit = 10
+        const lotsLimit = 5
         const loopLimit = dailyBusinessStatistics.length / lotsLimit
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
