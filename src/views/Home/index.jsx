@@ -276,13 +276,20 @@ const Home = () => {
             for (let index = 0; index < entry.productos.length; index++) {
                 const product = entry.productos[index]
                 const findProduct = await api.productos.findById(product._id)
-                const productInDb = findProduct._id
+                const productInDb = findProduct.data
                 const updatedProduct = {
                     ...product,
                     fraccionamiento: productInDb?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
                     unidadMedida: productInDb?.unidadMedida?._id ?? defaultUnitOfMeasure._id
                 }
-                productos.push(updatedProduct)
+                const {
+                    createdAt,
+                    selected,
+                    updatedAt,
+                    __v,
+                    ...fixedUpdatedProduct
+                } = updatedProduct
+                productos.push(fixedUpdatedProduct)
             }
             const updatedEntry = {
                 ...entry,
@@ -296,20 +303,28 @@ const Home = () => {
         // Update and save outputs
         const updatedOutputs = []
         for (let index = 0; index < outputs.length; index++) {
-            const output = outputs[index]
+            const outputData = outputs[index]
+            const { ganancia, ...output } = outputData
             const outputIncome = output.productos.reduce((acc, product) => acc + (parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta)), 0)
 
             const productos = []
             for (let index = 0; index < output.productos.length; index++) {
                 const product = output.productos[index]
                 const findProduct = await api.productos.findById(product._id)
-                const productInDb = findProduct._id
+                const productInDb = findProduct.data
                 const updatedProduct = {
                     ...product,
                     fraccionamiento: productInDb?.unidadMedida?.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
                     unidadMedida: productInDb?.unidadMedida?._id ?? defaultUnitOfMeasure._id
                 }
-                productos.push(updatedProduct)
+                const {
+                    createdAt,
+                    selected,
+                    updatedAt,
+                    __v,
+                    ...fixedUpdatedProduct
+                } = updatedProduct
+                productos.push(fixedUpdatedProduct)
             }
 
             const updatedOutput = {
@@ -741,6 +756,23 @@ const Home = () => {
         </Button>
     )
 
+    // ------------------------------- Button to test service -------------------------------- //
+    const testService = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const res = await api.productos.findById('67647e7b3d2292e2243f6f78')
+        console.log(res)
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const buttonToTestService = (
+        <Button
+            onClick={testService}
+            type='primary'
+        >
+            Probar servicio
+        </Button>
+    )
+
     // ------------------------------ Input pass to dev tools -------------------------------- //
     const onChangeDevPassword = (e) => {
         home_dispatch({ type: 'SET_DEV_PASSWORD', payload: e.target.value })
@@ -824,7 +856,7 @@ const Home = () => {
             key: 'home_buttonToFixDataBaseRecords',
             primaryAction: buttonToFixDataBaseRecords,
             renderable: true,
-            secondaryAction: null
+            secondaryAction: buttonToTestService
         },
         {
             description: 'Muestra en consola los tipos de comprobantes soportados por el controlador de Afip.',
