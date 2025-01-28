@@ -68,8 +68,11 @@ const DetailsModal = () => {
         },
         {
             title: 'Ingreso total',
-            render: (_, product) => round(
-                product.cantidadesSalientes * product.precioVenta
+            render: (_, product) => (
+                round(
+                    parseFloat(product.cantidadesSalientes)
+                    * parseFloat(product.precioVenta)
+                )
             )
         },
         {

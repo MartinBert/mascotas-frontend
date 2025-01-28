@@ -262,8 +262,10 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findEntries = await api.entradas.findAll()
         const findOutputs = await api.salidas.findAll()
+        const findDefaultUnitOfMeasure = await api.unidadesmedida.findAllByFilters(JSON.stringify({ fraccionamiento: 1 }))
         const entries = findEntries.docs
         const outputs = findOutputs.docs
+        const defaultUnitOfMeasure = findDefaultUnitOfMeasure.docs[0]
 
         // Update and save entries
         const updatedEntries = entries.map(entry => {
@@ -273,18 +275,23 @@ const Home = () => {
                     cantidadesEntrantes: round(product.cantidadesEntrantes) ?? 0,
                     cantidadFraccionadaStock: round(product.cantidadFraccionadaStock) ?? 0,
                     cantidadStock: round(product.cantidadStock) ?? 0,
+                    fraccionamiento: product?.unidadMedida.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
                     gananciaNeta: round(product.gananciaNeta) ?? 0,
                     gananciaNetaFraccionado: round(product.gananciaNetaFraccionado) ?? 0,
+                    imagenes: product?.imagenes.map(image => image._id) ?? null,
                     iva: round(product.iva) ?? 0,
                     ivaCompra: round(product.ivaCompra) ?? 0,
                     ivaVenta: round(product.ivaVenta) ?? 0,
+                    marca: product?.marca._id ?? null,
                     margenGanancia: round(product.margenGanancia) ?? 0,
                     margenGananciaFraccionado: round(product.margenGananciaFraccionado) ?? 0,
                     porcentajeIvaCompra: round(product.porcentajeIvaCompra) ?? 0,
                     porcentajeIvaVenta: round(product.porcentajeIvaVenta) ?? 0,
                     precioUnitario: round(product.precioUnitario) ?? 0,
                     precioVenta: round(product.precioVenta) ?? 0,
-                    precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0
+                    precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0,
+                    rubro: product?.rubro._id ?? null,
+                    unidadMedida: product?.unidadMedida._id ?? defaultUnitOfMeasure._id
                 }
                 return updatedProduct
             })
@@ -310,19 +317,23 @@ const Home = () => {
                     cantidadesSalientes: round(product.cantidadesSalientes) ?? 0,
                     cantidadFraccionadaStock: round(product.cantidadFraccionadaStock) ?? 0,
                     cantidadStock: round(product.cantidadStock) ?? 0,
+                    fraccionamiento: product?.unidadMedida.fraccionamiento ?? defaultUnitOfMeasure.fraccionamiento,
                     gananciaNeta: round(product.gananciaNeta) ?? 0,
                     gananciaNetaFraccionado: round(product.gananciaNetaFraccionado) ?? 0,
-                    gananciaNetaTotal: round(product.gananciaNetaTotal) ?? 0,
+                    imagenes: product?.imagenes.map(image => image._id) ?? null,
                     iva: round(product.iva) ?? 0,
                     ivaCompra: round(product.ivaCompra) ?? 0,
                     ivaVenta: round(product.ivaVenta) ?? 0,
+                    marca: product?.marca._id ?? null,
                     margenGanancia: round(product.margenGanancia) ?? 0,
                     margenGananciaFraccionado: round(product.margenGananciaFraccionado) ?? 0,
                     porcentajeIvaCompra: round(product.porcentajeIvaCompra) ?? 0,
                     porcentajeIvaVenta: round(product.porcentajeIvaVenta) ?? 0,
                     precioUnitario: round(product.precioUnitario) ?? 0,
                     precioVenta: round(product.precioVenta) ?? 0,
-                    precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0
+                    precioVentaFraccionado: round(product.precioVentaFraccionado) ?? 0,
+                    rubro: product?.rubro._id ?? null,
+                    unidadMedida: product?.unidadMedida._id ?? defaultUnitOfMeasure._id
                 }
                 return updatedProduct
             })

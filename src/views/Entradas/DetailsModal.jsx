@@ -68,7 +68,12 @@ const DetailsModal = () => {
         },
         {
             title: 'Costo total',
-            render: (_, product) => round(product.cantidadesEntrantes * product.precioUnitario)
+            render: (_, product) => (
+                round(
+                    parseFloat(product.cantidadesEntrantes)
+                    * parseFloat(product.precioUnitario)
+                )
+            )
         },
         {
             title: 'Detalles',
