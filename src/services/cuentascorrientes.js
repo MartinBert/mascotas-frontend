@@ -87,7 +87,7 @@ const findPaginated = async (params) => {
 const save = async (customer) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/customers`, customer, headers)
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/cuentas_corrientes`, customer, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)

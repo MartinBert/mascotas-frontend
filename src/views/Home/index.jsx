@@ -263,12 +263,10 @@ const Home = () => {
         const findEntries = await api.entradas.findAll()
         const findOutputs = await api.salidas.findAll()
         const findDefaultUnitOfMeasure = await api.unidadesmedida.findAllByFilters(JSON.stringify({ fraccionamiento: 1 }))
-        const findDefaultUnitOfMeasures = await api.unidadesmedida.findAllByFilters({ fraccionamiento: 1 })
         const entries = findEntries.docs
         const outputs = findOutputs.docs
         const defaultUnitOfMeasure = findDefaultUnitOfMeasure.docs[0]
-        console.log(findDefaultUnitOfMeasure)
-        console.log(findDefaultUnitOfMeasures)
+
         // Update and save entries
         const updatedEntries = entries.map(entry => {
             const entryExpense = entry.productos.reduce(
