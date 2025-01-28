@@ -40,7 +40,7 @@ const fixDailyBusinessStatistics = async (outputToDelete) => {
     const findStatisticToFix = await api.dailyBusinessStatistics.findAllByFilters(filters)
     const [statisticToFix] = findStatisticToFix.docs
     if (!statisticToFix) return
-    const fixedDailyIncome = statisticToFix.balanceViewIncome - outputToDelete.ganancia
+    const fixedDailyIncome = statisticToFix.balanceViewIncome - outputToDelete.ingreso
     const fixedStatistic = {
         ...statisticToFix,
         balanceViewIncome: fixedDailyIncome,
@@ -200,7 +200,7 @@ const Salidas = () => {
         },
         {
             dataIndex: 'output_netProfit',
-            render: (_, output) => output.ganancia,
+            render: (_, output) => output.ingreso,
             title: 'Ingreso'
         },
         {

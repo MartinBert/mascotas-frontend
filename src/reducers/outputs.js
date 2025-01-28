@@ -63,8 +63,8 @@ const initialState = {
         fecha: new Date(),
         fechaString: simpleDateWithHours(new Date()),
         cantidad: 0,
-        ganancia: 0,
         gananciaNeta: 0,
+        ingreso: 0,
         productos: [],
         usuario: null
     },
@@ -92,16 +92,6 @@ const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actions.CALCULATE_OUTPUT_NET_PROFIT_AND_PRODUCTS_QUANTITY:
             const cantidad = state.params.productos.reduce((acc, item) => acc + parseFloat(item.cantidadesSalientes), 0)
-            const ganancia = round(
-                state.params.productos.reduce(
-                    (acc, item) =>
-                        acc + (
-                            parseFloat(item.cantidadesSalientes)
-                                ? parseFloat(item.precioVenta) * parseFloat(item.cantidadesSalientes)
-                                : 0
-                        ), 0
-                )
-            )
             const gananciaNeta = round(
                 state.params.productos.reduce(
                     (acc, item) =>
@@ -112,9 +102,19 @@ const reducer = (state = initialState, action) => {
                         ), 0
                 )
             )
+            const ingreso = round(
+                state.params.productos.reduce(
+                    (acc, item) =>
+                        acc + (
+                            parseFloat(item.cantidadesSalientes)
+                                ? parseFloat(item.precioVenta) * parseFloat(item.cantidadesSalientes)
+                                : 0
+                        ), 0
+                )
+            )
             return {
                 ...state,
-                params: { ...state.params, cantidad, ganancia, gananciaNeta }
+                params: { ...state.params, cantidad, ingreso, gananciaNeta }
             }
         case actions.CLEAN_STATE:
             return initialState

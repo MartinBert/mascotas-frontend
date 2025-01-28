@@ -42,7 +42,7 @@ const edit = async (salida) => {
 const editAll = async (outputs) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const lotsLimit = 5
+        const lotsLimit = 10
         const loopLimit = outputs.length / lotsLimit
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {

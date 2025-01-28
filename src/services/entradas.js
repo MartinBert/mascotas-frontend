@@ -41,14 +41,12 @@ const edit = async (entrada) => {
 
 const editAll = async (entries) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    console.log(entries)
     try {
-        const lotsLimit = 5
+        const lotsLimit = 10
         const loopLimit = entries.length / lotsLimit
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
             const lot = entries.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            console.log(lot)
             const response = await axios.put(`${process.env.REACT_APP_API_REST}/entradas/entries/edit_all`, lot, headers)
             responseData.push(response.data)
         }

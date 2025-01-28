@@ -157,8 +157,8 @@ const SalidasForm = () => {
     const generateNewStatistic = () => {
         const newStatistic = {
             balanceViewExpense: 0,
-            balanceViewIncome: parseFloat(outputs_state.params.ganancia),
-            balanceViewProfit: parseFloat(outputs_state.params.ganancia),
+            balanceViewIncome: parseFloat(outputs_state.params.ingreso),
+            balanceViewProfit: parseFloat(outputs_state.params.ingreso),
             concept: 'Generado automáticamente',
             date: localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10)),
             dateOrder: numberOrderDate(outputs_state.params.fechaString.substring(0, 10)),
@@ -225,7 +225,7 @@ const SalidasForm = () => {
         if (statisticToEdit) {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
-            const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ganancia)
+            const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ingreso)
             const balanceViewIncome = round(currentBalanceViewIncome + newAddedBalanceViewIncome)
             const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
             const updatedStatistic = {
@@ -281,7 +281,7 @@ const SalidasForm = () => {
         const dateChanged = outputToEdit.fechaString.substring(0, 10) !== outputs_state.params.fechaString.substring(0, 10)
         const previousStatisticToEdit = await findStatisticByStringDate(outputToEdit.fechaString)
         if (previousStatisticToEdit && dateChanged) {
-            const balanceViewIncome = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(outputs_state.params.ganancia)
+            const balanceViewIncome = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(outputs_state.params.ingreso)
             const balanceViewProfit = parseFloat(balanceViewIncome) - parseFloat(previousStatisticToEdit.balanceViewExpense)
             const edittedPreviousStatistic = {
                 ...previousStatisticToEdit,
@@ -292,10 +292,10 @@ const SalidasForm = () => {
         }
         const statisticToEdit = await findStatisticByStringDate(outputs_state.params.fechaString)
         if (statisticToEdit) {
-            const incomeFromOutputToEdit = parseFloat(outputToEdit.ganancia)
+            const incomeFromOutputToEdit = parseFloat(outputToEdit.ingreso)
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
-            const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ganancia)
+            const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ingreso)
             const balanceViewIncome = round(
                 currentBalanceViewIncome
                 - (!dateChanged ? incomeFromOutputToEdit : 0)
@@ -583,7 +583,7 @@ const SalidasForm = () => {
     )
 
     // -------------- Title of total cost  --------------- //
-    const titleOfNetProfit = <h1>Ingreso Total: {round(outputs_state.params.ganancia)}</h1>
+    const titleOfNetProfit = <h1>Ingreso Total: {round(outputs_state.params.ingreso)}</h1>
 
 
     const itemsToRender = [

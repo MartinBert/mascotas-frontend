@@ -72,7 +72,7 @@ const Header = () => {
             if (columnHeaders.includes('Fecha')) activeOptions.push(salida.fecha ? simpleDateWithHours(salida.fecha) : '-- Fecha no registrada --')
             if (columnHeaders.includes('Descripción')) activeOptions.push(salida.descripcion ? salida.descripcion : '-- Sin descripción --')
             if (columnHeaders.includes('Productos')) activeOptions.push(salida.productos ? productosString.substring(0, productosString.length - 2) : '-- Sin productos --')
-            if (columnHeaders.includes('Ganancia')) activeOptions.push(salida.ganancia ? salida.ganancia : '-- Ganancia no calculada --')
+            if (columnHeaders.includes('Ganancia')) activeOptions.push(salida.ingreso ? salida.ingreso : '-- Ganancia no calculada --')
             if (columnHeaders.includes('Ganancia Neta')) activeOptions.push(salida.gananciaNeta ? salida.gananciaNeta : '-- Ganancia neta no calculada --')
             processedLines.push(activeOptions)
         }
@@ -147,7 +147,7 @@ const Header = () => {
         { disabled: true, label: 'Fecha', value: 'fecha' },
         { disabled: false, label: 'Descripción', value: 'descripcion' },
         { disabled: false, label: 'Productos', value: 'productos' },
-        { disabled: false, label: 'Ganancia', value: 'ganancia' },
+        { disabled: false, label: 'Ingreso', value: 'ingreso' },
         { disabled: false, label: 'Ganancia Neta', value: 'gananciaNeta' }
     ]
 
