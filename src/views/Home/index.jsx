@@ -299,6 +299,11 @@ const Home = () => {
             }
             updatedEntries.push(updatedEntry)
         }
+        const entriesSavingRes = await api.entradas.editAll(updatedEntries)
+        if (!entriesSavingRes || entriesSavingRes.code !== 200) {
+            home_dispatch({ type: 'SET_LOADING', payload: false })
+            return errorAlert('No se pudo corregir las entradas.')
+        }
 
         // Update and save outputs
         const updatedOutputs = []
@@ -336,22 +341,13 @@ const Home = () => {
             }
             updatedOutputs.push(updatedOutput)
         }
+        const outputsSavingRes = await api.salidas.editAll(updatedOutputs)
+        if (!outputsSavingRes || outputsSavingRes.code !== 200) {
+            home_dispatch({ type: 'SET_LOADING', payload: false })
+            return errorAlert('No se pudo corregir las salidas.')
+        }
 
-        console.log(updatedEntries)
-        console.log(updatedOutputs)
-        // const entriesSavingRes = await api.entradas.editAll(updatedEntries)
-        // if (!entriesSavingRes || entriesSavingRes.code !== 200) {
-        //     home_dispatch({ type: 'SET_LOADING', payload: false })
-        //     return errorAlert('No se pudo corregir las entradas.')
-        // }
-
-        // const outputsSavingRes = await api.salidas.editAll(updatedOutputs)
-        // if (!outputsSavingRes || outputsSavingRes.code !== 200) {
-        //     home_dispatch({ type: 'SET_LOADING', payload: false })
-        //     return errorAlert('No se pudo corregir las salidas.')
-        // }
-
-        // console.log('Records fixed.')
+        console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
