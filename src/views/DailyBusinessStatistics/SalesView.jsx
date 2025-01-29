@@ -49,9 +49,9 @@ const SalesView = () => {
         const creditNotesData = creditNotes.map(creditNote => {
             const dataItem = {
                 concept: 'Nota crédito',
-                expense: parseFloat(creditNote.total),
+                expense: round(creditNote.total),
                 productName: '-',
-                profit: - parseFloat(creditNote.total),
+                profit: - round(creditNote.total),
                 quantity: 1,
                 salePrice: 0
             }
@@ -67,9 +67,9 @@ const SalesView = () => {
                 concept: 'Nota débito',
                 expense: 0,
                 productName: '-',
-                profit: parseFloat(debitNote.total),
+                profit: round(debitNote.total),
                 quantity: 1,
-                salePrice: parseFloat(debitNote.total)
+                salePrice: round(debitNote.total)
             }
             return dataItem
         })
@@ -80,13 +80,14 @@ const SalesView = () => {
         const outputs = findOutputs.docs
         const outputsData = outputs.map(output => {
             const data = output.productos.map(product => {
+                const profit = parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta)
                 const dataItem = {
                     concept: 'Salida',
                     expense: 0,
                     productName: product.nombre,
-                    profit: parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta),
-                    quantity: parseFloat(product.cantidadesSalientes),
-                    salePrice: parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta),
+                    profit: round(profit),
+                    quantity: round(product.cantidadesSalientes),
+                    salePrice: round(profit)
                 }
                 return dataItem
             })
@@ -102,13 +103,14 @@ const SalesView = () => {
         const salesData = sales.map(sale => {
             const data = sale.renglones.map(line => {
                 const productLine = sale.productos.find(product => product.nombre === line.nombre)
+                const productListPrice = parseFloat(productLine.precioUnitario) / parseFloat(productLine.fraccionamiento)
                 const dataItem = {
                     concept: 'Venta',
-                    expense: parseFloat(productLine.precioUnitario ?? line.precioUnitario),
+                    expense: round(productListPrice),
                     productName: line.nombre,
-                    profit: parseFloat(line.precioNeto) - parseFloat(productLine.precioUnitario) ?? parseFloat(line.profit),
-                    quantity: parseFloat(line.cantidadUnidades),
-                    salePrice: parseFloat(line.precioNeto)
+                    profit: round(parseFloat(line.precioNeto) - productListPrice) ?? round(line.profit),
+                    quantity: round(line.cantidadUnidades),
+                    salePrice: round(line.precioNeto)
                 }
                 return dataItem
             })
@@ -125,9 +127,9 @@ const SalesView = () => {
         const salesViewData = { sales: data, totalSalesRecords: data.length }
         dailyBusinessStatistics_dispatch({ type: 'SET_SALES_TO_SALES_VIEW', payload: salesViewData })
 
-        const totalSalesViewExpense = data.reduce((acc, value) => acc + value.expense, 0)
-        const totalSalesViewProfit = data.reduce((acc, value) => acc + value.profit, 0)
-        const totalSalesViewSalePrices = data.reduce((acc, value) => acc + value.salePrice, 0)
+        const totalSalesViewExpense = round(data.reduce((acc, value) => acc + value.expense, 0))
+        const totalSalesViewProfit = round(data.reduce((acc, value) => acc + value.profit, 0))
+        const totalSalesViewSalePrices = round(data.reduce((acc, value) => acc + value.salePrice, 0))
         const salesViewTotals = { totalSalesViewExpense, totalSalesViewProfit, totalSalesViewSalePrices }
         dailyBusinessStatistics_dispatch({ type: 'SET_SALES_VIEW_TOTALS', payload: salesViewTotals })
     }

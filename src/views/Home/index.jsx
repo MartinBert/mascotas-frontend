@@ -196,11 +196,10 @@ const Home = () => {
     // -------------------- Button to delete daily business statistics ----------------------- //
     const deleteDailyBusinessStatistics = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
-        const dailyBusinessStatistics = findDailyBusinessStatistics.docs
-        for (let index = 0; index < dailyBusinessStatistics.length; index++) {
-            const dailyBusinessStatistic = dailyBusinessStatistics[index]
-            await api.dailyBusinessStatistics.deleteDailyBusinessStatistics(dailyBusinessStatistic._id)
+        const response = await api.dailyBusinessStatistics.deleteAll()
+        if (!response || response.code !== 200) {
+            home_dispatch({ type: 'SET_LOADING', payload: false })
+            return errorAlert('No se pudo eliminar las estadísticas diarias de negocio. Intente de nuevo.')
         }
         console.log('Daily business statistics was deleted.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -260,8 +259,8 @@ const Home = () => {
     // -------------------------- Button to fix data base records ---------------------------- //
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        
-        const outputsSavingRes = await api.salidas.editAll()
+        const propsToDelete = ['ganancia']
+        const outputsSavingRes = await api.salidas.deletePropsFromAll(propsToDelete)
         console.log(outputsSavingRes)
 
         console.log('Records fixed.')

@@ -28,6 +28,17 @@ const deleteById = async (id) => {
     }
 }
 
+const deletePropsFromAll = async (propsToDelete) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/delete_props_from_all`, propsToDelete, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const edit = async (salida) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -39,30 +50,27 @@ const edit = async (salida) => {
     }
 }
 
-const editAll = async () => {
-    const outputs = ['aaa', 'bbb']
+const editAll = async (outputs) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, outputs, headers)
-    return response.data
-    // try {
-    //     const lotsLimit = 5
-    //     const loopLimit = outputs.length / lotsLimit
-    //     const responseData = []
-    //     for (let index = 0; index < loopLimit; index++) {
-    //         const lot = outputs.slice(index * lotsLimit, (index + 1) * lotsLimit)
-    //         const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, lot, headers)
-    //         responseData.push(response.data)
-    //     }
-    //     const response = {
-    //         code: 200,
-    //         data: responseData,
-    //         status: 'OK'
-    //     }
-    //     return response
-    // } catch (err) {
-    //     checkStorageStatus(err)
-    //     console.error(err)
-    // }
+    try {
+        const lotsLimit = 5
+        const loopLimit = outputs.length / lotsLimit
+        const responseData = []
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = outputs.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, lot, headers)
+            responseData.push(response.data)
+        }
+        const response = {
+            code: 200,
+            data: responseData,
+            status: 'OK'
+        }
+        return response
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
 }
 
 const findAll = async () => {
@@ -157,6 +165,7 @@ const save = async (salida) => {
 const salidas = {
     countRecords,
     deleteById,
+    deletePropsFromAll,
     edit,
     editAll,
     findAll,
