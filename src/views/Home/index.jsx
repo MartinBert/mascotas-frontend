@@ -262,10 +262,7 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         
         const outputsSavingRes = await api.salidas.editAll()
-        if (!outputsSavingRes || outputsSavingRes.code !== 200) {
-            home_dispatch({ type: 'SET_LOADING', payload: false })
-            return errorAlert('No se pudo corregir las salidas.')
-        }
+        console.log(outputsSavingRes)
 
         console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
