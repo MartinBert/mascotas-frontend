@@ -10,7 +10,7 @@ const checkStorageStatus = (err) => {
 const deleteAll = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/daily_business_statistics`, headers)
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/daily_business_statistics/records/delete_all`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
