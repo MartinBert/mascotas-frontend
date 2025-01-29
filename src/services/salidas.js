@@ -39,9 +39,10 @@ const edit = async (salida) => {
     }
 }
 
-const editAll = async (outputs) => {
+const editAll = async () => {
+    const outputs = ['aaa', 'bbb']
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, headers)
+    const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, outputs, headers)
     return response.data
     // try {
     //     const lotsLimit = 5
