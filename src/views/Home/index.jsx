@@ -259,14 +259,7 @@ const Home = () => {
     // -------------------------- Button to fix data base records ---------------------------- //
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const propsToDeleteFromOutputs = ['ganancia']
-        const outputsSavingRes = await api.salidas.deletePropsFromAll(propsToDeleteFromOutputs)
-        console.log('SALIDAS RESPONSE')
-        console.log(outputsSavingRes)
-        console.log('-------------------------------------------------')
-        if (!outputsSavingRes || outputsSavingRes.code !== 200) {
-            return errorAlert('No se pudo reparar los registros de salidas. Intente de nuevo.')
-        }
+        
         const propsToDeleteFromSalesLines = [
             'importeDescuentoRenglon',
             'importeRecargoRenglon',
@@ -279,7 +272,6 @@ const Home = () => {
             'totalRenglon'
         ]
         const salesLinesSavingRes = await api.ventas.deletePropsFromAllLines(propsToDeleteFromSalesLines)
-        console.log('RENGLONES RESPONSE')
         console.log(salesLinesSavingRes)
         if (!salesLinesSavingRes || salesLinesSavingRes.code !== 200) {
             return errorAlert('No se pudo reparar los registros de renglones de ventas. Intente de nuevo.')
