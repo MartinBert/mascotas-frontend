@@ -16,11 +16,33 @@ const countRecords = async () => {
     }
 }
 
-const deleteVenta = async (id) => {
+const deleteById = async (id) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.delete(`${process.env.REACT_APP_API_REST}/ventas/${id}`, headers)
         return response.data.message
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const deletePropsFromAll = async (propsToDelete) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/sales/delete_props_from_all`, propsToDelete, headers)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const deletePropsFromAllLines = async (propsToDelete) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/ventas/sales/lines/delete_props_from_all`, propsToDelete, headers)
+        return response.data
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
@@ -219,7 +241,9 @@ const saveAll = async (sales) => {
 
 const ventas = {
     countRecords,
-    deleteVenta,
+    deleteById,
+    deletePropsFromAll,
+    deletePropsFromAllLines,
     edit,
     editAll,
     findAll,
