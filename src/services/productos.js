@@ -43,6 +43,29 @@ const edit = async (producto) => {
     }
 }
 
+const editAll = async (products) => {
+    const headers = { headers: { Authorization: localStorage.getItem('token') } }
+    try {
+        const lotsLimit = 5
+        const loopLimit = products.length / lotsLimit
+        const responseData = []
+        for (let index = 0; index < loopLimit; index++) {
+            const lot = products.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const response = await axios.put(`${process.env.REACT_APP_API_REST}/productos/products/edit_all`, lot, headers)
+            responseData.push(response.data)
+        }
+        const response = {
+            code: 200,
+            data: responseData,
+            status: 'OK'
+        }
+        return response
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
 const findAll = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
@@ -156,6 +179,7 @@ const productos = {
     countRecords,
     deleteById,
     edit,
+    editAll,
     findAll,
     findAllByFilters,
     findAllForCatalogue,
