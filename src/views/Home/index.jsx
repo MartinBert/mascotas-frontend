@@ -259,23 +259,6 @@ const Home = () => {
     // -------------------------- Button to fix data base records ---------------------------- //
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        
-        const propsToDeleteFromSalesLines = [
-            'importeDescuentoRenglon',
-            'importeRecargoRenglon',
-            'productoCodigoBarras',
-            'productoFraccionamiento',
-            'productoImporteIva',
-            'productoNombre',
-            'productoPorcentajeIva',
-            'productoPrecioUnitario',
-            'totalRenglon'
-        ]
-        const salesLinesSavingRes = await api.ventas.deletePropsFromAllLines(propsToDeleteFromSalesLines)
-        console.log(salesLinesSavingRes)
-        if (!salesLinesSavingRes || salesLinesSavingRes.code !== 200) {
-            return errorAlert('No se pudo reparar los registros de renglones de ventas. Intente de nuevo.')
-        }
 
         console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
