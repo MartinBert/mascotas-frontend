@@ -261,21 +261,25 @@ const Home = () => {
         const isOperableProduct = (
             referenceProduct._id === productToCompare._id
             || referenceProduct.nombre === productToCompare.nombre
-        ) ? true : false
+        ) ? true : false        
         let quantity
         if (isOperableProduct) {
             switch (operationType) {
                 case 'entry':
                     quantity = parseFloat(productToCompare.cantidadesEntrantes)
+                    break
                 case 'output':
                     quantity = parseFloat(productToCompare.cantidadesSalientes)
+                    break
                 case 'sale':
                     quantity = (
                         parseFloat(productToCompare.cantidadUnidades)
                         / (productToCompare.fraccionar ? parseFloat(productToCompare.fraccionamiento) : 1)
                     )
+                    break
                 default:
                     quantity = 0
+                    break
             }
         } else quantity = 0
         return quantity
@@ -336,11 +340,20 @@ const Home = () => {
             )
 
             // Return data
+            const cantidadFraccionadaStock = round(
+               (1 * (product.unidadMedida.fraccionamiento))
+                - (productFractionedSales - Math.trunc(productFractionedSales))
+            )
+            const cantidadStock = round(productEntries - (productOutputs + productUnfractionedSales))
             const data = {
                 ...product,
-                cantidadFraccionadaStock: round( 1 - (productFractionedSales - Math.trunc(productFractionedSales))),
-                cantidadStock: round(productEntries - (productOutputs + productUnfractionedSales)),
+                cantidadFraccionadaStock,
+                cantidadStock: cantidadStock <= 0 ? 10 : cantidadStock,
             }
+            console.log('CANTIDAD FRAC STOCK:     ' + cantidadFraccionadaStock)
+            console.log('CANTIDAD STOCK:     ' + cantidadStock <= 0 ? 10 : cantidadStock)
+            console.log(data)
+            console.log('------------------------------------')
             return data
         })
 
