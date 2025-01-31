@@ -350,8 +350,12 @@ const Home = () => {
                 cantidadFraccionadaStock,
                 cantidadStock: cantidadStock <= 0 ? 10 : cantidadStock,
             }
+            console.log('TOTAL DE VENTAS FRACCIONADAS:     ' + productFractionedSales)
             console.log('CANTIDAD FRAC STOCK:     ' + cantidadFraccionadaStock)
-            console.log('CANTIDAD STOCK:     ' + cantidadStock <= 0 ? 10 : cantidadStock)
+            console.log('CANTIDAD STOCK:     ' + (cantidadStock <= 0 ? 10 : cantidadStock))
+            console.log('producto original: ')
+            console.log(product)
+            console.log('producto modificado: ')
             console.log(data)
             console.log('------------------------------------')
             return data
