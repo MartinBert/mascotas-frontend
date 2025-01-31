@@ -380,7 +380,10 @@ const Home = () => {
                         const productLine = sale.renglones.find(line => line.nombre === product.nombre)
                         const data = {
                             productUnitPrice: product.precioUnitario,
-                            proportion: (productLine?.cantidadUnidades ?? 1) / (productLine?.fraccionamiento ?? 1)
+                            proportion: (
+                                (productLine?.cantidadUnidades ?? 1)
+                                / (productLine?.fraccionar ? productLine?.fraccionamiento : 1)
+                            )
                         }
                         return data
                     })
