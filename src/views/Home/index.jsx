@@ -276,7 +276,12 @@ const Home = () => {
             }
         }
 
-        console.log(salesDef)
+        const testSales = salesDef.map(sale => {
+            const testCrit = sale.productos.length === sale.renglones.length
+            return testCrit
+        })
+
+        console.log(testSales.includes(false))
         // const updatedProducts = products.map(product => {
         //      const updatedProduct = {
         //          ...product,
