@@ -343,8 +343,8 @@ const Home = () => {
 
             // Return data
             const cantidadFraccionadaStock = round(
-               (1 * (product.unidadMedida.fraccionamiento))
-                - (productFractionedSales - Math.trunc(productFractionedSales))
+               (1 - (productFractionedSales - Math.trunc(productFractionedSales)))
+               * parseFloat(product.unidadMedida.fraccionamiento)
             )
             const cantidadStock = round(productEntries - (productOutputs + productUnfractionedSales))
             const data = {
