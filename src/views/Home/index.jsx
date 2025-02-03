@@ -369,26 +369,22 @@ const Home = () => {
             const data = {
                 ...product,
                 cantidadFraccionadaStock,
-                cantidadStock: cantidadStock <= 0 ? 10 : cantidadStock,
+                cantidadStock: (
+                    product.nombre === 'PEZ SUELTO 50 GRS'
+                        ? 13
+                        : product.nombre === 'RAID MATA MOSCAS Y MOSQUITOS SIN OLOR 380CM3'
+                            ? 1
+                            : cantidadStock <= 0
+                                ? 10
+                                    : cantidadStock
+                )
             }
-            if (isNaN(cantidadStock)) {
-                console.log('TOTAL DE VENTAS FRACCIONADAS:     ' + round(productFractionedSales))
-                console.log('CANTIDAD FRAC STOCK:     ' + round(cantidadFraccionadaStock))
-                console.log('CANTIDAD STOCK:     ' + (cantidadStock <= 0 ? 10 : round(cantidadStock)))
-                console.log('producto original: ')
-                console.log(product)
-                console.log('producto modificado: ')
-                console.log(data)
-                console.log('------------------------------------')
-            }
-            
             return data
         })
 
-        console.log(updatedProducts)
-        // const res = await api.productos.editAll(updatedProducts)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        // else console.log('Records fixed.')
+        const res = await api.productos.editAll(updatedProducts)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
