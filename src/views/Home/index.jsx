@@ -392,7 +392,7 @@ const Home = () => {
 
     const buttonToFixDataBaseRecords = (
         <Button
-            onClick={fixProducts}
+            onClick={fixDataBaseRecords}
             type='primary'
         >
             Reparar
