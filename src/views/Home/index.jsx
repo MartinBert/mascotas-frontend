@@ -259,8 +259,24 @@ const Home = () => {
     // -------------------------- Button to fix data base records ---------------------------- //
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        // const findProducts = await api.productos.findAll()
-        // const products = findProducts.docs
+        const findSales = await api.ventas.findAll()
+        const sales = findSales.docs
+        const salesDef = []
+        for (let index = 0; index < sales.length; index++) {
+            const sale = sales[index]
+            const salesDefPart = []
+            for (let index = 0; index < sale.renglones.length; index++) {
+                const saleLine = sale.renglones[index]
+                const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
+                const matchTheProduct = saleProduct ? true : false
+                if (!matchTheProduct) salesDefPart.push(sale)
+            }
+            if(salesDefPart.length > 0) {
+                salesDef.push(salesDefPart[0])
+            }
+        }
+
+        console.log(salesDef)
         // const updatedProducts = products.map(product => {
         //      const updatedProduct = {
         //          ...product,
