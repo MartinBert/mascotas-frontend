@@ -276,12 +276,15 @@ const Home = () => {
             }
         }
 
-        const testSales = salesDef.map(sale => {
-            const testCrit = sale.productos.length === sale.renglones.length
-            return testCrit
-        })
+        valff = []
+        for (let index = 0; index < salesDef.length; index++) {
+            const sal = salesDef[index]
+            const testCrit = sal.productos.length === sal.renglones.length
+            if (!testCrit) valff.push(sal)
+        }
 
-        console.log(testSales.includes(false))
+        console.log(valff)
+        
         // const updatedProducts = products.map(product => {
         //      const updatedProduct = {
         //          ...product,
