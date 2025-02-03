@@ -257,134 +257,20 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const fixProducts = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const filters = JSON.stringify({ fraccionamiento: 1 })
-        const findDefaultUnitOfMeasure = await api.unidadesmedida.findAllByFilters(filters)
-        const findProducts = await api.productos.findAll()
-        const defaultUnitOfMeasure = findDefaultUnitOfMeasure.docs[0]
-        const products = findProducts.docs
-
-        const updatedProducts = products.map(product => {
-            const updatedProduct = {
-                ...product,
-                unidadMedida: product.unidadMedida ?? defaultUnitOfMeasure
-            }
-            return updatedProduct
-        })
-
-        const res = await api.productos.editAll(updatedProducts)
-        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        else console.log('Records fixed.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const getOperationProductsQuantity = (referenceProduct, productToCompare, operationType) => {
-        const isOperableProduct = (
-            referenceProduct._id === productToCompare._id
-            || referenceProduct.nombre === productToCompare.nombre
-        ) ? true : false        
-        let quantity
-        if (isOperableProduct) {
-            switch (operationType) {
-                case 'entry':
-                    quantity = parseFloat(productToCompare.cantidadesEntrantes)
-                    break
-                case 'output':
-                    quantity = parseFloat(productToCompare.cantidadesSalientes)
-                    break
-                case 'sale':
-                    quantity = (
-                        parseFloat(productToCompare.cantidadUnidades)
-                        / (productToCompare.fraccionar ? parseFloat(productToCompare.fraccionamiento) : 1)
-                    )
-                    break
-                default:
-                    quantity = 0
-                    break
-            }
-        } else quantity = 0
-        return quantity
-    }
-
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findEntries = await api.entradas.findAll()
-        const findOutputs = await api.salidas.findAll()
-        const findProducts = await api.productos.findAll()
-        const findSales = await api.ventas.findAll()
-        const entries = findEntries.docs
-        const outputs = findOutputs.docs
-        const products = findProducts.docs
-        const sales = findSales.docs
-            .filter(record => record.documento.cashRegister)
-            .filter(record =>
-                !creditCodes.includes(record.documentoCodigo)
-                && !debitCodes.includes(record.documentoCodigo)
-            )
-
-        const updatedProducts = products.map(product => {
-            // Product entries
-            const productEntries = entries.reduce((acc, entry) =>
-                acc +
-                    entry.productos.reduce((acc, entryProduct) =>
-                        acc + getOperationProductsQuantity(product, entryProduct, 'entry'), 0
-                    )
-                , 0
-            )
-
-            // Product outputs
-            const productOutputs = outputs.reduce((acc, output) =>
-                acc +
-                    output.productos.reduce((acc, outputProduct) =>
-                        acc + getOperationProductsQuantity(product, outputProduct, 'output'), 0
-                    )
-                , 0
-            )
-            const productUnfractionedSales = sales.reduce((acc, sale) =>
-                acc +
-                    sale.renglones
-                        .filter(line => line.fraccionar === false)
-                        .reduce((acc, line) =>
-                            acc + getOperationProductsQuantity(product, line, 'sale'), 0
-                        )
-                , 0
-            )
-            const productFractionedSales = sales.reduce((acc, sale) =>
-                acc +
-                    sale.renglones
-                        .filter(line => line.fraccionar === true)
-                        .reduce((acc, line) =>
-                            acc + getOperationProductsQuantity(product, line, 'sale'), 0
-                        )
-                , 0
-            )
-
-            // Return data
-            const cantidadFraccionadaStock = round(
-               (1 - (productFractionedSales - Math.trunc(productFractionedSales)))
-               * parseFloat(product.unidadMedida.fraccionamiento)
-            )
-            const cantidadStock = round(productEntries - (productOutputs + productUnfractionedSales))
-            const data = {
-                ...product,
-                cantidadFraccionadaStock,
-                cantidadStock: (
-                    product.nombre === 'PEZ SUELTO 50 GRS'
-                        ? 13
-                        : product.nombre === 'RAID MATA MOSCAS Y MOSQUITOS SIN OLOR 380CM3'
-                            ? 1
-                            : cantidadStock <= 0
-                                ? 10
-                                    : cantidadStock
-                )
-            }
-            return data
-        })
-
-        const res = await api.productos.editAll(updatedProducts)
-        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        else console.log('Records fixed.')
+        // const findProducts = await api.productos.findAll()
+        // const products = findProducts.docs
+        // const updatedProducts = products.map(product => {
+        //      const updatedProduct = {
+        //          ...product,
+        //          
+        //      }
+        //      return updatedProduct
+        // })
+        // const res = await api.productos.editAll(updatedProducts)
+        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        // else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

@@ -103,13 +103,20 @@ const SalesView = () => {
         const salesData = sales.map(sale => {
             const data = sale.renglones.map(line => {
                 const productLine = sale.productos.find(product => product.nombre === line.nombre)
-                const productListPrice = parseFloat(productLine.precioUnitario) / parseFloat(line.fraccionamiento)
+                console.log(line)
+                console.log(productLine)
+                const productListPrice = (
+                    parseFloat(productLine.precioUnitario)
+                    / (line.fraccionar ? parseFloat(line.fraccionamiento) : 1)
+                )
                 const dataItem = {
                     concept: 'Venta',
                     expense: round(productListPrice),
                     productName: line.nombre,
                     profit: round(parseFloat(line.precioNeto) - productListPrice) ?? round(line.profit),
-                    quantity: round(line.cantidadUnidades),
+                    quantity: !line.fraccionar
+                        ? round(line.cantidadUnidades)
+                        : `${round(line.cantidadUnidades)} (fracc. ${round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))})`,
                     salePrice: round(line.precioNeto)
                 }
                 return dataItem
