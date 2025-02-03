@@ -257,6 +257,28 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
+    const fixProducts = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const filters = JSON.stringify({ fraccionamiento: 1 })
+        const findDefaultUnitOfMeasure = await api.unidadesmedida.findAllByFilters(filters)
+        const findProducts = await api.productos.findAll()
+        const defaultUnitOfMeasure = findDefaultUnitOfMeasure.docs[0]
+        const products = findProducts.docs
+
+        const updatedProducts = products.map(product => {
+            const updatedProduct = {
+                ...product,
+                unidadMedida: product.unidadMedida ?? defaultUnitOfMeasure
+            }
+            return updatedProduct
+        })
+
+        const res = await api.productos.editAll(updatedProducts)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        else console.log('Records fixed.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
     const getOperationProductsQuantity = (referenceProduct, productToCompare, operationType) => {
         const isOperableProduct = (
             referenceProduct._id === productToCompare._id
@@ -370,7 +392,7 @@ const Home = () => {
 
     const buttonToFixDataBaseRecords = (
         <Button
-            onClick={fixDataBaseRecords}
+            onClick={fixProducts}
             type='primary'
         >
             Reparar
