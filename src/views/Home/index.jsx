@@ -324,9 +324,6 @@ const Home = () => {
             )
 
         const updatedProducts = products.map(product => {
-            console.log('producto original: ')
-            console.log(product)
-
             // Product entries
             const productEntries = entries.reduce((acc, entry) =>
                 acc +
@@ -374,12 +371,17 @@ const Home = () => {
                 cantidadFraccionadaStock,
                 cantidadStock: cantidadStock <= 0 ? 10 : cantidadStock,
             }
-            console.log('TOTAL DE VENTAS FRACCIONADAS:     ' + round(productFractionedSales))
-            console.log('CANTIDAD FRAC STOCK:     ' + round(cantidadFraccionadaStock))
-            console.log('CANTIDAD STOCK:     ' + (cantidadStock <= 0 ? 10 : round(cantidadStock)))
-            console.log('producto modificado: ')
-            console.log(data)
-            console.log('------------------------------------')
+            if (isNaN(cantidadStock)) {
+                console.log('TOTAL DE VENTAS FRACCIONADAS:     ' + round(productFractionedSales))
+                console.log('CANTIDAD FRAC STOCK:     ' + round(cantidadFraccionadaStock))
+                console.log('CANTIDAD STOCK:     ' + (cantidadStock <= 0 ? 10 : round(cantidadStock)))
+                console.log('producto original: ')
+                console.log(product)
+                console.log('producto modificado: ')
+                console.log(data)
+                console.log('------------------------------------')
+            }
+            
             return data
         })
 
