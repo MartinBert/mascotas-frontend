@@ -107,8 +107,9 @@ const SalesView = () => {
                 if (!productLine) productListPrice = 0
                 else {
                     productListPrice = (
-                        parseFloat(productLine.precioUnitario)
-                        / (line.fraccionar ? parseFloat(line.fraccionamiento) : 1)
+                        (parseFloat(productLine.precioUnitario)
+                        / (line.fraccionar ? parseFloat(line.fraccionamiento) : 1))
+                        * parseFloat(line.cantidadUnidades)
                     )
                 }
                 const dataItem = {
