@@ -269,7 +269,7 @@ const Home = () => {
                 const saleLine = sale.renglones[index]
                 const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
                 const matchTheProduct = saleProduct ? true : false
-                if (!matchTheProduct) salesDefPart.push(sale)
+                if (!matchTheProduct) saleDefectiveItems.push(sale)
             }
             if(saleDefectiveItems.length > 0) {
                 salesDefective.push(saleDefectiveItems[0])
