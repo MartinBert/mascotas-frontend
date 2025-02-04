@@ -261,24 +261,24 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
         const sales = findSales.docs
-        const salesDef = []
+        const salesDefective = []
         for (let index = 0; index < sales.length; index++) {
             const sale = sales[index]
-            const salesDefPart = []
+            const saleDefectiveItems = []
             for (let index = 0; index < sale.renglones.length; index++) {
                 const saleLine = sale.renglones[index]
                 const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
                 const matchTheProduct = saleProduct ? true : false
                 if (!matchTheProduct) salesDefPart.push(sale)
             }
-            if(salesDefPart.length > 0) {
-                salesDef.push(salesDefPart[0])
+            if(saleDefectiveItems.length > 0) {
+                salesDefective.push(saleDefectiveItems[0])
             }
         }
 
         const valff = []
-        for (let index = 0; index < salesDef.length; index++) {
-            const sal = salesDef[index]
+        for (let index = 0; index < salesDefective.length; index++) {
+            const sal = salesDefective[index]
             const testCrit = sal.productos.length === sal.renglones.length
             if (!testCrit) valff.push(sal)
         }
@@ -411,12 +411,12 @@ const Home = () => {
                 )
                 .map(sale => {
                     const data = sale.productos.map(product => {
-                        const productLine = sale.renglones.find(line => line.nombre === product.nombre)
+                        const lineOfProduct = sale.renglones.find(line => line.nombre === product.nombre)
                         const data = {
                             productUnitPrice: product.precioUnitario,
                             proportion: (
-                                (productLine?.cantidadUnidades ?? 1)
-                                / (productLine?.fraccionar ? productLine?.fraccionamiento : 1)
+                                (lineOfProduct?.cantidadUnidades ?? 1)
+                                / (lineOfProduct?.fraccionar ? lineOfProduct?.fraccionamiento : 1)
                             )
                         }
                         return data
