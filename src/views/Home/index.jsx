@@ -257,11 +257,60 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const fixDataBaseRecords = async () => {
+    const addReceiverIvaConditionToClients = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const allReceiverIvaConditions = [1, 4, 5, 6, 7, 8, 9, 10, 13, 15, 16]
+        const businessFiscalCondition = auth_state.user.empresa.condicionFiscal.nombre
+        const findClients = await api.clientes.findAll()
+        const clients = findClients.docs
+
+        const updatedClients = clients.map(client => {
+            let receiverIvaCondition = 0
+            if (!businessFiscalCondition) receiverIvaCondition = 0 
+            else {
+                switch (client.condicionFiscal.nombre) {
+                    case 'Consumidor Final':
+                        receiverIvaCondition = 5
+                        break;
+                    case 'Excento':
+                        receiverIvaCondition = 4
+                        break;
+                    case 'Monotributista':
+                        receiverIvaCondition = 6
+                        break;
+                    case 'Responsable Inscripto':
+                        receiverIvaCondition = 1
+                        break;
+                    default:
+                        receiverIvaCondition = 0
+                        break;
+                }
+            }
+            if (!allReceiverIvaConditions.includes(receiverIvaCondition)) {
+                errorAlert('No se pudo categorizar al cliente respecto al Iva. Contacte a su proveedor.')
+                return
+            } else {
+                const updatedClient = {
+                    ...client,
+                    condicionFiscal: client.condicionFiscal._id,
+                    receiverIvaCondition
+                }
+                return updatedClient
+            }
+        })
+
+        const res = await api.clientes.editAll(updatedClients)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        else console.log('Records fixed.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const fixNameOfLinesOfSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
         const sales = findSales.docs
-        const salesDefective = []
+
+        const totalDefectiveSales = []
         for (let index = 0; index < sales.length; index++) {
             const sale = sales[index]
             const saleDefectiveItems = []
@@ -272,18 +321,21 @@ const Home = () => {
                 if (!matchTheProduct) saleDefectiveItems.push(sale)
             }
             if(saleDefectiveItems.length > 0) {
-                salesDefective.push(saleDefectiveItems[0])
+                totalDefectiveSales.push(saleDefectiveItems[0])
             }
         }
 
-        const valff = []
-        for (let index = 0; index < salesDefective.length; index++) {
-            const sal = salesDefective[index]
-            const testCrit = sal.productos.length === sal.renglones.length
-            if (!testCrit) valff.push(sal)
+        const defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts = []
+        for (let index = 0; index < totalDefectiveSales.length; index++) {
+            const defectiveSale = totalDefectiveSales[index]
+            const numberOfLinesEqualToTheNumberOfProducts = defectiveSale.productos.length === defectiveSale.renglones.length
+            if (!numberOfLinesEqualToTheNumberOfProducts) defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(defectiveSale)
         }
 
-        console.log(valff)
+        console.log('TODAS LAS VENTAS DEFECTUOSAS')
+        console.log(totalDefectiveSales)
+        console.log('VENTAS EN LAS CUALES NO COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
+        console.log(defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
 
         // const updatedProducts = products.map(product => {
         //      const updatedProduct = {
@@ -296,6 +348,125 @@ const Home = () => {
         // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
         // else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const fixValuesOfLinesOfSales = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const findSales = await api.ventas.findAll()
+        const sales = findSales.docs
+        const updatedSales = sales.map(sale => {
+            const updatedLines = sale.renglones.map(line => {
+                const productOfLine = sale.productos.find(product => product.nombre === line.nombre)
+                const existProductOfLine = !productOfLine ? false : true
+                const unitMeasureInlcudesGr = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes(' gramo') ?? false
+                const unitMeasureInlcudesKg = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes('kilo') ?? false
+                const unitMeasureInlcudesOnlyGr = (unitMeasureInlcudesGr && !unitMeasureInlcudesKg) ?? false
+                const unitMeasureInlcudesOnlyKg = (!unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
+                const unitMeasureInlcudesKgAndGr = (unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
+                const unitMeasureInlcudesKgOrGr = (unitMeasureInlcudesGr || unitMeasureInlcudesKg) ?? false
+
+                const discountVariation = round(
+                    parseFloat(line.porcentajeDescuentoRenglon / 100)
+                    + parseFloat(sale.porcentajeDescuentoGlobal / 100)
+                )
+                const surchargeVariation = round(
+                    parseFloat(line.porcentajeRecargoRenglon / 100)
+                    + parseFloat(sale.porcentajeRecargoGlobal / 100)
+                )
+                const lineVariation = round(
+                    1
+                    - discountVariation
+                    + surchargeVariation
+                    + parseFloat(line.porcentajeIva / 100)
+                )
+
+                const cantidadUnidades = (
+                    line.fraccionar
+                        ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
+                        : round(line.cantidadUnidades)
+                )
+                const cantidadUnidadesFraccionadas = (
+                    line.fraccionar
+                        ? round(line.cantidadUnidades)
+                        : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
+                )
+                const precioUnitario = round(
+                    (parseFloat(line.precioNeto)
+                    / parseFloat(lineVariation))
+                    / parseFloat(line.cantidadUnidades)
+                )
+                const precioListaUnitario = round(
+                    precioUnitario
+                    / (
+                        !existProductOfLine
+                            ? 1
+                            : line.fraccionar
+                                ? 1 + ((productOfLine.margenGananciaFraccionado + productOfLine.porcentajeIvaVenta) / 100)
+                                : 1 + ((productOfLine.margenGanancia + productOfLine.porcentajeIvaVenta) / 100)
+                    )
+                )
+                const cantidadAgregadaPorDescuento_enKg = (
+                    (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
+                        ? 0
+                        : round(cantidadUnidades / (1 + discountVariation))
+                )
+                const cantidadQuitadaPorRecargo_enKg = (
+                    (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
+                        ? 0
+                        : round(cantidadUnidades / (1 + surchargeVariation))
+                )
+                const cantidadg = (
+                    !unitMeasureInlcudesKgOrGr
+                        ? 0
+                        : unitMeasureInlcudesOnlyGr
+                            ? round(cantidadUnidadesFraccionadas)
+                            : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
+                                ? round((cantidadUnidades - Math.trunc(cantidadUnidades)) * 1000)
+                                : 0
+                )
+                const cantidadKg = (
+                    !unitMeasureInlcudesKgOrGr
+                        ? 0
+                        : (unitMeasureInlcudesOnlyGr && cantidadUnidadesFraccionadas < 1000)
+                            ? 0
+                            : unitMeasureInlcudesOnlyGr
+                                ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
+                                : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
+                                    ? round(previousInteger(cantidadUnidades))
+                                    : 0
+                )
+                const updatedLine = {
+                    ...line,
+                    cantidadAgregadaPorDescuento_enKg,
+                    cantidadg,
+                    cantidadKg,
+                    cantidadQuitadaPorRecargo_enKg,
+                    cantidadUnidades,
+                    cantidadUnidadesFraccionadas,
+                    precioListaUnitario,
+                    precioUnitario,
+                    profit: round(line.precioNeto - precioListaUnitario * cantidadUnidades)
+                }
+                return updatedLine
+            })
+            const updatedSale = {
+                ...sale,
+                profit: round(updatedLines.reduce((acc, line) => acc + parseFloat(line.profit), 0)),
+                renglones: updatedLines
+            }
+            return updatedSale
+        })
+        console.log(updatedSales)
+        // const res = await api.ventas.editAll(updatedSales)
+        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        // else console.log('Records fixed.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+
+    const fixDataBaseRecords = async () => {
+        // await addReceiverIvaConditionToClients()
+        await fixNameOfLinesOfSales()
+        // await fixValuesOfLinesOfSales()
     }
 
     const buttonToFixDataBaseRecords = (
@@ -414,10 +585,7 @@ const Home = () => {
                         const lineOfProduct = sale.renglones.find(line => line.nombre === product.nombre)
                         const data = {
                             productUnitPrice: product.precioUnitario,
-                            proportion: (
-                                (lineOfProduct?.cantidadUnidades ?? 1)
-                                / (lineOfProduct?.fraccionar ? lineOfProduct?.fraccionamiento : 1)
-                            )
+                            proportion: lineOfProduct?.cantidadUnidades ?? 1
                         }
                         return data
                     })
@@ -579,9 +747,7 @@ const Home = () => {
                         const productOfSale = {
                             date: sale.fechaEmision,
                             dateString: sale.fechaEmisionString.substring(0, 10),
-                            sales: currentLineOfSale.fraccionar
-                                ? currentLineOfSale.cantidadUnidades / currentLineOfSale.fraccionamiento
-                                : currentLineOfSale.cantidadUnidades
+                            sales: currentLineOfSale.cantidadUnidades
                         }
                         return productOfSale
                     } else return null
@@ -705,8 +871,9 @@ const Home = () => {
     // ------------------------------- Button to test service -------------------------------- //
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const res = await api.productos.findById('67647e7b3d2292e2243f6f78')
-        console.log(res)
+        const res = await api.clientes.findAll()
+        const docs = res.docs
+        console.log(docs)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

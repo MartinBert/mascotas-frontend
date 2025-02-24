@@ -5,6 +5,7 @@ import excel from './excel'
 import mathHelper from './mathHelper'
 import objHelper from './objHelper'
 import pdfHelper from './pdfHelper'
+import saleHelper from './saleHelper'
 import stringHelper from './stringHelper'
 
 const helpers = {
@@ -15,6 +16,7 @@ const helpers = {
     mathHelper,
     objHelper,
     pdfHelper,
+    saleHelper,
     stringHelper
 }
 

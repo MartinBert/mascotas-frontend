@@ -423,31 +423,46 @@ const Ventas = () => {
     const statusOfLineQuantity = (line) => {
         if (
             !line.cantidadUnidades
+            || !line.cantidadUnidadesFraccionadas
             || parseFloat(line.cantidadUnidades) < 0
+            || parseFloat(line.cantidadUnidadesFraccionadas) < 0
             || line?.cantidadUnidades?.toString()?.endsWith('.')
             || line?.cantidadUnidades?.toString()?.endsWith(',')
+            || line?.cantidadUnidadesFraccionadas?.toString()?.endsWith('.')
+            || line?.cantidadUnidadesFraccionadas?.toString()?.endsWith(',')
         ) return 'error'
         else return null
     }
 
     const hideSpanOfMeasureUnity = (line) => {
         if (!line.unidadMedida) return 'none'
-        const unitOfMeasureIncludesKg = line.unidadMedida.toLowerCase().includes('kilo')
-        const unitOfMeasureIncludesGr = line.unidadMedida.toLowerCase().includes('gramo')
+        const unitOfMeasureIncludesKg = line.unidadMedida.nombre.toLowerCase().includes('kilo')
+        const unitOfMeasureIncludesGr = line.unidadMedida.nombre.toLowerCase().includes('gramo')
         if (unitOfMeasureIncludesKg || unitOfMeasureIncludesGr) return 'block'
         else return 'none'
     }
 
     const onChangeLineQuantity = (e, line) => {
+        const prevLine = sale_state.renglones.find(renglon => renglon._id === line._id)
         const currentValue = fixInputNumberValue(e.target.value)
-        const prevValue = sale_state.renglones.find(renglon => renglon._id === line._id).cantidadUnidades
+        const prevValue = line.fraccionar ? prevLine.cantidadUnidadesFraccionadas : prevLine.cantidadUnidades
         const fixedValue = fixInputNumber(currentValue, prevValue)
+        const cantidadUnidades = (
+            line.fraccionar
+                ? (parseFloat(fixedValue) / parseFloat(line.fraccionamiento))
+                : fixedValue
+        )
+        const cantidadUnidadesFraccionadas = (
+            line.fraccionar
+                ? fixedValue
+                : (parseFloat(fixedValue) * parseFloat(line.fraccionamiento))
+        )
         sale_dispatch({
             type: 'SET_LINE_QUANTITY',
-            payload: { _id: line._id, cantidadUnidades: fixedValue }
+            payload: { _id: line._id, cantidadUnidades, cantidadUnidadesFraccionadas }
         })
     }
-
+    // console.log(sale_state.renglones)
     const inputQuantity = (line) => {
         const element = (
             <Row gutter={8} key={line.key}>
@@ -459,7 +474,7 @@ const Ventas = () => {
                         onKeyUp={setFocusWhenPressingEsc}
                         status={statusOfLineQuantity(line)}
                         style={{ width: '100%' }}
-                        value={line.cantidadUnidades}
+                        value={line.fraccionar ? line.cantidadUnidadesFraccionadas : line.cantidadUnidades}
                     />
                 </Col>
                 <Col span={8}>

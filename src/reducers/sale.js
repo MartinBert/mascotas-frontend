@@ -4,9 +4,9 @@ import dayjs from 'dayjs'
 // Helpers
 import helpers from '../helpers'
 
-const { decimalPercent, previousInteger, roundToMultiple, round } = helpers.mathHelper
 const { formatToCompleteVoucherNumber } = helpers.afipHelper
 const { afipDateToLocalFormat, localFormat, simpleDateWithHours } = helpers.dateHelper
+const { updateLinesValues, updateTotals } = helpers.saleHelper
 
 
 const actions = {
@@ -93,6 +93,7 @@ const initialState = {
     generalPercentage: null,
     generalPercentageType: null,
     lastModifiedParameter: {
+        lineId: null,
         parameter: null,
         timesModified: 0
     },
@@ -199,6 +200,7 @@ const initialState = {
     puntoVenta: null,
     puntoVentaNumero: null,
     puntoVentaNombre: null,
+    receiverIvaCondition: 0,
     renglones: [],
     subTotal: 0,
     total: 0,
@@ -206,322 +208,6 @@ const initialState = {
     totalRecargo: 0,
     usuario: null,
     vencimientoCae: null
-}
-
-// ---------------- Auxiliar functions --------------- //
-const fixLineDiscountPercentage = (line) => {
-    if (!line.porcentajeDescuentoRenglon) return null
-    if (line.porcentajeDescuentoRenglon.endsWith('.') || line.porcentajeDescuentoRenglon.endsWith(',')) return null
-    return line.porcentajeDescuentoRenglon
-}
-
-const fixLineSurchargePercentage = (line) => {
-    if (!line.porcentajeRecargoRenglon) return null
-    if (line.porcentajeRecargoRenglon.endsWith('.') || line.porcentajeRecargoRenglon.endsWith(',')) return null
-    return line.porcentajeRecargoRenglon
-}
-
-const getDiscountVariation = (line, stateData) => {
-    const { generalDiscount, paymentPlanPercentage } = stateData
-    const lineDiscountPercentage = fixLineDiscountPercentage(line)
-    const discountVariation = (
-        decimalPercent(lineDiscountPercentage)
-        + decimalPercent(generalDiscount)
-        + (paymentPlanPercentage > 0 ? 0 : paymentPlanPercentage)
-    )
-    return discountVariation
-}
-
-const calculateLineDiscount = (line, stateData) => {
-    const discountVariation = getDiscountVariation(line, stateData)
-    const factor = 1 - discountVariation
-    const grossPrice = calculateGrossPriceFromQuantity(line)
-    let lineDiscount
-    if (line.precioNetoFijo) {
-        lineDiscount = grossPrice > line.precioNeto ? grossPrice - line.precioNeto : 0
-    } else {
-        const netPrice = grossPrice * factor
-        lineDiscount = grossPrice - netPrice
-    }
-    const roundedLineDiscount = round(lineDiscount)
-    return roundedLineDiscount
-}
-
-const calculateLineSurcharge = (line, stateData) => {
-    const surchargeVariation = getSurchargeVariation(line, stateData)
-    const factor = 1 + surchargeVariation
-    const grossPrice = calculateGrossPriceFromQuantity(line)
-    let lineSurcharge
-    if (line.precioNetoFijo) {
-        lineSurcharge = line.precioNeto > grossPrice ? line.precioNeto - grossPrice : 0
-    } else {
-        const netPrice = grossPrice * factor
-        lineSurcharge = netPrice - grossPrice
-    }
-    const roundedLineSurcharge = round(lineSurcharge)
-    return roundedLineSurcharge
-}
-
-const getSurchargeVariation = (line, stateData) => {
-    const { generalSurcharge, paymentPlanPercentage } = stateData
-    const lineSurchargePercentage = fixLineSurchargePercentage(line)
-    const surchargeVariation = (
-        decimalPercent(lineSurchargePercentage)
-        + decimalPercent(generalSurcharge)
-        + (paymentPlanPercentage > 0 ? paymentPlanPercentage : 0)
-    )
-    return surchargeVariation
-}
-
-// ---------------- Update functions ----------------- //
-const calculateGrossPriceFromNetPrice = (line, stateData) => {
-    const discountVariation = getDiscountVariation(line, stateData)
-    const surchargeVariation = getSurchargeVariation(line, stateData)
-    const grossPrice = line.precioNeto / (1 - discountVariation + surchargeVariation)
-    const roundedGrossPrice = round(grossPrice)
-    return roundedGrossPrice
-}
-
-const calculateGrossPriceFromQuantity = (line) => {
-    const quantity = line.fraccionar
-        ? line.cantidadUnidades / line.fraccionamiento
-        : line.cantidadUnidades
-    const grossPrice = quantity * line.precioUnitario
-    const roundedGrossPrice = round(grossPrice)
-    return roundedGrossPrice
-}
-
-const calculateNetPrice = (line, lineDiscount, lineSurcharge) => {
-    const grossPrice = calculateGrossPriceFromQuantity(line)
-    const netPrice = grossPrice - lineDiscount + lineSurcharge
-    const roundedNetPrice = roundToMultiple(netPrice, 10)
-    return roundedNetPrice
-}
-
-const calculateQuantities = (line, stateData) => {
-    const discountVariation = getDiscountVariation(line, stateData)
-    const surchargeVariation = getSurchargeVariation(line, stateData)
-    const factor = 1 - discountVariation + surchargeVariation
-    const factorOfQuantity = line.precioNeto / factor / line.precioUnitario
-    const currentQuantity = line.fraccionar
-        ? (line.precioNeto / line.precioUnitario) * line.fraccionamiento
-        : line.precioNeto / line.precioUnitario
-    const updateQuantity = line.fraccionar
-        ? factorOfQuantity * line.fraccionamiento
-        : factorOfQuantity
-    const data = {
-        quantityAddedByDiscount: round(currentQuantity * discountVariation),
-        quantityRemovedBySurcharge: round(currentQuantity * surchargeVariation),
-        updatedQuantity: round(updateQuantity)
-    }
-    return data
-}
-
-const calculateSpanQuantity = (line) => {
-    const unitMeasureInlcudesKilograms = line?.unidadMedida.toLowerCase().includes('kilo') ?? null
-    const unitMeasureInlcudesGrams = line?.unidadMedida.toLowerCase().includes(' gramo') ?? null
-    const isUnitMeasureGramsToGrams = (!unitMeasureInlcudesKilograms && unitMeasureInlcudesGrams) ? true : false
-    let updatedKgQuantity
-    let updatedGrQuantity
-    if (line.fraccionar) {
-        if (line.fraccionamiento < 1000 && !isUnitMeasureGramsToGrams) {
-            updatedKgQuantity = round(previousInteger(line.cantidadUnidades))
-            updatedGrQuantity = 0
-        } else {
-            updatedKgQuantity = round(previousInteger(line.cantidadUnidades / 1000))
-            updatedGrQuantity = round(line.cantidadUnidades % 1000)
-        }
-    } else {
-        if (line.fraccionamiento < 1000) {
-            if (isUnitMeasureGramsToGrams) {
-                const remainder = (line.cantidadUnidades % 1000)
-                updatedKgQuantity = round(previousInteger(line.cantidadUnidades * line.fraccionamiento / 1000))
-                updatedGrQuantity = round(remainder * line.fraccionamiento % 1000)
-            } else {
-                const remainder = line.cantidadUnidades * line.fraccionamiento - previousInteger(line.cantidadUnidades * line.fraccionamiento)
-                updatedKgQuantity = round(previousInteger(line.cantidadUnidades * line.fraccionamiento))
-                updatedGrQuantity = round(remainder * 1000)
-            }
-        } else {
-            updatedKgQuantity = round(previousInteger(line.cantidadUnidades))
-            updatedGrQuantity = round((line.cantidadUnidades - previousInteger(line.cantidadUnidades)) * 1000)
-        }
-    }
-    const data = { updatedKgQuantity, updatedGrQuantity }
-    return data
-}
-
-const updateLinesValues = (state) => {
-    const verified = verifyUpdateLinesValues(state)
-    if (!verified) return state.renglones
-    // State data
-    const generalDiscount = state.porcentajeDescuentoGlobal
-    const generalSurcharge = state.porcentajeRecargoGlobal
-    const lastParameterModified = state.lastModifiedParameter.parameter
-    const paymentPlanPercentage = state.planesPago.length > 0 ? decimalPercent(parseFloat(state.planesPago[0].porcentaje)) : 0
-    const stateData = { generalDiscount, generalSurcharge, paymentPlanPercentage }
-    // Lines update
-    const updatedLines = state.renglones.map(line => {
-        // Line data
-        const netPriceWasEdited = lastParameterModified === 'lineNetPrice'
-        const quantityWasEdited = lastParameterModified === 'lineQuantity'
-        const conditionsToEditNetPrice = !line.precioNetoFijo && !netPriceWasEdited
-        const conditionsToEditQuantity = (line.precioNetoFijo || netPriceWasEdited) && !quantityWasEdited
-        const product = state.productos.find(product => product._id === line._id)
-        const productFractionedPrice = product.precioVentaFraccionado ?? product.precioVenta
-        const productUnfractionedPrice = product.precioVenta
-        // Line calculations
-        const { quantityAddedByDiscount, quantityRemovedBySurcharge, updatedQuantity } = calculateQuantities(line, stateData)
-        const { updatedKgQuantity, updatedGrQuantity } = calculateSpanQuantity(line)
-        const updatedGrossPrice = calculateGrossPriceFromNetPrice(line, stateData)
-        const updatedIvaImport = round(decimalPercent(line.porcentajeIva) * line.precioBruto)
-        const updatedLineDiscount = calculateLineDiscount(line, stateData)
-        const updatedLineSurcharge = calculateLineSurcharge(line, stateData)
-        const updatedProfit = round(line.precioNeto - line.importeIva)
-        const updatedUnitPrice = line.fraccionar ? round(productFractionedPrice) : round(productUnfractionedPrice)
-        // Line update
-        if (conditionsToEditNetPrice) {
-            const updatedNetPrice = calculateNetPrice(line, updatedLineDiscount, updatedLineSurcharge)
-            line.precioNeto = updatedNetPrice > 0 ? updatedNetPrice : null
-        }
-        if (conditionsToEditQuantity) {
-            line.cantidadUnidades = updatedQuantity > 0 ? updatedQuantity : null
-        }
-        line.cantidadg = updatedGrQuantity
-        line.cantidadKg = updatedKgQuantity
-        line.cantidadAgregadaPorDescuento_enKg = quantityAddedByDiscount
-        line.cantidadQuitadaPorRecargo_enKg = quantityRemovedBySurcharge
-        line.descuento = updatedLineDiscount
-        line.importeIva = updatedIvaImport
-        line.precioBruto = updatedGrossPrice
-        line.precioUnitario = updatedUnitPrice
-        line.profit = updatedProfit
-        line.recargo = updatedLineSurcharge
-        return line
-    })
-    return updatedLines
-}
-
-const updateTotals = (state) => {
-    const verified = verifyUpdateTotals(state)
-    if (!verified) {
-        state.baseImponible10 = 0
-        state.baseImponible21 = 0
-        state.baseImponible27 = 0
-        state.iva10 = 0
-        state.iva21 = 0
-        state.iva27 = 0
-        state.importeIva = 0
-        state.profit = 0
-        state.subTotal = 0
-        state.total = 0
-        state.totalDescuento = 0
-        state.totalRecargo = 0
-        return state
-    }
-
-    const fixDiscountAndSurcharge = (percentageValue) => {
-        if (
-            !percentageValue
-            || percentageValue.toString().endsWith('.')
-            || percentageValue.toString().endsWith(',')
-        ) return 0
-        else return parseFloat(percentageValue)
-    }
-
-    const fixNetPrice = (line) => {
-        if (
-            !line.precioNeto
-            || !line.cantidadUnidades
-            || line.precioNeto.toString().endsWith('.')
-            || line.precioNeto.toString().endsWith(',')
-            || line.cantidadUnidades.toString().endsWith('.')
-            || line.cantidadUnidades.toString().endsWith(',')
-        ) return 0
-        else return parseFloat(line.precioNeto)
-    }
-
-    // ---------------- Cálculos correspondientes a ítems de precio VARIABLE ---------------- //
-    const variableAmountLines = state.renglones.filter(renglon => !renglon.precioNetoFijo)
-    const variableLinesSumBasePrice = round(variableAmountLines.reduce((acc, line) => acc + fixNetPrice(line), 0))
-    const totalDescuentoVariable = round(variableAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.descuento), 0))
-    const totalRecargoVariable = round(variableAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.recargo), 0))
-
-    // ---------------- Cálculos correspondientes a ítems de precio FIJADO ---------------- //
-    const fixedAmountLines = state.renglones.filter(renglon => renglon.precioNetoFijo)
-    const fixedLinesSumBasePrice = round(fixedAmountLines.reduce((acc, line) => acc + fixNetPrice(line), 0))
-    const totalDescuentoFijo = round(fixedAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.descuento), 0))
-    const totalRecargoFijo = round(fixedAmountLines.reduce((acc, line) => acc + fixDiscountAndSurcharge(line.recargo), 0))
-
-    // ---------------- TOTALES (ítems de precio VARIABLE + ítems de precio FIJADO) ---------------- //
-    const totalLinesSum = variableLinesSumBasePrice + fixedLinesSumBasePrice
-    const totalRecargo = totalRecargoVariable + totalRecargoFijo
-    const totalDescuento = totalDescuentoVariable + totalDescuentoFijo
-
-    // ---------------- Cálculo de IVA, total y subtotal de la factura ---------------- //
-    const iva21productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 21)
-    const iva21productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 21)
-    const iva10productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 10.5)
-    const iva10productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 10.5)
-    const iva27productosMontoVariable = variableAmountLines.filter(renglon => renglon.porcentajeIva === 27)
-    const iva27productosMontoFijo = fixedAmountLines.filter(renglon => renglon.porcentajeIva === 27)
-    const iva21Total = round(
-        iva21productosMontoVariable.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
-        + iva21productosMontoFijo.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
-    )
-    const iva10Total = round(
-        iva10productosMontoVariable.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
-        + iva10productosMontoFijo.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
-    )
-    const iva27Total = round(
-        iva27productosMontoVariable.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
-        + iva27productosMontoFijo.reduce((acc, el) => acc + parseFloat(el.precioNeto), 0)
-    )
-    const baseImponible21 = round((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva21Total / 1.21) : iva21Total)
-    const baseImponible10 = round((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva10Total / 1.105) : iva10Total)
-    const baseImponible27 = round((state.documentoLetra === 'A' || state.documentoLetra === 'B') ? (iva27Total / 1.27) : iva27Total)
-    const iva21 = round(iva21Total - baseImponible21)
-    const iva10 = round(iva10Total - baseImponible10)
-    const iva27 = round(iva27Total - baseImponible27)
-    const importeIva = round(iva21 + iva10 + iva27)
-    const total = round(totalLinesSum)
-    const totalRedondeado = roundToMultiple(total, 10)
-    const totalDiferencia = round(totalRedondeado - total)
-    const subTotal = round(total - importeIva)
-    const profit = state.renglones.reduce((acc, el) => acc + parseFloat(el.profit), 0)
-
-    state.baseImponible21 = baseImponible21
-    state.baseImponible10 = baseImponible10
-    state.baseImponible27 = baseImponible27
-    state.importeIva = importeIva
-    state.iva21 = iva21
-    state.iva10 = iva10
-    state.iva27 = iva27
-    state.profit = profit
-    state.subTotal = subTotal
-    state.total = total
-    state.totalDescuento = totalDescuento
-    state.totalDiferencia = totalDiferencia
-    state.totalRecargo = totalRecargo
-    state.totalRedondeado = totalRedondeado
-
-    return state
-}
-
-const verifyUpdateLinesValues = (state) => {
-    if (
-        !state.porcentajeDescuentoGlobal
-        && !state.porcentajeRecargoGlobal
-        && state.mediosPago.length === 0
-        && state.planesPago.length === 0
-        && state.renglones.length === 0
-    ) return false
-    return true
-}
-
-const verifyUpdateTotals = (state) => {
-    if (state.renglones.length === 0) return false
-    return true
 }
 
 const reducer = (state = initialState, action) => {
@@ -593,6 +279,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: null,
                     parameter: 'generalPercentageType',
                     timesModified: state.lastModifiedParameter.parameter === 'generalPercentageType'
                         ? state.lastModifiedParameter.timesModified + 1
@@ -809,6 +496,7 @@ const reducer = (state = initialState, action) => {
                 clienteIdentificador: action.payload?.cuit ?? null,
                 clienteCondicionIva: action.payload?.condicionFiscal?.nombre ?? null,
                 clienteDocumentoReceptor: action.payload?.documentoReceptor ?? null,
+                receiverIvaCondition: action.payload?.receiverIvaCondition ?? 0,
                 selectClient: {
                     ...state.selectClient,
                     selectedValue: action.payload?.razonSocial ?? null
@@ -850,21 +538,15 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
-                    parameter: 'lineFractioned',
-                    timesModified: state.lastModifiedParameter.parameter === 'lineFractioned'
+                    lineId: action.payload._id,
+                    parameter: 'lineFractionated',
+                    timesModified: state.lastModifiedParameter.parameter === 'lineFractionated'
                         ? state.lastModifiedParameter.timesModified + 1
                         : 0
                 },
                 renglones: state.renglones.map(line => {
-                    const lineProduct = state.productos.find(product => product._id === line._id)
-                    const productUnfractionedProfit = lineProduct.gananciaNeta
-                    const productFractionedProfit = lineProduct.gananciaNetaFraccionado / lineProduct.unidadMedida.fraccionamiento
                     if (line._id === action.payload._id) {
-                        line.cantidadUnidades = (action.payload.fraccionar && action.payload.fraccionamiento >= 1000) ? 1000 : 1
                         line.fraccionar = action.payload.fraccionar
-                        line.profit = action.payload.fraccionar
-                            ? productFractionedProfit * action.payload.cantidadUnidades
-                            : productUnfractionedProfit * action.payload.cantidadUnidades
                     }
                     return line
                 })
@@ -878,6 +560,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 generalPercentage: existsValue ? action.payload : null,
                 lastModifiedParameter: {
+                    lineId: null,
                     parameter: 'generalPercentage',
                     timesModified: state.lastModifiedParameter.parameter === 'generalPercentage'
                         ? state.lastModifiedParameter.timesModified + 1
@@ -895,6 +578,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: action.payload._id,
                     parameter: 'lineDiscount',
                     timesModified: state.lastModifiedParameter.parameter === 'lineDiscount'
                         ? state.lastModifiedParameter.timesModified + 1
@@ -917,13 +601,17 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: action.payload._id,
                     parameter: 'lineQuantity',
                     timesModified: state.lastModifiedParameter.parameter === 'lineQuantity'
                         ? state.lastModifiedParameter.timesModified + 1
                         : 0
                 },
                 renglones: state.renglones.map(line => {
-                    if (line._id === action.payload._id) line.cantidadUnidades = action.payload.cantidadUnidades
+                    if (line._id === action.payload._id) {
+                        line.cantidadUnidades = action.payload.cantidadUnidades
+                        line.cantidadUnidadesFraccionadas = action.payload.cantidadUnidadesFraccionadas
+                    }
                     return line
                 })
             }
@@ -931,6 +619,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: action.payload._id,
                     parameter: 'lineSurcharge',
                     timesModified: state.lastModifiedParameter.parameter === 'lineSurcharge'
                         ? state.lastModifiedParameter.timesModified + 1
@@ -942,37 +631,49 @@ const reducer = (state = initialState, action) => {
                 })
             }
         case actions.SET_LINES:
-            return {
-                ...state,
-                lastModifiedParameter: {
-                    parameter: 'lines',
-                    timesModified: state.lastModifiedParameter.parameter === 'lines'
-                        ? state.lastModifiedParameter.timesModified + 1
-                        : 0
-                },
-                renglones: action.payload.map(line => {
+            const linesSet = action.payload.map(line => {
+                const lineAlreadyExistent = state.renglones
+                    .filter(renglon => !renglon._id.startsWith('customProduct_'))
+                    .find(renglon => renglon._id === line._id)
+
+                let formattedLine = {}
+                if (lineAlreadyExistent) {
+                    formattedLine = lineAlreadyExistent
+                } else {
+                    const fractionament = line?.unidadMedida?.fraccionamiento ?? 1
                     const isCustomLine = line._id.startsWith('customProduct_')
+                    const isLineFractionable = line?.unidadMedida?.fraccionamiento >= 1000 ?? null
+                    const productUnitOfMeasure = line.unidadMedida ?? null
                     const unitMeasureInlcudesKilograms = line?.unidadMedida?.nombre.toLowerCase().includes('kilo') ?? null
                     const unitMeasureInlcudesGrams = line?.unidadMedida?.nombre.toLowerCase().includes(' gramo') ?? null
-                    const isUnitMeasureGramsToGrams = (!unitMeasureInlcudesKilograms && unitMeasureInlcudesGrams) ? true : false
-
-                    const fractionament = !line.unidadMedida ? 1 : line.unidadMedida.fraccionamiento
-                    const productUnitOfMeasure = !line.unidadMedida
-                        ? null
-                        : action.payload.find(item => item._id === line._id).unidadMedida.nombre
-
-                    const linePresent = state.renglones
-                        .filter(renglon => !renglon._id.startsWith('customProduct_'))
-                        .find(renglon => renglon._id === line._id)
-                    if (linePresent) return linePresent
-
-                    const formattedLine = {
+                    const unitMeasureInlcudesGrOrKg = (unitMeasureInlcudesGrams || unitMeasureInlcudesKilograms) ?? false
+                    const isUnitMeasureGrToGr = (!unitMeasureInlcudesKilograms && unitMeasureInlcudesGrams) ? true : false
+                    const productFractionedQuantity = (
+                        !isLineFractionable
+                            ? (line.unidadMedida.fraccionamiento).toString()
+                            : fractionament >= 1000
+                                ? '1000'
+                                : (fractionament >= 100 && fractionament < 1000)
+                                    ? '100'
+                                    : '1'
+                    )
+                    const productQuantity = (
+                        !isLineFractionable
+                            ? '1'
+                            : fractionament >= 1000
+                                ? (1000 / line.unidadMedida.fraccionamiento).toString()
+                                : (fractionament >= 100 && fractionament < 1000)
+                                    ? (100 / line.unidadMedida.fraccionamiento).toString()
+                                    : (1 / line.unidadMedida.fraccionamiento).toString()
+                    )
+                    formattedLine = {
                         _id: line._id,
                         cantidadAgregadaPorDescuento_enKg: 0,
-                        cantidadg: isCustomLine ? 0 : isUnitMeasureGramsToGrams ? fractionament : 0,
-                        cantidadKg: isCustomLine ? 0 : isUnitMeasureGramsToGrams ? 0 : (fractionament < 1000) ? fractionament : 1,
+                        cantidadg: (isCustomLine || !unitMeasureInlcudesGrOrKg) ? 0 : isUnitMeasureGrToGr ? fractionament : 0,
+                        cantidadKg: (isCustomLine || !unitMeasureInlcudesGrOrKg) ? 0 : isUnitMeasureGrToGr ? 0 : (fractionament < 1000) ? fractionament : 1,
                         cantidadQuitadaPorRecargo_enKg: 0,
-                        cantidadUnidades: fractionament < 1000 ? '1' : '1000',
+                        cantidadUnidades: productQuantity,
+                        cantidadUnidadesFraccionadas: productFractionedQuantity,
                         codigoBarras: line.codigoBarras,
                         descuento: 0,
                         fraccionamiento: fractionament,
@@ -984,22 +685,34 @@ const reducer = (state = initialState, action) => {
                         porcentajeDescuentoRenglon: null,
                         porcentajeIva: line?.porcentajeIvaVenta ?? 0,
                         porcentajeRecargoRenglon: null,
-                        precioBruto: isCustomLine ? line.precioVenta : fractionament ? line.precioVentaFraccionado : line.precioVenta,
-                        precioNeto: isCustomLine ? line.precioVenta : fractionament ? line.precioVentaFraccionado : line.precioVenta,
+                        precioBruto: isCustomLine ? line.precioVenta : ((fractionament > 1 ? line.precioVentaFraccionado : line.precioVenta) * productQuantity),
+                        precioListaUnitario: isCustomLine ? 0 : line.precioUnitario,
+                        precioNeto: isCustomLine ? line.precioVenta : ((fractionament > 1 ? line.precioVentaFraccionado : line.precioVenta) * productQuantity),
                         precioNetoFijo: false,
-                        precioUnitario: isCustomLine ? line.precioVenta : fractionament ? line.precioVentaFraccionado : line.precioVenta,
-                        profit: line.profit ? line.profit : fractionament ? line.gananciaNetaFraccionado : line.gananciaNeta,
+                        precioUnitario: isCustomLine ? line.precioVenta : fractionament > 1 ? line.precioVentaFraccionado : line.precioVenta,
+                        profit: (fractionament > 1 ? line.gananciaNetaFraccionado : line.gananciaNeta) * productQuantity,
                         recargo: 0,
                         unidadMedida: productUnitOfMeasure
                     }
-
-                    return formattedLine
-                })
+                }
+                return formattedLine
+            })
+            return {
+                ...state,
+                lastModifiedParameter: {
+                    lineId: null,
+                    parameter: 'lines',
+                    timesModified: state.lastModifiedParameter.parameter === 'lines'
+                        ? state.lastModifiedParameter.timesModified + 1
+                        : 0
+                },
+                renglones: linesSet
             }
         case actions.SET_NET_PRICE:
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: action.payload._id,
                     parameter: 'lineNetPrice',
                     timesModified: state.lastModifiedParameter.parameter === 'lineNetPrice'
                         ? state.lastModifiedParameter.timesModified + 1
@@ -1024,6 +737,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: null,
                     parameter: 'paymentMethod',
                     timesModified: state.lastModifiedParameter.parameter === 'paymentMethod'
                         ? state.lastModifiedParameter.timesModified + 1
@@ -1042,6 +756,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 lastModifiedParameter: {
+                    lineId: null,
                     parameter: 'paymentPlan',
                     timesModified: state.lastModifiedParameter.parameter === 'paymentPlan'
                         ? state.lastModifiedParameter.timesModified + 1

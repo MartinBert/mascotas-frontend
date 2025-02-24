@@ -106,9 +106,8 @@ const SalesView = () => {
                 let productListPrice
                 if (!productLine) productListPrice = 0
                 else {
-                    productListPrice = (
-                        (parseFloat(productLine.precioUnitario)
-                        / (line.fraccionar ? parseFloat(line.fraccionamiento) : 1))
+                    productListPrice = round(
+                        parseFloat(productLine.precioUnitario)
                         * parseFloat(line.cantidadUnidades)
                     )
                 }
@@ -120,9 +119,7 @@ const SalesView = () => {
                     expense: round(productListPrice),
                     productName: line.nombre,
                     profit: round(parseFloat(line.precioNeto) - productListPrice) ?? round(line.profit),
-                    quantity: !line.fraccionar
-                        ? round(line.cantidadUnidades)
-                        : `${round(line.cantidadUnidades)} (fracc. ${round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))})`,
+                    quantity: round(line.cantidadUnidades),
                     salePrice: round(line.precioNeto)
                 }
                 return dataItem

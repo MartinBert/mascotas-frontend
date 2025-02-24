@@ -41,12 +41,7 @@ const createTicketTemplate = (templateData) => {
                         data.renglones.map(renglon => {
                             return `
                                 <div style='width: 100%; display: flex; text-align: left; padding-left: 5px; font-size: 12px;'>
-                                    <div style='width: 15%;'>
-                                        ${
-                                            renglon.fraccionar
-                                                ? round(renglon.cantidadUnidades / renglon.fraccionamiento)
-                                                : round(renglon.cantidadUnidades)}
-                                    </div>
+                                    <div style='width: 15%;'>${round(renglon.cantidadUnidades)}</div>
                                     <div style='width: 60%;'>${renglon.nombre}</div>
                                     <div style='width: 25%; text-align: right; padding-right: 5px;'>${round(renglon.precioBruto)}</div>
                                 </div>

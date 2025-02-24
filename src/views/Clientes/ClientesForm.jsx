@@ -35,6 +35,7 @@ const ClientesForm = () => {
     const { id } = useParams()
     const [loading, setLoading] = useState(true)
     const [cliente, setCliente] = useState({
+        _id: null,
         razonSocial: '',
         cuit: '',
         condicionFiscal: '',
@@ -44,7 +45,7 @@ const ClientesForm = () => {
         ciudad: '',
         provincia: '',
         documentoReceptor: 0,
-        _id: null
+        receiverIvaCondition: 0
     })
 
     const redirectToClientes = () => {
@@ -57,6 +58,45 @@ const ClientesForm = () => {
             [e.target.name]: e.target.value,
         })
     }
+
+    const setReceiverIvaCondition = () => {
+        if (!cliente.condicionFiscal) return
+        const allReceiverIvaConditions = [1, 4, 5, 6, 7, 8, 9, 10, 13, 15, 16]
+        let receiverIvaCondition = 0
+        const businessFiscalCondition = auth_state.user.empresa.condicionFiscal.nombre
+        if (!businessFiscalCondition) receiverIvaCondition = 0 
+        else {
+            switch (cliente.condicionFiscal.nombre) {
+                case 'Consumidor Final':
+                    receiverIvaCondition = 5
+                    break;
+                case 'Excento':
+                    receiverIvaCondition = 4
+                    break;
+                case 'Monotributista':
+                    receiverIvaCondition = 6
+                    break;
+                case 'Responsable Inscripto':
+                    receiverIvaCondition = 1
+                    break;
+                default:
+                    receiverIvaCondition = 0
+                    break;
+            }
+        }
+        if (!allReceiverIvaConditions.includes(receiverIvaCondition)) {
+            errorAlert('No se pudo categorizar al cliente respecto al Iva. Contacte a su proveedor.')
+            return
+        } else {
+            const updatedClient = {...cliente, receiverIvaCondition}
+            setCliente(updatedClient)
+            return
+        }
+    }
+
+    useEffect(() => {
+        setReceiverIvaCondition()
+    }, [cliente.condicionFiscal])
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -112,7 +152,7 @@ const ClientesForm = () => {
         const userCuit = auth_state.user.empresa.cuit
         const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit)
         if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
-
+        console.log(taxpayerData)
         setCliente({
             ...cliente,
             razonSocial: taxpayerData.razonSocial,

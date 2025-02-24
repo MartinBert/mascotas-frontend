@@ -97,6 +97,7 @@ const FinalizeSaleModal = () => {
             const fixedLine = {
                 ...line,
                 cantidadUnidades: round(line.cantidadUnidades),
+                cantidadUnidadesFraccionadas: round(line.cantidadUnidadesFraccionadas),
                 porcentajeDescuentoRenglon: round(line.porcentajeDescuentoRenglon),
                 porcentajeRecargoRenglon: round(line.porcentajeRecargoRenglon)
             }
@@ -124,7 +125,11 @@ const FinalizeSaleModal = () => {
                         lineOfProduct.fraccionar
                             ? 'fractionedQuantity'
                             : 'quantity'
-                    ]: round(lineOfProduct.cantidadUnidades)
+                    ]: round(
+                        lineOfProduct.fraccionar
+                            ? lineOfProduct.cantidadUnidadesFraccionadas
+                            : lineOfProduct.cantidadUnidades
+                    )
                 }
             if (productToModifyInStock) {
                 const response = await api.productos.modifyStock(productToModifyInStock)
@@ -204,9 +209,6 @@ const FinalizeSaleModal = () => {
             const product = sale_state.productos[index]
             if (!product._id.startsWith('customProduct_')) {
                 const [productLine] = sale_state.renglones.filter(line => line.key === product._id)
-                const productOutputs = productLine.fraccionar
-                    ? productLine.cantidadUnidades / productLine.fraccionamiento
-                    : productLine.cantidadUnidades
                 const filters = JSON.stringify({ dateString, product })
                 const findStockHistory = await api.stockHistory.findAllByFilters(filters)
                 const stockHistory = findStockHistory.docs
@@ -219,12 +221,12 @@ const FinalizeSaleModal = () => {
                 }
                 if (stockHistory.length < 1) {
                     data.entries = 0
-                    data.outputs = round(productOutputs)
+                    data.outputs = round(productLine.cantidadUnidades)
                     saveResponse = await api.stockHistory.save(data)
                 } else {
                     data._id = stockHistory[0]._id
                     data.entries = round(stockHistory[0].entries)
-                    data.outputs = round(stockHistory[0].outputs + productOutputs)
+                    data.outputs = round(stockHistory[0].outputs + productLine.cantidadUnidades)
                     saveResponse = await api.stockHistory.edit(data)
                 }
                 if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)

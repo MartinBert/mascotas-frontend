@@ -94,15 +94,9 @@ const createRemittanceTemplate = (templateData) => {
                         return (`
                             <div>
                                 <div style='width: 100%; display: flex; font-size: 16px;'>
-                                    <div style='width: 12%;'>
-                                        ${
-                                            renglon.fraccionar
-                                                ? round(renglon.cantidadUnidades / renglon.fraccionamiento)
-                                                : round(renglon.cantidadUnidades)
-                                        }
-                                    </div>
+                                    <div style='width: 12%;'>${round(renglon.cantidadUnidades)}</div>
                                     <div style='width: 34%;'>${renglon.nombre}</div>
-                                    <div style='width: 10%;'>${renglon.precioUnitario}</div>
+                                    <div style='width: 10%;'>${round(renglon.precioUnitario)}</div>
                                     <div style='width: 10%;'>${round(renglon.precioBruto)}</div>
                                     <div style='width: 12%;'>${round(renglon.descuento)}</div>
                                     <div style='width: 12%;'>${round(renglon.recargo)}</div>

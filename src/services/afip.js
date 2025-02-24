@@ -45,6 +45,15 @@ const getDocumentsTypes = async (cuit) => {
     }
 }
 
+const getFiscalConditionsTypes = async (cuit) => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_REST_AFIP}/obtenerTiposCondicionesFiscales/${cuit}`)
+        return response.data
+    } catch (err) {
+        console.error(err)
+    }
+}
+
 // queryData = { salePointNumber, voucherNumber, voucherTypeNumber }
 const getVoucherInfo = async (cuit, queryData) => {
     try {
@@ -61,6 +70,7 @@ const afip = {
     findTaxpayerData,
     generateVoucher,
     getDocumentsTypes,
+    getFiscalConditionsTypes,
     getVoucherInfo
 }
 
