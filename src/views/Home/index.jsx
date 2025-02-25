@@ -401,11 +401,10 @@ const Home = () => {
             const sale = defectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts[index]
             const indexesOfLinesToModify = sale.renglones
                 .map((line, index) => {
-                    if (line.nombre === sale.productos[index].nombre) return index
+                    if (line.nombre !== sale.productos[index].nombre) return index
                     else return null
                 })
                 .filter(index => typeof index === 'number')
-            console.log(indexesOfLinesToModify)
             const fixedLines = replaceNameOfLinesFromProducts(sale, indexesOfLinesToModify)
             const fixedSale = {
                 ...sale,
