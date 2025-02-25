@@ -346,6 +346,22 @@ const Home = () => {
         return data
     }
 
+    const replaceNameOfLinesFromProducts = (sale, indexesOfLinesToModify) => {
+        const updatedLines = sale.renglones.map((line, index) => {
+            let updatedLine
+            if (indexesOfLinesToModify.includes(index)) {
+                const productOfLine = sale.productos[index]
+                updatedLine = {
+                    ...line,
+                    codigoBarras: productOfLine.codigoBarras,
+                    nombre: productOfLine.nombre
+                }
+            } else updatedLine = line       
+            return updatedLine
+        })
+        return updatedLines
+    }
+
     const fixNameOfLinesOfSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
@@ -381,6 +397,143 @@ const Home = () => {
         console.log(defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
 
         const fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts = []
+        for (let index = 0; index < defectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.length; index++) {
+            const sale = defectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts[index]
+            const indexesOfLinesToModify = sale.renglones
+                .map((line, index) => {
+                    if (line.nombre === sale.productos[index].nombre) return index
+                    else return null
+                })
+                .filter(index => typeof index === 'number')
+            const fixedLines = replaceNameOfLinesFromProducts(sale, indexesOfLinesToModify)
+            const fixedSale = {
+                ...sale,
+                renglones: fixedLines
+            }
+            fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(fixedSale)
+
+            // let fixedLines
+            // let indexOfLine
+            // let indexOfProduct
+
+            // switch (index) {
+            //     case 0:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 1:
+            //         indexOfLine = 2
+            //         indexOfProduct = 2
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+                
+            //     case 2:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 3:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 4:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 5:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 6:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 7:
+            //         indexOfLine = 1
+            //         indexOfProduct = 1
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 8:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 9:
+            //         indexOfLine = 2
+            //         indexOfProduct = 2
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 10:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 11:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 12:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 13:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 14:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 15:
+            //         indexOfLine = 1
+            //         indexOfProduct = 1
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 16:
+            //         indexOfLine = 0
+            //         indexOfProduct = 0
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+
+            //     case 17:
+            //         indexOfLine = 1
+            //         indexOfProduct = 1
+            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
+            //         break
+            
+            //     default:
+            //         break
+            // }
+            // const fixedSale = {
+            //     ...sale,
+            //     renglones: fixedLines
+            // }
+            // fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(fixedSale)
+        }
 
         const fixedDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts = []
         for (let index = 0; index < defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.length; index++) {
@@ -688,7 +841,39 @@ const Home = () => {
         console.log(fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts)
         console.log('VENTAS DEFECTUOSAS REPARADAS EN LAS CUALES NO COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
         console.log(fixedDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
-           
+        
+        const remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts = []
+        for (let index = 0; index < fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.length; index++) {
+            const sale = fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts[index]
+            const saleDefectiveItems = []
+            for (let index = 0; index < sale.renglones.length; index++) {
+                const saleLine = sale.renglones[index]
+                const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
+                const matchTheProduct = saleProduct ? true : false
+                if (!matchTheProduct) remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(sale)
+            }
+            if(saleDefectiveItems.length > 0) {
+                remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(saleDefectiveItems[0])
+            }
+        }
+        const remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts = []
+        for (let index = 0; index < remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.length; index++) {
+            const sale = remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts[index]
+            const saleDefectiveItems = []
+            for (let index = 0; index < sale.renglones.length; index++) {
+                const saleLine = sale.renglones[index]
+                const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
+                const matchTheProduct = saleProduct ? true : false
+                if (!matchTheProduct) remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(sale)
+            }
+            if(saleDefectiveItems.length > 0) {
+                remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(saleDefectiveItems[0])
+            }
+        }
+        console.log('RESTANTES VENTAS DEFECTUOSAS EN LAS CUALES SI COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
+        console.log(remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts)
+        console.log('RESTANTES VENTAS DEFECTUOSAS EN LAS CUALES NO COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
+        console.log(remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
 
         // const updatedProducts = products.map(product => {
         //      const updatedProduct = {
