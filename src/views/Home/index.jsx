@@ -300,8 +300,8 @@ const Home = () => {
         })
 
         const res = await api.clientes.editAll(updatedClients)
-        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        else console.log('Records fixed.')
+        if (!res || res.code !== 200) errorAlert('No se pudieron actualizar los registros de clientes. Intente de nuevo.')
+        else console.log('Clients fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -391,11 +391,6 @@ const Home = () => {
             else defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(defectiveSale)
         }
 
-        console.log('VENTAS DEFECTUOSAS EN LAS CUALES SI COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
-        console.log(defectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts)
-        console.log('VENTAS DEFECTUOSAS EN LAS CUALES NO COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
-        console.log(defectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
-
         const fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts = []
         for (let index = 0; index < defectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.length; index++) {
             const sale = defectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts[index]
@@ -411,128 +406,6 @@ const Home = () => {
                 renglones: fixedLines
             }
             fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(fixedSale)
-
-            // let fixedLines
-            // let indexOfLine
-            // let indexOfProduct
-
-            // switch (index) {
-            //     case 0:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 1:
-            //         indexOfLine = 2
-            //         indexOfProduct = 2
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-                
-            //     case 2:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 3:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 4:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 5:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 6:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 7:
-            //         indexOfLine = 1
-            //         indexOfProduct = 1
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 8:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 9:
-            //         indexOfLine = 2
-            //         indexOfProduct = 2
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 10:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 11:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 12:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 13:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 14:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 15:
-            //         indexOfLine = 1
-            //         indexOfProduct = 1
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 16:
-            //         indexOfLine = 0
-            //         indexOfProduct = 0
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-
-            //     case 17:
-            //         indexOfLine = 1
-            //         indexOfProduct = 1
-            //         fixedLines = replaceNameOfLinesFromProducts(sale, indexOfLine, indexOfProduct)
-            //         break
-            
-            //     default:
-            //         break
-            // }
-            // const fixedSale = {
-            //     ...sale,
-            //     renglones: fixedLines
-            // }
-            // fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(fixedSale)
         }
 
         const fixedDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts = []
@@ -837,54 +710,13 @@ const Home = () => {
             fixedDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(fixedSale)
         }
 
-        console.log('VENTAS DEFECTUOSAS REPARADAS EN LAS CUALES SI COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
-        console.log(fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts)
-        console.log('VENTAS DEFECTUOSAS REPARADAS EN LAS CUALES NO COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
-        console.log(fixedDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
-        
-        const remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts = []
-        for (let index = 0; index < fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.length; index++) {
-            const sale = fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts[index]
-            const saleDefectiveItems = []
-            for (let index = 0; index < sale.renglones.length; index++) {
-                const saleLine = sale.renglones[index]
-                const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
-                const matchTheProduct = saleProduct ? true : false
-                if (!matchTheProduct) remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(sale)
-            }
-            if(saleDefectiveItems.length > 0) {
-                remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts.push(saleDefectiveItems[0])
-            }
-        }
-        const remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts = []
-        for (let index = 0; index < remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.length; index++) {
-            const sale = remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts[index]
-            const saleDefectiveItems = []
-            for (let index = 0; index < sale.renglones.length; index++) {
-                const saleLine = sale.renglones[index]
-                const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
-                const matchTheProduct = saleProduct ? true : false
-                if (!matchTheProduct) remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(sale)
-            }
-            if(saleDefectiveItems.length > 0) {
-                remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts.push(saleDefectiveItems[0])
-            }
-        }
-        console.log('RESTANTES VENTAS DEFECTUOSAS EN LAS CUALES SI COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
-        console.log(remainingDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts)
-        console.log('RESTANTES VENTAS DEFECTUOSAS EN LAS CUALES NO COINCIDE EL NÚMERO DE LÍNEAS CON EL NÚMERO DE PRODUCTOS')
-        console.log(remainingDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts)
-
-        // const updatedProducts = products.map(product => {
-        //      const updatedProduct = {
-        //          ...product,
-        //          
-        //      }
-        //      return updatedProduct
-        // })
-        // const res = await api.productos.editAll(updatedProducts)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        // else console.log('Records fixed.')
+        const fixedSales = [
+            ...fixedDefectiveSalesInWhichNumberOfLinesIsEqualToTheNumberOfProducts,
+            ...fixedDefectiveSalesInWhichNumberOfLinesIsNotEqualToTheNumberOfProducts
+        ]
+        const res = await api.ventas.editAll(fixedSales)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
+        else console.log('Lines names fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -894,85 +726,103 @@ const Home = () => {
         const sales = findSales.docs
         const updatedSales = sales.map(sale => {
             const updatedLines = sale.renglones.map(line => {
+                let cantidadAgregadaPorDescuento_enKg = 0
+                let cantidadg = 0
+                let cantidadKg = 0
+                let cantidadQuitadaPorRecargo_enKg = 0
+                let cantidadUnidades = 0
+                let cantidadUnidadesFraccionadas = 0
+                let precioListaUnitario = 0
+                let precioUnitario = 0
+                let profit = 0
                 const productOfLine = sale.productos.find(product => product.nombre === line.nombre)
-                const existProductOfLine = !productOfLine ? false : true
-                const unitMeasureInlcudesGr = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes(' gramo') ?? false
-                const unitMeasureInlcudesKg = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes('kilo') ?? false
-                const unitMeasureInlcudesOnlyGr = (unitMeasureInlcudesGr && !unitMeasureInlcudesKg) ?? false
-                const unitMeasureInlcudesOnlyKg = (!unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
-                const unitMeasureInlcudesKgAndGr = (unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
-                const unitMeasureInlcudesKgOrGr = (unitMeasureInlcudesGr || unitMeasureInlcudesKg) ?? false
-
-                const discountVariation = round(
-                    parseFloat(line.porcentajeDescuentoRenglon / 100)
-                    + parseFloat(sale.porcentajeDescuentoGlobal / 100)
-                )
-                const surchargeVariation = round(
-                    parseFloat(line.porcentajeRecargoRenglon / 100)
-                    + parseFloat(sale.porcentajeRecargoGlobal / 100)
-                )
-                const lineVariation = round(
-                    1
-                    - discountVariation
-                    + surchargeVariation
-                    + parseFloat(line.porcentajeIva / 100)
-                )
-
-                const cantidadUnidades = (
-                    line.fraccionar
-                        ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
-                        : round(line.cantidadUnidades)
-                )
-                const cantidadUnidadesFraccionadas = (
-                    line.fraccionar
-                        ? round(line.cantidadUnidades)
-                        : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
-                )
-                const precioUnitario = round(
-                    (parseFloat(line.precioNeto)
-                    / parseFloat(lineVariation))
-                    / parseFloat(line.cantidadUnidades)
-                )
-                const precioListaUnitario = round(
-                    precioUnitario
-                    / (
-                        !existProductOfLine
-                            ? 1
-                            : line.fraccionar
-                                ? 1 + ((productOfLine.margenGananciaFraccionado + productOfLine.porcentajeIvaVenta) / 100)
-                                : 1 + ((productOfLine.margenGanancia + productOfLine.porcentajeIvaVenta) / 100)
+                if (!productOfLine) {
+                    console.log(line)
+                    cantidadAgregadaPorDescuento_enKg = 0
+                    cantidadg = 0
+                    cantidadKg = 0
+                    cantidadQuitadaPorRecargo_enKg = 0
+                    cantidadUnidades = 1
+                    cantidadUnidadesFraccionadas = 1
+                    precioListaUnitario = 0
+                    precioUnitario = round(line.precioNeto)
+                    profit = round(parseFloat(line.precioNeto) / (1 + parseFloat(line.porcentajeIva / 100)))
+                } else {
+                    const unitMeasureInlcudesGr = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes(' gramo') ?? false
+                    const unitMeasureInlcudesKg = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes('kilo') ?? false
+                    const unitMeasureInlcudesOnlyGr = (unitMeasureInlcudesGr && !unitMeasureInlcudesKg) ?? false
+                    const unitMeasureInlcudesOnlyKg = (!unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
+                    const unitMeasureInlcudesKgAndGr = (unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
+                    const unitMeasureInlcudesKgOrGr = (unitMeasureInlcudesGr || unitMeasureInlcudesKg) ?? false
+    
+                    const discountVariation = round(
+                        parseFloat(line.porcentajeDescuentoRenglon / 100)
+                        + parseFloat(sale.porcentajeDescuentoGlobal / 100)
                     )
-                )
-                const cantidadAgregadaPorDescuento_enKg = (
-                    (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
-                        ? 0
-                        : round(cantidadUnidades / (1 + discountVariation))
-                )
-                const cantidadQuitadaPorRecargo_enKg = (
-                    (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
-                        ? 0
-                        : round(cantidadUnidades / (1 + surchargeVariation))
-                )
-                const cantidadg = (
-                    !unitMeasureInlcudesKgOrGr
-                        ? 0
-                        : unitMeasureInlcudesOnlyGr
-                            ? round(cantidadUnidadesFraccionadas)
-                            : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
-                                ? round((cantidadUnidades - Math.trunc(cantidadUnidades)) * 1000)
-                                : 0
-                )
-                const cantidadKg = (
-                    !unitMeasureInlcudesKgOrGr
-                        ? 0
-                        : (unitMeasureInlcudesOnlyGr && cantidadUnidadesFraccionadas < 1000)
+                    const surchargeVariation = round(
+                        parseFloat(line.porcentajeRecargoRenglon / 100)
+                        + parseFloat(sale.porcentajeRecargoGlobal / 100)
+                    )
+                    const lineVariation = round(
+                        1
+                        - discountVariation
+                        + surchargeVariation
+                    )
+    
+                    cantidadUnidades = (
+                        line.fraccionar
+                            ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
+                            : round(line.cantidadUnidades)
+                    )
+                    cantidadUnidadesFraccionadas = (
+                        line.fraccionar
+                            ? round(line.cantidadUnidades)
+                            : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
+                    )
+                    precioUnitario = round(
+                        (parseFloat(line.precioNeto)
+                        / parseFloat(lineVariation))
+                        / parseFloat(line.cantidadUnidades)
+                    )
+                    precioListaUnitario = round(
+                        precioUnitario
+                        / (
+                            line.fraccionar
+                                    ? 1 + ((productOfLine.margenGananciaFraccionado + productOfLine.porcentajeIvaVenta) / 100)
+                                    : 1 + ((productOfLine.margenGanancia + productOfLine.porcentajeIvaVenta) / 100)
+                        )
+                    )
+                    cantidadAgregadaPorDescuento_enKg = (
+                        (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
+                            ? 0
+                            : round(cantidadUnidades / (1 + discountVariation))
+                    )
+                    cantidadQuitadaPorRecargo_enKg = (
+                        (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
+                            ? 0
+                            : round(cantidadUnidades / (1 + surchargeVariation))
+                    )
+                    cantidadg = (
+                        !unitMeasureInlcudesKgOrGr
                             ? 0
                             : unitMeasureInlcudesOnlyGr
-                                ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
+                                ? round(cantidadUnidadesFraccionadas)
                                 : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
-                                    ? round(previousInteger(cantidadUnidades))
+                                    ? round((cantidadUnidades - Math.trunc(cantidadUnidades)) * 1000)
                                     : 0
-                )
+                    )
+                    cantidadKg = (
+                        !unitMeasureInlcudesKgOrGr
+                            ? 0
+                            : (unitMeasureInlcudesOnlyGr && cantidadUnidadesFraccionadas < 1000)
+                                ? 0
+                                : unitMeasureInlcudesOnlyGr
+                                    ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
+                                    : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
+                                        ? round(previousInteger(cantidadUnidades))
+                                        : 0
+                    )
+                }
                 const updatedLine = {
                     ...line,
                     cantidadAgregadaPorDescuento_enKg,
@@ -1002,7 +852,7 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        // await addReceiverIvaConditionToClients()
+        await addReceiverIvaConditionToClients()
         await fixNameOfLinesOfSales()
         // await fixValuesOfLinesOfSales()
     }

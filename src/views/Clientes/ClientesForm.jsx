@@ -157,12 +157,13 @@ const ClientesForm = () => {
             ...cliente,
             razonSocial: taxpayerData.razonSocial,
             condicionFiscal: null,
-            email: (taxpayerData.email) ? taxpayerData.email[0].direccion : '',
-            telefono: (taxpayerData.telefono) ? taxpayerData.telefono[0].numero : '',
-            direccion: (taxpayerData.domicilio[0].direccion) ? taxpayerData.domicilio[0].direccion : '',
-            ciudad: (taxpayerData.domicilio[0].localidad) ? taxpayerData.domicilio[0].localidad : '',
-            provincia: (taxpayerData.domicilio[0].descripcionProvincia) ? taxpayerData.domicilio[0].descripcionProvincia : '',
-            documentoReceptor: 80
+            email: taxpayerData?.email[0]?.direccion ?? '',
+            telefono: taxpayerData?.telefono[0]?.numero ?? '',
+            direccion: taxpayerData?.domicilio[0]?.direccion ?? '',
+            ciudad: taxpayerData?.domicilio[0]?.localidad ?? '',
+            provincia: taxpayerData?.domicilio[0]?.descripcionProvincia ?? '',
+            documentoReceptor: 80,
+            // receiverIvaCondition:
         })
     }
 
