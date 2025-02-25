@@ -321,7 +321,7 @@ const Home = () => {
         return missingProducts
     }
 
-    const formatDefectiveSale = async (productLineIndex, updateBarCode) => {
+    const formatDefectiveSale = async (sale, productLineIndex, updateBarCode) => {
         const arrayOfFilters = [sale.renglones[productLineIndex].nombre]
         const missingProducts = await findMissingProductsByName(arrayOfFilters)
         let fixedLines
@@ -393,283 +393,283 @@ const Home = () => {
                 case 0:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 13:
                     productLineIndex = 1
                     updateBarCode = false
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 15:
                     productLineIndex = 0
                     updateBarCode = false
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 16:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 17:
                     productLineIndex = 1
                     updateBarCode = false
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
             
                 case 18:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 19:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 20:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 21:
                     productLineIndex = 2
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 22:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 23:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 24:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 25:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 26:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 27:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 28:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 29:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 30:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 31:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 32:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 33:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 34:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 35:
                     productLineIndex = 2
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 36:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 37:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 38:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 39:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 40:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 41:
                     productLineIndex = 2
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 42:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 43:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 44:
                     productLineIndex = 5
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 45:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 46:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 47:
                     productLineIndex = 2
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 48:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 49:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 50:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 51:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 52:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 53:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 54:
                     productLineIndex = 0
                     updateBarCode = false
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 55:
                     productLineIndex = 1
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 56:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 57:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 58:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 case 59:
                     productLineIndex = 0
                     updateBarCode = true
-                    fixedSaleData = await formatDefectiveSale(productLineIndex, updateBarCode)
+                    fixedSaleData = await formatDefectiveSale(sale, productLineIndex, updateBarCode)
                     break
 
                 default:
