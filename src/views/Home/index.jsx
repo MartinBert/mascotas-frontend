@@ -405,6 +405,7 @@ const Home = () => {
                     else return null
                 })
                 .filter(index => typeof index === 'number')
+            console.log(indexesOfLinesToModify)
             const fixedLines = replaceNameOfLinesFromProducts(sale, indexesOfLinesToModify)
             const fixedSale = {
                 ...sale,
