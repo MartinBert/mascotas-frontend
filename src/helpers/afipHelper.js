@@ -197,7 +197,7 @@ const formatBody = (saleData) => {
         CbteHasta: parseInt(saleData.numeroFactura), // Numero de comprobante o numero del ultimo comprobante en caso de ser mas de uno
         CbteTipo: parseInt(saleData.documentoCodigo), // Tipo de comprobante (ver tipos disponibles)
         Concepto: 1, // Concepto del Comprobante: (1)Productos, (2)Servicios, (3)Productos y Servicios
-        CondicionIVAReceptorId: parseInt(saleData.receiverIvaCondition),
+        CondicionIVAReceptorId: parseInt(saleData.receiverIvaCondition), // A partir de 2025
         DocNro: parseInt(saleData.clienteIdentificador), // Numero de documento del comprador
         DocTipo: parseInt(saleData.clienteDocumentoReceptor), // Tipo de documento del comprador (ver tipos disponibles)
         ImpIVA: parseInt(saleData.importeIva), //Importe total de IVA

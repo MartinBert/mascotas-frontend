@@ -151,8 +151,8 @@ const ClientesForm = () => {
 
         const userCuit = auth_state.user.empresa.cuit
         const taxpayerData = await api.afip.findTaxpayerData(userCuit, cliente.cuit)
-        if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
         console.log(taxpayerData)
+        if (!taxpayerData) return errorAlert(`No existen datos en AFIP para el identificador ${cliente.cuit}`)
         setCliente({
             ...cliente,
             razonSocial: taxpayerData.razonSocial,
