@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 // Custom Components
 import InputHidden from '../../components/generics/InputHidden'
 
-// Custom Constexts
+// Custom Contexts
 import contexts from '../../contexts'
 
 // Design Components

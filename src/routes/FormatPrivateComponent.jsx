@@ -140,32 +140,33 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
         getItem('2', 'Lista de ventas', <FaList />, '/listaVentas'),
         auth_state.user.perfil ? getItem('3', 'Documentos', <FaFile />, '/documentos') : null,
         auth_state.user.perfil ? getItem('4', 'Clientes', <FaUsers />, '/clientes') : null,
-        auth_state.user.perfil ? getItem('5', 'Medios de pago', <FaMoneyBillWave />, '/mediospago') : null,
-        auth_state.user.perfil ? getItem('6', 'Zonas de Ventas', <FaChartArea />, '/zonasdeventas') : null,
+        // auth_state.user.perfil ? getItem('5', 'Beneficios', <FaMoneyBillWave />, '/benefits') : null,
+        auth_state.user.perfil ? getItem('6', 'Medios de pago', <FaMoneyBillWave />, '/mediospago') : null,
+        auth_state.user.perfil ? getItem('7', 'Zonas de Ventas', <FaChartArea />, '/zonasdeventas') : null,
     ]
 
     const productAndStockMenu = [
-        auth_state.user.perfil ? getItem('7', 'Productos', <FaBookmark />, '/productos') : null,
-        auth_state.user.perfil ? getItem('8', 'Salidas', <FaCheck />, '/salidas') : null,
-        auth_state.user.perfil ? getItem('9', 'Entradas', <FaInbox />, '/entradas') : null,
-        auth_state.user.perfil ? getItem('10', 'Marcas', <FaTag />, '/marcas') : null,
-        auth_state.user.perfil ? getItem('11', 'Rubros', <FaTags />, '/rubros') : null,
-        auth_state.user.perfil ? getItem('12', 'Unid. medida', <FaWeightHanging />, '/unidadesmedida') : null,
+        auth_state.user.perfil ? getItem('8', 'Productos', <FaBookmark />, '/productos') : null,
+        auth_state.user.perfil ? getItem('9', 'Salidas', <FaCheck />, '/salidas') : null,
+        auth_state.user.perfil ? getItem('10', 'Entradas', <FaInbox />, '/entradas') : null,
+        auth_state.user.perfil ? getItem('11', 'Marcas', <FaTag />, '/marcas') : null,
+        auth_state.user.perfil ? getItem('12', 'Rubros', <FaTags />, '/rubros') : null,
+        auth_state.user.perfil ? getItem('13', 'Unid. medida', <FaWeightHanging />, '/unidadesmedida') : null,
     ]
 
     const businessStatisticsMenu = [
-        auth_state.user.perfil ? getItem('13', 'Balance diario', <FaChartLine />, '/daily_business_statistics/daily_balance') : null,
-        auth_state.user.perfil ? getItem('14', 'Gráficos de balance diario', <FaChartPie />, '/daily_business_statistics/graphics') : null,
-        auth_state.user.perfil ? getItem('15', 'Historial de stock de productos', <FaBalanceScale />, '/stock_history/history') : null,
-        auth_state.user.perfil ? getItem('16', 'Gráficos de historial de stock', <FaChartPie />, '/stock_history/graphics') : null,
+        auth_state.user.perfil ? getItem('14', 'Balance diario', <FaChartLine />, '/daily_business_statistics/daily_balance') : null,
+        auth_state.user.perfil ? getItem('15', 'Gráficos de balance diario', <FaChartPie />, '/daily_business_statistics/graphics') : null,
+        auth_state.user.perfil ? getItem('16', 'Historial de stock de productos', <FaBalanceScale />, '/stock_history/history') : null,
+        auth_state.user.perfil ? getItem('17', 'Gráficos de historial de stock', <FaChartPie />, '/stock_history/graphics') : null,
     ]
 
     const configurationMenu = [
-        auth_state.user.perfil ? getItem('17', 'Usuarios', <FaUser />, '/usuarios') : null,
-        auth_state.user.perfil ? getItem('18', 'Empresas', <FaBusinessTime />, '/empresas') : null,
-        auth_state.user.perfil ? getItem('19', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
-        auth_state.user.perfil ? getItem('20', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
-        auth_state.user.perfil ? getItem('21', 'Estilos de interfaz', <FaHighlighter />, '/interfacestyles') : null,
+        auth_state.user.perfil ? getItem('18', 'Usuarios', <FaUser />, '/usuarios') : null,
+        auth_state.user.perfil ? getItem('19', 'Empresas', <FaBusinessTime />, '/empresas') : null,
+        auth_state.user.perfil ? getItem('20', 'Puntos de venta', <FaCodeBranch />, '/puntosventa') : null,
+        auth_state.user.perfil ? getItem('21', 'Condiciones fiscales', <FaAddressBook />, '/condicionesfiscales') : null,
+        auth_state.user.perfil ? getItem('22', 'Estilos de interfaz', <FaHighlighter />, '/interfacestyles') : null,
     ]
 
     const subMenusToSidebar = [

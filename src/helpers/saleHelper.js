@@ -182,12 +182,13 @@ const updateLinesValues = (state) => {
                         updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
     
                     } else if (line.fraccionar && !line.precioNetoFijo) {
-                        basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                        calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                        basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                         updatedDataOfLine.precioBruto = basicGrossPrice
                         updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                         updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
     
                     } else if (!line.fraccionar && line.precioNetoFijo) {
@@ -203,12 +204,13 @@ const updateLinesValues = (state) => {
                         updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                     
                     } else if (!line.fraccionar && !line.precioNetoFijo) {
-                        basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
+                        calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                        basicGrossPrice = salePriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                         updatedDataOfLine.precioBruto = basicGrossPrice
                         updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                         updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
     
                     } else updatedDataOfLine = {}
@@ -247,12 +249,13 @@ const updateLinesValues = (state) => {
                         updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
     
                     } else if (line.fraccionar && !line.precioNetoFijo) {
-                        basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                        calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                        basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                         updatedDataOfLine.precioBruto = basicGrossPrice
                         updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                         updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
     
                     } else if (!line.fraccionar && line.precioNetoFijo) {
@@ -268,12 +271,13 @@ const updateLinesValues = (state) => {
                         updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                     
                     } else if (!line.fraccionar && !line.precioNetoFijo) {
-                        basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
+                        calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                        basicGrossPrice = salePriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                         updatedDataOfLine.precioBruto = basicGrossPrice
                         updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                         updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                        updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                         updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
     
                     } else updatedDataOfLine = {}
@@ -310,12 +314,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
 
                 } else if (line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else if (!line.fraccionar && line.precioNetoFijo) {
@@ -331,12 +336,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                 
                 } else if (!line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = salePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else updatedDataOfLine = {}
@@ -372,13 +378,26 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
 
                 } else if (line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = (
+                        line.fraccionamiento >= 1000
+                            ? 1000
+                            : (line.fraccionamiento >= 100 && line.fraccionamiento < 1000)
+                                ? 100
+                                : 1
+                    ) / line.fraccionamiento
+                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
+                    updatedDataOfLine.cantidadAgregadaPorDescuento_enKg = 0
+                    updatedDataOfLine.cantidadQuitadaPorRecargo_enKg = 0
+                    updatedDataOfLine.cantidadUnidades = calculatedQuantity
+                    updatedDataOfLine.cantidadUnidadesFraccionadas = calculatedQuantity * line.fraccionamiento
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
+                    updatedDataOfLine.cantidadg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedGrQuantity
+                    updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                 
                 } else if (!line.fraccionar && line.precioNetoFijo) {
                     quantityWithoutVariations = line.precioNeto / salePriceOfProductOfLine
@@ -393,14 +412,19 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                 
                 } else if (!line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
-                    updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
-                    updatedDataOfLine.precioBruto = basicGrossPrice
-                    updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
+                    updatedDataOfLine.cantidadAgregadaPorDescuento_enKg = 0
+                    updatedDataOfLine.cantidadQuitadaPorRecargo_enKg = 0
+                    updatedDataOfLine.cantidadUnidades = 1
+                    updatedDataOfLine.cantidadUnidadesFraccionadas = line.fraccionamiento
+                    updatedDataOfLine.descuento = salePriceOfProductOfLine * discountDecimalVariation
+                    updatedDataOfLine.precioBruto = salePriceOfProductOfLine
+                    updatedDataOfLine.precioNeto = salePriceOfProductOfLine * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
-                    updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
-
+                    updatedDataOfLine.profit = salePriceOfProductOfLine * factorOfDecimalVariation - listUnitPriceOfProductOfLine
+                    updatedDataOfLine.recargo = salePriceOfProductOfLine * surchargeDecimalVariation
+                    updatedDataOfLine.cantidadg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedGrQuantity
+                    updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
+                    
                 } else updatedDataOfLine = {}
 
                 updatedLine = { ...line, ...updatedDataOfLine }
@@ -470,6 +494,7 @@ const updateLinesValues = (state) => {
                 if (line.fraccionar) {
                     lineQuantityIsNaN = isNaN(line.cantidadUnidades)
                     basicGrossPrice = fractionatedSalePriceOfProductOfLine * (lineQuantityIsNaN ? 0 : line.cantidadUnidades)
+                    updatedDataOfLine.cantidadUnidadesFraccionadas = line.cantidadUnidades * (lineQuantityIsNaN ? 0 : line.fraccionamiento)
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
@@ -482,6 +507,7 @@ const updateLinesValues = (state) => {
                 } else if (!line.fraccionar) {
                     lineQuantityIsNaN = isNaN(line.cantidadUnidades)
                     basicGrossPrice = salePriceOfProductOfLine * (lineQuantityIsNaN ? 0 : line.cantidadUnidades)
+                    updatedDataOfLine.cantidadUnidadesFraccionadas = line.cantidadUnidades * (lineQuantityIsNaN ? 0 : line.fraccionamiento)
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
@@ -524,12 +550,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
 
                 } else if (line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else if (!line.fraccionar && line.precioNetoFijo) {
@@ -545,12 +572,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                 
                 } else if (!line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = salePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else updatedDataOfLine = {}
@@ -585,12 +613,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
 
                 } else if (line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else if (!line.fraccionar && line.precioNetoFijo) {
@@ -606,12 +635,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                 
                 } else if (!line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = salePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else updatedDataOfLine = {}
@@ -646,12 +676,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
 
                 } else if (line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = fractionatedSalePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = fractionatedSalePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else if (!line.fraccionar && line.precioNetoFijo) {
@@ -667,12 +698,13 @@ const updateLinesValues = (state) => {
                     updatedDataOfLine.cantidadKg = calculateGrAndKgQuantity(line, updatedDataOfLine).updatedKgQuantity
                 
                 } else if (!line.fraccionar && !line.precioNetoFijo) {
-                    basicGrossPrice = salePriceOfProductOfLine * line.cantidadUnidades
+                    calculatedQuantity = line.cantidadUnidadesFraccionadas / line.fraccionamiento
+                    basicGrossPrice = salePriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
                     updatedDataOfLine.precioUnitario = salePriceOfProductOfLine
-                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * line.cantidadUnidades
+                    updatedDataOfLine.profit = basicGrossPrice * factorOfDecimalVariation - listUnitPriceOfProductOfLine * calculatedQuantity
                     updatedDataOfLine.recargo = basicGrossPrice * surchargeDecimalVariation
 
                 } else updatedDataOfLine = {}

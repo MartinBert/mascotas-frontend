@@ -1,4 +1,5 @@
 import auth from './auth'
+import benefits from './benefits'
 import business from './business'
 import dailyBusinessStatistics from './dailyBusinessStatistics'
 import deleteModal from './deleteModal'
@@ -16,6 +17,7 @@ import salePoint from './salePoint'
 
 const reducers = {
     auth,
+    benefits,
     business,
     dailyBusinessStatistics,
     deleteModal,

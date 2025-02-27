@@ -1,4 +1,5 @@
 import Auth from './Auth'
+import Benefits from './Benefits'
 import Business from './Business'
 import DailyBusinessStatistics from './DailyBusinessStatistics'
 import DeleteModal from './DeleteModal'
@@ -16,6 +17,7 @@ import SalePoint from './SalePoint'
 
 const contexts = {
     Auth,
+    Benefits,
     Business,
     DailyBusinessStatistics,
     DeleteModal,
