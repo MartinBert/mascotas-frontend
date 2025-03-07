@@ -257,109 +257,30 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const addReceiverIvaConditionToClients = async () => {
+    const addDataToSalesLines = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const allReceiverIvaConditions = [1, 4, 5, 6, 7, 8, 9, 10, 13, 15, 16]
-        const businessFiscalCondition = auth_state.user.empresa.condicionFiscal.nombre
-        const findClients = await api.clientes.findAll()
-        const clients = findClients.docs
-
-        const updatedClients = clients.map(client => {
-            let receiverIvaCondition = 0
-            if (!businessFiscalCondition) receiverIvaCondition = 0 
-            else {
-                switch (client.condicionFiscal.nombre) {
-                    case 'Consumidor Final':
-                        receiverIvaCondition = 5
-                        break;
-                    case 'Excento':
-                        receiverIvaCondition = 4
-                        break;
-                    case 'Monotributista':
-                        receiverIvaCondition = 6
-                        break;
-                    case 'Responsable Inscripto':
-                        receiverIvaCondition = 1
-                        break;
-                    default:
-                        receiverIvaCondition = 0
-                        break;
-                }
-            }
-            if (!allReceiverIvaConditions.includes(receiverIvaCondition)) {
-                errorAlert('No se pudo categorizar al cliente respecto al Iva. Contacte a su proveedor.')
-                return
-            } else {
-                const updatedClient = {
-                    ...client,
-                    condicionFiscal: client.condicionFiscal._id,
-                    receiverIvaCondition
-                }
-                return updatedClient
-            }
-        })
-
-        const res = await api.clientes.editAll(updatedClients)
-        if (!res || res.code !== 200) errorAlert('No se pudieron actualizar los registros de clientes. Intente de nuevo.')
-        else console.log('Clients fixed.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
-    const findMissingProductsByName = async (arrayOfFilters) => {
-        const missingProducts = []
-        for (let index = 0; index < arrayOfFilters.length; index++) {
-            const productFilters = arrayOfFilters[index]
-            const productStringFilters = JSON.stringify({ nombre: productFilters })
-            const findMissingProduct = await api.productos.findAllByFilters(productStringFilters)
-            if (findMissingProduct) {
-                if (findMissingProduct.docs.length > 0) {
-                    const missingProduct = findMissingProduct.docs[0]
-                    missingProducts.push(missingProduct)
-                }
-            }
-        }
-        return missingProducts
-    }
-
-    const formatDefectiveSale = async (sale, productLineIndex, updateBarCode) => {
-        const arrayOfFilters = [sale.renglones[productLineIndex].nombre]
-        const missingProducts = await findMissingProductsByName(arrayOfFilters)
-        let fixedLines
-        if (!updateBarCode) {
-            fixedLines = sale.renglones
-        } else {
-            fixedLines = sale.renglones.map((line, lineIndex) => {
-                let fixedLine
-                if (lineIndex === productLineIndex) {
-                    fixedLine = {
+        const findSales = await api.ventas.findAll()
+        const sales = findSales.docs
+        const updatedSales = sales.map(sale => {
+            const updatedSale = {
+                ...sale,
+                renglones: sale.renglones.map(line => {
+                    const productOfLine = sale.productos.find(product => product.nombre === line.nombre)
+                    const updatedLine = {
                         ...line,
-                        codigoBarras: missingProducts[0].codigoBarras
+                        productId: productOfLine?._id ?? null
                     }
-                } else fixedLine = line
-                return fixedLine
-            })
-        }
-        const data = {
-            fixedLines,
-            missingProducts
-        }
-        return data
-    }
-
-    const replaceNameOfLinesFromProducts = (sale, indexesOfLinesToModify) => {
-        const updatedLines = sale.renglones.map((line, index) => {
-            let updatedLine
-            if (indexesOfLinesToModify.includes(index)) {
-                const productOfLine = sale.productos[index]
-                updatedLine = {
-                    ...line,
-                    codigoBarras: productOfLine.codigoBarras,
-                    nombre: productOfLine.nombre
-                }
-            } else updatedLine = line       
-            return updatedLine
+                    return updatedLine
+                })
+            }
+            return updatedSale
         })
-        return updatedLines
+        console.log('VENTAS CON LINEAS ACTUALIZADAS (SE AGREGARON LAS IDS DEL PRODUCTO):')
+        console.log(updatedSales)
+        // const res = await api.ventas.editAll(updatedSales)
+        // if (!res || res.code !== 200) errorAlert('No se añadir la data a las líneas de las ventas. Intente de nuevo.')
+        // else console.log('Records fixed.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     const fixNameOfLinesOfSales = async () => {
@@ -382,23 +303,24 @@ const Home = () => {
             }
         }
 
-        const fixedSales = totalDefectiveSales.map(sale => {
-            const fixedSale = {
-                ...sale,
-                productos: sale.productos.map(product => {
-                    const fixedProduct = {
-                        ...product,
-                        nombre: product.nombre.trimEnd()
-                    }
-                    return fixedProduct
-                })
-            }
-            return fixedSale
-        })
-
-        const res = await api.ventas.editAll(fixedSales)
-        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
-        else console.log('Lines names fixed.')
+        // const fixedSales = totalDefectiveSales.map(sale => {
+        //     const fixedSale = {
+        //         ...sale,
+        //         productos: sale.productos.map(product => {
+        //             const fixedProduct = {
+        //                 ...product,
+        //                 nombre: product.nombre.trimEnd()
+        //             }
+        //             return fixedProduct
+        //         })
+        //     }
+        //     return fixedSale
+        // })
+        console.log('TOTAL VENTAS CON LINEAS QUE NO TIENEN PRODUCTOS ASOCIADOS')
+        console.log(totalDefectiveSales)
+        // const res = await api.ventas.editAll(fixedSales)
+        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
+        // else console.log('Lines names fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -534,9 +456,9 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        // await addReceiverIvaConditionToClients()
-        // await fixNameOfLinesOfSales()
-        await fixValuesOfLinesOfSales()
+        await addDataToSalesLines()
+        await fixNameOfLinesOfSales()
+        // await fixValuesOfLinesOfSales()
     }
 
     const buttonToFixDataBaseRecords = (

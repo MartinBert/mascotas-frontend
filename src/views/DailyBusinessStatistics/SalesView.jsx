@@ -102,15 +102,10 @@ const SalesView = () => {
             .filter(sale => !creditCodes.includes(sale.documentoCodigo) && !debitCodes.includes(sale.documentoCodigo))
         const salesData = sales.map(sale => {
             const data = sale.renglones.map(line => {
-                const productLine = sale.productos.find(product => product.nombre === line.nombre)
-                let productListPrice
-                if (!productLine) productListPrice = 0
-                else {
-                    productListPrice = round(
-                        parseFloat(productLine.precioUnitario)
-                        * parseFloat(line.cantidadUnidades)
-                    )
-                }
+                const productListPrice = round(
+                    parseFloat(line.precioListaUnitario)
+                    * parseFloat(line.cantidadUnidades)
+                )
                 console.log(line)
                 console.log(productLine)
                 console.log(productListPrice)

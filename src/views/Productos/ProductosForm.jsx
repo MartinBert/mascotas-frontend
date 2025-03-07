@@ -219,6 +219,7 @@ const ProductosForm = () => {
     }
 
     const editProduct = async () => {
+        console.log(product)
         const filters = formatFindFilters({
             cashRegister: true,
             documentoCodigo: { $nin: fiscalNotesCodes },
@@ -234,7 +235,13 @@ const ProductosForm = () => {
                     if (producto._id === product._id) {
                         updatedProduct = {
                             ...producto,
-                            nombre: product.nombre
+                            marca: product.marca._id,
+
+                            nombre: product.nombre,
+                            normalizedBrand: normalizeString(product.marca.nombre),
+                            normalizedName: normalizeString(product.nombre),
+                            normalizedType: normalizeString(product.rubro.nombre),
+                            rubro: product.rubro._id
                         }
                     } else updatedProduct = producto
                     return updatedProduct
