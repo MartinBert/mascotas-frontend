@@ -382,14 +382,21 @@ const Home = () => {
             }
         }
 
-        const viewData = totalDefectiveSales.map((sale, index) => {
-            console.log('VENTA INDEX:    ' + index)
-            console.log(sale.productos.map(prod => prod?.nombre ?? null))
-            console.log(sale.renglones.map(line => line.nombre))
-            console.log('------------------------------------------')
+        const fixedSales = totalDefectiveSales.map(sale => {
+            const fixedSale = {
+                ...sale,
+                productos: sale.productos.map(product => {
+                    const fixedProduct = {
+                        ...product,
+                        nombre: product.nombre.trimEnd()
+                    }
+                    return fixedProduct
+                })
+            }
+            return fixedSale
         })
 
-        console.log(viewData)
+        console.log(fixedSales)
         // const res = await api.ventas.editAll(fixedSales)
         // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
         // else console.log('Lines names fixed.')
