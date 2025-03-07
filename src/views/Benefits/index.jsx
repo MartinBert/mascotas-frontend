@@ -60,9 +60,17 @@ const Benefits = () => {
         return button
     }
 
-
-
     // ------------------ Records table ------------------ //
+    const findRecords = async () => {
+        const findPaginatedParams = formatFindParams(benefits_state.paginationParams)
+        // const recordsData = await api.benefits.findPaginated(findPaginatedParams)
+        // benefits_dispatch({ type: 'SET_RECORDS_TO_RENDER', payload: recordsData.data })
+        const recordsData = await api.benefits.findOldest()
+        console.log(recordsData)
+    }
+    // eslint-disable-next-line
+    useEffect(()=> { findRecords() }, [benefits_state.paginationParams])
+
     const setPageAndLimit = (page, limit) => {
         benefits_dispatch({ type: 'SET_PAGE', payload: parseInt(page) })
         benefits_dispatch({ type: 'SET_LIMIT', payload: parseInt(limit) })

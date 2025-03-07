@@ -1,159 +1,97 @@
-import axios from 'axios'
+import helpers from '../helpers'
 
-const lotsLimit = 5
-const pathName = 'benefits'
-
-const checkStorageStatus = (err) => {
-    if(err.status === 401 || err.status === 403){
-        localStorage.clear()
-    }
-}
+const path = 'benefits'
 
 
 const countRecords = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${pathName}/recordsInfo/quantity`, headers)
-        return response.data
-    } catch (err) {
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.countRecords }
+    const response = await processService(props)
+    return response
 }
 
-
-const deleteById = async(id) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/${pathName}/${id}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const edit = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.edit }
+    const response = await processService(props)
+    return response
 }
 
-const edit = async(record) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/${pathName}/${record._id}`, record, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const editAll = async (records) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const loopLimit = records.length / lotsLimit
-        const responseData = []
-        for (let index = 0; index < loopLimit; index++) {
-            const lot = records.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            const response = await axios.put(`${process.env.REACT_APP_API_REST}/${pathName}/${pathName}/edit_all`, lot, headers)
-            responseData.push(response.data)
-        }
-        const response = {
-            code: 200,
-            data: responseData,
-            status: 'OK'
-        }
-        return response
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findAll = async() => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${pathName}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findAll = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findAll }
+    const response = await processService(props)
+    return response
 }
 
 const findAllByFilters = async (filters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${pathName}?filters=${filters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: filters, path, service: services.findAllByFilters }
+    const response = await processService(props)
+    return response
 }
 
-const findById = async(id) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${pathName}/${id}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findById = async (id) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: id, path, service: services.findById }
+    const response = await processService(props)
+    return response
 }
 
-const findPaginated = async(params) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    const {page, limit, filters} = params
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${pathName}?page=${page}&limit=${limit}&filters=${filters}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findNewer = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findNewer }
+    const response = await processService(props)
+    return response
 }
 
-const save = async(record) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/${pathName}`, record, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findOldest = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findOldest }
+    const response = await processService(props)
+    return response
 }
 
-const saveAll = async (records) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const loopLimit = records.length / lotsLimit
-        const responseData = []
-        for (let index = 0; index < loopLimit; index++) {
-            const lot = records.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            const response = await axios.post(`${process.env.REACT_APP_API_REST}/${pathName}/${pathName}/save_all`, lot, headers)
-            responseData.push(response.data)
-        }
-        const response = {
-            code: 200,
-            data: responseData,
-            status: 'OK'
-        }
-        return response
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findPaginated = async (paginationParams) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: paginationParams, path, service: services.findPaginated }
+    const response = await processService(props)
+    return response
+}
+
+const remove = async (ids) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: ids, path, service: services.remove }
+    const response = await processService(props)
+    return response
+}
+
+const removeProps = async (propsArray) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: propsArray, path, service: services.removeProps }
+    const response = await processService(props)
+    return response
+}
+
+const save = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.save }
+    const response = await processService(props)
+    return response
 }
 
 const benefits = {
     countRecords,
-    deleteById,
     edit,
-    editAll,
     findAll,
     findAllByFilters,
     findById,
+    findNewer,
+    findOldest,
     findPaginated,
-    save,
-    saveAll
+    remove,
+    removeProps,
+    save
 }
 
 export default benefits

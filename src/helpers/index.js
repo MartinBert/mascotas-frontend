@@ -6,6 +6,7 @@ import mathHelper from './mathHelper'
 import objHelper from './objHelper'
 import pdfHelper from './pdfHelper'
 import saleHelper from './saleHelper'
+import servicesHelper from './servicesHelper'
 import stringHelper from './stringHelper'
 
 const helpers = {
@@ -17,6 +18,7 @@ const helpers = {
     objHelper,
     pdfHelper,
     saleHelper,
+    servicesHelper,
     stringHelper
 }
 

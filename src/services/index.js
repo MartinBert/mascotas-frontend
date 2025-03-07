@@ -1,5 +1,6 @@
 import afip from './afip'
 import auth from './auth'
+import benefits from './benefits'
 import clientes from './clientes'
 import condicionesfiscales from './condicionesfiscales'
 import dailyBusinessStatistics from './dailyBusinessStatistics'
@@ -27,6 +28,7 @@ import zonasdeventas from './zonasdeventas'
 const api = {
     afip,
     auth,
+    benefits,
     clientes,
     condicionesfiscales,
     dailyBusinessStatistics,
