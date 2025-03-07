@@ -535,8 +535,8 @@ const Home = () => {
 
     const fixDataBaseRecords = async () => {
         // await addReceiverIvaConditionToClients()
-        await fixNameOfLinesOfSales()
-        // await fixValuesOfLinesOfSales()
+        // await fixNameOfLinesOfSales()
+        await fixValuesOfLinesOfSales()
     }
 
     const buttonToFixDataBaseRecords = (

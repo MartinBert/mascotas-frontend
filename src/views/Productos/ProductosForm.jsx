@@ -13,6 +13,7 @@ import { Row, Col, Form, Input, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 
 // Helpers
+import actions from '../../actions'
 import helpers from '../../helpers'
 
 // Services
@@ -21,7 +22,9 @@ import api from '../../services'
 // Imports Destructuring
 const { GenericAutocomplete } = generics
 const { Spinner } = graphics
+const { formatFindFilters } = actions.paginationParams
 const { decimalPercent, roundToMultiple, round } = helpers.mathHelper
+const { fiscalNotesCodes } = helpers.afipHelper
 const { normalizeString } = helpers.stringHelper
 
 
@@ -211,7 +214,8 @@ const ProductosForm = () => {
         if (!validated) return
 
         product.imagenes = uploadedImages
-
+        product.nombre = product.nombre.trim()
+        
         const saveProduct = async () => {
             const response = await api.productos.save(product)
             if (response.code === 200) {
@@ -222,12 +226,40 @@ const ProductosForm = () => {
         }
 
         const editProduct = async () => {
-            const response = await api.productos.edit(product)
-            if (response.code === 200) {
-                successAlert('El registro fue grabado con exito').then(redirectToProducts())
-            } else {
-                errorAlert('Error al guardar el registro')
-            }
+            const filters = formatFindFilters({
+                cashRegister: true,
+                documentoCodigo: { $nin: fiscalNotesCodes },
+                productos: { $all: [ { $elemMatch: { _id: product._id } } ] }
+            })
+            const findSalesThatContainProduct = await api.ventas.findAllByFilters(filters)
+            const salesThatContainProduct = findSalesThatContainProduct.docs
+            console.log(salesThatContainProduct)
+            // const updatedSales = salesThatContainProduct.map(sale => {
+            //     const updatedSale = {
+            //         ...sale,
+            //         productos: sale.productos.map(producto => {
+            //             let updatedProduct
+            //             if (producto._id === product._id) {
+            //                 updatedProduct = {
+            //                     ...producto,
+            //                     nombre: product.nombre
+            //                 }
+            //             } else updatedProduct = producto
+            //             return updatedProduct
+            //         })
+            //     }
+            //     return updatedSale
+            // })
+            // const salesEditionResponse = await api.ventas.editAll(updatedSales)
+            // if (salesEditionResponse.code !== 200) {
+            //     return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
+            // }
+            // const productEditionResponse = await api.productos.edit(product)
+            // if (productEditionResponse.code !== 200) {
+            //     errorAlert('Error al guardar el registro.')
+            // } else {
+            //     successAlert('El registro fue grabado con éxito.').then(redirectToProducts())
+            // }
         }
 
         if (id === 'nuevo') saveProduct()
