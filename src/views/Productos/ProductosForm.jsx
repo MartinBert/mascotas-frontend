@@ -209,60 +209,58 @@ const ProductosForm = () => {
         return true
     }
 
+    const saveNewProduct = async () => {
+        const response = await api.productos.save(product)
+        if (response.code === 200) {
+            successAlert('El registro fue grabado con exito').then(redirectToProducts())
+        } else {
+            errorAlert('Error al guardar el registro')
+        }
+    }
+
+    const editProduct = async () => {
+        const filters = formatFindFilters({
+            cashRegister: true,
+            documentoCodigo: { $nin: fiscalNotesCodes },
+            productos: { $all: { _id: product._id } }
+        })
+        const findSalesThatContainProduct = await api.ventas.findAllByFilters(filters)
+        const salesThatContainProduct = findSalesThatContainProduct.docs
+        const updatedSales = salesThatContainProduct.map(sale => {
+            const updatedSale = {
+                ...sale,
+                productos: sale.productos.map(producto => {
+                    let updatedProduct
+                    if (producto._id === product._id) {
+                        updatedProduct = {
+                            ...producto,
+                            nombre: product.nombre
+                        }
+                    } else updatedProduct = producto
+                    return updatedProduct
+                })
+            }
+            return updatedSale
+        })
+        console.log(updatedSales)
+        // const salesEditionResponse = await api.ventas.editAll(updatedSales)
+        // if (salesEditionResponse.code !== 200) {
+        //     return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
+        // }
+        // const productEditionResponse = await api.productos.edit(product)
+        // if (productEditionResponse.code !== 200) {
+        //     errorAlert('Error al guardar el registro.')
+        // } else {
+        //     successAlert('El registro fue grabado con éxito.').then(redirectToProducts())
+        // }
+    }
+
     const saveProduct = () => {
         const validated = saveValidation()
         if (!validated) return
-
         product.imagenes = uploadedImages
         product.nombre = product.nombre.trim()
-        
-        const saveProduct = async () => {
-            const response = await api.productos.save(product)
-            if (response.code === 200) {
-                successAlert('El registro fue grabado con exito').then(redirectToProducts())
-            } else {
-                errorAlert('Error al guardar el registro')
-            }
-        }
-
-        const editProduct = async () => {
-            const filters = formatFindFilters({
-                cashRegister: true,
-                documentoCodigo: { $nin: fiscalNotesCodes },
-                productos: { $all: [ { $elemMatch: { _id: product._id } } ] }
-            })
-            const findSalesThatContainProduct = await api.ventas.findAllByFilters(filters)
-            const salesThatContainProduct = findSalesThatContainProduct.docs
-            console.log(salesThatContainProduct)
-            // const updatedSales = salesThatContainProduct.map(sale => {
-            //     const updatedSale = {
-            //         ...sale,
-            //         productos: sale.productos.map(producto => {
-            //             let updatedProduct
-            //             if (producto._id === product._id) {
-            //                 updatedProduct = {
-            //                     ...producto,
-            //                     nombre: product.nombre
-            //                 }
-            //             } else updatedProduct = producto
-            //             return updatedProduct
-            //         })
-            //     }
-            //     return updatedSale
-            // })
-            // const salesEditionResponse = await api.ventas.editAll(updatedSales)
-            // if (salesEditionResponse.code !== 200) {
-            //     return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
-            // }
-            // const productEditionResponse = await api.productos.edit(product)
-            // if (productEditionResponse.code !== 200) {
-            //     errorAlert('Error al guardar el registro.')
-            // } else {
-            //     successAlert('El registro fue grabado con éxito.').then(redirectToProducts())
-            // }
-        }
-
-        if (id === 'nuevo') saveProduct()
+        if (id === 'nuevo') saveNewProduct()
         else editProduct()
     }
 
