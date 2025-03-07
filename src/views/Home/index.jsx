@@ -396,10 +396,9 @@ const Home = () => {
             return fixedSale
         })
 
-        console.log(fixedSales)
-        // const res = await api.ventas.editAll(fixedSales)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
-        // else console.log('Lines names fixed.')
+        const res = await api.ventas.editAll(fixedSales)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
+        else console.log('Lines names fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
