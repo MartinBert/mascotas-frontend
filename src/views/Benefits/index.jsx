@@ -63,10 +63,8 @@ const Benefits = () => {
     // ------------------ Records table ------------------ //
     const findRecords = async () => {
         const findPaginatedParams = formatFindParams(benefits_state.paginationParams)
-        // const recordsData = await api.benefits.findPaginated(findPaginatedParams)
-        // benefits_dispatch({ type: 'SET_RECORDS_TO_RENDER', payload: recordsData.data })
-        const recordsData = await api.benefits.findOldest()
-        console.log(recordsData)
+        const recordsData = await api.benefits.findPaginated(findPaginatedParams)
+        benefits_dispatch({ type: 'SET_RECORDS_TO_RENDER', payload: recordsData.data })
     }
     // eslint-disable-next-line
     useEffect(()=> { findRecords() }, [benefits_state.paginationParams])
