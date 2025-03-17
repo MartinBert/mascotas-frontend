@@ -20,7 +20,7 @@ import api from '../../services'
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalNotesCodes, formatBody, invoiceCodes, ticketCodes } = helpers.afipHelper
-const { numberOrderDate, resetDate } = helpers.dateHelper
+const { localFormatToDateObj, numberOrderDate, resetDate } = helpers.dateHelper
 const { round } = helpers.mathHelper
 const {
     createBudgetPdf,
@@ -175,13 +175,14 @@ const FinalizeSaleModal = () => {
                 balanceViewIncome: sale_state.total,
                 balanceViewProfit: sale_state.total - sale_state.importeIva,
                 concept: 'Generado automáticamente',
-                date: new Date(sale_state.fechaEmisionString.substring(0, 10)),
+                date: localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10)),
                 dateOrder: numberOrderDate(sale_state.fechaEmisionString.substring(0, 10)),
                 dateString: sale_state.fechaEmisionString.substring(0, 10),
                 salesViewExpense: saleListPricesAndIva,
                 salesViewIncome: sale_state.total,
                 salesViewProfit: sale_state.total - saleListPricesAndIva
             }
+            console.log(newStatistic)
             await api.dailyBusinessStatistics.save(newStatistic)
         }
     }
@@ -191,7 +192,6 @@ const FinalizeSaleModal = () => {
             const { _id, ...lineData } = renglon
             return lineData
         })
-        console.log(sale_state)
         const { refs, productos, ...saleData } = sale_state
         const dataToSave = { ...saleData, renglones: fixedLines }
         const response = await api.ventas.save(dataToSave)

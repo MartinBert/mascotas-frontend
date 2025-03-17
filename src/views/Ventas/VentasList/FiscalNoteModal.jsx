@@ -20,6 +20,7 @@ import api from '../../../services'
 const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
 const { Item } = Form
 const { formatBody, findNextVoucherNumber_fiscal, fiscalVouchersCodes, creditCodes, debitCodes } = helpers.afipHelper
+const { localFormatToDateObj } = helpers.dateHelper
 const { existsProperty, spanishVoucherDataToSave } = helpers.objHelper
 const { roundToMultiple, decimalPercent } = helpers.mathHelper
 const { createCreditNotePdf, createDebitNotePdf, validations } = helpers.pdfHelper
@@ -118,7 +119,7 @@ const FiscalNoteModal = () => {
                 balanceViewIncome: addedIncome,
                 balanceViewProfit: addedIncome - addedExpense,
                 concept: 'Generado automáticamente',
-                date: new Date(fiscalNoteModal_state.params.dateString.substring(0, 10)),
+                date: localFormatToDateObj(fiscalNoteModal_state.params.dateString.substring(0, 10)),
                 dateString: fiscalNoteModal_state.params.dateString.substring(0, 10),
                 salesViewExpense: addedExpense,
                 salesViewIncome: addedIncome,
