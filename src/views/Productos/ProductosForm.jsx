@@ -219,47 +219,51 @@ const ProductosForm = () => {
     }
 
     const editProduct = async () => {
-        console.log(product)
-        const filters = formatFindFilters({
-            cashRegister: true,
-            documentoCodigo: { $nin: fiscalNotesCodes },
-            productos: { $all: { _id: product._id } }
-        })
-        const findSalesThatContainProduct = await api.ventas.findAllByFilters(filters)
-        const salesThatContainProduct = findSalesThatContainProduct.docs
-        const updatedSales = salesThatContainProduct.map(sale => {
-            const updatedSale = {
-                ...sale,
-                productos: sale.productos.map(producto => {
-                    let updatedProduct
-                    if (producto._id === product._id) {
-                        updatedProduct = {
-                            ...producto,
-                            marca: product.marca._id,
-
-                            nombre: product.nombre,
-                            normalizedBrand: normalizeString(product.marca.nombre),
-                            normalizedName: normalizeString(product.nombre),
-                            normalizedType: normalizeString(product.rubro.nombre),
-                            rubro: product.rubro._id
-                        }
-                    } else updatedProduct = producto
-                    return updatedProduct
-                })
+        const findProductInDb = await api.productos.findById(product._id)
+        const productInDb = findProductInDb.data
+        if (!productInDb) errorAlert('No se encontró el producto de referencia en la base de datos. Contacte a su proveedor.')
+        if (
+            productInDb.nombre !== product.nombre
+            || productInDb.codigoBarras !== product.codigoBarras
+        ) {
+            const filters = formatFindFilters({
+                cashRegister: true,
+                documentoCodigo: { $nin: fiscalNotesCodes },
+                // renglones: { $elemMatch: { productId: productInDb._id } }
+            })
+            const findSales = await api.ventas.findAllByFilters(filters)
+            const sales = findSales.docs
+            const salesThatContainProduct = sales.filter(sale =>
+                sale.renglones.map(line => line.nombre).includes(productInDb.nombre)
+            )
+            const updatedSales = salesThatContainProduct.map(sale => {
+                const updatedSale = {
+                    ...sale,
+                    renglones: sale.renglones.map(line => {
+                        let updatedLine
+                        if (line.productId === product._id) {
+                            updatedLine = {
+                                ...line,
+                                codigoBarras: product.codigoBarras,
+                                nombre: product.nombre
+                            }
+                        } else updatedLine = line
+                        return updatedLine
+                    })
+                }
+                return updatedSale
+            })
+            const salesEditionResponse = await api.ventas.editAll(updatedSales)
+            if (salesEditionResponse.code !== 200) {
+                return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
             }
-            return updatedSale
-        })
-        console.log(updatedSales)
-        // const salesEditionResponse = await api.ventas.editAll(updatedSales)
-        // if (salesEditionResponse.code !== 200) {
-        //     return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
-        // }
-        // const productEditionResponse = await api.productos.edit(product)
-        // if (productEditionResponse.code !== 200) {
-        //     errorAlert('Error al guardar el registro.')
-        // } else {
-        //     successAlert('El registro fue grabado con éxito.').then(redirectToProducts())
-        // }
+        }
+        const productEditionResponse = await api.productos.edit(product)
+        if (productEditionResponse.code !== 200) {
+            errorAlert('Error al guardar el registro.')
+        } else {
+            successAlert('El registro fue grabado con éxito.').then(redirectToProducts())
+        }
     }
 
     const saveProduct = () => {
@@ -652,6 +656,7 @@ const ProductosForm = () => {
                                 <Form.Item>
                                     <button
                                         className='btn-secondary'
+                                        disabled={loading}
                                         onClick={() => handleCancel()}
                                         type='button'
                                     >

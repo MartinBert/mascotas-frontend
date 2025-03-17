@@ -167,7 +167,7 @@ const Header = () => {
         const porcentajeIvaVenta = parseFloat(sale_state.customProductParams.percentageIva)
         const precioVenta = parseFloat(sale_state.customProductParams.unitPrice)
         const ivaVenta = precioVenta * porcentajeIvaVenta / 100
-        const quantityOfAlreadyCustomProductsSaved = sale_state.productos.filter(product => product._id.startsWith('customProduct_')).length
+        const quantityOfAlreadyCustomProductsSaved = sale_state.renglones.filter(line => line.productId.startsWith('customProduct_')).length
         const _id = 'customProduct_' + (quantityOfAlreadyCustomProductsSaved + 1)
         const customProduct = {
             _id,

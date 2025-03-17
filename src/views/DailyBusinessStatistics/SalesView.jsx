@@ -107,7 +107,6 @@ const SalesView = () => {
                     * parseFloat(line.cantidadUnidades)
                 )
                 console.log(line)
-                console.log(productLine)
                 console.log(productListPrice)
                 const dataItem = {
                     concept: 'Venta',

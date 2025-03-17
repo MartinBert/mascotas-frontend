@@ -261,25 +261,23 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
         const sales = findSales.docs
-        const updatedSales = sales.map(sale => {
-            const updatedSale = {
-                ...sale,
-                renglones: sale.renglones.map(line => {
-                    const productOfLine = sale.productos.find(product => product.nombre === line.nombre)
-                    const updatedLine = {
-                        ...line,
-                        productId: productOfLine?._id ?? null
-                    }
-                    return updatedLine
-                })
+        const updatedSales = []
+        for (let index = 0; index < sales.length; index++) {
+            const sale = sales[index]
+            let updatedLines = []
+            for (let index = 0; index < sale.renglones.length; index++) {
+                const line = sale.renglones[index]
+                const findProductOfLine = await api.productos.findAllByFilters(JSON.stringify({ nombre: line.nombre }))
+                const productOfLine = !findProductOfLine ? null : findProductOfLine.docs[0]
+                const updatedLine = { ...line, productId: productOfLine }
+                updatedLines.push(updatedLine)
             }
-            return updatedSale
-        })
-        console.log('VENTAS CON LINEAS ACTUALIZADAS (SE AGREGARON LAS IDS DEL PRODUCTO):')
-        console.log(updatedSales)
-        // const res = await api.ventas.editAll(updatedSales)
-        // if (!res || res.code !== 200) errorAlert('No se añadir la data a las líneas de las ventas. Intente de nuevo.')
-        // else console.log('Records fixed.')
+            const updatedSale = { ...sale, renglones: updatedLines }
+            updatedSales.push(updatedSale)
+        }
+        const res = await api.ventas.editAll(updatedSales)
+        if (!res || res.code !== 200) errorAlert('No se añadir la data a las líneas de las ventas. Intente de nuevo.')
+        else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -573,11 +571,10 @@ const Home = () => {
                     && !debitCodes.includes(record.documentoCodigo)
                 )
                 .map(sale => {
-                    const data = sale.productos.map(product => {
-                        const lineOfProduct = sale.renglones.find(line => line.nombre === product.nombre)
+                    const data = sale.renglones.map(line => {
                         const data = {
-                            productUnitPrice: product.precioUnitario,
-                            proportion: lineOfProduct?.cantidadUnidades ?? 1
+                            productUnitPrice: line.precioListaUnitario,
+                            proportion: line.cantidadUnidades
                         }
                         return data
                     })
@@ -731,10 +728,12 @@ const Home = () => {
             const productSalesData = allSales
                 .filter(sale => sale.documento.cashRegister)
                 .map(sale => {
-                    const productsOfSaleIDs = sale.productos.map(productOfSale => productOfSale._id)
+                    const productsOfSaleIDs = sale.renglones
+                        .filter(line => !line.codigoBarras.starsWith('custom'))
+                        .map(line => line.productId)
                     if (productsOfSaleIDs.includes(product._id)) {
-                        const [currentLineOfSale] = sale.renglones
-                            .filter(lineOfSale => lineOfSale.nombre === product.nombre)
+                        const currentLineOfSale = sale.renglones
+                            .find(lineOfSale => lineOfSale.productId === product._id)
                         if (!currentLineOfSale) return null
                         const productOfSale = {
                             date: sale.fechaEmision,
