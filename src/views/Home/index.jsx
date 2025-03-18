@@ -272,35 +272,12 @@ const Home = () => {
     const setProductId = async (lineName) => {
         const fixedLineName = fixLineName(lineName)
         const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: fixedLineName }))
+        if (!findCorrespondingProduct) return null
+        if (findCorrespondingProduct.docs.length === 0) return null
         const correspondingProduct = lineName === 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR'
             ? findCorrespondingProduct.docs[1]
             : findCorrespondingProduct.docs[0]
-        let productId = null
-        switch (lineName) {
-            case 'ROLLO SACA PELUSA (REPUESTO)':
-                productId = correspondingProduct._id
-                break
-            case 'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)':
-                productId = correspondingProduct._id
-                break
-            case 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR':
-                productId = correspondingProduct._id
-                break
-            case 'CAMISA TM (lomo 34cm, totax 58cm)':
-                productId = correspondingProduct._id
-                break
-            case 'CAMISA TS (lomo 28cm, totax 52cm)':
-                productId = correspondingProduct._id
-                break
-            case 'CAMISA TL (lomo 40cm, totax 68cm)':
-                productId = correspondingProduct._id
-                break
-            case 'MOCHILA CON CORREA (CONJUNTO)':
-                productId = correspondingProduct._id
-                break
-            default:
-                break
-        }
+        const productId = correspondingProduct._id
         return productId
     }
 
@@ -347,11 +324,10 @@ const Home = () => {
             updatedSales.push(updatedSale)
         }
         console.log(updatedSales)
-
-        // const res = await api.ventas.editAll(updatedSales)
-        // if (!res || res.code !== 200) {
-        //     errorAlert('No se pudo reparar los registros de ventas. Intente de nuevo.')
-        // } else console.log('Records fixed.')
+        const res = await api.ventas.editAll(updatedSales)
+        if (!res || res.code !== 200) {
+            errorAlert('No se pudo reparar los registros de ventas. Intente de nuevo.')
+        } else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
