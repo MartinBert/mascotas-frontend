@@ -266,30 +266,6 @@ const Home = () => {
         } else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
-    
-    const addDataToSalesLines = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findSales = await api.ventas.findAll()
-        const sales = findSales.docs
-        const updatedSales = []
-        for (let index = 0; index < sales.length; index++) {
-            const sale = sales[index]
-            let updatedLines = []
-            for (let index = 0; index < sale.renglones.length; index++) {
-                const line = sale.renglones[index]
-                const findProductOfLine = await api.productos.findAllByFilters(JSON.stringify({ nombre: line.nombre }))
-                const productOfLine = !findProductOfLine ? null : findProductOfLine.docs[0]
-                const updatedLine = { ...line, productId: productOfLine }
-                updatedLines.push(updatedLine)
-            }
-            const updatedSale = { ...sale, renglones: updatedLines }
-            updatedSales.push(updatedSale)
-        }
-        const res = await api.ventas.editAll(updatedSales)
-        if (!res || res.code !== 200) errorAlert('No se añadir la data a las líneas de las ventas. Intente de nuevo.')
-        else console.log('Records fixed.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
 
     const fixNameOfLinesOfSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
@@ -302,7 +278,8 @@ const Home = () => {
             const saleDefectiveItems = []
             for (let index = 0; index < sale.renglones.length; index++) {
                 const saleLine = sale.renglones[index]
-                const saleProduct = sale.productos.find(product => product.nombre === saleLine.nombre)
+                const findSaleProduct = await api.productos.findById(saleLine.productId)
+                const saleProduct = findSaleProduct.data
                 const matchTheProduct = saleProduct ? true : false
                 if (!matchTheProduct) saleDefectiveItems.push(sale)
             }
@@ -311,19 +288,6 @@ const Home = () => {
             }
         }
 
-        // const fixedSales = totalDefectiveSales.map(sale => {
-        //     const fixedSale = {
-        //         ...sale,
-        //         productos: sale.productos.map(product => {
-        //             const fixedProduct = {
-        //                 ...product,
-        //                 nombre: product.nombre.trimEnd()
-        //             }
-        //             return fixedProduct
-        //         })
-        //     }
-        //     return fixedSale
-        // })
         console.log('TOTAL VENTAS CON LINEAS QUE NO TIENEN PRODUCTOS ASOCIADOS')
         console.log(totalDefectiveSales)
         // const res = await api.ventas.editAll(fixedSales)
@@ -464,9 +428,9 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        await addDataToSalesLines()
+        // await addDataToSalesLines()
+        await removeProductsFromSales()
         await fixNameOfLinesOfSales()
-        // await removeProductsFromSales()
         // await fixValuesOfLinesOfSales()
     }
 
