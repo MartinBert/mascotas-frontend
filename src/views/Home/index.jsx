@@ -279,7 +279,7 @@ const Home = () => {
             for (let index = 0; index < sale.renglones.length; index++) {
                 const saleLine = sale.renglones[index]
                 const findSaleProduct = await api.productos.findById(saleLine.productId)
-                const saleProduct = findSaleProduct.data
+                const saleProduct = findSaleProduct?.data ?? null
                 const matchTheProduct = saleProduct ? true : false
                 if (!matchTheProduct) saleDefectiveItems.push(sale)
             }
@@ -429,7 +429,7 @@ const Home = () => {
 
     const fixDataBaseRecords = async () => {
         // await addDataToSalesLines()
-        await removeProductsFromSales()
+        // await removeProductsFromSales()
         await fixNameOfLinesOfSales()
         // await fixValuesOfLinesOfSales()
     }
