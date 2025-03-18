@@ -278,6 +278,7 @@ const Home = () => {
             const saleDefectiveItems = []
             for (let index = 0; index < sale.renglones.length; index++) {
                 const saleLine = sale.renglones[index]
+                console.log(saleLine)
                 const findSaleProduct = await api.productos.findById(saleLine.productId)
                 const saleProduct = findSaleProduct?.data ?? null
                 const matchTheProduct = saleProduct ? true : false
