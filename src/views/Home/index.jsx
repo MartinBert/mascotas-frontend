@@ -257,80 +257,6 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const fixLineName = (lineName) => {
-        let fixedName = lineName
-        if (lineName === 'ROLLO SACA PELUSA (REPUESTO)') fixedName = lineName.substring(0, 16)
-        if (lineName === 'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)') fixedName = lineName.substring(0, 33)
-        if (lineName === 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR') fixedName = lineName.substring(0, 33)
-        if (lineName === 'CAMISA TM (lomo 34cm, totax 58cm)') fixedName = lineName.substring(0, 9)
-        if (lineName === 'CAMISA TS (lomo 28cm, totax 52cm)') fixedName = lineName.substring(0, 9)
-        if (lineName === 'CAMISA TL (lomo 40cm, totax 68cm)') fixedName = lineName.substring(0, 9)
-        if (lineName === 'MOCHILA CON CORREA (CONJUNTO)') fixedName = lineName.substring(0, 17)
-        return fixedName
-    }
-
-    const setProductId = async (lineName) => {
-        const fixedLineName = fixLineName(lineName)
-        const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: fixedLineName }))
-        if (!findCorrespondingProduct) return null
-        if (findCorrespondingProduct.docs.length === 0) return null
-        const correspondingProduct = lineName === 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR'
-            ? findCorrespondingProduct.docs[1]
-            : findCorrespondingProduct.docs[0]
-        const productId = correspondingProduct._id
-        return productId
-    }
-
-    const repairDefectiveLines = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const defectiveNames = [
-            'ROLLO SACA PELUSA (REPUESTO)',
-            'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)',
-            'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR',
-            'CAMISA TM (lomo 34cm, totax 58cm)',
-            'CAMISA TS (lomo 28cm, totax 52cm)',
-            'CAMISA TL (lomo 40cm, totax 68cm)',
-            'MOCHILA CON CORREA (CONJUNTO)',
-        ]
-
-        const findSales = await api.ventas.findAll()
-        const defectiveSales = findSales.docs.filter(sale => {
-            const lineNames = sale.renglones.map(line => line.nombre)
-            const lineContainsADefectiveNameTest = lineNames.map(name => {
-                let res = false
-                if (defectiveNames.includes(name)) res = true
-                return res
-            })
-            const lineContainsADefectiveName = lineContainsADefectiveNameTest.includes(true) ? true : false
-            return lineContainsADefectiveName
-        })
-
-        const updatedSales = []
-        for (let index = 0; index < defectiveSales.length; index++) {
-            const sale = defectiveSales[index]
-            const updatedLines = []
-            for (let index = 0; index < sale.renglones.length; index++) {
-                const line = sale.renglones[index]
-                const updatedLine = {
-                    ...line,
-                    productId: await setProductId(line.nombre)
-                }
-                updatedLines.push(updatedLine)
-            }
-            const updatedSale = {
-                ...sale,
-                renglones: updatedLines
-            }
-            updatedSales.push(updatedSale)
-        }
-        console.log(updatedSales)
-        const res = await api.ventas.editAll(updatedSales)
-        if (!res || res.code !== 200) {
-            errorAlert('No se pudo reparar los registros de ventas. Intente de nuevo.')
-        } else console.log('Records fixed.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
     const fixNameOfLinesOfSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
@@ -493,8 +419,7 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        await repairDefectiveLines()
-        // await fixNameOfLinesOfSales()
+        await fixNameOfLinesOfSales()
         // await fixValuesOfLinesOfSales()
     }
 
