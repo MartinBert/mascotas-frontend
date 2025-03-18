@@ -270,56 +270,37 @@ const Home = () => {
     }
 
     const setProductId = async (lineName) => {
-        const defectiveNames = [
-            'ROLLO SACA PELUSA (REPUESTO)',
-            'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)',
-            'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR',
-            'CAMISA TM (lomo 34cm, totax 58cm)',
-            'CAMISA TS (lomo 28cm, totax 52cm)',
-            'CAMISA TL (lomo 40cm, totax 68cm)',
-            'MOCHILA CON CORREA (CONJUNTO)',
-        ]
         const fixedLineName = fixLineName(lineName)
         const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: fixedLineName }))
-        
-        if (defectiveNames.includes(lineName)) {
-            console.log(lineName)
-            console.log(findCorrespondingProduct)
-        }
-
-        const correspondingProduct = findCorrespondingProduct.docs[0]
-        
-        if (defectiveNames.includes(lineName)) {
-            console.log(correspondingProduct)
-            console.log('-------------------------------------')
-        }
-
+        const correspondingProduct = lineName === 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR'
+            ? findCorrespondingProduct.docs[1]
+            : findCorrespondingProduct.docs[0]
         let productId = null
-        // switch (lineName) {
-        //     case 'ROLLO SACA PELUSA (REPUESTO)':
-        //         productId = correspondingProduct._id
-        //         break
-        //     case 'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)':
-        //         productId = correspondingProduct._id
-        //         break
-        //     case 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR':
-        //         productId = correspondingProduct._id
-        //         break
-        //     case 'CAMISA TM (lomo 34cm, totax 58cm)':
-        //         productId = correspondingProduct._id
-        //         break
-        //     case 'CAMISA TS (lomo 28cm, totax 52cm)':
-        //         productId = correspondingProduct._id
-        //         break
-        //     case 'CAMISA TL (lomo 40cm, totax 68cm)':
-        //         productId = correspondingProduct._id
-        //         break
-        //     case 'MOCHILA CON CORREA (CONJUNTO)':
-        //         productId = correspondingProduct._id
-        //         break
-        //     default:
-        //         break
-        // }
+        switch (lineName) {
+            case 'ROLLO SACA PELUSA (REPUESTO)':
+                productId = correspondingProduct._id
+                break
+            case 'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)':
+                productId = correspondingProduct._id
+                break
+            case 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR':
+                productId = correspondingProduct._id
+                break
+            case 'CAMISA TM (lomo 34cm, totax 58cm)':
+                productId = correspondingProduct._id
+                break
+            case 'CAMISA TS (lomo 28cm, totax 52cm)':
+                productId = correspondingProduct._id
+                break
+            case 'CAMISA TL (lomo 40cm, totax 68cm)':
+                productId = correspondingProduct._id
+                break
+            case 'MOCHILA CON CORREA (CONJUNTO)':
+                productId = correspondingProduct._id
+                break
+            default:
+                break
+        }
         return productId
     }
 
@@ -365,8 +346,7 @@ const Home = () => {
             }
             updatedSales.push(updatedSale)
         }
-        // console.log(updatedSales)
-
+        console.log(updatedSales)
 
         // const res = await api.ventas.editAll(updatedSales)
         // if (!res || res.code !== 200) {
