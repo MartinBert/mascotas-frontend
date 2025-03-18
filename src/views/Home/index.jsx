@@ -257,6 +257,16 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
+    const removeProductsFromSales = async () => {
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+        const propsToDelete = ['productos']
+        const response = await api.ventas.deletePropsFromAll(propsToDelete)
+        if (!response || response.code !== 200) {
+            errorAlert('No se pudo eliminar los productos de los registros de ventas. Intente de nuevo.')
+        } else console.log('Records fixed.')
+        home_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+    
     const addDataToSalesLines = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
@@ -456,6 +466,7 @@ const Home = () => {
     const fixDataBaseRecords = async () => {
         await addDataToSalesLines()
         await fixNameOfLinesOfSales()
+        // await removeProductsFromSales()
         // await fixValuesOfLinesOfSales()
     }
 
