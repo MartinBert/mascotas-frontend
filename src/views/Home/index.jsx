@@ -257,13 +257,89 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const removeProductsFromSales = async () => {
+    const setProductId = async (lineName) => {
+        const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: lineName }))
+        const correspondingProduct = findCorrespondingProduct.docs[0]
+        console.log(correspondingProduct)
+        let productId = null
+        // switch (lineName) {
+        //     case 'ROLLO SACA PELUSA (REPUESTO)':
+        //         productId = correspondingProduct._id
+        //         break
+        //     case 'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)':
+        //         productId = correspondingProduct._id
+        //         break
+        //     case 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR':
+        //         productId = correspondingProduct._id
+        //         break
+        //     case 'CAMISA TM (lomo 34cm, totax 58cm)':
+        //         productId = correspondingProduct._id
+        //         break
+        //     case 'CAMISA TS (lomo 28cm, totax 52cm)':
+        //         productId = correspondingProduct._id
+        //         break
+        //     case 'CAMISA TL (lomo 40cm, totax 68cm)':
+        //         productId = correspondingProduct._id
+        //         break
+        //     case 'MOCHILA CON CORREA (CONJUNTO)':
+        //         productId = correspondingProduct._id
+        //         break
+        //     default:
+        //         break
+        // }
+        return productId
+    }
+
+    const repairDefectiveLines = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const propsToDelete = ['productos']
-        const response = await api.ventas.deletePropsFromAll(propsToDelete)
-        if (!response || response.code !== 200) {
-            errorAlert('No se pudo eliminar los productos de los registros de ventas. Intente de nuevo.')
-        } else console.log('Records fixed.')
+        const defectiveNames = [
+            'ROLLO SACA PELUSA (REPUESTO)',
+            'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)',
+            'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR',
+            'CAMISA TM (lomo 34cm, totax 58cm)',
+            'CAMISA TS (lomo 28cm, totax 52cm)',
+            'CAMISA TL (lomo 40cm, totax 68cm)',
+            'MOCHILA CON CORREA (CONJUNTO)',
+        ]
+
+        const findSales = await api.ventas.findAll()
+        const defectiveSales = findSales.docs.filter(sale => {
+            const lineNames = sale.renglones.map(line => line.nombre)
+            const lineContainsADefectiveNameTest = lineNames.map(name => {
+                let res = false
+                if (defectiveNames.includes(name)) res = true
+                return res
+            })
+            const lineContainsADefectiveName = lineContainsADefectiveNameTest.includes(true) ? true : false
+            return lineContainsADefectiveName
+        })
+        console.log(defectiveSales)
+
+        // const updatedSales = []
+        // for (let index = 0; index < defectiveSales.length; index++) {
+        //     const sale = defectiveSales[index]
+        //     const updatedLines = []
+        //     for (let index = 0; index < sale.renglones.length; index++) {
+        //         const line = sale.renglones[index]
+        //         const updatedLine = {
+        //             ...line,
+        //             productId: await setProductId(line.nombre)
+        //         }
+        //         updatedLines.push(updatedLine)
+        //     }
+        //     const updatedSale = {
+        //         ...sale,
+        //         renglones: updatedLines
+        //     }
+        //     updatedSales.push(updatedSale)
+        // }
+        // console.log(updatedSales)
+
+
+        // const res = await api.ventas.editAll(updatedSales)
+        // if (!res || res.code !== 200) {
+        //     errorAlert('No se pudo reparar los registros de ventas. Intente de nuevo.')
+        // } else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -429,9 +505,8 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        // await addDataToSalesLines()
-        // await removeProductsFromSales()
-        await fixNameOfLinesOfSales()
+        await repairDefectiveLines()
+        // await fixNameOfLinesOfSales()
         // await fixValuesOfLinesOfSales()
     }
 
