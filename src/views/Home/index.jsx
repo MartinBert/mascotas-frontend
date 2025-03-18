@@ -263,122 +263,124 @@ const Home = () => {
         const sales = findSales.docs
         const updatedSales = await Promise.all(
             sales.map(async sale => {
-                const updatedLines = await sale.renglones.map(async line => {
-                    let cantidadAgregadaPorDescuento_enKg = 0
-                    let cantidadg = 0
-                    let cantidadKg = 0
-                    let cantidadQuitadaPorRecargo_enKg = 0
-                    let cantidadUnidades = 0
-                    let cantidadUnidadesFraccionadas = 0
-                    let precioListaUnitario = 0
-                    let precioUnitario = 0
-                    let profit = 0
-                    const findProductOfLine = await api.productos.findById(line.productId)
-                    const productOfLine = findProductOfLine?.data ?? null
-                    if (!productOfLine) {
-                        cantidadAgregadaPorDescuento_enKg = 0
-                        cantidadg = 0
-                        cantidadKg = 0
-                        cantidadQuitadaPorRecargo_enKg = 0
-                        cantidadUnidades = 1
-                        cantidadUnidadesFraccionadas = 1
-                        precioListaUnitario = 0
-                        precioUnitario = round(line.precioNeto)
-                        profit = round(parseFloat(line.precioNeto) / (1 + parseFloat(line.porcentajeIva / 100)))
-                    } else {
-                        const unitMeasureInlcudesGr = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes(' gramo') ?? false
-                        const unitMeasureInlcudesKg = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes('kilo') ?? false
-                        const unitMeasureInlcudesOnlyGr = (unitMeasureInlcudesGr && !unitMeasureInlcudesKg) ?? false
-                        const unitMeasureInlcudesOnlyKg = (!unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
-                        const unitMeasureInlcudesKgAndGr = (unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
-                        const unitMeasureInlcudesKgOrGr = (unitMeasureInlcudesGr || unitMeasureInlcudesKg) ?? false
-        
-                        const discountVariation = round(
-                            parseFloat(line.porcentajeDescuentoRenglon / 100)
-                            + parseFloat(sale.porcentajeDescuentoGlobal / 100)
-                        )
-                        const surchargeVariation = round(
-                            parseFloat(line.porcentajeRecargoRenglon / 100)
-                            + parseFloat(sale.porcentajeRecargoGlobal / 100)
-                        )
-                        const lineVariation = round(
-                            1
-                            - discountVariation
-                            + surchargeVariation
-                        )
-        
-                        cantidadUnidades = (
-                            line.cantidadUnidadesFraccionadas
-                                ? line.cantidadUnidades
-                                : line.fraccionar
-                                    ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
-                                    : round(line.cantidadUnidades)
-                        )
-                        cantidadUnidadesFraccionadas = (
-                            line.cantidadUnidadesFraccionadas
-                                ? line.cantidadUnidadesFraccionadas
-                                : line.fraccionar
-                                    ? round(line.cantidadUnidades)
-                                    : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
-                        )
-                        precioUnitario = round(
-                            (parseFloat(line.precioNeto)
-                            / parseFloat(lineVariation))
-                            / parseFloat(line.cantidadUnidades)
-                        )
-                        precioListaUnitario = round(
-                            precioUnitario
-                            / (
-                                line.fraccionar
-                                        ? 1 + ((productOfLine.margenGananciaFraccionado + productOfLine.porcentajeIvaVenta) / 100)
-                                        : 1 + ((productOfLine.margenGanancia + productOfLine.porcentajeIvaVenta) / 100)
+                const updatedLines = await Promise.all(
+                    sale.renglones.map(async line => {
+                        let cantidadAgregadaPorDescuento_enKg = 0
+                        let cantidadg = 0
+                        let cantidadKg = 0
+                        let cantidadQuitadaPorRecargo_enKg = 0
+                        let cantidadUnidades = 0
+                        let cantidadUnidadesFraccionadas = 0
+                        let precioListaUnitario = 0
+                        let precioUnitario = 0
+                        let profit = 0
+                        const findProductOfLine = await api.productos.findById(line.productId)
+                        const productOfLine = findProductOfLine?.data ?? null
+                        if (!productOfLine) {
+                            cantidadAgregadaPorDescuento_enKg = 0
+                            cantidadg = 0
+                            cantidadKg = 0
+                            cantidadQuitadaPorRecargo_enKg = 0
+                            cantidadUnidades = 1
+                            cantidadUnidadesFraccionadas = 1
+                            precioListaUnitario = 0
+                            precioUnitario = round(line.precioNeto)
+                            profit = round(parseFloat(line.precioNeto) / (1 + parseFloat(line.porcentajeIva / 100)))
+                        } else {
+                            const unitMeasureInlcudesGr = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes(' gramo') ?? false
+                            const unitMeasureInlcudesKg = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes('kilo') ?? false
+                            const unitMeasureInlcudesOnlyGr = (unitMeasureInlcudesGr && !unitMeasureInlcudesKg) ?? false
+                            const unitMeasureInlcudesOnlyKg = (!unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
+                            const unitMeasureInlcudesKgAndGr = (unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
+                            const unitMeasureInlcudesKgOrGr = (unitMeasureInlcudesGr || unitMeasureInlcudesKg) ?? false
+            
+                            const discountVariation = round(
+                                parseFloat(line.porcentajeDescuentoRenglon / 100)
+                                + parseFloat(sale.porcentajeDescuentoGlobal / 100)
                             )
-                        )
-                        cantidadAgregadaPorDescuento_enKg = (
-                            (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
-                                ? 0
-                                : round(cantidadUnidades / (1 + discountVariation))
-                        )
-                        cantidadQuitadaPorRecargo_enKg = (
-                            (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
-                                ? 0
-                                : round(cantidadUnidades / (1 + surchargeVariation))
-                        )
-                        cantidadg = (
-                            !unitMeasureInlcudesKgOrGr
-                                ? 0
-                                : unitMeasureInlcudesOnlyGr
-                                    ? round(cantidadUnidadesFraccionadas)
-                                    : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
-                                        ? round((cantidadUnidades - Math.trunc(cantidadUnidades)) * 1000)
-                                        : 0
-                        )
-                        cantidadKg = (
-                            !unitMeasureInlcudesKgOrGr
-                                ? 0
-                                : (unitMeasureInlcudesOnlyGr && cantidadUnidadesFraccionadas < 1000)
+                            const surchargeVariation = round(
+                                parseFloat(line.porcentajeRecargoRenglon / 100)
+                                + parseFloat(sale.porcentajeRecargoGlobal / 100)
+                            )
+                            const lineVariation = round(
+                                1
+                                - discountVariation
+                                + surchargeVariation
+                            )
+            
+                            cantidadUnidades = (
+                                line.cantidadUnidadesFraccionadas
+                                    ? line.cantidadUnidades
+                                    : line.fraccionar
+                                        ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
+                                        : round(line.cantidadUnidades)
+                            )
+                            cantidadUnidadesFraccionadas = (
+                                line.cantidadUnidadesFraccionadas
+                                    ? line.cantidadUnidadesFraccionadas
+                                    : line.fraccionar
+                                        ? round(line.cantidadUnidades)
+                                        : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
+                            )
+                            precioUnitario = round(
+                                (parseFloat(line.precioNeto)
+                                / parseFloat(lineVariation))
+                                / parseFloat(line.cantidadUnidades)
+                            )
+                            precioListaUnitario = round(
+                                precioUnitario
+                                / (
+                                    line.fraccionar
+                                            ? 1 + ((productOfLine.margenGananciaFraccionado + productOfLine.porcentajeIvaVenta) / 100)
+                                            : 1 + ((productOfLine.margenGanancia + productOfLine.porcentajeIvaVenta) / 100)
+                                )
+                            )
+                            cantidadAgregadaPorDescuento_enKg = (
+                                (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
+                                    ? 0
+                                    : round(cantidadUnidades / (1 + discountVariation))
+                            )
+                            cantidadQuitadaPorRecargo_enKg = (
+                                (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
+                                    ? 0
+                                    : round(cantidadUnidades / (1 + surchargeVariation))
+                            )
+                            cantidadg = (
+                                !unitMeasureInlcudesKgOrGr
                                     ? 0
                                     : unitMeasureInlcudesOnlyGr
-                                        ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
+                                        ? round(cantidadUnidadesFraccionadas)
                                         : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
-                                            ? round(previousInteger(cantidadUnidades))
+                                            ? round((cantidadUnidades - Math.trunc(cantidadUnidades)) * 1000)
                                             : 0
-                        )
-                    }
-                    const updatedLine = {
-                        ...line,
-                        cantidadAgregadaPorDescuento_enKg,
-                        cantidadg,
-                        cantidadKg,
-                        cantidadQuitadaPorRecargo_enKg,
-                        cantidadUnidades,
-                        cantidadUnidadesFraccionadas,
-                        precioListaUnitario,
-                        precioUnitario,
-                        profit: round(line.precioNeto - precioListaUnitario * cantidadUnidades)
-                    }
-                    return updatedLine
-                })
+                            )
+                            cantidadKg = (
+                                !unitMeasureInlcudesKgOrGr
+                                    ? 0
+                                    : (unitMeasureInlcudesOnlyGr && cantidadUnidadesFraccionadas < 1000)
+                                        ? 0
+                                        : unitMeasureInlcudesOnlyGr
+                                            ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
+                                            : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
+                                                ? round(previousInteger(cantidadUnidades))
+                                                : 0
+                            )
+                        }
+                        const updatedLine = {
+                            ...line,
+                            cantidadAgregadaPorDescuento_enKg,
+                            cantidadg,
+                            cantidadKg,
+                            cantidadQuitadaPorRecargo_enKg,
+                            cantidadUnidades,
+                            cantidadUnidadesFraccionadas,
+                            precioListaUnitario,
+                            precioUnitario,
+                            profit: round(line.precioNeto - precioListaUnitario * cantidadUnidades)
+                        }
+                        return updatedLine
+                    })
+                )
                 const updatedSale = {
                     ...sale,
                     profit: round(updatedLines.reduce((acc, line) => acc + parseFloat(line.profit), 0)),
