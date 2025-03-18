@@ -259,8 +259,15 @@ const Home = () => {
     // -------------------------- Button to fix data base records ---------------------------- //
     const setProductId = async (lineName) => {
         const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: lineName }))
+        
+        console.log(lineName)
+        console.log(findCorrespondingProduct)
+        
         const correspondingProduct = findCorrespondingProduct.docs[0]
+        
         console.log(correspondingProduct)
+        console.log('-------------------------------------')
+
         let productId = null
         // switch (lineName) {
         //     case 'ROLLO SACA PELUSA (REPUESTO)':
