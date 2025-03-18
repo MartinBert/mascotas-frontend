@@ -313,26 +313,25 @@ const Home = () => {
             const lineContainsADefectiveName = lineContainsADefectiveNameTest.includes(true) ? true : false
             return lineContainsADefectiveName
         })
-        console.log(defectiveSales)
 
-        // const updatedSales = []
-        // for (let index = 0; index < defectiveSales.length; index++) {
-        //     const sale = defectiveSales[index]
-        //     const updatedLines = []
-        //     for (let index = 0; index < sale.renglones.length; index++) {
-        //         const line = sale.renglones[index]
-        //         const updatedLine = {
-        //             ...line,
-        //             productId: await setProductId(line.nombre)
-        //         }
-        //         updatedLines.push(updatedLine)
-        //     }
-        //     const updatedSale = {
-        //         ...sale,
-        //         renglones: updatedLines
-        //     }
-        //     updatedSales.push(updatedSale)
-        // }
+        const updatedSales = []
+        for (let index = 0; index < defectiveSales.length; index++) {
+            const sale = defectiveSales[index]
+            const updatedLines = []
+            for (let index = 0; index < sale.renglones.length; index++) {
+                const line = sale.renglones[index]
+                const updatedLine = {
+                    ...line,
+                    productId: await setProductId(line.nombre)
+                }
+                updatedLines.push(updatedLine)
+            }
+            const updatedSale = {
+                ...sale,
+                renglones: updatedLines
+            }
+            updatedSales.push(updatedSale)
+        }
         // console.log(updatedSales)
 
 
