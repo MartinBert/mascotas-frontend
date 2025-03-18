@@ -257,16 +257,42 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
+    const fixLineName = (lineName) => {
+        let fixedName = lineName
+        if (lineName === 'ROLLO SACA PELUSA (REPUESTO)') fixedName = lineName.substring(0, 16)
+        if (lineName === 'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)') fixedName = lineName.substring(0, 33)
+        if (lineName === 'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR') fixedName = lineName.substring(0, 33)
+        if (lineName === 'CAMISA TM (lomo 34cm, totax 58cm)') fixedName = lineName.substring(0, 9)
+        if (lineName === 'CAMISA TS (lomo 28cm, totax 52cm)') fixedName = lineName.substring(0, 9)
+        if (lineName === 'CAMISA TL (lomo 40cm, totax 68cm)') fixedName = lineName.substring(0, 9)
+        if (lineName === 'MOCHILA CON CORREA (CONJUNTO)') fixedName = lineName.substring(0, 17)
+        return fixedName
+    }
+
     const setProductId = async (lineName) => {
-        const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: lineName }))
+        const defectiveNames = [
+            'ROLLO SACA PELUSA (REPUESTO)',
+            'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)',
+            'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR',
+            'CAMISA TM (lomo 34cm, totax 58cm)',
+            'CAMISA TS (lomo 28cm, totax 52cm)',
+            'CAMISA TL (lomo 40cm, totax 68cm)',
+            'MOCHILA CON CORREA (CONJUNTO)',
+        ]
+        const fixedLineName = fixLineName(lineName)
+        const findCorrespondingProduct = await api.productos.findAllByFilters(JSON.stringify({ nombre: fixedLineName }))
         
-        console.log(lineName)
-        console.log(findCorrespondingProduct)
-        
+        if (defectiveNames.includes(lineName)) {
+            console.log(lineName)
+            console.log(findCorrespondingProduct)
+        }
+
         const correspondingProduct = findCorrespondingProduct.docs[0]
         
-        console.log(correspondingProduct)
-        console.log('-------------------------------------')
+        if (defectiveNames.includes(lineName)) {
+            console.log(correspondingProduct)
+            console.log('-------------------------------------')
+        }
 
         let productId = null
         // switch (lineName) {
