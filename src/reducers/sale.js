@@ -690,7 +690,7 @@ const reducer = (state = initialState, action) => {
                         precioNeto: isCustomLine ? line.precioVenta : ((fractionament > 1 ? line.precioVentaFraccionado : line.precioVenta) * productQuantity),
                         precioNetoFijo: false,
                         precioUnitario: isCustomLine ? line.precioVenta : fractionament > 1 ? line.precioVentaFraccionado : line.precioVenta,
-                        productId: line._id,
+                        productId: isCustomLine ? null : line._id,
                         profit: (fractionament > 1 ? line.gananciaNetaFraccionado : line.gananciaNeta) * productQuantity,
                         recargo: 0,
                         unidadMedida: productUnitOfMeasure

@@ -257,36 +257,6 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const fixNameOfLinesOfSales = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findSales = await api.ventas.findAll()
-        const sales = findSales.docs
-
-        const totalDefectiveSales = []
-        for (let index = 0; index < sales.length; index++) {
-            const sale = sales[index]
-            const saleDefectiveItems = []
-            for (let index = 0; index < sale.renglones.length; index++) {
-                const saleLine = sale.renglones[index]
-                console.log(saleLine)
-                const findSaleProduct = await api.productos.findById(saleLine.productId)
-                const saleProduct = findSaleProduct?.data ?? null
-                const matchTheProduct = saleProduct ? true : false
-                if (!matchTheProduct) saleDefectiveItems.push(sale)
-            }
-            if(saleDefectiveItems.length > 0) {
-                totalDefectiveSales.push(saleDefectiveItems[0])
-            }
-        }
-
-        console.log('TOTAL VENTAS CON LINEAS QUE NO TIENEN PRODUCTOS ASOCIADOS')
-        console.log(totalDefectiveSales)
-        // const res = await api.ventas.editAll(fixedSales)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los nombres de los conceptos de venta. Intente de nuevo.')
-        // else console.log('Lines names fixed.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
     const fixValuesOfLinesOfSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findSales = await api.ventas.findAll()
@@ -337,14 +307,18 @@ const Home = () => {
                     )
     
                     cantidadUnidades = (
-                        line.fraccionar
-                            ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
-                            : round(line.cantidadUnidades)
+                        line.cantidadUnidadesFraccionadas
+                            ? line.cantidadUnidades
+                            : line.fraccionar
+                                ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
+                                : round(line.cantidadUnidades)
                     )
                     cantidadUnidadesFraccionadas = (
-                        line.fraccionar
-                            ? round(line.cantidadUnidades)
-                            : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
+                        line.cantidadUnidadesFraccionadas
+                            ? line.cantidadUnidadesFraccionadas
+                            : line.fraccionar
+                                ? round(line.cantidadUnidades)
+                                : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
                     )
                     precioUnitario = round(
                         (parseFloat(line.precioNeto)
@@ -419,8 +393,7 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        await fixNameOfLinesOfSales()
-        // await fixValuesOfLinesOfSales()
+        await fixValuesOfLinesOfSales()
     }
 
     const buttonToFixDataBaseRecords = (
@@ -826,7 +799,17 @@ const Home = () => {
     // ------------------------------- Button to test service -------------------------------- //
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const res = await api.clientes.findAll()
+        const defectiveNames = [
+            'ROLLO SACA PELUSA (REPUESTO)',
+            'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)',
+            'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR',
+            'CAMISA TM (lomo 34cm, totax 58cm)',
+            'CAMISA TS (lomo 28cm, totax 52cm)',
+            'CAMISA TL (lomo 40cm, totax 68cm)',
+            'MOCHILA CON CORREA (CONJUNTO)',
+        ]
+        const filters = JSON.stringify({ normalizedName: normalizeString(defectiveNames[0]) })
+        const res = await api.productos.findAllByFilters(filters)
         const docs = res.docs
         console.log(docs)
         home_dispatch({ type: 'SET_LOADING', payload: false })
