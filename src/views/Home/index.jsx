@@ -327,7 +327,7 @@ const Home = () => {
                     precioUnitario = round(
                         (parseFloat(line.precioNeto)
                             / parseFloat(lineVariation))
-                        / parseFloat(line.cantidadUnidades)
+                        / parseFloat(cantidadUnidades)
                     )
                     precioListaUnitario = round(
                         precioUnitario
@@ -352,9 +352,11 @@ const Home = () => {
                             ? 0
                             : unitMeasureInlcudesOnlyGr
                                 ? round(cantidadUnidadesFraccionadas)
-                                : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
-                                    ? round((cantidadUnidades - Math.trunc(cantidadUnidades)) * 1000)
-                                    : 0
+                                : unitMeasureInlcudesOnlyKg
+                                    ? round((cantidadUnidadesFraccionadas - Math.trunc(cantidadUnidadesFraccionadas)) * 1000)
+                                    : unitMeasureInlcudesKgAndGr
+                                        ? round(((cantidadUnidadesFraccionadas / 1000) - Math.trunc((cantidadUnidadesFraccionadas / 1000))) * 1000)
+                                        : 0
                     )
                     cantidadKg = (
                         !unitMeasureInlcudesKgOrGr
@@ -363,9 +365,11 @@ const Home = () => {
                                 ? 0
                                 : unitMeasureInlcudesOnlyGr
                                     ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
-                                    : (unitMeasureInlcudesOnlyKg || unitMeasureInlcudesKgAndGr)
-                                        ? round(previousInteger(cantidadUnidades))
-                                        : 0
+                                    : unitMeasureInlcudesOnlyKg
+                                        ? round(previousInteger(cantidadUnidadesFraccionadas))
+                                        : unitMeasureInlcudesKgAndGr
+                                            ? round(previousInteger(cantidadUnidadesFraccionadas) / 1000)
+                                            : 0
                     )
                 }
                 const updatedLine = {
