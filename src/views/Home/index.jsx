@@ -277,6 +277,8 @@ const Home = () => {
                 let precioUnitario = 0
                 let profit = 0
                 const findProductOfLine = await api.productos.findById(line.productId)
+                console.log(sale)
+                console.log(line)
                 console.log(findProductOfLine)
                 const productOfLine = findProductOfLine?.data ?? null
                 if (!productOfLine) {
@@ -399,8 +401,6 @@ const Home = () => {
     }
 
     const fixDataBaseRecords = async () => {
-        const resd = await api.productos.findByName('DESODORANTE DE PISO X LTS')
-        console.log(resd)
         await fixValuesOfLinesOfSales()
     }
 
