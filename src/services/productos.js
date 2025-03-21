@@ -113,7 +113,7 @@ const findById = async (id) => {
 const findByName = async (name) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/name/${name}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/productos/product/name/${name}`, headers)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
