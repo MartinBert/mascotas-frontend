@@ -351,7 +351,7 @@ const Home = () => {
                         !unitMeasureInlcudesKgOrGr
                             ? 0
                             : unitMeasureInlcudesOnlyGr
-                                ? round(cantidadUnidadesFraccionadas)
+                                ? round(cantidadUnidadesFraccionadas % 1000)
                                 : unitMeasureInlcudesOnlyKg
                                     ? round((cantidadUnidadesFraccionadas - Math.trunc(cantidadUnidadesFraccionadas)) * 1000)
                                     : unitMeasureInlcudesKgAndGr
@@ -368,7 +368,7 @@ const Home = () => {
                                     : unitMeasureInlcudesOnlyKg
                                         ? round(previousInteger(cantidadUnidadesFraccionadas))
                                         : unitMeasureInlcudesKgAndGr
-                                            ? round(previousInteger(cantidadUnidadesFraccionadas) / 1000)
+                                            ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
                                             : 0
                     )
                 }
@@ -393,11 +393,9 @@ const Home = () => {
             }
             updatedSales.push(updatedSale)
         }
-        console.log(updatedSales)
-
-        // const res = await api.ventas.editAll(updatedSales)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        // else console.log('Records fixed.')
+        const res = await api.ventas.editAll(updatedSales)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        else console.log('Records fixed.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
