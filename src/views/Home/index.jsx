@@ -277,6 +277,7 @@ const Home = () => {
                 let precioUnitario = 0
                 let profit = 0
                 const findProductOfLine = await api.productos.findById(line.productId)
+                console.log(findProductOfLine)
                 const productOfLine = findProductOfLine?.data ?? null
                 if (!productOfLine) {
                     cantidadAgregadaPorDescuento_enKg = 0
