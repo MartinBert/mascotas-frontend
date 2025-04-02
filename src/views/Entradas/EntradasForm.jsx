@@ -21,7 +21,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useEntriesContext } = contexts.Entries
-const { localFormatToDateObj, numberOrderDate, resetDate, simpleDateWithHours } = helpers.dateHelper
+const { localFormatToDateObj, numberOrderDate, resetDateTo00hs, simpleDateWithHours } = helpers.dateHelper
 const { round } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
@@ -178,7 +178,7 @@ const EntradasForm = () => {
             const stockHistory = findStockHistory.docs
             let saveResponseCode
             const data = {
-                date: resetDate(entries_state.params.fecha),
+                date: resetDateTo00hs(entries_state.params.fecha),
                 dateString,
                 itIsAManualCorrection: false,
                 product: product._id

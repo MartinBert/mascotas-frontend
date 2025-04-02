@@ -9,7 +9,7 @@ import InputHidden from '../../components/generics/InputHidden'
 import contexts from '../../contexts'
 
 // Design Components
-import { Button, Col, DatePicker, Checkbox, Row } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Row } from 'antd'
 
 // Helpers
 import helpers from '../../helpers'
@@ -20,7 +20,8 @@ import api from '../../services'
 // Imports Destructurings
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { useInterfaceStylesContext } = contexts.InterfaceStyles
-const { resetDate, simpleDateWithHours } = helpers.dateHelper
+const { resetDateTo00hs, simpleDateWithHours } = helpers.dateHelper
+const { round } = helpers.mathHelper
 const { RangePicker } = DatePicker
 
 
@@ -164,8 +165,8 @@ const Header = () => {
     const setParams_dayRange = (date, dateString) => {
         const dateFilter = {
             date: !date ? null : {
-                $gte: resetDate(date[0].$d),
-                $lte: resetDate(date[1].$d)
+                $gte: resetDateTo00hs(date[0].$d),
+                $lte: resetDateTo00hs(date[1].$d)
             },
             dateString: null
         }
@@ -252,6 +253,75 @@ const Header = () => {
         </Row>
     )
 
+    // ---------- RangePicker to calculate profit ----------- //
+    const calculatePeriodProfit = async () => {
+        dailyBusinessStatistics_dispatch({ type: 'SET_LOADING', payload: true })
+        let periodProfit = null
+        const selectedDates = dailyBusinessStatistics_state.datePickersValues.profit_rangePicker
+        if (!selectedDates) {
+            periodProfit = null
+        } else {
+            const thereAreNoDates = selectedDates.includes('')
+            if (thereAreNoDates) {
+                periodProfit = null
+            } else {
+                const initialDate = selectedDates[0].$d
+                const finalDate = selectedDates[1].$d
+                const filters = JSON.stringify({ date: { $gte: initialDate, $lte: finalDate } })
+                const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAllByFilters(filters)
+                const dailyBusinessStatistics = findDailyBusinessStatistics.docs
+                periodProfit = round(
+                    dailyBusinessStatistics.reduce((acc, record) => acc + record.salesViewProfit, 0)
+                )
+            }
+        }
+        dailyBusinessStatistics_dispatch({ type: 'SET_PERIOD_PROFIT', payload: periodProfit })
+        dailyBusinessStatistics_dispatch({ type: 'SET_LOADING', payload: false })
+    }
+    
+    useEffect(() => {calculatePeriodProfit()}, [
+        // eslint-disable-next-line
+        dailyBusinessStatistics_state.datePickersValues.profit_rangePicker
+    ])
+
+    const setRangeToCalculateProfit = (date, dateString) => {
+        dailyBusinessStatistics_dispatch({
+            type: 'UPDATE_DATE_PICKERS_VALUES',
+            payload: {
+                pickerType: 'profit_rangePicker',
+                pickerValue: dateString
+            }
+        })
+    }
+
+    const rangePickerToCalculateProfit = (
+            <Row
+                align='middle'
+                gutter={[8, 8]}
+                justify='center'
+            >
+                <Col span={24}>
+                    <RangePicker
+                        disabled={dailyBusinessStatistics_state.loading}
+                        format={['DD-MM-YYYY']}
+                        onChange={setRangeToCalculateProfit}
+                        style={{ width: '100%' }}
+                        value={dailyBusinessStatistics_state.datePickersValues.profit_rangePicker}
+                    />
+                </Col>
+                <Col span={24}>
+                    <Row gutter={8}>
+                        <Col span={12} style={{ textAlign: 'end' }}>
+                            <h3>Ganacia del período</h3>
+                        </Col>
+                        <Col span={12} style={{ textAlign: 'start' }}>
+                            <h3>$ {dailyBusinessStatistics_state.periodProfit}</h3>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+    )
+
     // ----------------- Title of actions ------------------- //
     const titleOfActions = <h3>Acciones</h3>
 
@@ -262,7 +332,7 @@ const Header = () => {
     const itemsToRender = [
         {
             element: buttonToClearFilters,
-            order: { lg: 5, md: 5, sm: 10, xl: 5, xs: 10, xxl: 5 }
+            order: { lg: 5, md: 5, sm: 8, xl: 5, xs: 8, xxl: 5 }
         },
         {
             element: buttonToShowOrHideNullRecords,
@@ -270,35 +340,35 @@ const Header = () => {
         },
         {
             element: datePickerToFilterByDay,
-            order: { lg: 4, md: 4, sm: 3, xl: 4, xs: 3, xxl: 4 }
+            order: { lg: 4, md: 4, sm: 2, xl: 4, xs: 2, xxl: 4 }
         },
         {
             element: datePickerToFilterByMonth,
-            order: { lg: 8, md: 8, sm: 5, xl: 8, xs: 5, xxl: 8 }
+            order: { lg: 8, md: 8, sm: 4, xl: 8, xs: 4, xxl: 8 }
         },
         {
             element: <InputHidden />,
-            order: { lg: 7, md: 7, sm: 1, xl: 7, xs: 1, xxl: 7 }
+            order: { lg: 7, md: 7, sm: 6, xl: 7, xs: 6, xxl: 7 }
         },
         {
-            element: <InputHidden />,
-            order: { lg: 9, md: 9, sm: 7, xl: 9, xs: 7, xxl: 9 }
+            element: rangePickerToCalculateProfit,
+            order: { lg: 9, md: 9, sm: 10, xl: 9, xs: 10, xxl: 9 }
         },
         {
             element: rangePickerToFilterByDays,
-            order: { lg: 6, md: 6, sm: 4, xl: 6, xs: 4, xxl: 6 }
+            order: { lg: 6, md: 6, sm: 3, xl: 6, xs: 3, xxl: 6 }
         },
         {
             element: rangePickerToFilterByMonths,
-            order: { lg: 10, md: 10, sm: 6, xl: 10, xs: 6, xxl: 10 }
+            order: { lg: 10, md: 10, sm: 5, xl: 10, xs: 5, xxl: 10 }
         },
         {
             element: titleOfActions,
-            order: { lg: 1, md: 1, sm: 8, xl: 1, xs: 8, xxl: 1 }
+            order: { lg: 1, md: 1, sm: 7, xl: 1, xs: 7, xxl: 1 }
         },
         {
             element: titleOfFilters,
-            order: { lg: 2, md: 2, sm: 2, xl: 2, xs: 2, xxl: 2 }
+            order: { lg: 2, md: 2, sm: 1, xl: 2, xs: 1, xxl: 2 }
         }
     ]
 

@@ -117,7 +117,8 @@ const Header = () => {
 
     const changeDate = async (e) => {
         if (!e) return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
-        if (isItLater(new Date(), e.$d)) {
+        const selectedDateIsLaterFromToday = isItLater(new Date(), e.$d)
+        if (selectedDateIsLaterFromToday) {
             errorAlert('No es conveniente facturar con fecha posterior a hoy.')
             return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
         }

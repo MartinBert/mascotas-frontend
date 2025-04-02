@@ -20,7 +20,7 @@ import FirstSteps from './FirstSteps'
 // Imports Destructuring
 const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
-const { creditCodes, debitCodes } = helpers.afipHelper
+const {creditCodes, debitCodes, invoiceAndTicketCodes } = helpers.afipHelper
 const { localFormat, numberOrderDate } = helpers.dateHelper
 const { previousInteger, round } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper
@@ -257,150 +257,16 @@ const Home = () => {
     )
 
     // -------------------------- Button to fix data base records ---------------------------- //
-    const fixValuesOfLinesOfSales = async () => {
-        home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findSales = await api.ventas.findAll()
-        const sales = findSales.docs
-        const updatedSales = []
-        for (let index = 0; index < sales.length; index++) {
-            const sale = sales[index]
-            const updatedLines = []
-            for (let index = 0; index < sale.renglones.length; index++) {
-                const line = sale.renglones[index]
-                let cantidadAgregadaPorDescuento_enKg = 0
-                let cantidadg = 0
-                let cantidadKg = 0
-                let cantidadQuitadaPorRecargo_enKg = 0
-                let cantidadUnidades = 0
-                let cantidadUnidadesFraccionadas = 0
-                let precioListaUnitario = 0
-                let precioUnitario = 0
-                let profit = 0
-                const findProductOfLine = await api.productos.findById(line.productId)
-                const productOfLine = findProductOfLine?.data ?? null
-                if (!productOfLine) {
-                    cantidadAgregadaPorDescuento_enKg = 0
-                    cantidadg = 0
-                    cantidadKg = 0
-                    cantidadQuitadaPorRecargo_enKg = 0
-                    cantidadUnidades = 1
-                    cantidadUnidadesFraccionadas = 1
-                    precioListaUnitario = 0
-                    precioUnitario = round(line.precioNeto)
-                    profit = round(parseFloat(line.precioNeto) / (1 + parseFloat(line.porcentajeIva / 100)))
-                } else {
-                    const unitMeasureInlcudesGr = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes(' gramo') ?? false
-                    const unitMeasureInlcudesKg = productOfLine?.unidadMedida?.nombre?.toLowerCase().includes('kilo') ?? false
-                    const unitMeasureInlcudesOnlyGr = (unitMeasureInlcudesGr && !unitMeasureInlcudesKg) ?? false
-                    const unitMeasureInlcudesOnlyKg = (!unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
-                    const unitMeasureInlcudesKgAndGr = (unitMeasureInlcudesGr && unitMeasureInlcudesKg) ?? false
-                    const unitMeasureInlcudesKgOrGr = (unitMeasureInlcudesGr || unitMeasureInlcudesKg) ?? false
-
-                    const discountVariation = round(
-                        parseFloat(line.porcentajeDescuentoRenglon / 100)
-                        + parseFloat(sale.porcentajeDescuentoGlobal / 100)
-                    )
-                    const surchargeVariation = round(
-                        parseFloat(line.porcentajeRecargoRenglon / 100)
-                        + parseFloat(sale.porcentajeRecargoGlobal / 100)
-                    )
-                    const lineVariation = round(
-                        1
-                        - discountVariation
-                        + surchargeVariation
-                    )
-
-                    cantidadUnidades = (
-                        line.cantidadUnidadesFraccionadas
-                            ? line.cantidadUnidades
-                            : line.fraccionar
-                                ? round(parseFloat(line.cantidadUnidades) / parseFloat(line.fraccionamiento))
-                                : round(line.cantidadUnidades)
-                    )
-                    cantidadUnidadesFraccionadas = (
-                        line.cantidadUnidadesFraccionadas
-                            ? line.cantidadUnidadesFraccionadas
-                            : line.fraccionar
-                                ? round(line.cantidadUnidades)
-                                : round(parseFloat(line.cantidadUnidades) * parseFloat(line.fraccionamiento))
-                    )
-                    precioUnitario = round(
-                        (parseFloat(line.precioNeto)
-                            / parseFloat(lineVariation))
-                        / parseFloat(cantidadUnidades)
-                    )
-                    precioListaUnitario = round(
-                        precioUnitario
-                        / (
-                            line.fraccionar
-                                ? 1 + ((productOfLine.margenGananciaFraccionado + productOfLine.porcentajeIvaVenta) / 100)
-                                : 1 + ((productOfLine.margenGanancia + productOfLine.porcentajeIvaVenta) / 100)
-                        )
-                    )
-                    cantidadAgregadaPorDescuento_enKg = (
-                        (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
-                            ? 0
-                            : round(cantidadUnidades / (1 + discountVariation))
-                    )
-                    cantidadQuitadaPorRecargo_enKg = (
-                        (!line.precioNetoFijo || !unitMeasureInlcudesKgOrGr)
-                            ? 0
-                            : round(cantidadUnidades / (1 + surchargeVariation))
-                    )
-                    cantidadg = (
-                        !unitMeasureInlcudesKgOrGr
-                            ? 0
-                            : unitMeasureInlcudesOnlyGr
-                                ? round(cantidadUnidadesFraccionadas % 1000)
-                                : unitMeasureInlcudesOnlyKg
-                                    ? round((cantidadUnidadesFraccionadas - Math.trunc(cantidadUnidadesFraccionadas)) * 1000)
-                                    : unitMeasureInlcudesKgAndGr
-                                        ? round(((cantidadUnidadesFraccionadas / 1000) - Math.trunc((cantidadUnidadesFraccionadas / 1000))) * 1000)
-                                        : 0
-                    )
-                    cantidadKg = (
-                        !unitMeasureInlcudesKgOrGr
-                            ? 0
-                            : (unitMeasureInlcudesOnlyGr && cantidadUnidadesFraccionadas < 1000)
-                                ? 0
-                                : unitMeasureInlcudesOnlyGr
-                                    ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
-                                    : unitMeasureInlcudesOnlyKg
-                                        ? round(previousInteger(cantidadUnidadesFraccionadas))
-                                        : unitMeasureInlcudesKgAndGr
-                                            ? round(previousInteger(cantidadUnidadesFraccionadas / 1000))
-                                            : 0
-                    )
-                }
-                const updatedLine = {
-                    ...line,
-                    cantidadAgregadaPorDescuento_enKg,
-                    cantidadg,
-                    cantidadKg,
-                    cantidadQuitadaPorRecargo_enKg,
-                    cantidadUnidades,
-                    cantidadUnidadesFraccionadas,
-                    precioListaUnitario,
-                    precioUnitario,
-                    profit: round(line.precioNeto - precioListaUnitario * cantidadUnidades)
-                }
-                updatedLines.push(updatedLine)
-            }
-            const updatedSale = {
-                ...sale,
-                profit: round(updatedLines.reduce((acc, line) => acc + parseFloat(line.profit), 0)),
-                renglones: updatedLines
-            }
-            updatedSales.push(updatedSale)
-        }
-        const res = await api.ventas.editAll(updatedSales)
-        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        else console.log('Records fixed.')
-        home_dispatch({ type: 'SET_LOADING', payload: false })
-    }
-
     const fixDataBaseRecords = async () => {
-        await fixValuesOfLinesOfSales()
+        home_dispatch({ type: 'SET_LOADING', payload: true })
+
+        // const findSales = await api.ventas.findAll()
+        // const sales = findSales.docs
+        // const res = await api.ventas.editAll(updatedSales)
+        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        // else console.log('Records fixed.')
+
+        home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     const buttonToFixDataBaseRecords = (
@@ -806,19 +672,17 @@ const Home = () => {
     // ------------------------------- Button to test service -------------------------------- //
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const defectiveNames = [
-            'ROLLO SACA PELUSA (REPUESTO)',
-            'SAHUMERIO ULLAS PALO SANTO - CEDAR WOOD (MADERA CEDRO)',
-            'SAHUMERIO TUBO INCENSE X 40 SANDAL & CEDAR',
-            'CAMISA TM (lomo 34cm, totax 58cm)',
-            'CAMISA TS (lomo 28cm, totax 52cm)',
-            'CAMISA TL (lomo 40cm, totax 68cm)',
-            'MOCHILA CON CORREA (CONJUNTO)',
-        ]
-        const filters = JSON.stringify({ nombre: defectiveNames[0] })
-        const res = await api.productos.findAllByFilters(filters)
-        const docs = res.docs
-        console.log(docs)
+        const filters = JSON.stringify({
+            documentoCodigo: { $in: invoiceAndTicketCodes },
+            // renglones: { $match: { productId: '67a3dbaebf1fc67a7b5e5620' } }
+        })
+        const response = await api.ventas.findAllByFilters(filters)
+        if (response.statusText !== 'OK') {
+            console.log('Service error')
+        } else {
+            const docs = response.data
+            console.log(docs)
+        }
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

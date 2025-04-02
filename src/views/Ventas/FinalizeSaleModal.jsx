@@ -20,7 +20,7 @@ import api from '../../services'
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalNotesCodes, formatBody, invoiceCodes, ticketCodes } = helpers.afipHelper
-const { localFormatToDateObj, numberOrderDate, resetDate } = helpers.dateHelper
+const { localFormatToDateObj, numberOrderDate, resetDateTo00hs } = helpers.dateHelper
 const { round } = helpers.mathHelper
 const {
     createBudgetPdf,
@@ -210,7 +210,7 @@ const FinalizeSaleModal = () => {
                 const stockHistory = findStockHistory.docs
                 let saveResponse
                 const data = {
-                    date: resetDate(sale_state.fechaEmision),
+                    date: resetDateTo00hs(sale_state.fechaEmision),
                     dateString,
                     itIsAManualCorrection: false,
                     product: line.productId

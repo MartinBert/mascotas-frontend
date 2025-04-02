@@ -45,7 +45,7 @@ const SalesView = () => {
         // Credit notes
         const creditNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: creditCodes })
         const findCreditNotes = await api.ventas.findAllByFilters(creditNotesFilters)
-        const creditNotes = findCreditNotes.docs
+        const creditNotes = findCreditNotes.data
         const creditNotesData = creditNotes.map(creditNote => {
             const dataItem = {
                 concept: 'Nota crédito',
@@ -61,7 +61,7 @@ const SalesView = () => {
         // Debit Notes
         const debitNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: debitCodes })
         const findDebitNotes = await api.ventas.findAllByFilters(debitNotesFilters)
-        const debitNotes = findDebitNotes.docs
+        const debitNotes = findDebitNotes.data
         const debitNotesData = debitNotes.map(debitNote => {
             const dataItem = {
                 concept: 'Nota débito',
@@ -97,7 +97,7 @@ const SalesView = () => {
         // Sales
         const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
         const findSales = await api.ventas.findAllByFilters(salesFilters)
-        const sales = findSales.docs
+        const sales = findSales.data
             .filter(sale => sale.documento.cashRegister === true)
             .filter(sale => !creditCodes.includes(sale.documentoCodigo) && !debitCodes.includes(sale.documentoCodigo))
         const salesData = sales.map(sale => {
@@ -106,15 +106,13 @@ const SalesView = () => {
                     parseFloat(line.precioListaUnitario)
                     * parseFloat(line.cantidadUnidades)
                 )
-                console.log(line)
-                console.log(productListPrice)
                 const dataItem = {
                     concept: 'Venta',
                     expense: round(productListPrice),
                     productName: line.nombre,
-                    profit: round(parseFloat(line.precioNeto) - productListPrice) ?? round(line.profit),
+                    profit: round(parseFloat(line.precioNeto * line.cantidadUnidades) - productListPrice) ?? round(line.profit),
                     quantity: round(line.cantidadUnidades),
-                    salePrice: round(line.precioNeto)
+                    salePrice: round(line.precioNeto * line.cantidadUnidades)
                 }
                 return dataItem
             })

@@ -16,7 +16,7 @@ import api from '../../../services'
 // Imports Destructuring
 const { RangePicker } = DatePicker
 const { generateExcel } = helpers.excel
-const { addDays } = helpers.dateHelper
+const { resetDateTo00hs, resetDateTo2359hs } = helpers.dateHelper
 
 
 const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, mediosPago, mediosPagoNombres }) => {
@@ -27,16 +27,17 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
     const [ventasToReport, setVentasToReport] = useState(null)
     useEffect(() => { setVentasToReport(ventas) }, [ventas])
 
-    const fetchVentasByDates = async (value) => {
-        if (value === null) setVentasToReport(ventas)
+    const fetchVentasByDates = async (dates) => {
+        console.log(dates)
+        if (!dates || dates.includes('')) setVentasToReport(ventas)
         else {
-            const initialDate = (addDays(value[0].$d, 0)).toISOString()
-            const finalDate = (addDays(value[1].$d, 1)).toISOString()
+            const initialDate = resetDateTo00hs(dates[0].$d)
+            const finalDate = resetDateTo2359hs(dates[1].$d)
             const dateFilters = JSON.stringify({
                 fechaEmision: { $gte: initialDate, $lte: finalDate }
             })
-            const data = await api.ventas.findAllByFilters(dateFilters)
-            const ventas = data.docs
+            const findRecords = await api.ventas.findAllByFilters(dateFilters)
+            const ventas = findRecords.data
             setVentasToReport(ventas)
         }
     }
@@ -135,7 +136,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
                     <Col span={8}>
                         <RangePicker
                             format='DD-MM-YYYY'
-                            onChange={value => fetchVentasByDates(value)}
+                            onChange={fetchVentasByDates}
                         />
                     </Col>
                     <Col span={3}>

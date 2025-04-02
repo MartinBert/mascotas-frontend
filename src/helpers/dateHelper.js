@@ -1,28 +1,45 @@
 // -------------------------------------- Base functions -------------------------------------- //
-// Reset date to 00:00 hs
-const resetDate = (date) => {
-    const resetedDate = new Date(Date.parse(date) - Date.parse(date) % 86400000 + 10800000)
+const msIn2359hs = 86399999
+const msIn24hs = 86400000
+const msIn3hs = 10800000
+
+const convertDateIntoMs = (date) => {
+    const dateObj = new Date(date)
+    const parsedDate = Date.parse(dateObj)
+    return parsedDate
+}
+
+const getDateInMsAt00hs = (date) => {
+    const dateInMs = convertDateIntoMs(date)
+    const dateInMsAt00hs = dateInMs - (dateInMs % msIn24hs) + msIn3hs
+    return dateInMsAt00hs
+}
+
+const getDateInMsAt2359hs = (date) => {
+    const dateInMs = convertDateIntoMs(date)
+    const dateInMsAt00hs = dateInMs - (dateInMs % msIn24hs) + msIn3hs + msIn2359hs
+    return dateInMsAt00hs
+}
+
+const resetDateTo00hs = (date) => {
+    const dateInMsAt00hs = getDateInMsAt00hs(date)
+    const resetedDate = new Date(dateInMsAt00hs)
     return resetedDate
 }
 
-const twoCharsPattern = (value) => {
-    return (value.length === 1) ? '0' + value : value
+const resetDateTo2359hs = (date) => {
+    const dateInMsAt2359hs = getDateInMsAt2359hs(date)
+    const resetedDate = new Date(dateInMsAt2359hs)
+    return resetedDate
 }
 
-
-const addDays = (
-    date,
-
-    // value you want +0: not includes the last day
-    // value you want +1: includes the last day
-    daysQuantity
-
-) => {
-    const dateToModify = Date.parse(date) - Date.parse(date) % 86400000 // Date in milliseconds
-    const dateModified = new Date(dateToModify + daysQuantity * 86400000 - 1)
-    return dateModified
+const twoCharsPattern = (chars) => {
+    const charsLengthIs1 = chars.length === 1
+    const updatedChars = charsLengthIs1 ? '0' + chars : chars
+    return updatedChars
 }
 
+// --------------------------------------- Date Helper ---------------------------------------- //
 const afipDateToLocalFormat = (stringAfipDate) => {
     if (!stringAfipDate) return 'no-data'
     const includesHyphen = stringAfipDate.includes('-')
@@ -52,63 +69,58 @@ const dateToQrAfip = (unformattedDate) => {
 }
 
 const getLastFortnight = () => {
-    const resetTodayDateInMs = Date.parse(resetDate(new Date()))
-    const today = resetTodayDateInMs + 85399999
-    const initDateOfLastFortnight = resetTodayDateInMs - 14 * 86400000
-    const lastFortnight = [new Date(initDateOfLastFortnight), new Date(today)]
+    const resetTodayDateInMs = Date.parse(resetDateTo00hs(new Date()))
+    const todayAt2359hs = resetTodayDateInMs + msIn24hs - 1
+    const initDateOfLastFortnight = resetTodayDateInMs - 14 * msIn24hs
+    const lastFortnight = [new Date(initDateOfLastFortnight), new Date(todayAt2359hs)]
     return lastFortnight
 }
 
 const getLastMonth = () => {
-    const resetTodayDateInMs = Date.parse(resetDate(new Date()))
-    const today = resetTodayDateInMs + 85399999
-    const initDateOfLastMonth = resetTodayDateInMs - 30 * 86400000
-    const lastMonth = [new Date(initDateOfLastMonth), new Date(today)]
+    const resetTodayDateInMs = Date.parse(resetDateTo00hs(new Date()))
+    const todayAt2359hs = resetTodayDateInMs + msIn24hs - 1
+    const initDateOfLastMonth = resetTodayDateInMs - 30 * msIn24hs
+    const lastMonth = [new Date(initDateOfLastMonth), new Date(todayAt2359hs)]
     return lastMonth
 }
 
 const getLastWeek = () => {
-    const resetTodayDateInMs = Date.parse(resetDate(new Date()))
-    const today = resetTodayDateInMs + 85399999
-    const initDateOfLastWeek = resetTodayDateInMs - 7 * 86400000
-    const lastWeek = [new Date(initDateOfLastWeek), new Date(today)]
+    const resetTodayDateInMs = Date.parse(resetDateTo00hs(new Date()))
+    const todayAt2359hs = resetTodayDateInMs + msIn24hs - 1
+    const initDateOfLastWeek = resetTodayDateInMs - 7 * msIn24hs
+    const lastWeek = [new Date(initDateOfLastWeek), new Date(todayAt2359hs)]
     return lastWeek
 }
 
-const getTomorrowDate = () => {
-    const tomorrow_ms =
-        Date.parse(new Date()) // cantidad de ms en el instante actual
-        + (86400000 - Date.parse(new Date()) % 86400000) // cantidad de ms hasta hoy a las 21 hs
-        + 97199999 // ms que se suman para obtener mañana a las 23:59 hs
-    const tomorrow = new Date(tomorrow_ms)
-    return tomorrow
+const getTomorrowDateAt00hs = () => {
+    const todayDateInMsAt00hs = getDateInMsAt00hs(new Date())
+    const tomorrowDateInMsAt00hs = todayDateInMsAt00hs + msIn24hs
+    const tomorrowDateAt00hs = new Date(tomorrowDateInMsAt00hs)
+    return tomorrowDateAt00hs
 }
 
-const getYesterdayDate = () => {
-    const yesterday_ms =
-        Date.parse(new Date()) // cantidad de ms en el instante actual
-        + (86400000 - Date.parse(new Date()) % 86400000) // cantidad de ms hasta hoy a las 21 hs
-        - 75600001 // ms que se restan para obtener ayer a las 23:59 hs
-    const yesterday = new Date(yesterday_ms)
-    return yesterday
+const getYesterdayDateAt00hs = () => {
+    const todayDateInMsAt00hs = getDateInMsAt00hs(new Date())
+    const yesterdayDateInMsAt00hs = todayDateInMsAt00hs - msIn24hs
+    const yesterdayDateAt00hs = new Date(yesterdayDateInMsAt00hs)
+    return yesterdayDateAt00hs
 }
 
 const isItLater = (initialDate, finalDate) => {
-    const reference = addDays(initialDate, 1)
-    const dateToCompare = addDays(finalDate, 0)
-    const response = (dateToCompare >= reference) ? true : false
+    const referenceDateInMs = getDateInMsAt00hs(resetDateTo00hs(initialDate))
+    const dateToCompareInMs = getDateInMsAt00hs(finalDate)
+    const isLaterThanReference = referenceDateInMs + msIn24hs <= dateToCompareInMs
+    const response = isLaterThanReference ? true : false
     return response
 }
 
 const localFormat = (unformattedDate) => {
     const date = new Date(unformattedDate)
+    const day = twoCharsPattern(date.getDate().toString())
+    const month = twoCharsPattern((parseInt(date.getMonth()) + 1).toString())
     const year = date.getFullYear().toString()
-    const month = (parseInt(date.getMonth()) + 1)
-    const day = date.getDate()
-
-    const fixedDay = (day < 10) ? '0' + day.toString() : day.toString()
-    const fixedMonth = (month < 10) ? '0' + month.toString() : month.toString()
-    return fixedDay + '/' + fixedMonth + '/' + year
+    const parsedDate = day + '/' + month + '/' + year
+    return parsedDate
 }
 
 const localFormatToDateObj = (localFormatDate) => {
@@ -129,6 +141,13 @@ const numberOrderDate = (stringDateInLocalFormat) => { // local format: dd/mm/yy
     return numberOrderDate // yyyymmdd
 }
 
+const resetDateTo00hsAndAddDays = (date, daysQuantity = 0) => {
+    const dateInMsAt00hs = getDateInMsAt00hs(date)
+    const calculatedDateInMsAt00hs = dateInMsAt00hs + daysQuantity * 86400000
+    const calculatedDate = new Date(calculatedDateInMsAt00hs)
+    return calculatedDate
+}
+
 const simpleDateWithHours = (unformattedDate) => {
     const date = new Date(unformattedDate)
     const year = date.getFullYear().toString()
@@ -142,20 +161,21 @@ const simpleDateWithHours = (unformattedDate) => {
 
 
 const dateHelper = {
-    addDays,
+    resetDateTo00hsAndAddDays,
     afipDateToLocalFormat,
     dateToAfip,
     dateToQrAfip,
     getLastFortnight,
     getLastMonth,
     getLastWeek,
-    getTomorrowDate,
-    getYesterdayDate,
+    getTomorrowDateAt00hs,
+    getYesterdayDateAt00hs,
     isItLater,
     localFormat,
     localFormatToDateObj,
     numberOrderDate,
-    resetDate,
+    resetDateTo00hs,
+    resetDateTo2359hs,
     simpleDateWithHours
 }
 

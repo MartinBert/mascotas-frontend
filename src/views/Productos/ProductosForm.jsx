@@ -232,7 +232,7 @@ const ProductosForm = () => {
                 // renglones: { $elemMatch: { productId: productInDb._id } }
             })
             const findSales = await api.ventas.findAllByFilters(filters)
-            const sales = findSales.docs
+            const sales = findSales.data
             const salesThatContainProduct = sales.filter(sale =>
                 sale.renglones.map(line => line.nombre).includes(productInDb.nombre)
             )

@@ -22,6 +22,7 @@ const actions = {
     SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW',
     SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW',
     SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW',
+    SET_PERIOD_PROFIT: 'SET_PERIOD_PROFIT',
     SET_REFERENCE_STATISTICS: 'SET_REFERENCE_STATISTICS',
     SET_SALES_TO_SALES_VIEW: 'SET_SALES_TO_SALES_VIEW',
     SET_SALES_VIEW_TOTALS: 'SET_SALES_VIEW_TOTALS',
@@ -37,7 +38,8 @@ const initialState = {
         day_datePicker: null,
         day_rangePicker: null,
         month_datePicker: null,
-        month_rangePicker: null
+        month_rangePicker: null,
+        profit_rangePicker: null
     },
     fixStatisticsModalIsVisible: false,
     loading: true,
@@ -63,6 +65,7 @@ const initialState = {
         salesViewIncome: 0,
         salesViewProfit: 0
     },
+    periodProfit: null,
     recordsToRender: null,
     referenceStatistics: {
         concept: '',
@@ -169,7 +172,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 showNullRecords: false
             }
-            case actions.HIDE_SALES_VIEW_MODAL:
+        case actions.HIDE_SALES_VIEW_MODAL:
             return {
                 ...state,
                 statisticsView: {
@@ -269,7 +272,7 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-            case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW:
+        case actions.SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW:
             return {
                 ...state,
                 statisticsView: {
@@ -283,6 +286,11 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
+        case actions.SET_PERIOD_PROFIT:
+            return {
+                ...state,
+                periodProfit: action.payload
+            }
         case actions.SET_REFERENCE_STATISTICS:
             const referenceStatistics = {
                 concept: action.payload.concept,
@@ -295,12 +303,12 @@ const reducer = (state = initialState, action) => {
                 params: {
                     ...state.params,
                     date: action.payload.date,
-                    dateOrder: numberOrderDate(action.payload.dateString.substring(0,10)),
+                    dateOrder: numberOrderDate(action.payload.dateString.substring(0, 10)),
                     dateString: action.payload.dateString
                 },
                 referenceStatistics
             }
-            case actions.SET_SALES_TO_SALES_VIEW:
+        case actions.SET_SALES_TO_SALES_VIEW:
             return {
                 ...state,
                 statisticsView: {
@@ -316,7 +324,7 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-            case actions.SET_SALES_VIEW_TOTALS:
+        case actions.SET_SALES_VIEW_TOTALS:
             return {
                 ...state,
                 statisticsView: {
@@ -341,7 +349,7 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-            case actions.SET_STATISTIC_TO_SALES_VIEW:
+        case actions.SET_STATISTIC_TO_SALES_VIEW:
             return {
                 ...state,
                 statisticsView: {
@@ -379,6 +387,9 @@ const reducer = (state = initialState, action) => {
                     : '',
                 month_rangePicker: pickerType === 'month_rangePicker' && !pickerValue.includes('')
                     ? [dayjs(pickerValue[0], 'MM-YYYY'), dayjs(pickerValue[1], 'MM-YYYY')]
+                    : ['', ''],
+                profit_rangePicker: pickerType === 'profit_rangePicker' && !pickerValue.includes('')
+                    ? [dayjs(pickerValue[0], 'DD-MM-YYYY'), dayjs(pickerValue[1], 'DD-MM-YYYY')]
                     : ['', '']
             }
             return {

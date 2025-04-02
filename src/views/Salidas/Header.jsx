@@ -22,7 +22,7 @@ import api from '../../services'
 const { formatFindFilters, nullifyFilters } = actions.paginationParams
 const { useOutputsContext } = contexts.Outputs
 const { RangePicker } = DatePicker
-const { addDays } = helpers.dateHelper
+const { resetDateTo2359hs, resetDateTo00hs } = helpers.dateHelper
 const { generateExcel } = helpers.excel
 const { simpleDateWithHours } = helpers.dateHelper
 const { existsProperty } = helpers.objHelper
@@ -118,8 +118,8 @@ const Header = () => {
         let findOutputs
         if (!arrayOfDates) findOutputs = { docs: [] }
         else {
-            const initialDate = (addDays(arrayOfDates[0].$d, 0)).toISOString()
-            const finalDate = (addDays(arrayOfDates[1].$d, 1)).toISOString()
+            const initialDate = resetDateTo00hs(arrayOfDates[0].$d)
+            const finalDate = resetDateTo2359hs(arrayOfDates[1].$d)
             const dateFilters = JSON.stringify({ fecha: { $gte: initialDate, $lte: finalDate } })
             findOutputs = await api.salidas.findAllByFilters(dateFilters)
         }
