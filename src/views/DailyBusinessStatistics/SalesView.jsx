@@ -110,9 +110,9 @@ const SalesView = () => {
                     concept: 'Venta',
                     expense: round(productListPrice),
                     productName: line.nombre,
-                    profit: round(parseFloat(line.precioNeto * line.cantidadUnidades) - productListPrice) ?? round(line.profit),
+                    profit: round(parseFloat(line.precioNeto) - productListPrice) ?? round(line.profit),
                     quantity: round(line.cantidadUnidades),
-                    salePrice: round(line.precioNeto * line.cantidadUnidades)
+                    salePrice: round(line.precioNeto)
                 }
                 return dataItem
             })
