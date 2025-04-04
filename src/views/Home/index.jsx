@@ -676,7 +676,18 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
         const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
-        console.log(dailyBusinessStatistics)
+        
+        const balanceViewTotalProfit = dailyBusinessStatistics.reduce(
+            (acc, value) => acc + value.balanceViewProfit
+        )
+        const salesViewTotalProfit = dailyBusinessStatistics.reduce(
+            (acc, value) => acc + value.salesViewProfit
+        )
+        console.log('PROFIT BALANCEVIEW')
+        console.log(balanceViewTotalProfit)
+        console.log('PROFIT SALESVIEW')
+        console.log(salesViewTotalProfit)
+
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
