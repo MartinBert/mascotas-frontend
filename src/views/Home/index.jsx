@@ -273,8 +273,8 @@ const Home = () => {
             )
             const updatedOutput = {
                 ...output,
-                gananciaNeta,
-                ingreso
+                gananciaNeta: round(gananciaNeta),
+                ingreso: round(ingreso)
             }
             updatedOutputs.push(updatedOutput)
         }
@@ -284,9 +284,9 @@ const Home = () => {
         console.log('SALIDAS CORREGIDAS')
         console.log(updatedOutputs)
 
-        // const res = await api.salidas.editAll(updatedOutputs)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        // else console.log('Records fixed.')
+        const res = await api.salidas.editAll(updatedOutputs)
+        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        else console.log('Records fixed.')
 
         // const findSales = await api.ventas.findAll()
         // const sales = findSales.docs
