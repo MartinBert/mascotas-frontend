@@ -678,15 +678,15 @@ const Home = () => {
         const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
         
         const balanceViewTotalProfit = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + value.balanceViewProfit
+            (acc, value) => acc + parseFloat(value.balanceViewProfit), 0
         )
         const salesViewTotalProfit = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + value.salesViewProfit
+            (acc, value) => acc + parseFloat(value.salesViewProfit), 0
         )
         console.log('PROFIT BALANCEVIEW')
-        console.log(balanceViewTotalProfit)
+        console.log(round(balanceViewTotalProfit))
         console.log('PROFIT SALESVIEW')
-        console.log(salesViewTotalProfit)
+        console.log(round(salesViewTotalProfit))
 
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
