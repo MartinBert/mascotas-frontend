@@ -673,7 +673,9 @@ const Home = () => {
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const findAllOutputs = await api.salidas.findAll()
         const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
+        const outputs = findAllOutputs.docs
         
         const balanceViewTotalExpense = dailyBusinessStatistics.reduce(
             (acc, value) => acc + parseFloat(value.balanceViewExpense), 0
@@ -693,6 +695,13 @@ const Home = () => {
         const salesViewTotalProfit = dailyBusinessStatistics.reduce(
             (acc, value) => acc + parseFloat(value.salesViewProfit), 0
         )
+        const outputsIncome = outputs.reduce(
+            (acc, value) => acc + parseFloat(value.ingreso), 0
+        )
+        const outputsNetProfit = outputs.reduce(
+            (acc, value) => acc + parseFloat(value.ingreso), 0
+        )
+
         console.log('MODELO ESTADISTICA')
         console.log(dailyBusinessStatistics[0])
         console.log('PROFIT BALANCEVIEW')
@@ -701,13 +710,18 @@ const Home = () => {
         console.log(round(salesViewTotalProfit))
         console.log('---------------------------------------')
         console.log('EXPENSE BALANCEVIEW')
-        console.log(balanceViewTotalExpense)
+        console.log(round(balanceViewTotalExpense))
         console.log('INCOME BALANCEVIEW')
-        console.log(balanceViewTotalIncome)
+        console.log(round(balanceViewTotalIncome))
         console.log('EXPENSE SALESVIEW')
-        console.log(salesViewTotalExpense)
+        console.log(round(salesViewTotalExpense))
         console.log('INCOME SALESVIEW')
-        console.log(salesViewTotalIncome)
+        console.log(round(salesViewTotalIncome))
+        console.log('---------------------------------------')
+        console.log('SALIDAS - INGRESO TOTAL')
+        console.log(round(outputsIncome))
+        console.log('SALIDAS - GANANCIA NETA')
+        console.log(round(outputsNetProfit))
 
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
