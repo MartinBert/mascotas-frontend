@@ -670,23 +670,44 @@ const Home = () => {
     )
 
     // ------------------------------- Button to test service -------------------------------- //
-    // MARZO 2025 - BALANCE VIEW 1029103,92 - SALES VIEW 711885,44
-
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
         const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
         
+        const balanceViewTotalExpense = dailyBusinessStatistics.reduce(
+            (acc, value) => acc + parseFloat(value.balanceViewExpense), 0
+        )
+        const balanceViewTotalIncome = dailyBusinessStatistics.reduce(
+            (acc, value) => acc + parseFloat(value.balanceViewIncome), 0
+        )
         const balanceViewTotalProfit = dailyBusinessStatistics.reduce(
             (acc, value) => acc + parseFloat(value.balanceViewProfit), 0
+        )
+        const salesViewTotalExpense = dailyBusinessStatistics.reduce(
+            (acc, value) => acc + parseFloat(value.salesViewExpense), 0
+        )
+        const salesViewTotalIncome = dailyBusinessStatistics.reduce(
+            (acc, value) => acc + parseFloat(value.salesViewIncome), 0
         )
         const salesViewTotalProfit = dailyBusinessStatistics.reduce(
             (acc, value) => acc + parseFloat(value.salesViewProfit), 0
         )
+        console.log('MODELO ESTADISTICA')
+        console.log(dailyBusinessStatistics[0])
         console.log('PROFIT BALANCEVIEW')
         console.log(round(balanceViewTotalProfit))
         console.log('PROFIT SALESVIEW')
         console.log(round(salesViewTotalProfit))
+        console.log('---------------------------------------')
+        console.log('EXPENSE BALANCEVIEW')
+        console.log(balanceViewTotalExpense)
+        console.log('INCOME BALANCEVIEW')
+        console.log(balanceViewTotalIncome)
+        console.log('EXPENSE SALESVIEW')
+        console.log(salesViewTotalExpense)
+        console.log('INCOME SALESVIEW')
+        console.log(salesViewTotalIncome)
 
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
