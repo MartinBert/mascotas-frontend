@@ -260,34 +260,6 @@ const Home = () => {
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
-        const findOutputs = await api.salidas.findAll()
-        const outputs = findOutputs.docs
-        const updatedOutputs = []
-        for (let index = 0; index < outputs.length; index++) {
-            const output = outputs[index]
-            const gananciaNeta = output.productos.reduce(
-                (acc, value) => acc + (parseFloat(value.precioVenta) - parseFloat(value.precioUnitario) - parseFloat(value.ivaVenta)), 0
-            )
-            const ingreso = output.productos.reduce(
-                (acc, value) => acc + (parseFloat(value.precioVenta)), 0
-            )
-            const updatedOutput = {
-                ...output,
-                gananciaNeta: round(gananciaNeta),
-                ingreso: round(ingreso)
-            }
-            updatedOutputs.push(updatedOutput)
-        }
-
-        console.log('SALIDAS')
-        console.log(outputs)
-        console.log('SALIDAS CORREGIDAS')
-        console.log(updatedOutputs)
-
-        const res = await api.salidas.editAll(updatedOutputs)
-        if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
-        else console.log('Records fixed.')
-
         // const findSales = await api.ventas.findAll()
         // const sales = findSales.docs
         // const res = await api.ventas.editAll(updatedSales)
@@ -728,7 +700,7 @@ const Home = () => {
             (acc, value) => acc + parseFloat(value.ingreso), 0
         )
         const outputsNetProfit = outputs.reduce(
-            (acc, value) => acc + parseFloat(value.ingreso), 0
+            (acc, value) => acc + parseFloat(value.gananciaNeta), 0
         )
 
         console.log('MODELO ESTADISTICA')
