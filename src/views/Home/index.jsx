@@ -674,8 +674,10 @@ const Home = () => {
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const findAllEntries = await api.entradas.findAll()
         const findAllOutputs = await api.salidas.findAll()
         const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
+        const entries = findAllEntries.docs
         const outputs = findAllOutputs.docs
         
         const balanceViewTotalExpense = dailyBusinessStatistics.reduce(
@@ -696,6 +698,9 @@ const Home = () => {
         const salesViewTotalProfit = dailyBusinessStatistics.reduce(
             (acc, value) => acc + parseFloat(value.salesViewProfit), 0
         )
+        const entriesExpense = entries.reduce(
+            (acc, value) => acc + parseFloat(value.costoTotal), 0
+        )
         const outputsIncome = outputs.reduce(
             (acc, value) => acc + parseFloat(value.ingreso), 0
         )
@@ -710,20 +715,22 @@ const Home = () => {
         console.log('PROFIT SALESVIEW')
         console.log(round(salesViewTotalProfit))
         console.log('---------------------------------------')
-        console.log('EXPENSE BALANCEVIEW')
-        console.log(round(balanceViewTotalExpense))
         console.log('INCOME BALANCEVIEW')
         console.log(round(balanceViewTotalIncome))
-        console.log('EXPENSE SALESVIEW')
-        console.log(round(salesViewTotalExpense))
         console.log('INCOME SALESVIEW')
         console.log(round(salesViewTotalIncome))
-        console.log('---------------------------------------')
         console.log('SALIDAS - INGRESO TOTAL')
         console.log(round(outputsIncome))
         console.log('SALIDAS - GANANCIA NETA')
         console.log(round(outputsNetProfit))
-
+        console.log('---------------------------------------')
+        console.log('EXPENSE BALANCEVIEW')
+        console.log(round(balanceViewTotalExpense))
+        console.log('EXPENSE SALESVIEW')
+        console.log(round(salesViewTotalExpense))
+        console.log('ENTRADAS - GASTO TOTAL')
+        console.log(round(entriesExpense))
+        
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
