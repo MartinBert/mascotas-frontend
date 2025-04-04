@@ -326,7 +326,7 @@ const Home = () => {
         const dates = []
         const datesInMs = []
         const stringDates = []
-        for (let index = 0; index < loopLimit; index++) {
+        for (let index = 0; index <= loopLimit; index++) {
             const currentDayInMs = oldestActivityDateInMs + index * 86400000
             dates.push(new Date(currentDayInMs))
             datesInMs.push(currentDayInMs)
