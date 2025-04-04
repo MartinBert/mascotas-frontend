@@ -277,7 +277,7 @@ const Home = () => {
             Reparar
         </Button>
     )
-
+    
     // ------------------- Button to generate daily business statistics ---------------------- //
     const oldestActivityErrorMessage = (activity) => {
         const fixedActivity = activity.substring(0, activity.length - 1)
@@ -670,21 +670,31 @@ const Home = () => {
     )
 
     // ------------------------------- Button to test service -------------------------------- //
+    // MARZO 2025 - BALANCE VIEW 1029103,92 - SALES VIEW 711885,44
+
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const filters = JSON.stringify({
-            documentoCodigo: { $in: invoiceAndTicketCodes },
-            // renglones: { $match: { productId: '67a3dbaebf1fc67a7b5e5620' } }
-        })
-        const response = await api.ventas.findAllByFilters(filters)
-        if (response.statusText !== 'OK') {
-            console.log('Service error')
-        } else {
-            const docs = response.data
-            console.log(docs)
-        }
+        const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
+        const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
+        console.log(dailyBusinessStatistics)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
+
+    // const testService = async () => {
+    //     home_dispatch({ type: 'SET_LOADING', payload: true })
+    //     const filters = JSON.stringify({
+    //         documentoCodigo: { $in: invoiceAndTicketCodes },
+    //         // renglones: { $match: { productId: '67a3dbaebf1fc67a7b5e5620' } }
+    //     })
+    //     const response = await api.ventas.findAllByFilters(filters)
+    //     if (response.statusText !== 'OK') {
+    //         console.log('Service error')
+    //     } else {
+    //         const docs = response.data
+    //         console.log(docs)
+    //     }
+    //     home_dispatch({ type: 'SET_LOADING', payload: false })
+    // }
 
     const buttonToTestService = (
         <Button
