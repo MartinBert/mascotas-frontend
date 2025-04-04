@@ -22,7 +22,7 @@ const actions = {
     SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_EXPENSES_IN_BALANCE_VIEW',
     SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_INCOMES_IN_BALANCE_VIEW',
     SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW: 'SET_PAGINATION_PARAMS_OF_TABLE_OF_SALES_IN_SALES_VIEW',
-    SET_PERIOD_PROFIT: 'SET_PERIOD_PROFIT',
+    SET_PERIOD_TOTALS: 'SET_PERIOD_TOTALS',
     SET_REFERENCE_STATISTICS: 'SET_REFERENCE_STATISTICS',
     SET_SALES_TO_SALES_VIEW: 'SET_SALES_TO_SALES_VIEW',
     SET_SALES_VIEW_TOTALS: 'SET_SALES_VIEW_TOTALS',
@@ -65,6 +65,8 @@ const initialState = {
         salesViewIncome: 0,
         salesViewProfit: 0
     },
+    periodExpense: null,
+    periodIncome: null,
     periodProfit: null,
     recordsToRender: null,
     referenceStatistics: {
@@ -286,10 +288,12 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-        case actions.SET_PERIOD_PROFIT:
+        case actions.SET_PERIOD_TOTALS:
             return {
                 ...state,
-                periodProfit: action.payload
+                periodExpense: action.payload.periodExpense,
+                periodIncome: action.payload.periodIncome,
+                periodProfit: action.payload.periodProfit
             }
         case actions.SET_REFERENCE_STATISTICS:
             const referenceStatistics = {

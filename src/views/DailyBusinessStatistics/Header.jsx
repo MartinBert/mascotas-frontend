@@ -256,13 +256,19 @@ const Header = () => {
     // ---------- RangePicker to calculate profit ----------- //
     const calculatePeriodProfit = async () => {
         dailyBusinessStatistics_dispatch({ type: 'SET_LOADING', payload: true })
+        let periodExpense = null
+        let periodIncome = null
         let periodProfit = null
         const selectedDates = dailyBusinessStatistics_state.datePickersValues.profit_rangePicker
         if (!selectedDates) {
+            periodExpense = null
+            periodIncome = null
             periodProfit = null
         } else {
             const thereAreNoDates = selectedDates.includes('')
             if (thereAreNoDates) {
+                periodExpense = null
+                periodIncome = null
                 periodProfit = null
             } else {
                 const initialDate = selectedDates[0].$d
@@ -270,17 +276,32 @@ const Header = () => {
                 const filters = JSON.stringify({ date: { $gte: initialDate, $lte: finalDate } })
                 const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAllByFilters(filters)
                 const dailyBusinessStatistics = findDailyBusinessStatistics.docs
+                periodExpense = round(
+                    interfaceStyles_state.typeOfStatisticsView === 'balance'
+                        ? dailyBusinessStatistics.reduce((acc, record) => acc + record.balanceViewExpense, 0)
+                        : dailyBusinessStatistics.reduce((acc, record) => acc + record.salesViewExpense, 0)
+                )
+                periodIncome = round(
+                    interfaceStyles_state.typeOfStatisticsView === 'balance'
+                        ? dailyBusinessStatistics.reduce((acc, record) => acc + record.balanceViewIncome, 0)
+                        : dailyBusinessStatistics.reduce((acc, record) => acc + record.salesViewIncome, 0)
+                )
                 periodProfit = round(
-                    dailyBusinessStatistics.reduce((acc, record) => acc + record.salesViewProfit, 0)
+                    interfaceStyles_state.typeOfStatisticsView === 'balance'
+                        ? dailyBusinessStatistics.reduce((acc, record) => acc + record.balanceViewProfit, 0)
+                        : dailyBusinessStatistics.reduce((acc, record) => acc + record.salesViewProfit, 0)
                 )
             }
         }
-        dailyBusinessStatistics_dispatch({ type: 'SET_PERIOD_PROFIT', payload: periodProfit })
+        dailyBusinessStatistics_dispatch({
+            type: 'SET_PERIOD_TOTALS',
+            payload: { periodExpense, periodIncome, periodProfit }
+        })
         dailyBusinessStatistics_dispatch({ type: 'SET_LOADING', payload: false })
     }
     
+    // eslint-disable-next-line
     useEffect(() => {calculatePeriodProfit()}, [
-        // eslint-disable-next-line
         dailyBusinessStatistics_state.datePickersValues.profit_rangePicker
     ])
 
@@ -310,12 +331,15 @@ const Header = () => {
                     />
                 </Col>
                 <Col span={24}>
-                    <Row gutter={8}>
-                        <Col span={12} style={{ textAlign: 'end' }}>
-                            <h3>Ganacia del período</h3>
+                    <Row gutter={8} justify='space-around'>
+                        <Col span={8} style={{ textAlign: 'center' }}>
+                            <h3>Ingresos: ${dailyBusinessStatistics_state.periodIncome}</h3>
                         </Col>
-                        <Col span={12} style={{ textAlign: 'start' }}>
-                            <h3>$ {dailyBusinessStatistics_state.periodProfit}</h3>
+                        <Col span={8} style={{ textAlign: 'center' }}>
+                            <h3>Gastos: ${dailyBusinessStatistics_state.periodExpense}</h3>
+                        </Col>
+                        <Col span={8} style={{ textAlign: 'center' }}>
+                            <h3>Ganancia: ${dailyBusinessStatistics_state.periodProfit}</h3>
                         </Col>
                     </Row>
                 </Col>
