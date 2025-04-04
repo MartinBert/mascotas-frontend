@@ -266,7 +266,7 @@ const Home = () => {
         for (let index = 0; index < outputs.length; index++) {
             const output = outputs[index]
             const gananciaNeta = output.productos.reduce(
-                (acc, value) => acc + (parseFloat(value.precioVenta) - parseFloat(precioUnitario) - parseFloat(ivaVenta)), 0
+                (acc, value) => acc + (parseFloat(value.precioVenta) - parseFloat(value.precioUnitario) - parseFloat(value.ivaVenta)), 0
             )
             const ingreso = output.productos.reduce(
                 (acc, value) => acc + (parseFloat(value.precioVenta)), 0
