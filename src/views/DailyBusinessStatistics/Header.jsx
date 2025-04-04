@@ -302,7 +302,8 @@ const Header = () => {
     
     // eslint-disable-next-line
     useEffect(() => {calculatePeriodProfit()}, [
-        dailyBusinessStatistics_state.datePickersValues.profit_rangePicker
+        dailyBusinessStatistics_state.datePickersValues.profit_rangePicker,
+        interfaceStyles_state.typeOfStatisticsView
     ])
 
     const setRangeToCalculateProfit = (date, dateString) => {
