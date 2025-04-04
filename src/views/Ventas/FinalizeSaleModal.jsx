@@ -188,7 +188,7 @@ const FinalizeSaleModal = () => {
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
         const statisticToEdit = findStatisticToEdit.docs[0] || null
         const saleListPricesAndIva = (
-            sale_state.renglones.reduce((acc, line) => acc + line.precioListaUnitario, 0)
+            sale_state.renglones.reduce((acc, line) => acc + parseFloat(line.precioListaUnitario) * parseFloat(line.cantidadUnidades), 0)
             + sale_state.renglones
                 .filter(line => line._id.startsWith('customProduct_'))
                 .reduce((acc, line) => acc + line.importeIva, 0)
@@ -198,11 +198,11 @@ const FinalizeSaleModal = () => {
             if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             const editedStatistic = {
                 ...statisticToEdit,
-                balanceViewIncome: statisticToEdit.balanceViewIncome + sale_state.total,
-                balanceViewProfit: statisticToEdit.balanceViewProfit + sale_state.total - sale_state.importeIva,
-                salesViewExpense: statisticToEdit.salesViewExpense + saleListPricesAndIva,
-                salesViewIncome: statisticToEdit.salesViewIncome + sale_state.total,
-                salesViewProfit: statisticToEdit.salesViewProfit + sale_state.total - saleListPricesAndIva,
+                balanceViewIncome: round(statisticToEdit.balanceViewIncome + sale_state.total),
+                balanceViewProfit: round(statisticToEdit.balanceViewProfit + sale_state.total - sale_state.importeIva),
+                salesViewExpense: round(statisticToEdit.salesViewExpense + saleListPricesAndIva),
+                salesViewIncome: round(statisticToEdit.salesViewIncome + sale_state.total),
+                salesViewProfit: round(statisticToEdit.salesViewProfit + sale_state.total - saleListPricesAndIva),
             }
             await api.dailyBusinessStatistics.edit(editedStatistic)
         } else {
@@ -210,15 +210,15 @@ const FinalizeSaleModal = () => {
             if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             const newStatistic = {
                 balanceViewExpense: 0,
-                balanceViewIncome: sale_state.total,
-                balanceViewProfit: sale_state.total - sale_state.importeIva,
+                balanceViewIncome: round(sale_state.total),
+                balanceViewProfit: round(sale_state.total - sale_state.importeIva),
                 concept: 'Generado automáticamente',
                 date: localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10)),
                 dateOrder: numberOrderDate(sale_state.fechaEmisionString.substring(0, 10)),
                 dateString: sale_state.fechaEmisionString.substring(0, 10),
-                salesViewExpense: saleListPricesAndIva,
-                salesViewIncome: sale_state.total,
-                salesViewProfit: sale_state.total - saleListPricesAndIva
+                salesViewExpense: round(saleListPricesAndIva),
+                salesViewIncome: round(sale_state.total),
+                salesViewProfit: round(sale_state.total - saleListPricesAndIva)
             }
             await api.dailyBusinessStatistics.save(newStatistic)
         }

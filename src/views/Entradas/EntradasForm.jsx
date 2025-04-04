@@ -260,8 +260,8 @@ const EntradasForm = () => {
             const filledPreviousDates = await fillPreviousDates()
             if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             else {
-                const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
-                const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
+                const currentBalanceViewExpense = statisticToEdit.balanceViewExpense
+                const currentBalanceViewIncome = statisticToEdit.balanceViewIncome
                 const newAddedBalanceViewExpense = parseFloat(entries_state.params.costoTotal)
                 const balanceViewExpense = round(currentBalanceViewExpense + newAddedBalanceViewExpense)
                 const balanceViewProfit = round(currentBalanceViewIncome - balanceViewExpense)
@@ -321,8 +321,8 @@ const EntradasForm = () => {
         const dateChanged = entryToEdit.fechaString.substring(0, 10) !== entries_state.params.fechaString.substring(0, 10)
         const previousStatisticToEdit = await findStatisticByStringDate(entryToEdit.fechaString)
         if (previousStatisticToEdit && dateChanged) {
-            const balanceViewExpense = parseFloat(previousStatisticToEdit.balanceViewExpense) - parseFloat(entries_state.params.costoTotal)
-            const balanceViewProfit = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(balanceViewExpense)
+            const balanceViewExpense = round(previousStatisticToEdit.balanceViewExpense - parseFloat(entries_state.params.costoTotal))
+            const balanceViewProfit = round(previousStatisticToEdit.balanceViewIncome - parseFloat(balanceViewExpense))
             const edittedPreviousStatistic = {
                 ...previousStatisticToEdit,
                 balanceViewExpense,
@@ -332,9 +332,9 @@ const EntradasForm = () => {
         }
         const statisticToEdit = await findStatisticByStringDate(entries_state.params.fechaString)
         if (statisticToEdit) {
-            const expenseFromEntryToEdit = parseFloat(entryToEdit.costoTotal)
-            const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
-            const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
+            const expenseFromEntryToEdit = entryToEdit.costoTotal
+            const currentBalanceViewExpense = statisticToEdit.balanceViewExpense
+            const currentBalanceViewIncome = statisticToEdit.balanceViewIncome
             const newAddedBalanceViewExpense = parseFloat(entries_state.params.costoTotal)
             const balanceViewExpense = round(
                 currentBalanceViewExpense

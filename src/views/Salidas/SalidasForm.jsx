@@ -257,10 +257,10 @@ const SalidasForm = () => {
         // Corregir o crear la estadística diaria correspondiente a la fecha de la salida
         const statisticToEdit = await findStatisticByStringDate(outputs_state.params.fechaString)
         if (statisticToEdit) {
-            const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
-            const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
-            const currentSalesViewExpense = parseFloat(statisticToEdit.salesViewExpense)
-            const currentSalesViewIncome = parseFloat(statisticToEdit.salesViewIncome)
+            const currentBalanceViewExpense = statisticToEdit.balanceViewExpense
+            const currentBalanceViewIncome = statisticToEdit.balanceViewIncome
+            const currentSalesViewExpense = statisticToEdit.salesViewExpense
+            const currentSalesViewIncome = statisticToEdit.salesViewIncome
             const newAddedIncome = parseFloat(outputs_state.params.gananciaNeta)
             const balanceViewIncome = round(currentBalanceViewIncome + newAddedIncome)
             const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
@@ -323,10 +323,10 @@ const SalidasForm = () => {
         const dateChanged = outputToEdit.fechaString.substring(0, 10) !== outputs_state.params.fechaString.substring(0, 10)
         const previousStatisticToEdit = await findStatisticByStringDate(outputToEdit.fechaString)
         if (previousStatisticToEdit && dateChanged) {
-            const balanceViewIncome = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(outputs_state.params.gananciaNeta)
-            const balanceViewProfit = parseFloat(balanceViewIncome) - parseFloat(previousStatisticToEdit.balanceViewExpense)
-            const salesViewIncome = parseFloat(previousStatisticToEdit.salesViewIncome) - parseFloat(outputs_state.params.gananciaNeta)
-            const salesViewProfit = parseFloat(salesViewIncome) - parseFloat(previousStatisticToEdit.salesViewExpense)
+            const balanceViewIncome = round(previousStatisticToEdit.balanceViewIncome - parseFloat(outputs_state.params.gananciaNeta))
+            const balanceViewProfit = round(balanceViewIncome - previousStatisticToEdit.balanceViewExpense)
+            const salesViewIncome = round(previousStatisticToEdit.salesViewIncome - parseFloat(outputs_state.params.gananciaNeta))
+            const salesViewProfit = round(salesViewIncome - previousStatisticToEdit.salesViewExpense)
             const edittedPreviousStatistic = {
                 ...previousStatisticToEdit,
                 balanceViewIncome,
