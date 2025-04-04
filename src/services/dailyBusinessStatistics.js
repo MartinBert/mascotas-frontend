@@ -77,7 +77,7 @@ const findNewerRecord = async () => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics/recordsInfo/newer`, headers)
-        return response.data
+        return response.data[0]
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)
@@ -88,7 +88,7 @@ const findOldestRecord = async (params) => {
     const headers = { headers: { Authorization: localStorage.getItem('token') } }
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/daily_business_statistics/recordsInfo/oldest`, headers)
-        return response.data
+        return response.data[0]
     } catch (err) {
         checkStorageStatus(err)
         console.error(err)

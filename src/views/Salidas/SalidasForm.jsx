@@ -21,7 +21,7 @@ import api from '../../services'
 // Imports Destructuring
 const { useDeleteModalContext } = contexts.DeleteModal
 const { useOutputsContext } = contexts.Outputs
-const { localFormatToDateObj, numberOrderDate, resetDateTo00hs, simpleDateWithHours } = helpers.dateHelper
+const { localFormat, localFormatToDateObj, numberOrderDate, resetDateTo00hs, simpleDateWithHours } = helpers.dateHelper
 const { round } = helpers.mathHelper
 const { fixInputNumber, nonCaseSensitive, normalizeString, regExp } = helpers.stringHelper
 const { Delete } = icons
@@ -154,6 +154,40 @@ const SalidasForm = () => {
         return 'OK'
     }
 
+    const fillPreviousDates = async () => {
+        const currentDate = localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10))
+        const newerRecord = await api.dailyBusinessStatistics.findNewerRecord()
+        const newerRecordDate = newerRecord.date
+        const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
+            (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
+        )
+        let filled = false
+        if (differenceOfDaysBetweenNewerRecordDateAndCurrentDate < 2) filled = true
+        else {
+            const recordsToFill = []
+            for (let index = 1; index < differenceOfDaysBetweenNewerRecordDateAndCurrentDate; index++) {
+                const recordDate = new Date(Date.parse(newerRecordDate) + index * 86400000)
+                const recordToFill = {
+                    balanceViewExpense: 0,
+                    balanceViewIncome: 0,
+                    balanceViewProfit: 0,
+                    concept: 'Generado automáticamente',
+                    date: recordDate,
+                    dateOrder: numberOrderDate(localFormat(recordDate)),
+                    dateString: localFormat(recordDate),
+                    salesViewExpense: 0,
+                    salesViewIncome: 0,
+                    salesViewProfit: 0
+                }
+                recordsToFill.push(recordToFill)
+            }
+            const response = await api.dailyBusinessStatistics.saveAll(recordsToFill)
+            if (!response || response.code !== 200) filled = false
+            else filled = true
+        }
+        return filled
+    }
+
     const generateNewStatistic = () => {
         const newStatistic = {
             balanceViewExpense: 0,
@@ -235,6 +269,8 @@ const SalidasForm = () => {
             }
             await api.dailyBusinessStatistics.edit(updatedStatistic)
         } else {
+            const filledPreviousDates = await fillPreviousDates()
+            if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             const newStatistic = generateNewStatistic()
             await api.dailyBusinessStatistics.save(newStatistic)
         }
@@ -292,23 +328,29 @@ const SalidasForm = () => {
         }
         const statisticToEdit = await findStatisticByStringDate(outputs_state.params.fechaString)
         if (statisticToEdit) {
-            const incomeFromOutputToEdit = parseFloat(outputToEdit.ingreso)
-            const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
-            const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
-            const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ingreso)
-            const balanceViewIncome = round(
-                currentBalanceViewIncome
-                - (!dateChanged ? incomeFromOutputToEdit : 0)
-                + newAddedBalanceViewIncome
-            )
-            const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
-            const editedStatistic = {
-                ...statisticToEdit,
-                balanceViewIncome,
-                balanceViewProfit
+            const filledPreviousDates = await fillPreviousDates()
+            if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
+            else {
+                const incomeFromOutputToEdit = parseFloat(outputToEdit.ingreso)
+                const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
+                const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
+                const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ingreso)
+                const balanceViewIncome = round(
+                    currentBalanceViewIncome
+                    - (!dateChanged ? incomeFromOutputToEdit : 0)
+                    + newAddedBalanceViewIncome
+                )
+                const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
+                const editedStatistic = {
+                    ...statisticToEdit,
+                    balanceViewIncome,
+                    balanceViewProfit
+                }
+                await api.dailyBusinessStatistics.edit(editedStatistic)
             }
-            await api.dailyBusinessStatistics.edit(editedStatistic)
         } else {
+            const filledPreviousDates = await fillPreviousDates()
+            if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             const newStatistic = generateNewStatistic()
             await api.dailyBusinessStatistics.save(newStatistic)
         }

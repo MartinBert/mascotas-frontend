@@ -20,7 +20,7 @@ import api from '../../services'
 const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
 const { fiscalNotesCodes, formatBody, invoiceCodes, ticketCodes } = helpers.afipHelper
-const { localFormatToDateObj, numberOrderDate, resetDateTo00hs } = helpers.dateHelper
+const { localFormat, localFormatToDateObj, numberOrderDate, resetDateTo00hs } = helpers.dateHelper
 const { round } = helpers.mathHelper
 const {
     createBudgetPdf,
@@ -149,6 +149,40 @@ const FinalizeSaleModal = () => {
         if (!response.isCreated) return errorAlert('No se pudo generar el comprobante de la operación. Recupérelo desde la página de AFIP.')
     }
 
+    const fillPreviousDates = async () => {
+        const currentDate = localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10))
+        const newerRecord = await api.dailyBusinessStatistics.findNewerRecord()
+        const newerRecordDate = newerRecord.date
+        const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
+            (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
+        )
+        let filled = false
+        if (differenceOfDaysBetweenNewerRecordDateAndCurrentDate < 2) filled = true
+        else {
+            const recordsToFill = []
+            for (let index = 1; index < differenceOfDaysBetweenNewerRecordDateAndCurrentDate; index++) {
+                const recordDate = new Date(Date.parse(newerRecordDate) + index * 86400000)
+                const recordToFill = {
+                    balanceViewExpense: 0,
+                    balanceViewIncome: 0,
+                    balanceViewProfit: 0,
+                    concept: 'Generado automáticamente',
+                    date: recordDate,
+                    dateOrder: numberOrderDate(localFormat(recordDate)),
+                    dateString: localFormat(recordDate),
+                    salesViewExpense: 0,
+                    salesViewIncome: 0,
+                    salesViewProfit: 0
+                }
+                recordsToFill.push(recordToFill)
+            }
+            const response = await api.dailyBusinessStatistics.saveAll(recordsToFill)
+            if (!response || response.code !== 200) filled = false
+            else filled = true
+        }
+        return filled
+    }
+
     const saveDailyBusinessStatistic = async () => {
         const filters = JSON.stringify({ dateString: sale_state.fechaEmisionString.substring(0, 10) })
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
@@ -160,6 +194,8 @@ const FinalizeSaleModal = () => {
                 .reduce((acc, line) => acc + line.importeIva, 0)
         )
         if (statisticToEdit) {
+            const filledPreviousDates = await fillPreviousDates()
+            if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             const editedStatistic = {
                 ...statisticToEdit,
                 balanceViewIncome: statisticToEdit.balanceViewIncome + sale_state.total,
@@ -170,6 +206,8 @@ const FinalizeSaleModal = () => {
             }
             await api.dailyBusinessStatistics.edit(editedStatistic)
         } else {
+            const filledPreviousDates = await fillPreviousDates()
+            if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             const newStatistic = {
                 balanceViewExpense: 0,
                 balanceViewIncome: sale_state.total,
@@ -182,7 +220,6 @@ const FinalizeSaleModal = () => {
                 salesViewIncome: sale_state.total,
                 salesViewProfit: sale_state.total - saleListPricesAndIva
             }
-            console.log(newStatistic)
             await api.dailyBusinessStatistics.save(newStatistic)
         }
     }
