@@ -494,7 +494,6 @@ const updateLinesValues = (state) => {
                 if (line.fraccionar) {
                     lineQuantityIsNaN = isNaN(line.cantidadUnidades)
                     basicGrossPrice = fractionatedSalePriceOfProductOfLine * (lineQuantityIsNaN ? 0 : line.cantidadUnidades)
-                    updatedDataOfLine.cantidadUnidadesFraccionadas = line.cantidadUnidades * (lineQuantityIsNaN ? 0 : line.fraccionamiento)
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
@@ -507,7 +506,6 @@ const updateLinesValues = (state) => {
                 } else if (!line.fraccionar) {
                     lineQuantityIsNaN = isNaN(line.cantidadUnidades)
                     basicGrossPrice = salePriceOfProductOfLine * (lineQuantityIsNaN ? 0 : line.cantidadUnidades)
-                    updatedDataOfLine.cantidadUnidadesFraccionadas = line.cantidadUnidades * (lineQuantityIsNaN ? 0 : line.fraccionamiento)
                     updatedDataOfLine.descuento = basicGrossPrice * discountDecimalVariation
                     updatedDataOfLine.precioBruto = basicGrossPrice
                     updatedDataOfLine.precioNeto = basicGrossPrice * factorOfDecimalVariation
@@ -520,6 +518,7 @@ const updateLinesValues = (state) => {
                 } else updatedDataOfLine = {}
 
                 updatedLine = { ...line, ...updatedDataOfLine }
+                console.log(updatedLine)
                 return updatedLine
             })
             break

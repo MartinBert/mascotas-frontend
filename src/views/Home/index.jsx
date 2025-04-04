@@ -20,7 +20,7 @@ import FirstSteps from './FirstSteps'
 // Imports Destructuring
 const { useAuthContext } = contexts.Auth
 const { useHomeContext } = contexts.Home
-const {creditCodes, debitCodes, invoiceAndTicketCodes } = helpers.afipHelper
+const {creditCodes, debitCodes } = helpers.afipHelper
 const { localFormat, numberOrderDate } = helpers.dateHelper
 const { previousInteger, round } = helpers.mathHelper
 const { normalizeString } = helpers.stringHelper

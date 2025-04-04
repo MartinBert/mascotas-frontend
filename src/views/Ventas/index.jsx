@@ -462,7 +462,7 @@ const Ventas = () => {
             payload: { _id: line._id, cantidadUnidades, cantidadUnidadesFraccionadas }
         })
     }
-    // console.log(sale_state.renglones)
+
     const inputQuantity = (line) => {
         const element = (
             <Row gutter={8} key={line.key}>
