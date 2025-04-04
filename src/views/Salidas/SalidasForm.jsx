@@ -191,15 +191,15 @@ const SalidasForm = () => {
     const generateNewStatistic = () => {
         const newStatistic = {
             balanceViewExpense: 0,
-            balanceViewIncome: parseFloat(outputs_state.params.ingreso),
-            balanceViewProfit: parseFloat(outputs_state.params.ingreso),
+            balanceViewIncome: parseFloat(outputs_state.params.gananciaNeta),
+            balanceViewProfit: parseFloat(outputs_state.params.gananciaNeta),
             concept: 'Generado automáticamente',
             date: localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10)),
             dateOrder: numberOrderDate(outputs_state.params.fechaString.substring(0, 10)),
             dateString: outputs_state.params.fechaString.substring(0, 10),
             salesViewExpense: 0,
-            salesViewIncome: 0,
-            salesViewProfit: 0
+            salesViewIncome: parseFloat(outputs_state.params.gananciaNeta),
+            salesViewProfit: parseFloat(outputs_state.params.gananciaNeta)
         }
         return newStatistic
     }
@@ -259,13 +259,19 @@ const SalidasForm = () => {
         if (statisticToEdit) {
             const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
             const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
-            const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ingreso)
-            const balanceViewIncome = round(currentBalanceViewIncome + newAddedBalanceViewIncome)
+            const currentSalesViewExpense = parseFloat(statisticToEdit.salesViewExpense)
+            const currentSalesViewIncome = parseFloat(statisticToEdit.salesViewIncome)
+            const newAddedIncome = parseFloat(outputs_state.params.gananciaNeta)
+            const balanceViewIncome = round(currentBalanceViewIncome + newAddedIncome)
             const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
+            const salesViewIncome = round(currentSalesViewIncome + newAddedIncome)
+            const salesViewProfit = round(balanceViewIncome - currentSalesViewExpense)
             const updatedStatistic = {
                 ...statisticToEdit,
                 balanceViewIncome,
-                balanceViewProfit
+                balanceViewProfit,
+                salesViewIncome,
+                salesViewProfit
             }
             await api.dailyBusinessStatistics.edit(updatedStatistic)
         } else {
@@ -317,12 +323,16 @@ const SalidasForm = () => {
         const dateChanged = outputToEdit.fechaString.substring(0, 10) !== outputs_state.params.fechaString.substring(0, 10)
         const previousStatisticToEdit = await findStatisticByStringDate(outputToEdit.fechaString)
         if (previousStatisticToEdit && dateChanged) {
-            const balanceViewIncome = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(outputs_state.params.ingreso)
+            const balanceViewIncome = parseFloat(previousStatisticToEdit.balanceViewIncome) - parseFloat(outputs_state.params.gananciaNeta)
             const balanceViewProfit = parseFloat(balanceViewIncome) - parseFloat(previousStatisticToEdit.balanceViewExpense)
+            const salesViewIncome = parseFloat(previousStatisticToEdit.salesViewIncome) - parseFloat(outputs_state.params.gananciaNeta)
+            const salesViewProfit = parseFloat(salesViewIncome) - parseFloat(previousStatisticToEdit.salesViewExpense)
             const edittedPreviousStatistic = {
                 ...previousStatisticToEdit,
                 balanceViewIncome,
-                balanceViewProfit
+                balanceViewProfit,
+                salesViewIncome,
+                salesViewProfit
             }
             await api.dailyBusinessStatistics.edit(edittedPreviousStatistic)
         }
@@ -331,20 +341,30 @@ const SalidasForm = () => {
             const filledPreviousDates = await fillPreviousDates()
             if (!filledPreviousDates) errorAlert('No se pudieron generar las estadísticas de negocio anteriores a la fecha. Contacte con su proveedor.')
             else {
-                const incomeFromOutputToEdit = parseFloat(outputToEdit.ingreso)
+                const incomeFromOutputToEdit = parseFloat(outputToEdit.gananciaNeta)
                 const currentBalanceViewExpense = parseFloat(statisticToEdit.balanceViewExpense)
                 const currentBalanceViewIncome = parseFloat(statisticToEdit.balanceViewIncome)
-                const newAddedBalanceViewIncome = parseFloat(outputs_state.params.ingreso)
+                const currentSalesViewExpense = parseFloat(statisticToEdit.salesViewExpense)
+                const currentSalesViewIncome = parseFloat(statisticToEdit.salesViewIncome)
+                const newAddedIncome = parseFloat(outputs_state.params.gananciaNeta)
                 const balanceViewIncome = round(
                     currentBalanceViewIncome
                     - (!dateChanged ? incomeFromOutputToEdit : 0)
-                    + newAddedBalanceViewIncome
+                    + newAddedIncome
                 )
                 const balanceViewProfit = round(balanceViewIncome - currentBalanceViewExpense)
+                const salesViewIncome = round(
+                    currentSalesViewIncome
+                    - (!dateChanged ? incomeFromOutputToEdit : 0)
+                    + newAddedIncome
+                )
+                const salesViewProfit = round(salesViewIncome - currentSalesViewExpense)
                 const editedStatistic = {
                     ...statisticToEdit,
                     balanceViewIncome,
-                    balanceViewProfit
+                    balanceViewProfit,
+                    salesViewIncome,
+                    salesViewProfit
                 }
                 await api.dailyBusinessStatistics.edit(editedStatistic)
             }

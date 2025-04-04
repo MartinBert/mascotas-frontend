@@ -260,6 +260,34 @@ const Home = () => {
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
+        const findOutputs = await api.salidas.findAll()
+        const outputs = findOutputs.docs
+        const updatedOutputs = []
+        for (let index = 0; index < outputs.length; index++) {
+            const output = outputs[index]
+            const gananciaNeta = output.productos.reduce(
+                (acc, value) => acc + (parseFloat(value.precioVenta) - parseFloat(precioUnitario) - parseFloat(ivaVenta)), 0
+            )
+            const ingreso = output.productos.reduce(
+                (acc, value) => acc + (parseFloat(value.precioVenta)), 0
+            )
+            const updatedOutput = {
+                ...output,
+                gananciaNeta,
+                ingreso
+            }
+            updatedOutputs.push(updatedOutput)
+        }
+
+        console.log('SALIDAS')
+        console.log(outputs)
+        console.log('SALIDAS CORREGIDAS')
+        console.log(updatedOutputs)
+
+        // const res = await api.salidas.editAll(updatedOutputs)
+        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        // else console.log('Records fixed.')
+
         // const findSales = await api.ventas.findAll()
         // const sales = findSales.docs
         // const res = await api.ventas.editAll(updatedSales)
@@ -374,7 +402,8 @@ const Home = () => {
                 .filter(record => !creditCodes.includes(record.documentoCodigo))
                 .reduce((acc, voucher) => acc + voucher.importeIva, 0)
             const entries = dataItem.entries.reduce((acc, entry) => acc + entry.costoTotal, 0)
-            const outputs = dataItem.outputs.reduce((acc, output) => acc + output.ingreso, 0)
+            const outputsIncome = dataItem.outputs.reduce((acc, output) => acc + output.ingreso, 0)
+            const outputsNetProfit = dataItem.outputs.reduce((acc, output) => acc + output.gananciaNeta, 0)
             const salesListPricesData = dataItem.sales
                 .filter(record =>
                     !creditCodes.includes(record.documentoCodigo)
@@ -395,10 +424,10 @@ const Home = () => {
                 .reduce((acc, item) => acc + item.productUnitPrice * item.proportion, 0)
 
             const balanceViewExpense = round(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries)
-            const balanceViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputs)
+            const balanceViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputsIncome)
             const balanceViewProfit = round(balanceViewIncome - balanceViewExpense)
             const salesViewExpense = round(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices)
-            const salesViewIncome = round(cashRegisterVouchersExceptCreditNotes)
+            const salesViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputsNetProfit)
             const salesViewProfit = round(salesViewIncome - salesViewExpense)
 
             const record = {
