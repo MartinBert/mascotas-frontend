@@ -30,7 +30,11 @@ const { Delete, Edit } = icons
 
 const Benefits = () => {
     const navigate = useNavigate()
-    const [benefits_state, benefits_dispatch] = useBenefitsContext()
+    const {
+        benefits_actions,
+        benefits_dispatch,
+        benefits_state
+    } = useBenefitsContext()
 
     // ----------------- Button to delete ---------------- //
     const deleteBenefit = async (benefit) => {

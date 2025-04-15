@@ -18,6 +18,7 @@ const { DailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { DeleteModalContext } = contexts.DeleteModal
 const { EntriesContext } = contexts.Entries
 const { FiscalNoteModalContext } = contexts.FiscalNoteModal
+const { GenericComponentsContext } = contexts.GenericComponents
 const { HomeContext } = contexts.Home
 const { InterfaceStylesContext } = contexts.InterfaceStyles
 const { OutputsContext } = contexts.Outputs
@@ -40,27 +41,29 @@ function App() {
                             <DeleteModalContext>
                                 <EntriesContext>
                                     <FiscalNoteModalContext>
-                                        <HomeContext>
-                                            <InterfaceStylesContext>
-                                                <OutputsContext>
-                                                    <PrivateRouteContext>
-                                                        <ProductsContext>
-                                                            <RenderConditionsContext>
-                                                                <SaleContext>
-                                                                    <SalesAreasContext>
-                                                                        <SalePointContext>
-                                                                            <Router>
-                                                                                <AppRouter />
-                                                                            </Router>
-                                                                        </SalePointContext>
-                                                                    </SalesAreasContext>
-                                                                </SaleContext>
-                                                            </RenderConditionsContext>
-                                                        </ProductsContext>
-                                                    </PrivateRouteContext>
-                                                </OutputsContext>
-                                            </InterfaceStylesContext>
-                                        </HomeContext>
+                                        <GenericComponentsContext>
+                                            <HomeContext>
+                                                <InterfaceStylesContext>
+                                                    <OutputsContext>
+                                                        <PrivateRouteContext>
+                                                            <ProductsContext>
+                                                                <RenderConditionsContext>
+                                                                    <SaleContext>
+                                                                        <SalesAreasContext>
+                                                                            <SalePointContext>
+                                                                                <Router>
+                                                                                    <AppRouter />
+                                                                                </Router>
+                                                                            </SalePointContext>
+                                                                        </SalesAreasContext>
+                                                                    </SaleContext>
+                                                                </RenderConditionsContext>
+                                                            </ProductsContext>
+                                                        </PrivateRouteContext>
+                                                    </OutputsContext>
+                                                </InterfaceStylesContext>
+                                            </HomeContext>
+                                        </GenericComponentsContext>
                                     </FiscalNoteModalContext>
                                 </EntriesContext>
                             </DeleteModalContext>

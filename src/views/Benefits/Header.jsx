@@ -17,8 +17,12 @@ const { useBenefitsContext } = contexts.Benefits
 
 const Header = () => {
     const navigate = useNavigate()
-    const [benefits_state, benefits_dispatch] = useBenefitsContext()
-
+    const {
+        benefits_actions,
+        benefits_dispatch,
+        benefits_state
+    } = useBenefitsContext()
+    
     // ------- Button of redirect to benefit form -------- //
     const redirectToForm = () => {
         navigate('/benefits/new')
@@ -72,21 +76,21 @@ const Header = () => {
         },
         {
             element: <InputHidden />,
-            order: { lg: 2, md: 2, sm: 3, xl: 2, xs: 3, xxl: 2 }
+            order: { lg: 2, md: 4, sm: 4, xl: 2, xs: 4, xxl: 2 }
         },
         {
             element: inputToFilterByDescription,
-            order: { lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4 }
+            order: { lg: 4, md: 3, sm: 3, xl: 4, xs: 3, xxl: 4 }
         },
         {
             element: inputToFilterByTitle,
-            order: { lg: 3, md: 3, sm: 2, xl: 3, xs: 2, xxl: 3 }
+            order: { lg: 3, md: 2, sm: 2, xl: 3, xs: 2, xxl: 3 }
         },
     ]
 
     const responsiveGrid = {
         gutter: { horizontal: 8, vertical: 8 },
-        span: { lg: 6, md: 6, sm: 12, xl: 6, xs: 12, xxl: 6 }
+        span: { lg: 6, md: 8, sm: 24, xl: 6, xs: 24, xxl: 6 }
     }
 
     return (

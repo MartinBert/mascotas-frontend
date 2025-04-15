@@ -5,6 +5,7 @@ import dailyBusinessStatistics from './dailyBusinessStatistics'
 import deleteModal from './deleteModal'
 import entries from './entries'
 import fiscalNoteModal from './fiscalNoteModal'
+import genericComponents from './genericComponents'
 import home from './home'
 import interfaceStyles from './interfaceStyles'
 import outputs from './outputs'
@@ -23,6 +24,7 @@ const reducers = {
     deleteModal,
     entries,
     fiscalNoteModal,
+    genericComponents,
     home,
     interfaceStyles,
     outputs,

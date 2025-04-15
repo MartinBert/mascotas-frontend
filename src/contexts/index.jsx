@@ -5,6 +5,7 @@ import DailyBusinessStatistics from './DailyBusinessStatistics'
 import DeleteModal from './DeleteModal'
 import Entries from './Entries'
 import FiscalNoteModal from './FiscalNoteModal'
+import GenericComponents from './GenericComponents'
 import Home from './Home'
 import InterfaceStyles from './InterfaceStyles'
 import Outputs from './Outputs'
@@ -23,6 +24,7 @@ const contexts = {
     DeleteModal,
     Entries,
     FiscalNoteModal,
+    GenericComponents,
     Home,
     InterfaceStyles,
     Outputs,

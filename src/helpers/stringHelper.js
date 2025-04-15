@@ -30,7 +30,7 @@ const regExp = {
 
 // Fixed commas and points of input number values
 const fixInputNumber = (currentValue, prevValue) => {
-    if (!currentValue || currentValue === '') return null
+    if (!currentValue || currentValue === '') return ''
 
     // Data
     let currentValueString = currentValue.toString()
