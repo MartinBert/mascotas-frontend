@@ -33,10 +33,10 @@ const fixInputNumber = (currentValue, prevValue) => {
     if (!currentValue || currentValue === '') return ''
 
     // Data
-    let currentValueString = currentValue.toString()
     const prevValueString = prevValue ? prevValue.toString() : ''
-    currentValueString = currentValueString.replace(regExp.ifNotNumbersCommaAndPoint, '').replace(',', '.')
     const previousValueAlreadyContainsAPoint = prevValueString.includes('.')
+    let currentValueString = currentValue.toString()
+    currentValueString = currentValueString.replace(regExp.ifNotNumbersCommaAndPoint, '').replace(',', '.')
     const endsWithPoint = currentValueString.endsWith('.')
     // Conditions
     const decimalPlacesOfcurrentValue = countDecimalPlaces(currentValueString)

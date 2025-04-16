@@ -376,6 +376,7 @@ const Home = () => {
             const entries = dataItem.entries.reduce((acc, entry) => acc + entry.costoTotal, 0)
             const outputsIncome = dataItem.outputs.reduce((acc, output) => acc + output.ingreso, 0)
             const outputsNetProfit = dataItem.outputs.reduce((acc, output) => acc + output.gananciaNeta, 0)
+            const outputsExpense = outputsIncome - outputsNetProfit
             const salesListPricesData = dataItem.sales
                 .filter(record =>
                     !creditCodes.includes(record.documentoCodigo)
@@ -398,8 +399,8 @@ const Home = () => {
             const balanceViewExpense = round(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + entries)
             const balanceViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputsIncome)
             const balanceViewProfit = round(balanceViewIncome - balanceViewExpense)
-            const salesViewExpense = round(creditNotes + cashRegisterVouchersIVAExceptCreditNotes + salesListPrices)
-            const salesViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputsNetProfit)
+            const salesViewExpense = round(cashRegisterVouchersIVAExceptCreditNotes + creditNotes + outputsExpense + salesListPrices)
+            const salesViewIncome = round(cashRegisterVouchersExceptCreditNotes + outputsIncome)
             const salesViewProfit = round(salesViewIncome - salesViewExpense)
 
             const record = {

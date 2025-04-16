@@ -184,8 +184,8 @@ const BalanceView = () => {
                 const dataItem = {
                     concept: 'Salida',
                     productName: product.nombre,
-                    profit: product.cantidadesSalientes * product.precioVenta,
-                    quantity: product.cantidadesSalientes
+                    profit: round(parseFloat(product.cantidadesSalientes) * parseFloat(product.precioVenta)),
+                    quantity: round(product.cantidadesSalientes)
                 }
                 return dataItem
             })
@@ -201,8 +201,8 @@ const BalanceView = () => {
                 const dataItem = {
                     concept: 'Venta',
                     productName: line.nombre,
-                    profit: line.precioNeto,
-                    quantity: line.cantidadUnidades
+                    profit: round(line.precioNeto),
+                    quantity: round(line.cantidadUnidades)
                 }
                 return dataItem
             })

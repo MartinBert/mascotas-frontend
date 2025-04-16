@@ -80,10 +80,10 @@ const SalesView = () => {
         const outputs = findOutputs.docs
         const outputsData = outputs.map(output => {
             const data = output.productos.map(product => {
-                const profit = parseFloat(product.cantidadesSalientes) * (parseFloat(product.precioVenta) - parseFloat(product.precioListaUnitario) - parseFloat(product.ivaVenta))
+                const profit = parseFloat(product.cantidadesSalientes) * (parseFloat(product.precioVenta) - parseFloat(product.precioUnitario) - parseFloat(product.ivaVenta))
                 const dataItem = {
                     concept: 'Salida',
-                    expense: 0,
+                    expense: round(product.precioUnitario),
                     productName: product.nombre,
                     profit: round(profit),
                     quantity: round(product.cantidadesSalientes),

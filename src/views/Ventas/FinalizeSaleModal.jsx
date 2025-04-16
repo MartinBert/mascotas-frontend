@@ -270,16 +270,17 @@ const FinalizeSaleModal = () => {
     const save = async () => {
         sale_dispatch({ type: 'LOADING_VIEW' })
         const itsASale = sale_state.documento.cashRegister
+        const isNotFiscalNote = !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
+        const conditionsToModifyStock = itsASale && isNotFiscalNote
 
         // Save daily business statistic
         if (itsASale) saveDailyBusinessStatistic()
 
         //Modify stock history of products
-        saveStockHistoryOfProducts()
+        if (conditionsToModifyStock) saveStockHistoryOfProducts()
 
         //Modify stock of products
-        const isNotFiscalNote = !fiscalNotesCodes.includes(sale_state.documento.codigoUnico)
-        const conditionsToModifyStock = itsASale && isNotFiscalNote
+        
         if (conditionsToModifyStock) applyStockModification()
 
         //Save sale data in sales list
