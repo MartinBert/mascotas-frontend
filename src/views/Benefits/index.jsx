@@ -67,6 +67,7 @@ const Benefits = () => {
     // ------------------ Records table ------------------ //
     const findRecords = async () => {
         const findPaginatedParams = formatFindParams(benefits_state.paginationParams)
+        console.log(findPaginatedParams)
         const recordsData = await api.benefits.findPaginated(findPaginatedParams)
         benefits_dispatch({ type: 'SET_RECORDS_TO_RENDER', payload: recordsData.data })
     }

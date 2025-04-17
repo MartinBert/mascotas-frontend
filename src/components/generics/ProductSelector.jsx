@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import api from '../../services'
 import contexts from '../../contexts'
 import helpers from '../../helpers'
 import { Select } from 'antd'
-import { errorAlert } from '../alerts'
 
 const { useGenericComponentsContext } = contexts.GenericComponents
 const { existsProperty } = helpers.objHelper
@@ -58,7 +57,7 @@ const ProductSelector = (props) => {
                 placeholder = 'Código de barras'
                 break
             case genericComponents_params.productSelector.searchParams.name:
-                placeholder = 'Nombre producto'
+                placeholder = 'Nombre del producto'
                 break
             case genericComponents_params.productSelector.searchParams.productCode:
                 placeholder = 'Código de producto'
@@ -73,13 +72,38 @@ const ProductSelector = (props) => {
         const params = getFindParams(e)
         const findProducts = await api.productos.findPaginated(params)
         const products = findProducts.docs
-        const options = products.map(product => {
-            const option = {
-                label: `${product.nombre} (cód. ${product.codigoBarras}) `,
-                value: product._id
-            }
-            return option
-        })
+        let options
+        switch (searchParam) {
+            case genericComponents_params.productSelector.searchParams.barCode:
+                options = products.map(product => {
+                    const option = {
+                        label: `${product.nombre} (cód. barras: ${product.codigoBarras})`,
+                        value: product._id
+                    }
+                    return option
+                })
+                break
+            case genericComponents_params.productSelector.searchParams.name:
+                options = products.map(product => {
+                    const option = {
+                        label: `${product.nombre}`,
+                        value: product._id
+                    }
+                    return option
+                })
+                break
+            case genericComponents_params.productSelector.searchParams.productCode:
+                options = products.map(product => {
+                    const option = {
+                        label: `${product.nombre} (cód. prod: ${product.codigoProducto})`,
+                        value: product._id
+                    }
+                    return option
+                })
+                break
+            default:
+                options = []
+        }
         genericComponents_dispatch({
             type: genericComponents_actions.PRODUCT_SELECTOR_SET_OPTIONS,
             payload: options
@@ -96,7 +120,7 @@ const ProductSelector = (props) => {
         })
     }
 
-
+    
     const selectToAddProductByName = (
         <Select
             allowClear

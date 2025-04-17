@@ -18,8 +18,8 @@ const actions = {
     SET_STATUS_OF_TITLE: 'SET_STATUS_OF_TITLE',
     SET_VALUE_OF_DESCRIPTION: 'SET_VALUE_OF_DESCRIPTION',
     SET_VALUE_OF_FIXED_AMOUNT_BONUS: 'SET_VALUE_OF_FIXED_AMOUNT_BONUS',
-    SET_VALUE_OF_ID_OF_PRODUCTS_BONUS: 'SET_VALUE_OF_ID_OF_PRODUCTS_BONUS',
     SET_VALUE_OF_PERCENTAGE_BONUS: 'SET_VALUE_OF_PERCENTAGE_BONUS',
+    SET_VALUE_OF_PRODUCTS_BONUS: 'SET_VALUE_OF_PRODUCTS_BONUS',
     SET_VALUE_OF_PURCHASE_AMOUNT_FOR_ACTIVATION: 'SET_VALUE_OF_PURCHASE_AMOUNT_FOR_ACTIVATION',
     SET_VALUE_OF_PURCHASE_AMOUNT_CONDITION_FOR_ACTIVATION: 'SET_VALUE_OF_PURCHASE_AMOUNT_CONDITION_FOR_ACTIVATION',
     SET_VALUE_OF_PURCHASE_QUANTITY_CONDITION_FOR_ACTIVATION: 'SET_VALUE_OF_PURCHASE_QUANTITY_CONDITION_FOR_ACTIVATION',
@@ -295,7 +295,29 @@ const reducer = (state = initialState, action) => {
                     }
                 }
             }
-        case actions.SET_VALUE_OF_ID_OF_PRODUCTS_BONUS:
+        case actions.SET_VALUE_OF_PERCENTAGE_BONUS:
+            return {
+                ...state,
+                benefit: {
+                    ...state.benefit,
+                    activeBenefits: {
+                        ...state.benefit.activeBenefits,
+                        message: '',
+                        status: paramsStatus.null,
+                        value: {
+                            ...state.benefit.activeBenefits.value,
+                            percentageBonus: action.payload.length === 0 ? false : true
+                        }
+                    },
+                    percentageBonus: {
+                        ...state.benefit.percentageBonus,
+                        message: '',
+                        status: paramsStatus.null,
+                        value: action.payload
+                    }
+                }
+            }
+        case actions.SET_VALUE_OF_PRODUCTS_BONUS:
             const productAdded = { id: action.payload._id, name: action.payload.nombre, quantity: 0 }
             updatedProducts = [...state.benefit.productsBonus.value, productAdded]
             return {
@@ -316,28 +338,6 @@ const reducer = (state = initialState, action) => {
                         message: '',
                         status: paramsStatus.null,
                         value: updatedProducts
-                    }
-                }
-            }
-        case actions.SET_VALUE_OF_PERCENTAGE_BONUS:
-            return {
-                ...state,
-                benefit: {
-                    ...state.benefit,
-                    activeBenefits: {
-                        ...state.benefit.activeBenefits,
-                        message: '',
-                        status: paramsStatus.null,
-                        value: {
-                            ...state.benefit.activeBenefits.value,
-                            percentageBonus: action.payload.length === 0 ? false : true
-                        }
-                    },
-                    percentageBonus: {
-                        ...state.benefit.percentageBonus,
-                        message: '',
-                        status: paramsStatus.null,
-                        value: action.payload
                     }
                 }
             }

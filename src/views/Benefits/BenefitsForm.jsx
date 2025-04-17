@@ -253,13 +253,15 @@ const BenefitsForm = () => {
                 })
             }
         }
-        console.log(benefitToSave)
-        // const response = await api.benefits.save(benefitToSave)
-        // console.log(response)
-        // successAlert('Registro guardado correctamente.')
-        // benefits_dispatch({ type: benefits_actions.RESTART_PARAMS })
-        // navigate('benefits')
+        const response = await api.benefits.save(benefitToSave.parsedParams)
+        if (response.status !== 'OK') {
+            errorAlert('No se pudo guardar el registro. Contacte a su proveedor.')
+        } else {
+            successAlert('Registro guardado correctamente.')
+        }
+        benefits_dispatch({ type: benefits_actions.RESTART_PARAMS })
         benefits_dispatch({ type: benefits_actions.SET_LOADING, payload: false })
+        navigate('/benefits')
     }
 
     const buttonToSave = (
@@ -539,7 +541,7 @@ const BenefitsForm = () => {
                 <ProductSelector
                     currentSelectedProducts={benefits_state.benefit.productsBonus.value}
                     dispatch={benefits_dispatch}
-                    actionToDispatchProduct={benefits_actions.SET_VALUE_OF_ID_OF_PRODUCTS_BONUS}
+                    actionToDispatchProduct={benefits_actions.SET_VALUE_OF_PRODUCTS_BONUS}
                     searchParam={genericComponents_params.productSelector.searchParams.barCode}
                 />
             </Col>
@@ -554,7 +556,7 @@ const BenefitsForm = () => {
                 <ProductSelector
                     currentSelectedProducts={benefits_state.benefit.productsBonus.value}
                     dispatch={benefits_dispatch}
-                    actionToDispatchProduct={benefits_actions.SET_VALUE_OF_ID_OF_PRODUCTS_BONUS}
+                    actionToDispatchProduct={benefits_actions.SET_VALUE_OF_PRODUCTS_BONUS}
                     searchParam={genericComponents_params.productSelector.searchParams.name}
                 />
             </Col>

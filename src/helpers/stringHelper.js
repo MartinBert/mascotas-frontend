@@ -66,9 +66,9 @@ const fixInputNumberValue = (value) => {
 }
 
 // Non case sensitive for 'Select' antd
-const nonCaseSensitive = (inputValue, option) => {
-    const normalizedInputValue = normalizeString(inputValue)
-    const normalizedOptionValue = normalizeString(option.value)
+const nonCaseSensitive = (inputLabel, option) => {
+    const normalizedInputValue = normalizeString(inputLabel)
+    const normalizedOptionValue = normalizeString(option.label)
     if (normalizedOptionValue.toUpperCase().indexOf(normalizedInputValue.toUpperCase()) !== -1) return true
     else return false
 }
