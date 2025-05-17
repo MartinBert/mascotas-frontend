@@ -31,7 +31,7 @@ const { DeleteModal } = generics
 const { Delete, Details, Edit } = icons
 
 const findOutput = async (outputID) => {
-    const findOutput = await api.salidas.findById(outputID)
+    const findOutput = await api.outputs.findById(outputID)
     return findOutput
 }
 
@@ -52,9 +52,9 @@ const fixDailyBusinessStatistics = async (outputToDelete) => {
 
 const fixStock = async (outputToDelete) => {
     for (let productOfOutput of outputToDelete.productos) {
-        const findProduct = await api.productos.findById(productOfOutput._id)
+        const findProduct = await api.products.findById(productOfOutput._id)
         const product = await findProduct.data
-        await api.productos.modifyStock({
+        await api.products.modifyStock({
             product,
             isIncrement: true,
             quantity: productOfOutput.cantidadesSalientes
@@ -92,7 +92,7 @@ const Salidas = () => {
 
     // ------------------ Fetch Outputs ------------------ //
     const loadRenderConditions = async () => {
-        const recordsQuantityOfProducts = await api.productos.countRecords()
+        const recordsQuantityOfProducts = await api.products.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_PRODUCTS',
             payload: recordsQuantityOfProducts < 1 ? false : true
@@ -101,7 +101,7 @@ const Salidas = () => {
 
     const fetchOutputs_paginated = async () => {
         const findParams = formatFindParams(outputs_state.paginationParams)
-        const data = await api.salidas.findPaginated(findParams)
+        const data = await api.outputs.findPaginated(findParams)
         outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: data })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -134,7 +134,7 @@ const Salidas = () => {
         fixDailyBusinessStatistics(findOutputToDelete.data)
         fixStock(findOutputToDelete.data)
         fixStockHistory(findOutputToDelete.data)
-        const response = await api.salidas.deleteById(deleteModal_state.entityID)
+        const response = await api.outputs.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })

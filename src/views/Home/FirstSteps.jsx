@@ -58,13 +58,13 @@ const FirstSteps = () => {
     }
 
     const isStep1Complete = async () => {
-        const findResult = await api.puntosventa.findAll()
+        const findResult = await api.salePoints.findAll()
         if (findResult.docs.length === 0) return false
         else return true
     }
 
     const isStep2Complete = async () => {
-        const findResult = await api.empresas.findAll()
+        const findResult = await api.business.findAll()
         if (findResult.docs.length === 0) return false
         else return true
     }
@@ -75,11 +75,11 @@ const FirstSteps = () => {
 
     const setSelectOptionsForStep2 = async () => {
         if (home_state.firstSteps.activeStep !== 2) return
-        const findSalePoints = await api.puntosventa.findAll()
+        const findSalePoints = await api.salePoints.findAll()
         const salePoints = findSalePoints.docs.map(salepoint => {
             return { label: salepoint.nombre, value: salepoint._id }
         })
-        const findFiscalConditions = await api.condicionesfiscales.findAll()
+        const findFiscalConditions = await api.fiscalConditions.findAll()
         const fiscalConditions = findFiscalConditions.docs.map(fiscalCondition => {
             return { label: fiscalCondition.nombre, value: fiscalCondition._id }
         })
@@ -111,12 +111,12 @@ const FirstSteps = () => {
         const verifyFinish = await isStep2Complete()
         if (!verifyFinish) return errorAlert('Debes registrar la empresa antes de finalizar.')
         else {
-            const findBusiness = await api.empresas.findAll()
-            const findSalePoint = await api.puntosventa.findAll()
+            const findBusiness = await api.business.findAll()
+            const findSalePoint = await api.salePoints.findAll()
             const business = findBusiness.docs[0]._id
             const salePoint = findSalePoint.docs[0]._id
             const updatedUser = { ...auth_state.user, empresa: business, puntoVenta: salePoint }
-            const res = await api.usuarios.edit(updatedUser)
+            const res = await api.users.edit(updatedUser)
             if (res.code !== 200) return errorAlert('No se pudo completar el registro. Intente de nuevo.')
             const alertRes = await successAlert('¡Registros guardados exitosamente!')
             if (alertRes.isConfirmed) reloadPage()

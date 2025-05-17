@@ -1,97 +1,99 @@
-import axios from 'axios'
+import helpers from '../helpers'
 
-const checkStorageStatus = (err) => {
-    if (err.status === 401 || err.status === 403) {
-        localStorage.clear()
-    }
+
+const path = 'sales_areas'
+
+const countRecords = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.countRecords }
+    const response = await processService(props)
+    return response
 }
 
-const deleteByID = async (id) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/zonasdeventas/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const editByID = async (salesArea) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/zonasdeventas/${salesArea._id}`, salesArea, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const edit = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.edit }
+    const response = await processService(props)
+    return response
 }
 
 const findAll = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/zonasdeventas`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findAll }
+    const response = await processService(props)
+    return response
 }
 
 const findAllByFilters = async (filters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/zonasdeventas?filters=${filters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: filters, path, service: services.findAllByFilters }
+    const response = await processService(props)
+    return response
 }
 
 const findById = async (id) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/zonasdeventas/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: id, path, service: services.findById }
+    const response = await processService(props)
+    return response
 }
 
-const findPaginated = async (params) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    const { page, limit, filters } = params
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/zonasdeventas?page=${page}&limit=${limit}&filters=${filters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findNewer = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findNewer }
+    const response = await processService(props)
+    return response
 }
 
-const save = async (salesArea) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/zonasdeventas`, salesArea, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findOldest = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findOldest }
+    const response = await processService(props)
+    return response
 }
 
-const zonasdeventas = {
-    deleteByID,
-    editByID,
+const findPaginated = async (paginationParams) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: paginationParams, path, service: services.findPaginated }
+    const response = await processService(props)
+    return response
+}
+
+const remove = async (ids) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: ids, path, service: services.remove }
+    const response = await processService(props)
+    return response
+}
+
+const removeProps = async (propsArray) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: propsArray, path, service: services.removeProps }
+    const response = await processService(props)
+    return response
+}
+
+const save = async (records, tenantId = null, newlyUser = false) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.save }
+    if (newlyUser) props.newlyUser = newlyUser
+    if (tenantId) props.tenantId = tenantId
+    const response = await processService(props)
+    return response
+}
+
+const salesAreas = {
+    countRecords,
+    edit,
     findAll,
     findAllByFilters,
     findById,
+    findNewer,
+    findOldest,
     findPaginated,
+    remove,
+    removeProps,
     save
 }
 
-export default zonasdeventas
+export default salesAreas

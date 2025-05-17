@@ -49,7 +49,7 @@ const Home = () => {
     // ----------------------------- Button to console entries ------------------------------- //
     const consoleEntries = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllEntries = await api.entradas.findAll()
+        const findAllEntries = await api.entries.findAll()
         const allEntries = findAllEntries.docs
         console.log(allEntries)
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -85,7 +85,7 @@ const Home = () => {
     // ----------------------------- Button to console outputs ------------------------------- //
     const consoleOutputs = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllOutputs = await api.salidas.findAll()
+        const findAllOutputs = await api.outputs.findAll()
         const allOutputs = findAllOutputs.docs
         console.log(allOutputs)
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -103,7 +103,7 @@ const Home = () => {
     // ----------------------------- Button to console products ------------------------------ //
     const consoleProducts = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllProducts = await api.productos.findAll()
+        const findAllProducts = await api.products.findAll()
         const allProducts = findAllProducts.docs
         console.log(allProducts)
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -121,7 +121,7 @@ const Home = () => {
     // ------------- Button to console products without assigned brand or type --------------- //
     const consoleProductsWithoutAssignedBrandOrType = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllProducts = await api.productos.findAll()
+        const findAllProducts = await api.products.findAll()
         const allProducts = findAllProducts.docs
         const productsWithoutBrandOrType = allProducts.filter(product =>
             !product.marca || !product.rubro
@@ -142,7 +142,7 @@ const Home = () => {
     // ------------------------------ Button to console sales -------------------------------- //
     const consoleSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllSales = await api.ventas.findAll()
+        const findAllSales = await api.sales.findAll()
         const allSales = findAllSales.docs
         console.log(allSales)
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -240,7 +240,7 @@ const Home = () => {
         const stockHistories = findStockHistories.docs
         for (let index = 0; index < stockHistories.length; index++) {
             const stockHistory = stockHistories[index]
-            await api.stockHistory.deleteStockHistory(stockHistory._id)
+            await api.stockHistory.remove(stockHistory._id)
         }
         console.log('Stock histories was deleted.')
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -260,9 +260,9 @@ const Home = () => {
     const fixDataBaseRecords = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
-        // const findSales = await api.ventas.findAll()
+        // const findSales = await api.sales.findAll()
         // const sales = findSales.docs
-        // const res = await api.ventas.editAll(updatedSales)
+        // const res = await api.sales.edit(updatedSales)
         // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
         // else console.log('Records fixed.')
 
@@ -342,9 +342,9 @@ const Home = () => {
         const datesForCreateRecords = datesData.dates
         const stringDatesForCreateRecords = datesData.stringDates
 
-        const findEntries = await api.entradas.findAll()
-        const findOutputs = await api.salidas.findAll()
-        const findSales = await api.ventas.findAll()
+        const findEntries = await api.entries.findAll()
+        const findOutputs = await api.outputs.findAll()
+        const findSales = await api.sales.findAll()
         const entriesRecords = findEntries.docs
         const outputsRecords = findOutputs.docs
         const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
@@ -419,7 +419,7 @@ const Home = () => {
         }
 
         // Save records
-        const res = await api.dailyBusinessStatistics.saveAll(dailyBusinessStatisticsToSave)
+        const res = await api.dailyBusinessStatistics.save(dailyBusinessStatisticsToSave)
         if (!res || res.code !== 200) {
             home_dispatch({ type: 'SET_LOADING', payload: false })
             return errorAlert('No se pudo generar las estadísticas diarias.')
@@ -460,10 +460,10 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
         // Data to generate records
-        const findAllEntries = await api.entradas.findAll()
-        const findAllOutputs = await api.salidas.findAll()
-        const findAllProducts = await api.productos.findAll()
-        const findAllSales = await api.ventas.findAll()
+        const findAllEntries = await api.entries.findAll()
+        const findAllOutputs = await api.outputs.findAll()
+        const findAllProducts = await api.products.findAll()
+        const findAllSales = await api.sales.findAll()
         const allEntries = findAllEntries.docs
         const allOutputs = findAllOutputs.docs
         const allProducts = findAllProducts.docs
@@ -675,8 +675,8 @@ const Home = () => {
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
-        const findAllEntries = await api.entradas.findAll()
-        const findAllOutputs = await api.salidas.findAll()
+        const findAllEntries = await api.entries.findAll()
+        const findAllOutputs = await api.outputs.findAll()
         const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
         const entries = findAllEntries.docs
         const outputs = findAllOutputs.docs
@@ -741,7 +741,7 @@ const Home = () => {
     //         documentoCodigo: { $in: invoiceAndTicketCodes },
     //         // renglones: { $match: { productId: '67a3dbaebf1fc67a7b5e5620' } }
     //     })
-    //     const response = await api.ventas.findAllByFilters(filters)
+    //     const response = await api.sales.findAllByFilters(filters)
     //     if (response.statusText !== 'OK') {
     //         console.log('Service error')
     //     } else {

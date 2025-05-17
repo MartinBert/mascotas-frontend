@@ -40,7 +40,7 @@ const Marcas = () => {
     useEffect(() => {
         const fetchMarcas = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.marcas.findPaginated({ page, limit, filters: stringFilters })
+            const data = await api.brands.findPaginated({ page, limit, filters: stringFilters })
             setMarcas(data.docs)
             setTotalDocs(data.totalDocs)
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -63,7 +63,7 @@ const Marcas = () => {
             )
             if (validation === 'FAIL') return
             deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.marcas.deleteMarca(deleteModal_state.entityID)
+            const response = await api.brands.remove(deleteModal_state.entityID)
             if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
             successAlert('El registro se eliminó correctamente.')
             deleteModal_dispatch({ type: 'CLEAN_STATE' })

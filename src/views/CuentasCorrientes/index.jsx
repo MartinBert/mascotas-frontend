@@ -66,7 +66,7 @@ const CuentasCorrientes = () => {
             )
             if (validation === 'FAIL') return
             deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.cuentasCorrientes.deleteCuentaCorriente(deleteModal_state.entityID)
+            const response = await api.cuentasCorrientes.remove(deleteModal_state.entityID)
             if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
             successAlert('El registro se eliminó correctamente.')
             deleteModal_dispatch({ type: 'CLEAN_STATE' })

@@ -65,12 +65,12 @@ const Ventas = () => {
         sale_dispatch({ type: 'SET_REFS', payload: refs })
         // User data
         const userId = localStorage.getItem('userId')
-        const loggedUser = await api.usuarios.findById(userId)
+        const loggedUser = await api.users.findById(userId)
         sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.empresa })
         sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.puntoVenta })
         sale_dispatch({ type: 'SET_USER', payload: loggedUser })
         // Voucher data
-        const lastIndex = await api.ventas.findLastIndex()
+        const lastIndex = await api.sales.findLastIndex()
         sale_dispatch({ type: 'SET_INDEX', payload: lastIndex + 1 })
     }
 

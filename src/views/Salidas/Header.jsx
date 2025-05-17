@@ -58,7 +58,7 @@ const Header = () => {
         if (outputs_state.outputsForExcelReport.length > 0) {
             outputsForReport = outputs_state.outputsForExcelReport
         } else {
-            const findAllFilteredOutputs = await api.salidas.findAllByFilters(formatFindFilters(outputs_state.paginationParams.filters))
+            const findAllFilteredOutputs = await api.outputs.findAllByFilters(formatFindFilters(outputs_state.paginationParams.filters))
             outputsForReport = findAllFilteredOutputs.docs
         }
         const processedLines = []
@@ -121,7 +121,7 @@ const Header = () => {
             const initialDate = resetDateTo00hs(arrayOfDates[0].$d)
             const finalDate = resetDateTo2359hs(arrayOfDates[1].$d)
             const dateFilters = JSON.stringify({ fecha: { $gte: initialDate, $lte: finalDate } })
-            findOutputs = await api.salidas.findAllByFilters(dateFilters)
+            findOutputs = await api.outputs.findAllByFilters(dateFilters)
         }
         const outputsForExcelReport = findOutputs.docs
         const rangePickerValueForExcelReport = rangeDatesString

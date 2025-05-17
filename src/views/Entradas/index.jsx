@@ -31,7 +31,7 @@ const { DeleteModal } = generics
 const { Delete, Details, Edit } = icons
 
 const findEntry = async (entryID) => {
-    const findEntry = await api.entradas.findById(entryID)
+    const findEntry = await api.entries.findById(entryID)
     return findEntry
 }
 
@@ -52,9 +52,9 @@ const fixDailyBusinessStatistics = async (entryToDelete) => {
 
 const fixStock = async (entryToDelete) => {
     for (let productOfEntry of entryToDelete.productos) {
-        const findProduct = await api.productos.findById(productOfEntry._id)
+        const findProduct = await api.products.findById(productOfEntry._id)
         const product = await findProduct.data
-        await api.productos.modifyStock({
+        await api.products.modifyStock({
             product,
             isIncrement: false,
             quantity: productOfEntry.cantidadesEntrantes
@@ -92,7 +92,7 @@ const Entradas = () => {
 
     // ------------------ Fetch Entries ------------------ //
     const loadRenderConditions = async () => {
-        const recordsQuantityOfProducts = await api.productos.countRecords()
+        const recordsQuantityOfProducts = await api.products.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_PRODUCTS',
             payload: recordsQuantityOfProducts < 1 ? false : true
@@ -101,7 +101,7 @@ const Entradas = () => {
 
     const fetchEntries_paginated = async () => {
         const findParams = formatFindParams(entries_state.paginationParams)
-        const data = await api.entradas.findPaginated(findParams)
+        const data = await api.entries.findPaginated(findParams)
         entries_dispatch({ type: 'SET_ENTRIES_FOR_RENDER', payload: data })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -151,7 +151,7 @@ const Entradas = () => {
         fixDailyBusinessStatistics(findEntryToDelete.data)
         fixStock(findEntryToDelete.data)
         fixStockHistory(findEntryToDelete.data)
-        const response = await api.entradas.deleteById(deleteModal_state.entityID)
+        const response = await api.entries.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })

@@ -35,7 +35,7 @@ const findNextVoucherNumber_fiscal = async (codigoUnico, empresaCuit, puntoVenta
 }
 
 const findNextVoucherNumber_noFiscal = async (documentoCodigo) => {
-    const lastVoucherNumber = await api.ventas.findLastVoucherNumber(documentoCodigo)
+    const lastVoucherNumber = await api.sales.findLastVoucherNumber(documentoCodigo)
     if (typeof lastVoucherNumber !== 'number') {
         if (attemps === 10) {
             return errorAlert(`

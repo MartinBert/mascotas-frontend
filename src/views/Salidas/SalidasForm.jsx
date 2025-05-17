@@ -53,7 +53,7 @@ const SalidasForm = () => {
 
     const loadParams = async () => {
         if (outputID !== 'nuevo') {
-            const response = await api.salidas.findById(outputID)
+            const response = await api.outputs.findById(outputID)
             outputs_dispatch({ type: 'SET_PARAMS', payload: response.data })
         } else {
             const usuario = localStorage.getItem('userId')
@@ -156,7 +156,7 @@ const SalidasForm = () => {
 
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10))
-        const newerRecord = await api.dailyBusinessStatistics.findNewerRecord()
+        const newerRecord = await api.dailyBusinessStatistics.findNewer()
         const newerRecordDate = newerRecord.date
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
@@ -181,7 +181,7 @@ const SalidasForm = () => {
                 }
                 recordsToFill.push(recordToFill)
             }
-            const response = await api.dailyBusinessStatistics.saveAll(recordsToFill)
+            const response = await api.dailyBusinessStatistics.save(recordsToFill)
             if (!response || response.code !== 200) filled = false
             else filled = true
         }
@@ -227,7 +227,7 @@ const SalidasForm = () => {
                 data.entries = round(stockHistory[0].entries)
                 data.outputs = round(stockHistory[0].outputs) + round(outputs_state.params.cantidad)
                 if (outputID !== 'nuevo') {
-                    const outputToEdit = await api.salidas.findById(outputID)
+                    const outputToEdit = await api.outputs.findById(outputID)
                     const previousQuantity = round(outputToEdit.data.cantidad)
                     data.outputs -= previousQuantity
                 }
@@ -247,7 +247,7 @@ const SalidasForm = () => {
 
         // Corregir stock de productos pertenecientes a la salida
         for (const product of outputs_state.params.productos) {
-            await api.productos.modifyStock({
+            await api.products.modifyStock({
                 product,
                 isIncrement: false,
                 quantity: round(product.cantidadesSalientes)
@@ -282,7 +282,7 @@ const SalidasForm = () => {
         }
 
         // Guardar la salida nueva
-        const response = await api.salidas.save(outputs_state.params)
+        const response = await api.outputs.save(outputs_state.params)
         if (response.code === 200) {
             successAlert('El registro se guardó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
@@ -295,7 +295,7 @@ const SalidasForm = () => {
         if (result === 'FAIL') return
 
         // Datos necesarios para corregir el stock y las estadísticas diarias
-        const findOutputToEdit = await api.salidas.findById(outputID)
+        const findOutputToEdit = await api.outputs.findById(outputID)
         const outputToEdit = findOutputToEdit.data
 
         // Corregir historial de stock de productos pertenecientes a la salida
@@ -305,13 +305,13 @@ const SalidasForm = () => {
         for (let product of outputs_state.params.productos) {
             const productOfOutputToEdit = outputToEdit.productos.find(el => el._id === product._id)
             if (productOfOutputToEdit && productOfOutputToEdit.cantidadesSalientes !== product.cantidadesSalientes) {
-                const findProductToModifyStock = await api.productos.findById(product._id)
+                const findProductToModifyStock = await api.products.findById(product._id)
                 const productToModifyStock = findProductToModifyStock.data
                 productToModifyStock.cantidadStock += productOfOutputToEdit.cantidadesSalientes
                 productToModifyStock.cantidadStock -= parseFloat(product.cantidadesSalientes)
-                await api.productos.edit(productToModifyStock)
+                await api.products.edit(productToModifyStock)
             } else {
-                await api.productos.modifyStock({
+                await api.products.modifyStock({
                     product,
                     isIncrement: false,
                     quantity: round(product.cantidadesSalientes)
@@ -377,7 +377,7 @@ const SalidasForm = () => {
 
         // Guardar la salida editada
         const recordToEdit = { ...outputs_state.params, id: outputID }
-        const response = await api.salidas.edit(recordToEdit)
+        const response = await api.outputs.edit(recordToEdit)
         if (response.code === 200) {
             successAlert('El registro se editó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
@@ -479,7 +479,7 @@ const SalidasForm = () => {
     const onSearchProductByBarcode = async (e) => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 15, filters }
-        const findProducts = await api.productos.findPaginated(params)
+        const findProducts = await api.products.findPaginated(params)
         const products = findProducts.docs
         const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedBarcode)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
@@ -495,7 +495,7 @@ const SalidasForm = () => {
     const onSelectProductByBarcode = async (e) => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
-        const findProducts = await api.productos.findPaginated(params)
+        const findProducts = await api.products.findPaginated(params)
         const products = findProducts.docs
         const productsToSet = [...outputs_state.params.productos, ...products]
         outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
@@ -529,7 +529,7 @@ const SalidasForm = () => {
     const onSearchProductByName = async (e) => {
         const filters = JSON.stringify({ normalizedName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
-        const findProducts = await api.productos.findPaginated(params)
+        const findProducts = await api.products.findPaginated(params)
         const products = findProducts.docs
         const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedName)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedName))
@@ -539,7 +539,7 @@ const SalidasForm = () => {
 
     const onSelectProductByName = async (e) => {
         const filters = JSON.stringify({ normalizedName: e })
-        const findProducts = await api.productos.findAllByFilters(filters)
+        const findProducts = await api.products.findAllByFilters(filters)
         const products = findProducts.docs
         const productsToSet = [...outputs_state.params.productos, ...products]
         outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })

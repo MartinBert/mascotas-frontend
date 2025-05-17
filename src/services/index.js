@@ -1,56 +1,60 @@
 import afip from './afip'
 import auth from './auth'
 import benefits from './benefits'
-import clientes from './clientes'
-import condicionesfiscales from './condicionesfiscales'
+import brands from './marcas'
+import business from './empresas'
+import clients from './clientes'
+import currentAccounts from './cuentascorrientes'
+import fiscalConditions from './condicionesfiscales'
 import dailyBusinessStatistics from './dailyBusinessStatistics'
-import documentos from './documentos'
-import empresas from './empresas'
-import entradas from './entradas'
+import documents from './documentos'
+import entries from './entradas'
 import fiscalNotes from './fiscalNotes'
-import genericos from './genericos'
+import generics from './genericos'
 import interfaceStyles from './interfaceStyles'
-import marcas from './marcas'
-import mediospago from './mediospago'
-import productos from './productos'
-import puntosventa from './puntosventa'
-import rubros from './rubros'
-import salidas from './salidas'
+import measureUnits from './unidadesmedida'
+import outputs from './salidas'
+import paymentMethods from './mediospago'
+import products from './productos'
+import salePoints from './puntosventa'
+import sales from './ventas'
+import salesAreas from './zonasdeventas'
 import seed from './seed'
 import stockHistory from './stockHistory'
-import unidadesmedida from './unidadesmedida'
+import tenants from './tenants'
+import types from './rubros'
 import uploader from './uploader'
-import usuarios from './usuarios'
-import ventas from './ventas'
-import zonasdeventas from './zonasdeventas'
+import users from './usuarios'
 
 
 const api = {
     afip,
     auth,
     benefits,
-    clientes,
-    condicionesfiscales,
+    brands,
+    business,
+    clients,
+    currentAccounts,
+    fiscalConditions,
     dailyBusinessStatistics,
-    documentos,
-    empresas,
-    entradas,
+    documents,
+    entries,
     fiscalNotes,
-    genericos,
+    generics, // Remove
     interfaceStyles,
-    marcas,
-    mediospago,
-    productos,
-    puntosventa,
-    rubros,
-    salidas,
+    measureUnits,
+    outputs,
+    paymentMethods,
+    products,
+    salePoints,
+    sales,
+    salesAreas,
     seed,
     stockHistory,
-    unidadesmedida,
+    tenants,
+    types,
     uploader,
-    usuarios,
-    ventas,
-    zonasdeventas
+    users
 }
 
 export default api

@@ -39,7 +39,7 @@ const Rubros = () => {
     // ------------------ Fetch Product Categories ------------------ //
     const fetchRubros = async () => {
         const stringFilters = JSON.stringify(filters)
-        const data = await api.rubros.findPaginated({ page, limit, filters: stringFilters })
+        const data = await api.types.findPaginated({ page, limit, filters: stringFilters })
         setRubros(data.docs)
         setTotalDocs(data.totalDocs)
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -63,7 +63,7 @@ const Rubros = () => {
         )
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-        const response = await api.rubros.deleteRubro(deleteModal_state.entityID)
+        const response = await api.types.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })

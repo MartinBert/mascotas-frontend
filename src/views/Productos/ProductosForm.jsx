@@ -67,7 +67,7 @@ const ProductosForm = () => {
 
     const fetchProductById = async () => {
         if (id === 'nuevo') return setLoading(false)
-        const response = await api.productos.findById(id)
+        const response = await api.products.findById(id)
         const product = response.data
         setSelectedBrand({ _id: product?.marca?._id ?? null, nombre: product?.marca?.nombre ?? null })
         setSelectedHeading({ _id: product?.rubro?._id ?? null, nombre: product?.rubro?.nombre ?? null })
@@ -153,7 +153,7 @@ const ProductosForm = () => {
 
     const setSelectedBrandToProduct = async (brand) => {
         setSelectedBrand(brand)
-        const response = await api.marcas.findById(brand._id)
+        const response = await api.brands.findById(brand._id)
         setProduct({
             ...product,
             marca: response,
@@ -163,7 +163,7 @@ const ProductosForm = () => {
 
     const setSelectedHeadingToProduct = async (heading) => {
         setSelectedHeading(heading)
-        const response = await api.rubros.findById(heading._id)
+        const response = await api.types.findById(heading._id)
         setProduct({
             ...product,
             rubro: response,
@@ -173,7 +173,7 @@ const ProductosForm = () => {
 
     const setSelectedMeasureToProduct = async (measure) => {
         setSelectedMeasure(measure)
-        const response = await api.unidadesmedida.findById(measure._id)
+        const response = await api.measureUnits.findById(measure._id)
         setProduct({
             ...product,
             unidadMedida: response,
@@ -210,7 +210,7 @@ const ProductosForm = () => {
     }
 
     const saveNewProduct = async () => {
-        const response = await api.productos.save(product)
+        const response = await api.products.save(product)
         if (response.code === 200) {
             successAlert('El registro fue grabado con exito').then(redirectToProducts())
         } else {
@@ -219,7 +219,7 @@ const ProductosForm = () => {
     }
 
     const editProduct = async () => {
-        const findProductInDb = await api.productos.findById(product._id)
+        const findProductInDb = await api.products.findById(product._id)
         const productInDb = findProductInDb.data
         if (!productInDb) errorAlert('No se encontró el producto de referencia en la base de datos. Contacte a su proveedor.')
         if (
@@ -231,7 +231,7 @@ const ProductosForm = () => {
                 documentoCodigo: { $nin: fiscalNotesCodes },
                 // renglones: { $elemMatch: { productId: productInDb._id } }
             })
-            const findSales = await api.ventas.findAllByFilters(filters)
+            const findSales = await api.sales.findAllByFilters(filters)
             const sales = findSales.data
             const salesThatContainProduct = sales.filter(sale =>
                 sale.renglones.map(line => line.nombre).includes(productInDb.nombre)
@@ -253,12 +253,12 @@ const ProductosForm = () => {
                 }
                 return updatedSale
             })
-            const salesEditionResponse = await api.ventas.editAll(updatedSales)
+            const salesEditionResponse = await api.sales.edit(updatedSales)
             if (salesEditionResponse.code !== 200) {
                 return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
             }
         }
-        const productEditionResponse = await api.productos.edit(product)
+        const productEditionResponse = await api.products.edit(product)
         if (productEditionResponse.code !== 200) {
             errorAlert('Error al guardar el registro.')
         } else {

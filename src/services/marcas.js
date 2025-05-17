@@ -1,121 +1,97 @@
-import axios from 'axios'
+import helpers from '../helpers'
 
-const checkStorageStatus = (err) => {
-    if(err.status === 401 || err.status === 403){
-        localStorage.clear()
-    }
-}
+
+const path = 'brands'
 
 const countRecords = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas/recordsInfo/quantity`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.countRecords }
+    const response = await processService(props)
+    return response
 }
 
-const deleteMarca = async(id) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/marcas/${id}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const edit = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.edit }
+    const response = await processService(props)
+    return response
 }
 
-const edit = async(marca) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/marcas/${marca._id}`, marca, headers)
-        return response.data.message
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const findAll = async() => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findAll = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findAll }
+    const response = await processService(props)
+    return response
 }
 
 const findAllByFilters = async (filters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas?filters=${filters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: filters, path, service: services.findAllByFilters }
+    const response = await processService(props)
+    return response
 }
 
-const findById = async(id) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas/${id}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findById = async (id) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: id, path, service: services.findById }
+    const response = await processService(props)
+    return response
 }
 
-const findMultipleIds = async(ids) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findNewer = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findNewer }
+    const response = await processService(props)
+    return response
 }
 
-const findPaginated = async(params) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    const {page, limit, filters} = params
-    try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/marcas?page=${page}&limit=${limit}&filters=${filters}`, headers)
-        return response.data
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findOldest = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findOldest }
+    const response = await processService(props)
+    return response
 }
 
-const save = async(marca) => {
-    const headers = {headers: {Authorization: localStorage.getItem('token')}}
-    try{
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/marcas`, marca, headers)
-        return response.data.message
-    }catch(err){
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findPaginated = async (paginationParams) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: paginationParams, path, service: services.findPaginated }
+    const response = await processService(props)
+    return response
 }
 
-const marcas = {
+const remove = async (ids) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: ids, path, service: services.remove }
+    const response = await processService(props)
+    return response
+}
+
+const removeProps = async (propsArray) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: propsArray, path, service: services.removeProps }
+    const response = await processService(props)
+    return response
+}
+
+const save = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.save }
+    const response = await processService(props)
+    return response
+}
+
+const brands = {
     countRecords,
-    deleteMarca,
     edit,
     findAll,
     findAllByFilters,
     findById,
-    findMultipleIds,
+    findNewer,
+    findOldest,
     findPaginated,
+    remove,
+    removeProps,
     save
 }
 
-export default marcas
+export default brands

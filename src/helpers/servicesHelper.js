@@ -1,17 +1,27 @@
 import axios from 'axios'
 import { errorAlert } from '../components/alerts'
+import mathHelper from './mathHelper'
 
+const { round } = mathHelper
 const lotsLimit = 5
 
 const services = {
     countRecords: 'countRecords',
+    deletePropsFromAllLines: 'deletePropsFromAllLines',
     edit: 'edit',
     findAll: 'findAll',
     findAllByFilters: 'findAllByFilters',
+    findAllForCatalogue: 'findAllForCatalogue',
+    findAllUsers: 'findAllUsers',
     findById: 'findById',
+    findLastIndex: 'findLastIndex',
+    findLastVoucherNumber: 'findLastVoucherNumber',
     findNewer: 'findNewer',
+    findNewerSale: 'findNewerSale',
     findOldest: 'findOldest',
+    findOldestSale: 'findOldestSale',
     findPaginated: 'findPaginated',
+    modifyStock: 'modifyStock',
     remove: 'remove',
     removeProps: 'removeProps',
     save: 'save'
@@ -23,12 +33,31 @@ const checkStorageStatus = (err) => {
     }
 }
 
+const getMetadata = (tenantIdInRequest = null) => {
+    const tenantId = tenantIdInRequest ?? localStorage.getItem('tenantId') ?? null
+    const token = localStorage.getItem('token') ?? null
+    const metadata = {
+        headers: {
+            Authorization: token,
+            tenantId
+        }
+    }
+    return metadata
+}
+
 const processService = async (props) => {
     const { service, ...caseProps } = props
+    const tenantIdInRequest = caseProps.tenantId ?? null
+    const { headers } = getMetadata(tenantIdInRequest)
+    caseProps.headers = headers
+
     let response
     switch (service) {
         case services.countRecords:
             response = await processCountRecords(caseProps)
+            break
+        case services.deletePropsFromAllLines:
+            response = await processDeletePropsFromAllLines(caseProps)
             break
         case services.edit:
             response = await processEdit(caseProps)
@@ -39,17 +68,38 @@ const processService = async (props) => {
         case services.findAllByFilters:
             response = await processFindAllByFilters(caseProps)
             break
+        case services.findAllForCatalogue:
+            response = await processFindAllForCatalogue(caseProps)
+            break
+        case services.findAllUsers:
+            response = await processFindAllUsers(caseProps)
+            break
         case services.findById:
             response = await processFindById(caseProps)
+            break
+        case services.findLastIndex:
+            response = await processFindLastIndex(caseProps)
+            break
+        case services.findLastVoucherNumber:
+            response = await processFindLastVoucherNumber(caseProps)
             break
         case services.findNewer:
             response = await processFindNewer(caseProps)
             break
+        case services.findNewerSale:
+            response = await processFindNewerSale(caseProps)
+            break
         case services.findOldest:
             response = await processFindOldest(caseProps)
             break
+        case services.findOldestSale:
+            response = await processFindOldestSale(caseProps)
+            break
         case services.findPaginated:
             response = await processFindPaginated(caseProps)
+            break
+        case services.modifyStock:
+            response = await processModifyStock(caseProps)
             break
         case services.remove:
             response = await processRemove(caseProps)
@@ -75,9 +125,21 @@ const processService = async (props) => {
 
 const processCountRecords = async (caseProps) => {
     try {
-        const { path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/getTotalQuantity`, headers)
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/countRecords`, reqConfig)
+        return response.data
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+const processDeletePropsFromAllLines = async (caseProps) => {
+    try {
+        const { data, headers, path } = caseProps
+        const propsToDelete = Array.isArray(data) ? data : [data]
+        const reqConfig = { headers }
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/deletePropsFromAllLines`, propsToDelete, reqConfig)
         return response.data
     } catch (err) {
         console.error(err)
@@ -86,14 +148,14 @@ const processCountRecords = async (caseProps) => {
 
 const processEdit = async (caseProps) => {
     try {
-        const { data, path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
+        const { data, headers, path } = caseProps
         const records = Array.isArray(data) ? data : [data]
         const loopLimit = Math.ceil(records.length / lotsLimit)
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
             const lot = records.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/edit`, lot, headers)
+            const reqConfig = { headers }
+            const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/edit`, lot, reqConfig)
             responseData.push(response.data)
         }
         const response = {
@@ -110,9 +172,9 @@ const processEdit = async (caseProps) => {
 
 const processFindAll = async (caseProps) => {
     try {
-        const { path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findAll`, headers)
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findAll`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -122,9 +184,33 @@ const processFindAll = async (caseProps) => {
 
 const processFindAllByFilters = async (caseProps) => {
     try {
-        const { data: filters, path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findAllByFilters?filters=${filters}`, headers)
+        const { data: filters, headers, path } = caseProps
+        const reqConfig = { headers, params: { filters } }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findAllByFilters`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processFindAllForCatalogue = async (caseProps) => {
+    try {
+        const { data: filters, headers, path } = caseProps
+        const reqConfig = { headers, params: { filters } }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findAllForCatalogue`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processFindAllUsers = async (caseProps) => {
+    try {
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findAllUsers`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -134,9 +220,33 @@ const processFindAllByFilters = async (caseProps) => {
 
 const processFindById = async (caseProps) => {
     try {
-        const { data: id, path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findById/${id}`, headers)
+        const { data: id, headers, path } = caseProps
+        const reqConfig = { headers, params: { id } }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findById`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processFindLastIndex = async (caseProps) => {
+    try {
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findLastIndex`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processFindLastVoucherNumber = async (caseProps) => {
+    try {
+        const { data: { code }, headers, path } = caseProps
+        const reqConfig = { headers, params: { code } }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/processFindLastVoucherNumber`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -146,9 +256,21 @@ const processFindById = async (caseProps) => {
 
 const processFindNewer = async (caseProps) => {
     try {
-        const { path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findNewer`, headers)
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findNewer`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processFindNewerSale = async (caseProps) => {
+    try {
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findNewerSale`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -158,9 +280,21 @@ const processFindNewer = async (caseProps) => {
 
 const processFindOldest = async (caseProps) => {
     try {
-        const { path } = caseProps
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findOldest`, headers)
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findOldest`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processFindOldestSale = async (caseProps) => {
+    try {
+        const { headers, path } = caseProps
+        const reqConfig = { headers }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findOldestSale`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -170,9 +304,29 @@ const processFindOldest = async (caseProps) => {
 
 const processFindPaginated = async (caseProps) => {
     try {
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const { data: { page, limit, filters }, path } = caseProps
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findPaginated?page=${page}&limit=${limit}&filters=${filters}`, headers)
+        const { data: { filters, limit, page }, headers, path } = caseProps
+        const reqConfig = { headers, params: { filters, limit, page } }
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findPaginated`, reqConfig)
+        return response.data
+    } catch (err) {
+        checkStorageStatus(err)
+        console.error(err)
+    }
+}
+
+const processModifyStock = async (caseProps) => {
+    try {
+        const { data, headers, path } = caseProps
+        const stockModificationData = {
+            ...data,
+            product: {
+                ...data.product,
+                cantidadStock: round(data.product.cantidadStock),
+                cantidadFraccionadaStock: round(data.product.cantidadFraccionadaStock)
+            }
+        }
+        const reqConfig = { headers }
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/modifyStock`, stockModificationData, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -182,14 +336,14 @@ const processFindPaginated = async (caseProps) => {
 
 const processRemove = async (caseProps) => {
     try {
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const { data: ids, path } = caseProps
-        const idOfRecords = Array.isArray(ids) ? ids : [ids]
-        const loopLimit = Math.ceil(idOfRecords.length / lotsLimit)
+        const { data: ids, headers, path } = caseProps
+        const idsOfRecords = Array.isArray(ids) ? ids : [ids]
+        const loopLimit = Math.ceil(idsOfRecords.length / lotsLimit)
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
-            const lot = idOfRecords.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            const response = await axios.delete(`${process.env.REACT_APP_API_REST}/${path}/records/remove`, lot, headers)
+            const idsFromRemove = idsOfRecords.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const reqConfig = { headers }
+            const response = await axios.delete(`${process.env.REACT_APP_API_REST}/${path}/records/remove`, idsFromRemove, reqConfig)
             responseData.push(response.data)
         }
         const response = {
@@ -206,10 +360,10 @@ const processRemove = async (caseProps) => {
 
 const processRemoveProps = async (caseProps) => {
     try {
-        const { data, path } = caseProps
-        const propsToDelete = Array.isArray(data) ? data : [data]
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/removeProps`, propsToDelete, headers)
+        const { data, headers, path } = caseProps
+        const propsToRemove = Array.isArray(data) ? data : [data]
+        const reqConfig = { headers }
+        const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/removeProps`, propsToRemove, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -219,13 +373,14 @@ const processRemoveProps = async (caseProps) => {
 
 const processSave = async (caseProps) => {
     try {
-        const headers = { headers: { Authorization: localStorage.getItem('token') } }
-        const { data, path } = caseProps
+        const { data, headers, newlyUser, path } = caseProps
         const records = Array.isArray(data) ? data : [data]
         const loopLimit = Math.ceil(records.length / lotsLimit)
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
             const lot = records.slice(index * lotsLimit, (index + 1) * lotsLimit)
+            const reqConfig = { headers }
+            if (newlyUser) reqConfig.params.newlyUser = newlyUser
             const response = await axios.post(`${process.env.REACT_APP_API_REST}/${path}/records/save`, lot, headers)
             responseData.push(response.data)
         }

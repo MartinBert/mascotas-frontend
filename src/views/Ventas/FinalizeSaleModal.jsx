@@ -37,7 +37,7 @@ const FinalizeSaleModal = () => {
     useEffect(() => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
-            const loggedUser = await api.usuarios.findById(userId)
+            const loggedUser = await api.users.findById(userId)
             auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
         }
         fetchUser()
@@ -113,7 +113,7 @@ const FinalizeSaleModal = () => {
     const applyStockModification = async () => {
         const productsToApplyModification = sale_state.renglones.filter(line => !line.productId.startsWith('custom'))
         for (const lineOfProduct of productsToApplyModification) {
-            const findProductToEdit = await api.productos.findById(lineOfProduct.productId)
+            const findProductToEdit = await api.products.findById(lineOfProduct.productId)
             const productToEdit = findProductToEdit.data
             const productToModifyInStock = {
                 product: productToEdit,
@@ -128,7 +128,7 @@ const FinalizeSaleModal = () => {
                 )
             }
             if (productToModifyInStock) {
-                const response = await api.productos.modifyStock(productToModifyInStock)
+                const response = await api.products.modifyStock(productToModifyInStock)
                 if (response.code !== 200) errorAlert(`No se pudo modificar el stock del producto "${lineOfProduct.nombre}". Modifíquelo manualmente en la sección "Productos" / "Editar".`)
             }
         }
@@ -151,7 +151,7 @@ const FinalizeSaleModal = () => {
 
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10))
-        const newerRecord = await api.dailyBusinessStatistics.findNewerRecord()
+        const newerRecord = await api.dailyBusinessStatistics.findNewer()
         const newerRecordDate = newerRecord.date
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
@@ -176,7 +176,7 @@ const FinalizeSaleModal = () => {
                 }
                 recordsToFill.push(recordToFill)
             }
-            const response = await api.dailyBusinessStatistics.saveAll(recordsToFill)
+            const response = await api.dailyBusinessStatistics.save(recordsToFill)
             if (!response || response.code !== 200) filled = false
             else filled = true
         }
@@ -231,7 +231,7 @@ const FinalizeSaleModal = () => {
         })
         const { refs, productos, ...saleData } = sale_state
         const dataToSave = { ...saleData, renglones: fixedLines }
-        const response = await api.ventas.save(dataToSave)
+        const response = await api.sales.save(dataToSave)
         if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
     }
 
@@ -240,7 +240,7 @@ const FinalizeSaleModal = () => {
         for (let index = 0; index < sale_state.renglones.length; index++) {
             const line = sale_state.renglones[index]
             if (!line.productId.startsWith('customProduct_')) {
-                const findProductToSaveStockHistory = await api.productos.findById(line.productId)
+                const findProductToSaveStockHistory = await api.products.findById(line.productId)
                 const productToSaveStockHistory = findProductToSaveStockHistory.data
                 const filters = JSON.stringify({ dateString, product: productToSaveStockHistory })
                 const findStockHistory = await api.stockHistory.findAllByFilters(filters)

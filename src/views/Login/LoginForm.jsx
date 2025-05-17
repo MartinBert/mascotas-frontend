@@ -57,13 +57,14 @@ const LoginForm = () => {
             setError(true)
             return redirectToLogin()
         }
-        const { token, data } = response
+        const { tenantId, token, userId } = response
         if (!token) {
             setError(true)
             return redirectToLogin()
         }
+        localStorage.setItem('tenantId', tenantId)
         localStorage.setItem('token', token)
-        localStorage.setItem('userId', data)
+        localStorage.setItem('userId', userId)
         auth_dispatch({ type: 'SET_LOADING', payload: false })
         verifyUserAndRedirect()
         reloadPage()

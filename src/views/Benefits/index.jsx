@@ -38,7 +38,7 @@ const Benefits = () => {
 
     // ----------------- Button to delete ---------------- //
     const deleteBenefit = async (benefit) => {
-        const response = await api.productos.deleteById(benefit._id)
+        const response = await api.products.remove(benefit._id)
     }
 
     const buttonToDeleteBenefit = (benefit) => {

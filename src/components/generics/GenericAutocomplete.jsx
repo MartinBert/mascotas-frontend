@@ -26,7 +26,7 @@ const GenericAutocomplete = ({
         if (!searchText || searchText.length < 3) return
         const fetchOptions = async () => {
             setLoading(true)
-            const response = await api.genericos.filterAutocompleteOptions(modelToFind, searchText, keyToCompare)
+            const response = await api.generics.filterAutocompleteOptions(modelToFind, searchText, keyToCompare)
             setOptions(response.data.docs)
             setLoading(false)
         }

@@ -9,6 +9,7 @@ import { Row } from 'antd'
 
 // Views
 import LoginForm from './LoginForm'
+import TenantRegistrationForm from './TenantRegistrationForm'
 
 
 const Login = () => {
@@ -29,6 +30,11 @@ const Login = () => {
                 <div style={{ width: '100%', marginTop: '10%', justifyContent: 'center', display: 'flex' }}>
                     <div style={{ width: '300px', height: '200px' }}>
                         <LoginForm />
+                    </div>
+                </div>
+                <div style={{ width: '100%', justifyContent: 'center', display: 'flex' }}>
+                    <div style={{ width: '300px', height: '200px' }}>
+                        <TenantRegistrationForm />
                     </div>
                 </div>
                 {bubbles}

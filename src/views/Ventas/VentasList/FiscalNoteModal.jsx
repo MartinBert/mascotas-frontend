@@ -89,7 +89,7 @@ const FiscalNoteModal = () => {
             vencimientoCae: responseOfAfip.CAEFchVto
         }
 
-        const result = await api.ventas.save(fiscalNoteParams)
+        const result = await api.sales.save(fiscalNoteParams)
         if (result.code === 500) warningAlert('Se procesó exitosamente la solicitud con AFIP, pero no se pudo guardar el registro en el sistema. Sin embargo, es posible recuperarlo desde AFIP.')
 
         // Save daily business statistic
@@ -271,7 +271,7 @@ const FiscalNoteModal = () => {
         const amountGross = fiscalNoteModal_state.params.amountNet
         const amountRounded = roundToMultiple(amountGross, 10)
         const filters = JSON.stringify({ $or: [{ nombre: 'Contado' }, { nombre: 'Efectivo' }] })
-        const findPaymentMethod = await api.mediospago.findAllByFilters(filters)
+        const findPaymentMethod = await api.paymentMethods.findAllByFilters(filters)
         const paymentMethod = findPaymentMethod.docs
         const [paymentPlan] = paymentMethod.map(method => method.planes)
         const propsForCreditNote = {
@@ -361,7 +361,7 @@ const FiscalNoteModal = () => {
         if (!paymentMethodName) return
         fiscalNoteModal_dispatch({ type: 'SET_LOADING_PAYMENT_METHOD', payload: true })
         const filters = JSON.stringify({ nombre: paymentMethodName })
-        const findSelectedPaymentMethod = await api.mediospago.findAllByFilters(filters)
+        const findSelectedPaymentMethod = await api.paymentMethods.findAllByFilters(filters)
         const [selectedPaymentMethod] = findSelectedPaymentMethod.docs
         const paymentPlans = selectedPaymentMethod.planes
         const paymentPlansNames = paymentPlans.map(plan => plan.nombre)
@@ -381,11 +381,11 @@ const FiscalNoteModal = () => {
 
         // Load User
         const userId = localStorage.getItem('userId')
-        const loggedUser = await api.usuarios.findById(userId)
+        const loggedUser = await api.users.findById(userId)
         fiscalNoteModal_dispatch({ type: 'SET_USER', payload: loggedUser })
 
         // Load Payment Methods
-        const findPaymentMethods = await api.mediospago.findAll()
+        const findPaymentMethods = await api.paymentMethods.findAll()
         const paymentMethods = findPaymentMethods.docs
         const paymentMethodsNames = paymentMethods.map(method => method.nombre)
         fiscalNoteModal_dispatch({ type: 'SET_ALL_PAYMENT_METHODS', payload: { paymentMethods, paymentMethodsNames } })
@@ -393,8 +393,10 @@ const FiscalNoteModal = () => {
         // Load Debit and Credit Notes
         const referenceVoucherCode = fiscalNoteModal_state.params.referenceVoucher.documento.codigoUnico
         const associatedFiscalNotesCodes = fiscalVouchersCodes[fiscalVouchersCodes.indexOf(referenceVoucherCode) + 1]
-        const creditNote = await api.documentos.findByCode(associatedFiscalNotesCodes.credit)
-        const debitNote = await api.documentos.findByCode(associatedFiscalNotesCodes.debit)
+        const findCreditNote = await api.documents.findAllByFilters({ codigoUnico: associatedFiscalNotesCodes.credit })
+        const findDebitNote = await api.documents.findAllByFilters({ codigoUnico: associatedFiscalNotesCodes.debit })
+        const creditNote = findCreditNote.docs[0]
+        const debitNote = findDebitNote.docs[0]
         fiscalNoteModal_dispatch({ type: 'SET_CREDIT_NOTE', payload: creditNote })
         fiscalNoteModal_dispatch({ type: 'SET_DEBIT_NOTE', payload: debitNote })
     }

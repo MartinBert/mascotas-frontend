@@ -43,7 +43,7 @@ const MediosPago = () => {
     useEffect(() => {
         const fetchPaymentMethods = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.mediospago.findPaginated({ page, limit, filters: stringFilters })
+            const data = await api.paymentMethods.findPaginated({ page, limit, filters: stringFilters })
             setMediosPago(data.docs)
             setTotalDocs(data.totalDocs)
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -66,7 +66,7 @@ const MediosPago = () => {
             )
             if (validation === 'FAIL') return
             deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-            const response = await api.mediospago.deleteMedioPago(deleteModal_state.entityID)
+            const response = await api.paymentMethods.remove(deleteModal_state.entityID)
             if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
             successAlert('El registro se eliminó correctamente.')
             deleteModal_dispatch({ type: 'CLEAN_STATE' })

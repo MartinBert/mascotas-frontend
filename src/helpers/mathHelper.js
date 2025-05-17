@@ -1,5 +1,3 @@
-import { errorAlert } from "../components/alerts"
-
 const decimalPercent = (value) => {
     return Number(value) / 100
 }

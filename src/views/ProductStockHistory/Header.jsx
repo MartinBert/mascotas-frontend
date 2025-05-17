@@ -27,8 +27,8 @@ const Header = () => {
 
     // ----------------------------- Load brands and types ------------------------------ //
     const loadBrandsAndTypes = async () => {
-        const findBrands = await api.marcas.findAll()
-        const findTypes = await api.rubros.findAll()
+        const findBrands = await api.brands.findAll()
+        const findTypes = await api.types.findAll()
         const allBrands = findBrands.docs
         const allBrandsNames = allBrands.length < 0
             ? []

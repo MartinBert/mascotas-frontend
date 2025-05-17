@@ -43,7 +43,7 @@ const BalanceView = () => {
         const statisticDate = dailyBusinessStatistics_state.statisticsView.balanceView.statisticToViewDetails.dateString
         const entriesFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
         // Entries data
-        const findEntries = await api.entradas.findAllByFilters(entriesFilters)
+        const findEntries = await api.entries.findAllByFilters(entriesFilters)
         const entries = findEntries.docs
         const entriesData = entries.map(entry => {
             const data = entry.productos.map(product => {
@@ -59,7 +59,7 @@ const BalanceView = () => {
         })
         // Credit notes data
         const creditNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: creditCodes })
-        const findCreditNotes = await api.ventas.findAllByFilters(creditNotesFilters)
+        const findCreditNotes = await api.sales.findAllByFilters(creditNotesFilters)
         const creditNotes = findCreditNotes.data
         const creditNotesData = creditNotes.map(creditNote => {
             const dataItem = {
@@ -72,7 +72,7 @@ const BalanceView = () => {
         })
         // IVA of sales and debit notes
         const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
-        const findSales = await api.ventas.findAllByFilters(salesFilters)
+        const findSales = await api.sales.findAllByFilters(salesFilters)
         const sales = findSales.data
             .filter(sale => sale.documento.cashRegister === true)
             .filter(sale => !creditCodes.includes(sale.documentoCodigo))
@@ -165,7 +165,7 @@ const BalanceView = () => {
         const outputsFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
         const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
         // Debit notes
-        const findDebitNotes = await api.ventas.findAllByFilters(debitNotesFilters)
+        const findDebitNotes = await api.sales.findAllByFilters(debitNotesFilters)
         const debitNotes = findDebitNotes.data
         const debitNotesData = debitNotes.map(debitNote => {
             const dataItem = {
@@ -177,7 +177,7 @@ const BalanceView = () => {
             return dataItem
         })
         // Outputs
-        const findOutputs = await api.salidas.findAllByFilters(outputsFilters)
+        const findOutputs = await api.outputs.findAllByFilters(outputsFilters)
         const outputs = findOutputs.docs
         const outputsData = outputs.map(output => {
             const data = output.productos.map(product => {
@@ -192,7 +192,7 @@ const BalanceView = () => {
             return data
         })
         // Sales
-        const findSales = await api.ventas.findAllByFilters(salesFilters)
+        const findSales = await api.sales.findAllByFilters(salesFilters)
         const sales = findSales.data
             .filter(sale => sale.documento.cashRegister === true)
             .filter(sale => !creditCodes.includes(sale.documentoCodigo) && !debitCodes.includes(sale.documentoCodigo))

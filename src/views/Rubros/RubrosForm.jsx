@@ -42,7 +42,7 @@ const RubrosForm = () => {
         }
 
         const fetchRubro = async () => {
-            const searchedItem = await api.rubros.findById(id)
+            const searchedItem = await api.types.findById(id)
             setRubro({
                 _id: searchedItem._id,
                 nombre: searchedItem.nombre,
@@ -60,8 +60,8 @@ const RubrosForm = () => {
 
         const saveItem = async () => {
             const response = rubro._id
-                ? await api.rubros.edit(rubro)
-                : await api.rubros.save(rubro)
+                ? await api.types.edit(rubro)
+                : await api.types.save(rubro)
             if (response === 'OK') return success()
             return fail()
         }

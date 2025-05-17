@@ -39,7 +39,7 @@ const PuntosVenta = () => {
     // ------------------ Fetch Sale Points ------------------ //
     const fetchPuntosVenta = async () => {
         const stringFilters = JSON.stringify(filters)
-        const data = await api.puntosventa.findPaginated({ page, limit, filters: stringFilters })
+        const data = await api.salePoints.findPaginated({ page, limit, filters: stringFilters })
         setPuntosVenta(data.docs)
         setTotalDocs(data.totalDocs)
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -63,7 +63,7 @@ const PuntosVenta = () => {
         )
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-        const response = await api.puntosventa.deletePuntoVenta(deleteModal_state.entityID)
+        const response = await api.salePoints.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })

@@ -56,7 +56,7 @@ const VentasList = () => {
 
     // ------------------------------------- Load data --------------------------------------- //
     const loadRenderConditions = async () => {
-        const recordsQuantityOfSales = await api.ventas.countRecords()
+        const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_SALES',
             payload: recordsQuantityOfSales < 1 ? false : true
@@ -64,14 +64,14 @@ const VentasList = () => {
     }
 
     const fetchDocumentos = async () => {
-        const data = await api.documentos.findAll()
+        const data = await api.documents.findAll()
         const todosLosDocumentos = data.docs.map(doc => { return { value: doc.nombre, label: doc.nombre } })
         setDocumentos(data.docs)
         setDocumentosNombres(todosLosDocumentos)
     }
 
     const fetchMediosPago = async () => {
-        const data = await api.mediospago.findAll()
+        const data = await api.paymentMethods.findAll()
         const todosLosMediosDePago = data.docs.map(mp => { return { value: mp.nombre, label: mp.nombre } })
         setMediosPago(data.docs)
         setMediosPagoNombres(todosLosMediosDePago)
@@ -79,7 +79,7 @@ const VentasList = () => {
 
     const fetchVentasList = async () => {
         const stringFilters = JSON.stringify(filters)
-        const salesData = await api.ventas.findPaginated({ page, limit, filters: stringFilters })
+        const salesData = await api.sales.findPaginated({ page, limit, filters: stringFilters })
         setVentas(salesData.docs)
         setTotalDocs(salesData.totalDocs)
         setLoading(false)
@@ -107,7 +107,7 @@ const VentasList = () => {
 
     // -------------------------------------- Actions ---------------------------------------- //
     const openFiscalNoteModal = async (ventaID) => {
-        const referenceVoucher = await api.ventas.findById(ventaID)
+        const referenceVoucher = await api.sales.findById(ventaID)
         fiscalNoteModal_dispatch({ type: 'SET_REFERENCE_VOUCHER', payload: referenceVoucher })
         fiscalNoteModal_dispatch({ type: 'SHOW_FISCAL_NOTE_MODAL' })
     }

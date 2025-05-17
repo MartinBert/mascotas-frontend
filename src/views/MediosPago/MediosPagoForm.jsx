@@ -41,7 +41,7 @@ const MediosPagoForm = () => {
         } else {
             if (mediopago.nombre) return
             const fetchPaymentMethod = async () => {
-                const response = await api.mediospago.findById(id)
+                const response = await api.paymentMethods.findById(id)
                 setMedioPago(response.data)
                 setPlanLines(response.data.planes)
                 setLoading(false)
@@ -63,7 +63,7 @@ const MediosPagoForm = () => {
                 return fixedPlan
             })
             if (id === 'nuevo') {
-                api.mediospago.save(mediopago)
+                api.paymentMethods.save(mediopago)
                     .then(response => {
                         if (response.code === 200) {
                             success()
@@ -72,7 +72,7 @@ const MediosPagoForm = () => {
                         }
                     })
             } else {
-                api.mediospago.edit(mediopago)
+                api.paymentMethods.edit(mediopago)
                     .then(response => {
                         if (response.code === 200) {
                             success()

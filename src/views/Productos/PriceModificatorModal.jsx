@@ -32,8 +32,8 @@ const PriceModificatorModal = () => {
 
     // ------------- Fetch Brands and Types -------------- //
     const loadBrandsAndTypes = async () => {
-        const findBrands = await api.marcas.findAll()
-        const findTypes = await api.rubros.findAll()
+        const findBrands = await api.brands.findAll()
+        const findTypes = await api.types.findAll()
         const allBrands = findBrands.docs
         const allBrandsNames = allBrands.length < 0
             ? []
@@ -153,7 +153,7 @@ const PriceModificatorModal = () => {
             product.gananciaNetaFraccionado = round(newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear)
             product.precioVenta = newPrecioVenta
             product.precioVentaFraccionado = newPrecioVentaFraccionado
-            api.productos.edit(product)
+            api.products.edit(product)
         }
         products_dispatch({ type: 'CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL' })
         successAlert('Los precios fueron modificados!').then(() => { window.location.reload() })
@@ -519,7 +519,7 @@ const PriceModificatorModal = () => {
 
     const loadProductsToRender = async () => {
         const params = formatFindParams(products_state.priceModificatorModal.productsToRender.paginationParams)
-        const response = await api.productos.findPaginated(params)
+        const response = await api.products.findPaginated(params)
         products_dispatch({
             type: 'SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
             payload: response

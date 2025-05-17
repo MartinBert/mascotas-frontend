@@ -32,9 +32,9 @@ const ProductStockHistory = () => {
 
 	// ------------------------------------- Load data --------------------------------------- //
 	const loadRenderConditions = async () => {
-        const recordsQuantityOfEntries = await api.entradas.countRecords()
-        const recordsQuantityOfOutputs = await api.salidas.countRecords()
-        const recordsQuantityOfSales = await api.ventas.countRecords()
+        const recordsQuantityOfEntries = await api.entries.countRecords()
+        const recordsQuantityOfOutputs = await api.outputs.countRecords()
+        const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_ENTRIES',
             payload: recordsQuantityOfEntries < 1 ? false : true
@@ -51,7 +51,7 @@ const ProductStockHistory = () => {
 
 	const fetchProducts = async () => {
 		const findParams = formatFindParams(products_state.stockHistory.productsToRender.paginationParams)
-		const data = await api.productos.findPaginated(findParams)
+		const data = await api.products.findPaginated(findParams)
 		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
 	}
 

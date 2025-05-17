@@ -53,7 +53,7 @@ const DocumentosForm = () => {
 
     useEffect(() => {
         const fetchDocumento = async (id) => {
-            const searchedItem = await api.documentos.findById(id)
+            const searchedItem = await api.documents.findById(id)
             setDocumento(searchedItem)
             setLoading(false)
         }
@@ -64,7 +64,7 @@ const DocumentosForm = () => {
     const save = async () => {
         if (id && noEmptyKeys(documento) === true) {
             const fixedDocument = { ...documento, normalizedName: normalizeString(documento.nombre) }
-            const response = (id === 'nuevo') ? await api.documentos.save(fixedDocument) : await api.documentos.edit(fixedDocument)
+            const response = (id === 'nuevo') ? await api.documents.save(fixedDocument) : await api.documents.edit(fixedDocument)
             if (response.code === 200) {
                 successAlert('El registro se guardó correctamente.')
                 redirectToDocumentos()

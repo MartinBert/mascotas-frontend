@@ -70,7 +70,7 @@ const ProductSelector = (props) => {
 
     const onSearch = async (e) => {
         const params = getFindParams(e)
-        const findProducts = await api.productos.findPaginated(params)
+        const findProducts = await api.products.findPaginated(params)
         const products = findProducts.docs
         let options
         switch (searchParam) {
@@ -111,7 +111,7 @@ const ProductSelector = (props) => {
     }
 
     const onSelect = async (e) => {
-        const findProduct = await api.productos.findById(e)
+        const findProduct = await api.products.findById(e)
         const product = findProduct.data
         dispatch({ type: actionToDispatchProduct, payload: product })
         genericComponents_dispatch({

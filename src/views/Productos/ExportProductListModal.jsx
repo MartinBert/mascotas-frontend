@@ -34,8 +34,8 @@ const ExportProductListModal = () => {
     const [salesAreas_state, salesAreas_dispatch] = useSalesAreasContext()
 
     const loadBrandsAndTypes = async () => {
-        const findBrands = await api.marcas.findAll()
-        const findTypes = await api.rubros.findAll()
+        const findBrands = await api.brands.findAll()
+        const findTypes = await api.types.findAll()
         const allBrands = findBrands.docs
         const allBrandsNames = allBrands.length < 1
             ? []
@@ -56,7 +56,7 @@ const ExportProductListModal = () => {
 
     const loadUserData = async () => {
         const userId = localStorage.getItem('userId')
-        const loggedUser = await api.usuarios.findById(userId)
+        const loggedUser = await api.users.findById(userId)
         auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
     }
 
@@ -447,7 +447,7 @@ const ExportProductListModal = () => {
 
     // ------------ Select to sales areas ---------------- //
     const loadSalesAreas = async () => {
-        const findSalesAreas = await api.zonasdeventas.findAll()
+        const findSalesAreas = await api.salesAreas.findAll()
         if (findSalesAreas.docs.length === 0) return
         salesAreas_dispatch({ type: 'SET_ALL_SALES_AREAS', payload: findSalesAreas.docs })
     }
@@ -459,7 +459,7 @@ const ExportProductListModal = () => {
 
     const changeSalesArea = async (e) => {
         const filters = JSON.stringify({ name: e })
-        const findSalesArea = await api.zonasdeventas.findAllByFilters(filters)
+        const findSalesArea = await api.salesAreas.findAllByFilters(filters)
         salesAreas_dispatch({ type: 'SET_SELECTED_SALES_AREA', payload: findSalesArea.docs })
     }
 
@@ -482,8 +482,8 @@ const ExportProductListModal = () => {
     // --------- Table of products to export ------------- //
     const fetchProducts = async () => {
         const findParamsForRender = formatFindParams(products_state.exportProductList.paginationParams)
-        const dataForRender = await api.productos.findPaginated(findParamsForRender)
-        const dataForExport = await api.productos.findAllForCatalogue(findParamsForRender.filters)
+        const dataForRender = await api.products.findPaginated(findParamsForRender)
+        const dataForExport = await api.products.findAllForCatalogue(findParamsForRender.filters)
         const data = {
             productsToExport: dataForExport.docs,
             productsToRender: dataForRender.docs,

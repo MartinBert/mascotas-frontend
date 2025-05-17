@@ -9,7 +9,7 @@ const checkStorageStatus = (err) => {
 const filterAutocompleteOptions = async(service, search, keyToCompare) => {
     const headers = {headers: {Authorization: localStorage.getItem('token')}}
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/genericos/genericAutocompleteFilter?model=${service}&search=${search}&keyToCompare=${keyToCompare}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/generics/genericAutocompleteFilter?model=${service}&search=${search}&keyToCompare=${keyToCompare}`, headers)
         return response.data
     }catch(err){
         checkStorageStatus(err)
@@ -17,8 +17,8 @@ const filterAutocompleteOptions = async(service, search, keyToCompare) => {
     }
 }
 
-const genericos = {
+const generics = {
     filterAutocompleteOptions
 }
 
-export default genericos
+export default generics

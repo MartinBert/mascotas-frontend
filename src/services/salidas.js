@@ -1,181 +1,97 @@
-import axios from 'axios'
+import helpers from '../helpers'
 
-const checkStorageStatus = (err) => {
-    if (err.status === 401 || err.status === 403) {
-        localStorage.clear()
-    }
-}
+
+const path = 'outputs'
 
 const countRecords = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/recordsInfo/quantity`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.countRecords }
+    const response = await processService(props)
+    return response
 }
 
-const deleteById = async (id) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/salidas/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const deletePropsFromAll = async (propsToDelete) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/delete_props_from_all`, propsToDelete, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const edit = async (salida) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas`, salida, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
-}
-
-const editAll = async (outputs) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const lotsLimit = 5
-        const loopLimit = outputs.length / lotsLimit
-        const responseData = []
-        for (let index = 0; index < loopLimit; index++) {
-            const lot = outputs.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            const response = await axios.put(`${process.env.REACT_APP_API_REST}/salidas/outputs/edit_all`, lot, headers)
-            responseData.push(response.data)
-        }
-        const response = {
-            code: 200,
-            data: responseData,
-            status: 'OK'
-        }
-        return response
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const edit = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.edit }
+    const response = await processService(props)
+    return response
 }
 
 const findAll = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findAll }
+    const response = await processService(props)
+    return response
 }
 
 const findAllByFilters = async (filters) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas?filters=${filters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: filters, path, service: services.findAllByFilters }
+    const response = await processService(props)
+    return response
 }
 
 const findById = async (id) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/${id}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: id, path, service: services.findById }
+    const response = await processService(props)
+    return response
 }
 
-const findMultipleIds = async (ids) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/multiple/idList?ids=${JSON.stringify(ids)}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findNewer = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findNewer }
+    const response = await processService(props)
+    return response
 }
 
-const findNewerRecord = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/recordsInfo/newer`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findOldest = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findOldest }
+    const response = await processService(props)
+    return response
 }
 
-const findOldestRecord = async () => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas/recordsInfo/oldest`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const findPaginated = async (paginationParams) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: paginationParams, path, service: services.findPaginated }
+    const response = await processService(props)
+    return response
 }
 
-const findPaginated = async (params) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const { page, limit, filters } = params
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/salidas?page=${page}&limit=${limit}&filters=${filters}`, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const remove = async (ids) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: ids, path, service: services.remove }
+    const response = await processService(props)
+    return response
 }
 
-const save = async (salida) => {
-    const headers = { headers: { Authorization: localStorage.getItem('token') } }
-    try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/salidas`, salida, headers)
-        return response.data
-    } catch (err) {
-        checkStorageStatus(err)
-        console.error(err)
-    }
+const removeProps = async (propsArray) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: propsArray, path, service: services.removeProps }
+    const response = await processService(props)
+    return response
 }
 
-const salidas = {
+const save = async (records) => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { data: records, path, service: services.save }
+    const response = await processService(props)
+    return response
+}
+
+const outputs = {
     countRecords,
-    deleteById,
-    deletePropsFromAll,
     edit,
-    editAll,
     findAll,
     findAllByFilters,
     findById,
-    findMultipleIds,
-    findNewerRecord,
-    findOldestRecord,
+    findNewer,
+    findOldest,
     findPaginated,
+    remove,
+    removeProps,
     save
 }
 
-export default salidas
+export default outputs

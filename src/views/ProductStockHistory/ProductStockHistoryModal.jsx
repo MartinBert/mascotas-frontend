@@ -64,7 +64,7 @@ const ProductStockHistoryModal = () => {
 
     // --------------- Table of stock flow --------------- //
     const stockHistoryDeletion = async (stockHistory) => {
-        const response = await api.stockHistory.deleteStockHistory(stockHistory._id)
+        const response = await api.stockHistory.remove(stockHistory._id)
         if (response.code !== 200) errorAlert('No se pudo eliminar el registro. Inténtelo de nuevo.')
         else successAlert('Registro eliminado exitosamente.')
         const paginationParams = {

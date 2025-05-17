@@ -39,7 +39,7 @@ const CondicionesFiscales = () => {
     // --------------- Fetch Fiscal Condition --------------- //
     const fetchCondicionesFiscales = async () => {
         const stringFilters = JSON.stringify(filters)
-        const data = await api.condicionesfiscales.findPaginated({ page, limit, filters: stringFilters })
+        const data = await api.fiscalConditions.findPaginated({ page, limit, filters: stringFilters })
         setCondicionesFiscales(data.docs)
         setTotalDocs(data.totalDocs)
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -63,7 +63,7 @@ const CondicionesFiscales = () => {
         )
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-        const response = await api.condicionesfiscales.deleteCondicionFiscal(deleteModal_state.entityID)
+        const response = await api.fiscalConditions.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })

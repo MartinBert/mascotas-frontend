@@ -45,9 +45,9 @@ const DailyBusinessStatistics = () => {
 
     // ------------------------------------- Load data --------------------------------------- //
     const loadRenderConditions = async () => {
-        const recordsQuantityOfEntries = await api.entradas.countRecords()
-        const recordsQuantityOfOutputs = await api.salidas.countRecords()
-        const recordsQuantityOfSales = await api.ventas.countRecords()
+        const recordsQuantityOfEntries = await api.entries.countRecords()
+        const recordsQuantityOfOutputs = await api.outputs.countRecords()
+        const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_ENTRIES',
             payload: recordsQuantityOfEntries < 1 ? false : true

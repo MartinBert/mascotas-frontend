@@ -40,7 +40,7 @@ const Usuarios = () => {
     // ------------------ Fetch Users ------------------ //
     const fetchUsuarios = async () => {
         const stringFilters = JSON.stringify(filters)
-        const data = await api.usuarios.findPaginated({ page, limit, filters: stringFilters })
+        const data = await api.users.findPaginated({ page, limit, filters: stringFilters })
         setUsuarios(data.docs)
         setTotalDocs(data.totalDocs)
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -64,7 +64,7 @@ const Usuarios = () => {
         )
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-        const response = await api.usuarios.deleteUsuario(deleteModal_state.entityID)
+        const response = await api.users.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })

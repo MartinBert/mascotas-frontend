@@ -1,7 +1,7 @@
 import helpers from '../helpers'
 
 
-const path = 'measure_units'
+const path = 'tenants'
 
 const countRecords = async () => {
     const { processService, services } = helpers.servicesHelper
@@ -27,6 +27,13 @@ const findAll = async () => {
 const findAllByFilters = async (filters) => {
     const { processService, services } = helpers.servicesHelper
     const props = { data: filters, path, service: services.findAllByFilters }
+    const response = await processService(props)
+    return response
+}
+
+const findAllUsers = async () => {
+    const { processService, services } = helpers.servicesHelper
+    const props = { path, service: services.findAllUsers }
     const response = await processService(props)
     return response
 }
@@ -80,11 +87,12 @@ const save = async (records) => {
     return response
 }
 
-const measureUnits = {
+const benefits = {
     countRecords,
     edit,
     findAll,
     findAllByFilters,
+    findAllUsers,
     findById,
     findNewer,
     findOldest,
@@ -94,4 +102,4 @@ const measureUnits = {
     save
 }
 
-export default measureUnits
+export default benefits

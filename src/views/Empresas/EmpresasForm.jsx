@@ -53,7 +53,7 @@ const EmpresasForm = () => {
                 setLoading(false)
                 return
             }
-            const searchedItem = await api.empresas.findById(id)
+            const searchedItem = await api.business.findById(id)
             setEmpresa({
                 _id: searchedItem._id,
                 razonSocial: searchedItem.razonSocial,
@@ -79,7 +79,7 @@ const EmpresasForm = () => {
         if (!empresa.logo) empresa.logo = uploadedImages[0]
 
         const saveBusiness = async () => {
-            const response = await api.empresas.save(empresa)
+            const response = await api.business.save(empresa)
             if (response.code === 200) {
                 successAlert('El registro fue grabado con exito')
                     .then(redirectToEmpresas())
@@ -87,7 +87,7 @@ const EmpresasForm = () => {
         }
 
         const editBusiness = async () => {
-            const response = await api.empresas.edit(empresa)
+            const response = await api.business.edit(empresa)
             if (response.code === 200) success()
             else fail()
         }

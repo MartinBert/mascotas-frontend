@@ -39,7 +39,7 @@ const Empresas = () => {
     // ------------------ Fetch Business ------------------ //
     const fetchEmpresas = async () => {
         const stringFilters = JSON.stringify(filters)
-        const data = await api.empresas.findPaginated({ page, limit, filters: stringFilters })
+        const data = await api.business.findPaginated({ page, limit, filters: stringFilters })
         setEmpresas(data.docs)
         setTotalDocs(data.totalDocs)
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
@@ -63,7 +63,7 @@ const Empresas = () => {
         )
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-        const response = await api.empresas.deleteEmpresa(deleteModal_state.entityID)
+        const response = await api.business.remove(deleteModal_state.entityID)
         if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })
