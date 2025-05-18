@@ -19,6 +19,7 @@ import products from './productos'
 import salePoints from './puntosventa'
 import sales from './ventas'
 import salesAreas from './zonasdeventas'
+import salesLines from './salesLines'
 import seed from './seed'
 import stockHistory from './stockHistory'
 import tenants from './tenants'
@@ -49,6 +50,7 @@ const api = {
     salePoints,
     sales,
     salesAreas,
+    salesLines,
     seed,
     stockHistory,
     tenants,

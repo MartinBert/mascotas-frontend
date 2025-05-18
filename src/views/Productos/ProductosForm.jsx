@@ -254,7 +254,8 @@ const ProductosForm = () => {
                 return updatedSale
             })
             const salesEditionResponse = await api.sales.edit(updatedSales)
-            if (salesEditionResponse.code !== 200) {
+            const linesOfSalesEditionResponse = await api.sales.edit(updatedSales.renglones)
+            if (salesEditionResponse.code !== 200 || linesOfSalesEditionResponse.code !== 200) {
                 return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
             }
         }

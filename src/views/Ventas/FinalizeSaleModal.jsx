@@ -231,8 +231,11 @@ const FinalizeSaleModal = () => {
         })
         const { refs, productos, ...saleData } = sale_state
         const dataToSave = { ...saleData, renglones: fixedLines }
-        const response = await api.sales.save(dataToSave)
-        if (response.code !== 200) errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
+        const responseOfSaveLines = await api.salesLines.save(fixedLines)
+        const responseOfSaveSale = await api.sales.save(dataToSave)
+        if (responseOfSaveLines.code !== 200 || responseOfSaveSale.code !== 200) {
+            errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
+        }
     }
 
     const saveStockHistoryOfProducts = async () => {

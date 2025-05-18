@@ -7,7 +7,6 @@ const lotsLimit = 5
 
 const services = {
     countRecords: 'countRecords',
-    deletePropsFromAllLines: 'deletePropsFromAllLines',
     edit: 'edit',
     findAll: 'findAll',
     findAllByFilters: 'findAllByFilters',
@@ -55,9 +54,6 @@ const processService = async (props) => {
     switch (service) {
         case services.countRecords:
             response = await processCountRecords(caseProps)
-            break
-        case services.deletePropsFromAllLines:
-            response = await processDeletePropsFromAllLines(caseProps)
             break
         case services.edit:
             response = await processEdit(caseProps)
@@ -128,18 +124,6 @@ const processCountRecords = async (caseProps) => {
         const { headers, path } = caseProps
         const reqConfig = { headers }
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/countRecords`, reqConfig)
-        return response.data
-    } catch (err) {
-        console.error(err)
-    }
-}
-
-const processDeletePropsFromAllLines = async (caseProps) => {
-    try {
-        const { data, headers, path } = caseProps
-        const propsToDelete = Array.isArray(data) ? data : [data]
-        const reqConfig = { headers }
-        const response = await axios.put(`${process.env.REACT_APP_API_REST}/${path}/records/deletePropsFromAllLines`, propsToDelete, reqConfig)
         return response.data
     } catch (err) {
         console.error(err)
@@ -246,7 +230,7 @@ const processFindLastVoucherNumber = async (caseProps) => {
     try {
         const { data: { code }, headers, path } = caseProps
         const reqConfig = { headers, params: { code } }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/processFindLastVoucherNumber`, reqConfig)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findLastVoucherNumber`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
