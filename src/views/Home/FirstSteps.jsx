@@ -41,31 +41,31 @@ const FirstSteps = () => {
     // -------------------------------------- Actions ---------------------------------------- //
     const isStep0Complete = async () => {
         const data = [
-            { filter: JSON.stringify({ documentoReceptor: 86 }), service: 'clientes' },
-            { filter: JSON.stringify({ adicionaIva: false }), service: 'condicionesfiscales' },
-            { filter: JSON.stringify({ codigoUnico: '000' }), service: 'documentos' },
-            { filter: JSON.stringify({ surchargeDecimal: 0 }), service: 'zonasdeventas' },
-            { filter: JSON.stringify({ fraccionamiento: 1 }), service: 'unidadesmedida' },
+            { filter: JSON.stringify({ documentoReceptor: 86 }), service: 'clients' },
+            { filter: JSON.stringify({ adicionaIva: false }), service: 'fiscalConditions' },
+            { filter: JSON.stringify({ codigoUnico: '000' }), service: 'documents' },
+            { filter: JSON.stringify({ surchargeDecimal: 0 }), service: 'salesAreas' },
+            { filter: JSON.stringify({ fraccionamiento: 1 }), service: 'measureUnits' },
         ]
         const results = []
         for (let index = 0; index < data.length; index++) {
             const dataItem = data[index]
             const findResult = await api[dataItem.service].findAllByFilters(dataItem.filter)
-            results.push(findResult.docs.length)
+            results.push(findResult.data.totalDocs.length)
         }
         if (results.includes(0)) return false
         else return true
     }
-
+    
     const isStep1Complete = async () => {
         const findResult = await api.salePoints.findAll()
-        if (findResult.docs.length === 0) return false
+        if (findResult.data.length === 0) return false
         else return true
     }
 
     const isStep2Complete = async () => {
         const findResult = await api.business.findAll()
-        if (findResult.docs.length === 0) return false
+        if (findResult.data.length === 0) return false
         else return true
     }
 
@@ -76,11 +76,11 @@ const FirstSteps = () => {
     const setSelectOptionsForStep2 = async () => {
         if (home_state.firstSteps.activeStep !== 2) return
         const findSalePoints = await api.salePoints.findAll()
-        const salePoints = findSalePoints.docs.map(salepoint => {
+        const salePoints = findSalePoints.data.map(salepoint => {
             return { label: salepoint.nombre, value: salepoint._id }
         })
         const findFiscalConditions = await api.fiscalConditions.findAll()
-        const fiscalConditions = findFiscalConditions.docs.map(fiscalCondition => {
+        const fiscalConditions = findFiscalConditions.data.map(fiscalCondition => {
             return { label: fiscalCondition.nombre, value: fiscalCondition._id }
         })
         home_dispatch({ type: 'SET_SELECTS_OPTIONS_FOR_STEP_2_FISCAL_CONDITIONS', payload: fiscalConditions })
@@ -113,11 +113,11 @@ const FirstSteps = () => {
         else {
             const findBusiness = await api.business.findAll()
             const findSalePoint = await api.salePoints.findAll()
-            const business = findBusiness.docs[0]._id
-            const salePoint = findSalePoint.docs[0]._id
+            const business = findBusiness.data[0]._id
+            const salePoint = findSalePoint.data[0]._id
             const updatedUser = { ...auth_state.user, empresa: business, puntoVenta: salePoint }
             const res = await api.users.edit(updatedUser)
-            if (res.code !== 200) return errorAlert('No se pudo completar el registro. Intente de nuevo.')
+            if (res.status !== 'OK') return errorAlert('No se pudo completar el registro. Intente de nuevo.')
             const alertRes = await successAlert('¡Registros guardados exitosamente!')
             if (alertRes.isConfirmed) reloadPage()
         }
@@ -176,7 +176,7 @@ const FirstSteps = () => {
                     { adicionaIva: true, nombre: 'Monotributista' },
                     { adicionaIva: false, nombre: 'Excento' }
                 ],
-                service: 'condicionesfiscales',
+                service: 'fiscalConditions',
                 title: 'Condiciones fiscales'
             },
             {
@@ -248,7 +248,7 @@ const FirstSteps = () => {
                         ticket: false
                     }
                 ],
-                service: 'documentos',
+                service: 'documents',
                 title: 'Documentos'
             },
             {
@@ -267,14 +267,14 @@ const FirstSteps = () => {
                         }]
                     }
                 ],
-                service: 'mediospago',
+                service: 'paymentMethods',
                 title: 'Medios de pago'
             },
             {
                 source: [
                     { nombre: '1 Unid.', fraccionamiento: 1 }
                 ],
-                service: 'unidadesmedida',
+                service: 'measureUnits',
                 title: 'Unidades de medida'
             },
             {
@@ -288,7 +288,7 @@ const FirstSteps = () => {
                         surchargePercentage: 0
                     }
                 ],
-                service: 'zonasdeventas',
+                service: 'salesAreas',
                 title: 'Zonas de venta'
             }
         ],
@@ -311,12 +311,12 @@ const FirstSteps = () => {
                             {
                                 prop: 'condicionFiscal',
                                 query: JSON.stringify({ nombre: 'Consumidor Final' }),
-                                service: 'condicionesfiscales'
+                                service: 'fiscalConditions'
                             }
                         ]
                     }
                 ],
-                service: 'clientes',
+                service: 'clients',
                 title: 'Clientes'
             }
         ],
@@ -355,7 +355,7 @@ const FirstSteps = () => {
         isCompleted: home_state.firstSteps.isActiveStepCompleted,
         isCompletedDispatch: home_dispatch,
         isCompletedType: 'SET_IS_ACTIVE_STEP_COMPLETED',
-        service: 'puntosventa'
+        service: 'salePoints'
     }
 
     const step2Data = {
@@ -496,7 +496,7 @@ const FirstSteps = () => {
         isCompleted: home_state.firstSteps.isActiveStepCompleted,
         isCompletedDispatch: home_dispatch,
         isCompletedType: 'SET_IS_ACTIVE_STEP_COMPLETED',
-        service: 'empresas'
+        service: 'business'
     }
 
     const steps = [

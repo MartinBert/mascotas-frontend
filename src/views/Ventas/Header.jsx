@@ -122,8 +122,8 @@ const Header = () => {
             errorAlert('No es conveniente facturar con fecha posterior a hoy.')
             return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
         }
-        const [lastBill] = await api.sales.findNewerSale()
-        const dateOfLastBill = parseInt(dateToAfip(lastBill.fechaEmision))
+        const lastBill = await api.sales.findNewerSale()
+        const dateOfLastBill = parseInt(dateToAfip(lastBill.data.fechaEmision))
         const selectedDate = parseInt(dateToAfip(e.$d))
         if (selectedDate < dateOfLastBill) {
             errorAlert('La fecha de facturación debe ser igual o posterior a la del último comprobante emitido.')
@@ -482,7 +482,7 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedBusinessName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findClients = await api.clients.findPaginated(params)
-        const clients = findClients.docs
+        const clients = findClients.data.docs
         const options = clients.map(client => { return { label: client.razonSocial, value: client.normalizedBusinessName } })
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_CLIENT', payload: options })
     }
@@ -490,7 +490,7 @@ const Header = () => {
     const onSelectClient = async (e) => {
         const filters = JSON.stringify({ normalizedBusinessName: e })
         const findClients = await api.clients.findAllByFilters(filters)
-        const [client] = findClients.docs
+        const [client] = findClients.data.docs
         sale_dispatch({ type: 'SET_CLIENT', payload: client })
         sale_dispatch({ type: 'SET_STATUS_OF_CLIENT', payload: null })
     }
@@ -532,7 +532,7 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findDocuments = await api.documents.findPaginated(params)
-        const documents = findDocuments.docs
+        const documents = findDocuments.data.docs
         const fixedDocuments = documents.filter(document => !creditCodes.includes(document.codigoUnico) && !debitCodes.includes(document.codigoUnico))
         const options = fixedDocuments.map(document => { return { label: document.nombre, value: document.normalizedName } })
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_DOCUMENT', payload: options })
@@ -541,7 +541,7 @@ const Header = () => {
     const onSelectDocument = async (e) => {
         const filters = JSON.stringify({ normalizedName: e })
         const findDocuments = await api.documents.findAllByFilters(filters)
-        const [document] = findDocuments.docs
+        const [document] = findDocuments.data.docs
         sale_dispatch({ type: 'SET_DOCUMENT', payload: document })
         sale_dispatch({ type: 'SET_STATUS_OF_DOCUMENT', payload: null })
     }
@@ -583,7 +583,7 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findPaymentMethods = await api.paymentMethods.findPaginated(params)
-        const paymentMethods = findPaymentMethods.docs
+        const paymentMethods = findPaymentMethods.data.docs
         const options = paymentMethods.map(paymentMethod => { return { label: paymentMethod.nombre, value: paymentMethod.normalizedName } })
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PAYMENT_METHOD', payload: options })
     }
@@ -591,7 +591,7 @@ const Header = () => {
     const onSelectPaymentMethod = async (e) => {
         const filters = JSON.stringify({ normalizedName: e })
         const findPaymentMethods = await api.paymentMethods.findAllByFilters(filters)
-        const paymentMethods = findPaymentMethods.docs
+        const paymentMethods = findPaymentMethods.data.docs
         sale_dispatch({ type: 'SET_PAYMENT_METHOD', payload: paymentMethods })
         sale_dispatch({ type: 'SET_STATUS_OF_PAYMENT_METHOD', payload: null })
     }
@@ -716,7 +716,7 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 15, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsAlreadySelected = sale_state.productos.map(product => product.normalizedBarcode)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
         const options = productsNotYetSelected.map(product => {
@@ -741,7 +741,7 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         for (let index = 0; index < products.length; index++) {
             const product = products[index]
             sale_dispatch({ type: 'SET_PRODUCT', payload: product })
@@ -770,7 +770,7 @@ const Header = () => {
         const filters = JSON.stringify({ normalizedName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsAlreadySelected = sale_state.productos.map(product => product.normalizedName)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedName))
         const options = productsNotYetSelected.map(product => { return { label: product.nombre, value: product.normalizedName } })
@@ -780,7 +780,7 @@ const Header = () => {
     const onSelectProductByName = async (e) => {
         const filters = JSON.stringify({ normalizedName: e })
         const findProducts = await api.products.findAllByFilters(filters)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         for (let index = 0; index < products.length; index++) {
             const product = products[index]
             sale_dispatch({ type: 'SET_PRODUCT', payload: product })

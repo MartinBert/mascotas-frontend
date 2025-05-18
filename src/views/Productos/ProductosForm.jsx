@@ -156,8 +156,8 @@ const ProductosForm = () => {
         const response = await api.brands.findById(brand._id)
         setProduct({
             ...product,
-            marca: response,
-            normalizedBrand: response.nombre
+            marca: response.data,
+            normalizedBrand: response.data.nombre
         })
     }
 
@@ -166,8 +166,8 @@ const ProductosForm = () => {
         const response = await api.types.findById(heading._id)
         setProduct({
             ...product,
-            rubro: response,
-            normalizedType: response.nombre
+            rubro: response.data,
+            normalizedType: response.data.nombre
         })
     }
 
@@ -176,8 +176,8 @@ const ProductosForm = () => {
         const response = await api.measureUnits.findById(measure._id)
         setProduct({
             ...product,
-            unidadMedida: response,
-            cantidadFraccionadaStock: response.fraccionamiento
+            unidadMedida: response.data,
+            cantidadFraccionadaStock: response.data.fraccionamiento
         })
     }
 
@@ -211,7 +211,7 @@ const ProductosForm = () => {
 
     const saveNewProduct = async () => {
         const response = await api.products.save(product)
-        if (response.code === 200) {
+        if (response.status === 'OK') {
             successAlert('El registro fue grabado con exito').then(redirectToProducts())
         } else {
             errorAlert('Error al guardar el registro')
@@ -232,7 +232,7 @@ const ProductosForm = () => {
                 // renglones: { $elemMatch: { productId: productInDb._id } }
             })
             const findSales = await api.sales.findAllByFilters(filters)
-            const sales = findSales.data
+            const sales = findSales.data.docs
             const salesThatContainProduct = sales.filter(sale =>
                 sale.renglones.map(line => line.nombre).includes(productInDb.nombre)
             )
@@ -255,12 +255,12 @@ const ProductosForm = () => {
             })
             const salesEditionResponse = await api.sales.edit(updatedSales)
             const linesOfSalesEditionResponse = await api.sales.edit(updatedSales.renglones)
-            if (salesEditionResponse.code !== 200 || linesOfSalesEditionResponse.code !== 200) {
+            if (salesEditionResponse.status !== 'OK' || linesOfSalesEditionResponse.status !== 'OK') {
                 return errorAlert('Error al actualizar el nombre del producto en las ventas anteriores.')
             }
         }
         const productEditionResponse = await api.products.edit(product)
-        if (productEditionResponse.code !== 200) {
+        if (productEditionResponse.status !== 'OK') {
             errorAlert('Error al guardar el registro.')
         } else {
             successAlert('El registro fue grabado con éxito.').then(redirectToProducts())

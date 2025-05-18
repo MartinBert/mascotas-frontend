@@ -65,7 +65,7 @@ const MediosPagoForm = () => {
             if (id === 'nuevo') {
                 api.paymentMethods.save(mediopago)
                     .then(response => {
-                        if (response.code === 200) {
+                        if (response.status === 'OK') {
                             success()
                         } else {
                             errorAlert('No se ha podido guardar el registro')
@@ -74,7 +74,7 @@ const MediosPagoForm = () => {
             } else {
                 api.paymentMethods.edit(mediopago)
                     .then(response => {
-                        if (response.code === 200) {
+                        if (response.status === 'OK') {
                             success()
                         } else {
                             errorAlert('No se ha podido guardar el registro')

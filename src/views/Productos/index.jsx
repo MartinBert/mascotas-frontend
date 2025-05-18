@@ -59,13 +59,13 @@ const Productos = () => {
     const loadBrandsAndTypes = async () => {
         const findBrands = await api.brands.findAll()
         const findTypes = await api.types.findAll()
-        const allBrands = findBrands.docs
+        const allBrands = findBrands.data
         const allBrandsNames = allBrands.length < 1
             ? []
             : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
                 return { value: brand.nombre }
             }))
-        const allTypes = findTypes.docs
+        const allTypes = findTypes.data
         const allTypesNames = allTypes.length < 1
             ? []
             : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
@@ -82,11 +82,11 @@ const Productos = () => {
         const recordsQuantityOfTypes = await api.types.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_BRANDS',
-            payload: recordsQuantityOfBrands < 1 ? false : true
+            payload: recordsQuantityOfBrands.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_TYPES',
-            payload: recordsQuantityOfTypes < 1 ? false : true
+            payload: recordsQuantityOfTypes.data < 1 ? false : true
         })
     }
 
@@ -105,7 +105,7 @@ const Productos = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.users.findById(userId)
-            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
         }
         fetchUser()
     }, [auth_dispatch])
@@ -115,7 +115,7 @@ const Productos = () => {
         if (!products_state.index.paginationParams) return
         const findParamsForRender = formatFindParams(products_state.index.paginationParams)
         const dataForRender = await api.products.findPaginated(findParamsForRender)
-        products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender })
+        products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender.data.docs })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -138,7 +138,7 @@ const Productos = () => {
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
         const response = await api.products.remove(deleteModal_state.entityID)
-        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        if (response.status !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })
     }

@@ -59,29 +59,31 @@ const VentasList = () => {
         const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_SALES',
-            payload: recordsQuantityOfSales < 1 ? false : true
+            payload: recordsQuantityOfSales.data < 1 ? false : true
         })
     }
 
     const fetchDocumentos = async () => {
-        const data = await api.documents.findAll()
-        const todosLosDocumentos = data.docs.map(doc => { return { value: doc.nombre, label: doc.nombre } })
-        setDocumentos(data.docs)
-        setDocumentosNombres(todosLosDocumentos)
+        const findDocuments = await api.documents.findAll()
+        const documents = findDocuments.data
+        const documentsNames = documents.map(doc => { return { value: doc.nombre, label: doc.nombre } })
+        setDocumentos(documents)
+        setDocumentosNombres(documentsNames)
     }
 
     const fetchMediosPago = async () => {
-        const data = await api.paymentMethods.findAll()
-        const todosLosMediosDePago = data.docs.map(mp => { return { value: mp.nombre, label: mp.nombre } })
-        setMediosPago(data.docs)
-        setMediosPagoNombres(todosLosMediosDePago)
+        const findPaymentMethods = await api.paymentMethods.findAll()
+        const paymentMethods = findPaymentMethods.data
+        const paymentMethodsNames = paymentMethods.map(mp => { return { value: mp.nombre, label: mp.nombre } })
+        setMediosPago(paymentMethods)
+        setMediosPagoNombres(paymentMethodsNames)
     }
 
     const fetchVentasList = async () => {
         const stringFilters = JSON.stringify(filters)
         const salesData = await api.sales.findPaginated({ page, limit, filters: stringFilters })
-        setVentas(salesData.docs)
-        setTotalDocs(salesData.totalDocs)
+        setVentas(salesData.data.docs)
+        setTotalDocs(salesData.data.totalDocs)
         setLoading(false)
     }
 
@@ -108,7 +110,7 @@ const VentasList = () => {
     // -------------------------------------- Actions ---------------------------------------- //
     const openFiscalNoteModal = async (ventaID) => {
         const referenceVoucher = await api.sales.findById(ventaID)
-        fiscalNoteModal_dispatch({ type: 'SET_REFERENCE_VOUCHER', payload: referenceVoucher })
+        fiscalNoteModal_dispatch({ type: 'SET_REFERENCE_VOUCHER', payload: referenceVoucher.data })
         fiscalNoteModal_dispatch({ type: 'SHOW_FISCAL_NOTE_MODAL' })
     }
     

@@ -25,7 +25,7 @@ const getAssociatedData = async (fiscalData, getType = null) => {
 
     // Associated document data
     const findAssociatedDocument = await api.documents.findAllByFilters({ codigoUnico: associatedVoucher.Tipo })
-    const associatedDocument = findAssociatedDocument.docs[0]
+    const associatedDocument = findAssociatedDocument.data.docs[0]
     associatedData.voucherLetter = associatedDocument.letra
     associatedData.voucherName = associatedDocument.nombre
 

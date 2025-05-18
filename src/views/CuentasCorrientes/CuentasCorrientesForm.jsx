@@ -50,7 +50,7 @@ const CuentasCorrientesForm = () => {
 
         const fetchCuentaCorriente = async () => {
             const searchedItem = await api.cuentasCorrientes.findById(id)
-            setCuentaCorriente(searchedItem)
+            setCuentaCorriente(searchedItem.data)
             setLoading(false)
         }
         fetchCuentaCorriente()
@@ -64,7 +64,7 @@ const CuentasCorrientesForm = () => {
 
         const saveItem = async () => {
             const response = (cuentaCorriente._id) ? await api.cuentasCorrientes.edit(cuentaCorriente) : await api.cuentasCorrientes.save(cuentaCorriente)
-            if (response === 'OK') return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

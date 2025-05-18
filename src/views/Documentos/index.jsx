@@ -40,9 +40,9 @@ const Documentos = () => {
     useEffect(() => {
         const fetchDocumentos = async () => {
             const stringFilters = JSON.stringify(filters)
-            const data = await api.documents.findPaginated({ page, limit, filters: stringFilters })
-            setDocumentos(data.docs)
-            setTotalDocs(data.totalDocs)
+            const findRecords = await api.documents.findPaginated({ page, limit, filters: stringFilters })
+            setDocumentos(findRecords.data.docs)
+            setTotalDocs(findRecords.data.totalDocs)
             deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
         }
         fetchDocumentos()
@@ -63,7 +63,7 @@ const Documentos = () => {
             )
             if (validation === 'FAIL') return
             const response = await api.documents.remove(deleteModal_state.entityID)
-            if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+            if (response.status !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
             successAlert('El registro se eliminó correctamente.')
             deleteModal_dispatch({ type: 'CLEAN_STATE' })
         }

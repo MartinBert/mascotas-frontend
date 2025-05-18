@@ -50,7 +50,7 @@ const Home = () => {
     const consoleEntries = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllEntries = await api.entries.findAll()
-        const allEntries = findAllEntries.docs
+        const allEntries = findAllEntries.data
         console.log(allEntries)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -68,7 +68,7 @@ const Home = () => {
     const consoleDailyBusinessStatistics = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
-        const statistics = findDailyBusinessStatistics.docs
+        const statistics = findDailyBusinessStatistics.data
         console.log(statistics)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -86,7 +86,7 @@ const Home = () => {
     const consoleOutputs = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllOutputs = await api.outputs.findAll()
-        const allOutputs = findAllOutputs.docs
+        const allOutputs = findAllOutputs.data
         console.log(allOutputs)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -104,7 +104,7 @@ const Home = () => {
     const consoleProducts = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllProducts = await api.products.findAll()
-        const allProducts = findAllProducts.docs
+        const allProducts = findAllProducts.data
         console.log(allProducts)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -122,7 +122,7 @@ const Home = () => {
     const consoleProductsWithoutAssignedBrandOrType = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllProducts = await api.products.findAll()
-        const allProducts = findAllProducts.docs
+        const allProducts = findAllProducts.data
         const productsWithoutBrandOrType = allProducts.filter(product =>
             !product.marca || !product.rubro
         )
@@ -143,7 +143,7 @@ const Home = () => {
     const consoleSales = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findAllSales = await api.sales.findAll()
-        const allSales = findAllSales.docs
+        const allSales = findAllSales.data
         console.log(allSales)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -161,7 +161,7 @@ const Home = () => {
     const consoleStockHistories = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findStockHistory = await api.stockHistory.findAll()
-        const stockHistory = findStockHistory.docs
+        const stockHistory = findStockHistory.data
         console.log(stockHistory)
         home_dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -237,7 +237,7 @@ const Home = () => {
     const deleteStockHistories = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
         const findStockHistories = await api.stockHistory.findAll()
-        const stockHistories = findStockHistories.docs
+        const stockHistories = findStockHistories.data
         for (let index = 0; index < stockHistories.length; index++) {
             const stockHistory = stockHistories[index]
             await api.stockHistory.remove(stockHistory._id)
@@ -261,9 +261,9 @@ const Home = () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
 
         // const findSales = await api.sales.findAll()
-        // const sales = findSales.docs
+        // const sales = findSales.data
         // const res = await api.sales.edit(updatedSales)
-        // if (!res || res.code !== 200) errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
+        // if (!res || res.status !== 'OK') errorAlert('No se pudieron reparar los registros. Intente de nuevo.')
         // else console.log('Records fixed.')
 
         home_dispatch({ type: 'SET_LOADING', payload: false })
@@ -296,7 +296,7 @@ const Home = () => {
     }
 
     const getOldestActivityDate = async () => {
-        const activitiesToCheckOldestDate = ['entradas', 'salidas', 'ventas']
+        const activitiesToCheckOldestDate = ['entries', 'outputs', 'sales']
         const findOldestDatesInMs = []
         for (let index = 0; index < activitiesToCheckOldestDate.length; index++) {
             const activity = activitiesToCheckOldestDate[index];
@@ -345,9 +345,9 @@ const Home = () => {
         const findEntries = await api.entries.findAll()
         const findOutputs = await api.outputs.findAll()
         const findSales = await api.sales.findAll()
-        const entriesRecords = findEntries.docs
-        const outputsRecords = findOutputs.docs
-        const salesRecords = findSales.docs.filter(record => record.documento.cashRegister)
+        const entriesRecords = findEntries.data
+        const outputsRecords = findOutputs.data
+        const salesRecords = findSales.data.filter(record => record.documento.cashRegister)
         const dataForCreateRecords = stringDatesForCreateRecords.map((stringDate, index) => {
             const dataItem = {
                 date: datesForCreateRecords[index],
@@ -420,7 +420,7 @@ const Home = () => {
 
         // Save records
         const res = await api.dailyBusinessStatistics.save(dailyBusinessStatisticsToSave)
-        if (!res || res.code !== 200) {
+        if (!res || res.status !== 'OK') {
             home_dispatch({ type: 'SET_LOADING', payload: false })
             return errorAlert('No se pudo generar las estadísticas diarias.')
         }
@@ -464,10 +464,10 @@ const Home = () => {
         const findAllOutputs = await api.outputs.findAll()
         const findAllProducts = await api.products.findAll()
         const findAllSales = await api.sales.findAll()
-        const allEntries = findAllEntries.docs
-        const allOutputs = findAllOutputs.docs
-        const allProducts = findAllProducts.docs
-        const allSales = findAllSales.docs
+        const allEntries = findAllEntries.data
+        const allOutputs = findAllOutputs.data
+        const allProducts = findAllProducts.data
+        const allSales = findAllSales.data
 
         // Generate records
         const generateStockHistoryData = allProducts.map(product => {
@@ -677,9 +677,9 @@ const Home = () => {
         const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
         const findAllEntries = await api.entries.findAll()
         const findAllOutputs = await api.outputs.findAll()
-        const dailyBusinessStatistics = findAllDailyBusinessStatistics.docs
-        const entries = findAllEntries.docs
-        const outputs = findAllOutputs.docs
+        const dailyBusinessStatistics = findAllDailyBusinessStatistics.data
+        const entries = findAllEntries.data
+        const outputs = findAllOutputs.data
         
         const balanceViewTotalExpense = dailyBusinessStatistics.reduce(
             (acc, value) => acc + parseFloat(value.balanceViewExpense), 0

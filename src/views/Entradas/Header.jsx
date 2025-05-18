@@ -59,7 +59,7 @@ const Header = () => {
             entriesForReport = entries_state.entriesForExcelReport
         } else {
             const findAllFilteredEntries = await api.entries.findAllByFilters(formatFindFilters(entries_state.paginationParams.filters))
-            entriesForReport = findAllFilteredEntries.docs
+            entriesForReport = findAllFilteredEntries.data.docs
         }
         const processedLines = []
         for await (let entrada of entriesForReport) {
@@ -122,7 +122,7 @@ const Header = () => {
             const dateFilters = JSON.stringify({ fecha: { $gte: initialDate, $lte: finalDate } })
             findEntries = await api.entries.findAllByFilters(dateFilters)
         }
-        const entriesForExcelReport = findEntries.docs
+        const entriesForExcelReport = findEntries.data.docs
         const rangePickerValueForExcelReport = rangeDatesString
         return entries_dispatch({
             type: 'SET_ENTRIES_FOR_EXCEL_REPORT',

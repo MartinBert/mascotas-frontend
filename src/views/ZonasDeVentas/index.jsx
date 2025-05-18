@@ -47,8 +47,8 @@ const ZonasDeVentas = () => {
     // --------------- Fetch Sales Areas --------------- //
     const fetchZonasDeVentas = async () => {
         const findParams = formatFindParams(salesAreas_state.paginationParams)
-        const data = await api.salesAreas.findPaginated(findParams)
-        salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: data })
+        const findRecords = await api.salesAreas.findPaginated(findParams)
+        salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: findRecords.data.docs })
     }
 
     useEffect(() => {
@@ -70,7 +70,7 @@ const ZonasDeVentas = () => {
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
         const response = await api.salesAreas.remove(deleteModal_state.entityID)
-        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        if (response.status !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })
     }

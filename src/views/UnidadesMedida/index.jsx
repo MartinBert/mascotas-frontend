@@ -39,9 +39,9 @@ const UnidadesMedida = () => {
     // ------------------ Fetch Units of Measure ------------------ //
     const fetchUnidadesMedida = async () => {
         const stringFilters = JSON.stringify(filters)
-        const data = await api.measureUnits.findPaginated({ page, limit, filters: stringFilters })
-        setUnidadesMedida(data.docs)
-        setTotalDocs(data.totalDocs)
+        const findRecords = await api.measureUnits.findPaginated({ page, limit, filters: stringFilters })
+        setUnidadesMedida(findRecords.data.docs)
+        setTotalDocs(findRecords.data.totalDocs)
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -64,7 +64,7 @@ const UnidadesMedida = () => {
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
         const response = await api.measureUnits.remove(deleteModal_state.entityID)
-        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        if (response.status !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })
     }

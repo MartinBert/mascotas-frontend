@@ -69,7 +69,7 @@ const Benefits = () => {
         const findPaginatedParams = formatFindParams(benefits_state.paginationParams)
         console.log(findPaginatedParams)
         const recordsData = await api.benefits.findPaginated(findPaginatedParams)
-        benefits_dispatch({ type: 'SET_RECORDS_TO_RENDER', payload: recordsData.data })
+        benefits_dispatch({ type: 'SET_RECORDS_TO_RENDER', payload: recordsData.data.docs })
     }
     // eslint-disable-next-line
     useEffect(()=> { findRecords() }, [benefits_state.paginationParams])

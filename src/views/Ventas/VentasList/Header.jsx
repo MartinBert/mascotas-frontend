@@ -37,7 +37,7 @@ const Header = ({ setFilters, setPage, ventas, documentos, documentosNombres, me
                 fechaEmision: { $gte: initialDate, $lte: finalDate }
             })
             const findRecords = await api.sales.findAllByFilters(dateFilters)
-            const ventas = findRecords.data
+            const ventas = findRecords.data.docs
             setVentasToReport(ventas)
         }
     }

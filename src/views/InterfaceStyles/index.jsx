@@ -23,8 +23,8 @@ const InterfaceStyles = () => {
     // ------------------------------------ Inputs color ------------------------------------- //
     const loadStyles = async () => {
         const res = await api.interfaceStyles.findAll()
-        if (res.length < 1) interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: null })
-        else interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: res[0] })
+        if (res.data.length < 1) interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: null })
+        else interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: res.data[0] })
     }
 
     useEffect(() => {
@@ -36,15 +36,15 @@ const InterfaceStyles = () => {
     const saveStyles = async () => {
         let res
         const findStyles = await api.interfaceStyles.findAll()
-        if (findStyles.length < 1) res = await api.interfaceStyles.save(interfaceStyles_state)
+        if (findStyles.data.length < 1) res = await api.interfaceStyles.save(interfaceStyles_state)
         else {
             const newStyles = {
                 ...interfaceStyles_state,
-                _id: findStyles[0]._id
+                _id: findStyles.data[0]._id
             }
             res = await api.interfaceStyles.edit(newStyles)
         }
-        if (res.code !== 200) errorAlert('No pudieron registrarse los nuevos estilos. Intente de nuevo.')
+        if (res.status !== 'OK') errorAlert('No pudieron registrarse los nuevos estilos. Intente de nuevo.')
     }
 
     const buttonToSaveStyles = (

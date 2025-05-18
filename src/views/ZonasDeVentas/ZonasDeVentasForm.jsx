@@ -28,8 +28,8 @@ const ZonasDeVentasForm = () => {
     const loadSalesAreaDataState = async () => {
         if (pathname === 'nuevo') return
         const response = await api.salesAreas.findById(pathname)
-        formRef.current.setFieldsValue(response)
-        salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: response })
+        formRef.current.setFieldsValue(response.data)
+        salesAreas_dispatch({ type: 'EDIT_SALES_AREA', payload: response.data })
     }
 
     useEffect(() => {
@@ -50,7 +50,7 @@ const ZonasDeVentasForm = () => {
         let response
         if (pathname === 'nuevo') response = await api.salesAreas.save(salesAreas_state.currentSalesArea)
         else response = await api.salesAreas.edit(salesAreas_state.currentSalesArea)
-        if (response.code === 500) return errorAlert('Fallo al guardar el registro')
+        if (response.status !== 'OK') return errorAlert('Fallo al guardar el registro')
         successAlert('El registro se guardó correctamente')
         salesAreas_dispatch({ type: 'CLEAN_STATE' })
         navigate('/zonasdeventas')

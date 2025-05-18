@@ -44,8 +44,8 @@ const RubrosForm = () => {
         const fetchRubro = async () => {
             const searchedItem = await api.types.findById(id)
             setRubro({
-                _id: searchedItem._id,
-                nombre: searchedItem.nombre,
+                _id: searchedItem.data._id,
+                nombre: searchedItem.data.nombre,
             })
             setLoading(false)
         }
@@ -62,7 +62,7 @@ const RubrosForm = () => {
             const response = rubro._id
                 ? await api.types.edit(rubro)
                 : await api.types.save(rubro)
-            if (response === 'OK') return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

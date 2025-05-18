@@ -36,13 +36,13 @@ const ExportProductListModal = () => {
     const loadBrandsAndTypes = async () => {
         const findBrands = await api.brands.findAll()
         const findTypes = await api.types.findAll()
-        const allBrands = findBrands.docs
+        const allBrands = findBrands.data
         const allBrandsNames = allBrands.length < 1
             ? []
             : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
                 return { value: brand.nombre }
             }))
-        const allTypes = findTypes.docs
+        const allTypes = findTypes.data
         const allTypesNames = allTypes.length < 1
             ? []
             : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
@@ -57,7 +57,7 @@ const ExportProductListModal = () => {
     const loadUserData = async () => {
         const userId = localStorage.getItem('userId')
         const loggedUser = await api.users.findById(userId)
-        auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+        auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
     }
 
     useEffect(() => {
@@ -448,8 +448,8 @@ const ExportProductListModal = () => {
     // ------------ Select to sales areas ---------------- //
     const loadSalesAreas = async () => {
         const findSalesAreas = await api.salesAreas.findAll()
-        if (findSalesAreas.docs.length === 0) return
-        salesAreas_dispatch({ type: 'SET_ALL_SALES_AREAS', payload: findSalesAreas.docs })
+        if (findSalesAreas.data.length === 0) return
+        salesAreas_dispatch({ type: 'SET_ALL_SALES_AREAS', payload: findSalesAreas.data })
     }
 
     useEffect(() => {
@@ -460,7 +460,7 @@ const ExportProductListModal = () => {
     const changeSalesArea = async (e) => {
         const filters = JSON.stringify({ name: e })
         const findSalesArea = await api.salesAreas.findAllByFilters(filters)
-        salesAreas_dispatch({ type: 'SET_SELECTED_SALES_AREA', payload: findSalesArea.docs })
+        salesAreas_dispatch({ type: 'SET_SELECTED_SALES_AREA', payload: findSalesArea.data.docs })
     }
 
     const selectToSalesAreas = (
@@ -485,9 +485,9 @@ const ExportProductListModal = () => {
         const dataForRender = await api.products.findPaginated(findParamsForRender)
         const dataForExport = await api.products.findAllForCatalogue(findParamsForRender.filters)
         const data = {
-            productsToExport: dataForExport.docs,
-            productsToRender: dataForRender.docs,
-            quantityOfProducts: dataForExport.totalDocs
+            productsToExport: dataForExport.data.docs,
+            productsToRender: dataForRender.data.docs,
+            quantityOfProducts: dataForExport.data.totalDocs
         }
         products_dispatch({ type: 'SET_PRODUCTS_TO_EXPORT_PRODUCT_LIST_MODAL', payload: data })
     }

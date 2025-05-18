@@ -32,12 +32,13 @@ const checkStorageStatus = (err) => {
     }
 }
 
-const getMetadata = (tenantIdInRequest = null) => {
+const getMetadata = (newlyUser = null, tenantIdInRequest = null) => {
     const tenantId = tenantIdInRequest ?? localStorage.getItem('tenantId') ?? null
     const token = localStorage.getItem('token') ?? null
     const metadata = {
         headers: {
             Authorization: token,
+            newlyUser,
             tenantId
         }
     }
@@ -46,8 +47,9 @@ const getMetadata = (tenantIdInRequest = null) => {
 
 const processService = async (props) => {
     const { service, ...caseProps } = props
+    const newlyUser = caseProps.newlyUser ?? null
     const tenantIdInRequest = caseProps.tenantId ?? null
-    const { headers } = getMetadata(tenantIdInRequest)
+    const { headers } = getMetadata(newlyUser, tenantIdInRequest)
     caseProps.headers = headers
 
     let response
@@ -144,7 +146,7 @@ const processEdit = async (caseProps) => {
         }
         const response = {
             code: 200,
-            data: responseData,
+            data: responseData.length === 1 ? responseData[0].data : responseData,
             status: 'OK'
         }
         return response
@@ -332,7 +334,7 @@ const processRemove = async (caseProps) => {
         }
         const response = {
             code: 200,
-            data: responseData,
+            data: responseData.length === 1 ? responseData[0].data : responseData,
             status: 'OK'
         }
         return response
@@ -357,20 +359,19 @@ const processRemoveProps = async (caseProps) => {
 
 const processSave = async (caseProps) => {
     try {
-        const { data, headers, newlyUser, path } = caseProps
+        const { data, headers, path } = caseProps
         const records = Array.isArray(data) ? data : [data]
         const loopLimit = Math.ceil(records.length / lotsLimit)
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
             const lot = records.slice(index * lotsLimit, (index + 1) * lotsLimit)
             const reqConfig = { headers }
-            if (newlyUser) reqConfig.params.newlyUser = newlyUser
-            const response = await axios.post(`${process.env.REACT_APP_API_REST}/${path}/records/save`, lot, headers)
+            const response = await axios.post(`${process.env.REACT_APP_API_REST}/${path}/records/save`, lot, reqConfig)
             responseData.push(response.data)
         }
         const response = {
             code: 200,
-            data: responseData,
+            data: responseData.length === 1 ? responseData[0].data : responseData,
             status: 'OK'
         }
         return response

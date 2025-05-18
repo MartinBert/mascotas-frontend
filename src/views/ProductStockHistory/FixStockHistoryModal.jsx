@@ -72,7 +72,7 @@ const FixStockHistoryModal = () => {
         if (validationParameters.includes(recordToSave.entries)) recordToSave.entries = 0
         if (validationParameters.includes(recordToSave.outputs)) recordToSave.outputs = 0
         const response = await api.stockHistory.save(recordToSave)
-        if (response.code !== 200) return errorAlert('No se pudo guardar el registro. Inténtelo de nuevo.')
+        if (response.status !== 'OK') return errorAlert('No se pudo guardar el registro. Inténtelo de nuevo.')
         else {
             successAlert('El registro fue guardado con éxito.')
             products_dispatch({ type: 'HIDE_FIX_STOCK_HISTORY_MODAL' })

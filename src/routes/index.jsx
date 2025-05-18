@@ -29,7 +29,7 @@ const { findNextVoucherNumber_fiscal, invoiceAndTicketCodes } = helpers.afipHelp
 const getUserData = async () => {
     const userId = localStorage.getItem('userId')
     const loggedUser = await api.users.findById(userId)
-    return loggedUser
+    return loggedUser.data
 }
 
 const refreshAfipServices = async () => {
@@ -76,7 +76,7 @@ const AppRouter = () => {
             return
         }
         const loggedUser = await api.users.findById(userId)
-        auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+        auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
         auth_dispatch({ type: 'SET_LOADING', payload: false })
         privateRoute_dispatch({ type: 'SET_OPEN_SUBMENU_KEY', payload: ['sub1'] })
     }

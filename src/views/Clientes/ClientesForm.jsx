@@ -102,7 +102,7 @@ const ClientesForm = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.users.findById(userId)
-            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
         }
         fetchUser()
     }, [auth_dispatch])
@@ -110,7 +110,7 @@ const ClientesForm = () => {
     useEffect(() => {
         const fetchCliente = async (id) => {
             const searchedItem = await api.clients.findById(id)
-            setCliente(searchedItem)
+            setCliente(searchedItem.data)
             setLoading(false)
         }
         if (id !== 'nuevo') fetchCliente(id)
@@ -137,7 +137,7 @@ const ClientesForm = () => {
         if (id && noEmptyKeys(cliente) === true) {
             const fixedClient = { ...cliente, normalizedBusinessName: normalizeString(cliente.razonSocial) }
             const response = (id === 'nuevo') ? await api.clients.save(fixedClient) : await api.clients.edit(fixedClient)
-            if (response.code === 200) {
+            if (response.status === 'OK') {
                 successAlert('El registro se guardó correctamente.')
                 redirectToClientes()
             } else errorAlert('Error al guardar el registro.')

@@ -44,8 +44,8 @@ const MarcasForm = () => {
         const fetchMarca = async () => {
             const searchedItem = await api.brands.findById(id)
             setMarca({
-                _id: searchedItem._id,
-                nombre: searchedItem.nombre
+                _id: searchedItem.data._id,
+                nombre: searchedItem.data.nombre
             })
             setLoading(false)
         }
@@ -60,7 +60,7 @@ const MarcasForm = () => {
 
         const saveItem = async () => {
             const response = (marca._id) ? await api.brands.edit(marca) : await api.brands.save(marca)
-            if (response === 'OK') return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

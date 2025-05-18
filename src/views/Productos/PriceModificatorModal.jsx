@@ -34,13 +34,13 @@ const PriceModificatorModal = () => {
     const loadBrandsAndTypes = async () => {
         const findBrands = await api.brands.findAll()
         const findTypes = await api.types.findAll()
-        const allBrands = findBrands.docs
+        const allBrands = findBrands.data
         const allBrandsNames = allBrands.length < 0
             ? []
             : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
                 return { value: brand.nombre }
             }))
-        const allTypes = findTypes.docs
+        const allTypes = findTypes.data
         const allTypesNames = allTypes.length < 0
             ? []
             : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {
@@ -110,7 +110,7 @@ const PriceModificatorModal = () => {
     )
 
     // ------------- Button to save modifies ------------- //
-    const saveModifies = () => {
+    const saveModifies = async () => {
         products_dispatch({ type: 'SET_LOADING', payload: true })
         const modificationQuantity = products_state.priceModificatorModal.priceModificationQuantity
         const modificationSign = products_state.priceModificatorModal.priceModificationSign
@@ -128,6 +128,7 @@ const PriceModificatorModal = () => {
             'Debe seleccionar al menos 1 producto para modificar su precio...'
         )
 
+        const updatedProducts = []
         for (let product of productsToModify) {
             const decimalIvaCompra = decimalPercent(parseFloat(product.porcentajeIvaCompra))
             const decimalIvaVenta = decimalPercent(parseFloat(product.porcentajeIvaVenta))
@@ -153,10 +154,15 @@ const PriceModificatorModal = () => {
             product.gananciaNetaFraccionado = round(newGananciaNetaFraccionado + newPrecioVentaFraccionado - newPrecioVentaFraccionadoSinRedondear)
             product.precioVenta = newPrecioVenta
             product.precioVentaFraccionado = newPrecioVentaFraccionado
-            api.products.edit(product)
+            updatedProducts.push(product)
         }
-        products_dispatch({ type: 'CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL' })
-        successAlert('Los precios fueron modificados!').then(() => { window.location.reload() })
+        const response = await api.products.edit(updatedProducts)
+        if (response.status !== 'OK') {
+            errorAlert('No se pudo actualizar el precio de los productos. Intente de nuevo.')
+        } else {
+            products_dispatch({ type: 'CLEAR_STATE_OF_PRICE_MODIFICATOR_MODAL' })
+            successAlert('Los precios fueron modificados!').then(() => { window.location.reload() })
+        }
     }
 
     const buttonToSaveModifies = (
@@ -522,7 +528,7 @@ const PriceModificatorModal = () => {
         const response = await api.products.findPaginated(params)
         products_dispatch({
             type: 'SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
-            payload: response
+            payload: response.data.docs
         })
     }
 

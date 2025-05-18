@@ -45,9 +45,9 @@ const CondicionesFiscalesForm = () => {
         const fetchCondicionFiscal = async () => {
             const searchedItem = await api.fiscalConditions.findById(id)
             setCondicionFiscal({
-                _id: searchedItem._id,
-                nombre: searchedItem.nombre,
-                adicionaIva: searchedItem.adicionaIva
+                _id: searchedItem.data._id,
+                nombre: searchedItem.data.nombre,
+                adicionaIva: searchedItem.data.adicionaIva
             })
             setLoading(false)
         }
@@ -64,7 +64,7 @@ const CondicionesFiscalesForm = () => {
             const response = (condicionFiscal._id)
                 ? await api.fiscalConditions.edit(condicionFiscal)
                 : await api.fiscalConditions.save(condicionFiscal)
-            if (response.code === 200) return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

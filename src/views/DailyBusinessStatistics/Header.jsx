@@ -41,8 +41,8 @@ const Header = () => {
     const loadStatisticsViewType = async () => {
         let viewType
         const findStyles = await api.interfaceStyles.findAll()
-        if (findStyles.length < 1) viewType = ''
-        else viewType = findStyles[0].typeOfDailyStatisticsView
+        if (findStyles.data.length < 1) viewType = ''
+        else viewType = findStyles.data[0].typeOfDailyStatisticsView
         interfaceStyles_dispatch({ type: 'SET_TYPE_OF_STATISTICS_VIEW', payload: viewType })
     }
 
@@ -72,12 +72,12 @@ const Header = () => {
         const stylesToSave = { ...interfaceStyles_state, typeOfDailyStatisticsView: viewType }
         const findStyles = await api.interfaceStyles.findAll()
         let res
-        if (findStyles.length < 1) res = await api.interfaceStyles.save(stylesToSave)
+        if (findStyles.data.length < 1) res = await api.interfaceStyles.save(stylesToSave)
         else {
-            stylesToSave._id = findStyles[0]._id
+            stylesToSave._id = findStyles.data[0]._id
             res = await api.interfaceStyles.edit(stylesToSave)
         }
-        if (res.code !== 200) errorAlert('No pudieron registrarse los nuevos estilos. Intente de nuevo.')
+        if (res.status !== 'OK') errorAlert('No pudieron registrarse los nuevos estilos. Intente de nuevo.')
     }
 
     // -------------- Button to clear filters --------------- //
@@ -275,7 +275,7 @@ const Header = () => {
                 const finalDate = selectedDates[1].$d
                 const filters = JSON.stringify({ date: { $gte: initialDate, $lte: finalDate } })
                 const findDailyBusinessStatistics = await api.dailyBusinessStatistics.findAllByFilters(filters)
-                const dailyBusinessStatistics = findDailyBusinessStatistics.docs
+                const dailyBusinessStatistics = findDailyBusinessStatistics.data.docs
                 periodExpense = round(
                     interfaceStyles_state.typeOfStatisticsView === 'balance'
                         ? dailyBusinessStatistics.reduce((acc, record) => acc + record.balanceViewExpense, 0)

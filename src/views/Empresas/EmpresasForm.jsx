@@ -55,21 +55,21 @@ const EmpresasForm = () => {
             }
             const searchedItem = await api.business.findById(id)
             setEmpresa({
-                _id: searchedItem._id,
-                razonSocial: searchedItem.razonSocial,
-                cuit: searchedItem.cuit,
-                actividad: searchedItem.actividad,
-                fechaInicioActividad: searchedItem.fechaInicioActividad,
-                ingresosBrutos: searchedItem.ingresosBrutos,
-                direccion: searchedItem.direccion,
-                telefono: searchedItem.telefono,
-                email: searchedItem.email,
-                logo: searchedItem.logo,
-                condicionFiscal: searchedItem.condicionFiscal,
-                puntosVenta: searchedItem.puntosVenta
+                _id: searchedItem.data._id,
+                razonSocial: searchedItem.data.razonSocial,
+                cuit: searchedItem.data.cuit,
+                actividad: searchedItem.data.actividad,
+                fechaInicioActividad: searchedItem.data.fechaInicioActividad,
+                ingresosBrutos: searchedItem.data.ingresosBrutos,
+                direccion: searchedItem.data.direccion,
+                telefono: searchedItem.data.telefono,
+                email: searchedItem.data.email,
+                logo: searchedItem.data.logo,
+                condicionFiscal: searchedItem.data.condicionFiscal,
+                puntosVenta: searchedItem.data.puntosVenta
             })
-            setSelectedCondition(searchedItem.condicionFiscal)
-            setSelectedSalePoint(searchedItem.puntosVenta[0])
+            setSelectedCondition(searchedItem.data.condicionFiscal)
+            setSelectedSalePoint(searchedItem.data.puntosVenta[0])
             setLoading(false)
         }
         fetchEmpresa()
@@ -80,7 +80,7 @@ const EmpresasForm = () => {
 
         const saveBusiness = async () => {
             const response = await api.business.save(empresa)
-            if (response.code === 200) {
+            if (response.status === 'OK') {
                 successAlert('El registro fue grabado con exito')
                     .then(redirectToEmpresas())
             } else errorAlert('Error al guardar el registro')
@@ -88,7 +88,7 @@ const EmpresasForm = () => {
 
         const editBusiness = async () => {
             const response = await api.business.edit(empresa)
-            if (response.code === 200) success()
+            if (response.status === 'OK') success()
             else fail()
         }
 

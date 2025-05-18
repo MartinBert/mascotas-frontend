@@ -51,9 +51,9 @@ const UsuariosForm = () => {
 
         const fetchUsuario = async () => {
             const searchedItem = await api.users.findById(id)
-            setUsuario(searchedItem)
-            if (searchedItem.empresa) setSelectedCompany({ _id: searchedItem.empresa._id, razonSocial: searchedItem.empresa.razonSocial })
-            setSelectedSalePoint(searchedItem.puntoVenta)
+            setUsuario(searchedItem.data)
+            if (searchedItem.data.empresa) setSelectedCompany({ _id: searchedItem.data.empresa._id, razonSocial: searchedItem.data.empresa.razonSocial })
+            setSelectedSalePoint(searchedItem.data.puntoVenta)
             setLoading(false)
         }
         fetchUsuario()
@@ -83,7 +83,7 @@ const UsuariosForm = () => {
             const response = usuario._id
                 ? await api.users.edit(usuario)
                 : await api.users.save(usuario)
-            if (response.code === 200) return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

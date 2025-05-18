@@ -45,9 +45,9 @@ const UnidadesMedidaForm = () => {
         const fetchUnidadMedida = async () => {
             const searchedItem = await api.measureUnits.findById(id)
             setUnidadMedida({
-                _id: searchedItem._id,
-                nombre: searchedItem.nombre,
-                fraccionamiento: searchedItem.fraccionamiento
+                _id: searchedItem.data._id,
+                nombre: searchedItem.data.nombre,
+                fraccionamiento: searchedItem.data.fraccionamiento
             })
             setLoading(false)
         }
@@ -64,7 +64,7 @@ const UnidadesMedidaForm = () => {
             const response = (unidadMedida._id)
                 ? await api.measureUnits.edit(unidadMedida)
                 : await api.measureUnits.save(unidadMedida)
-            if (response.code === 200) return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

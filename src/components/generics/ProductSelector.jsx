@@ -71,7 +71,7 @@ const ProductSelector = (props) => {
     const onSearch = async (e) => {
         const params = getFindParams(e)
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         let options
         switch (searchParam) {
             case genericComponents_params.productSelector.searchParams.barCode:

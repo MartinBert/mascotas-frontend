@@ -59,12 +59,12 @@ const Form = ({ data }) => {
 		let res
 		if (data.isCompleted) {
 			const findPreviousData = await api[data.service].findAll()
-			const previousDataId = findPreviousData.docs[0]._id
+			const previousDataId = findPreviousData.data[0]._id
 			const newParams = { _id: previousDataId, ...params }
 			res = await api[data.service].edit(newParams)
 		} else res = await api[data.service].save(params)
 
-		if (res.code !== 200) {
+		if (res.status !== 'OK') {
 			errorAlert('No se pudo realizar el registro. Intente de nuevo.')
 			return reloadPage()
 		}

@@ -29,13 +29,13 @@ const Header = () => {
     const loadBrandsAndTypes = async () => {
         const findBrands = await api.brands.findAll()
         const findTypes = await api.types.findAll()
-        const allBrands = findBrands.docs
+        const allBrands = findBrands.data
         const allBrandsNames = allBrands.length < 0
             ? []
             : [{ value: 'Todas las marcas' }].concat(allBrands.map(brand => {
                 return { value: brand.nombre }
             }))
-        const allTypes = findTypes.docs
+        const allTypes = findTypes.data
         const allTypesNames = allTypes.length < 0
             ? []
             : [{ value: 'Todos los rubros' }].concat(allTypes.map(type => {

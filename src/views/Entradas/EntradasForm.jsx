@@ -30,7 +30,7 @@ const { ifNotNumbersCommaAndPoint } = regExp
 const findStatisticByStringDate = async (stringDate) => {
     const filters = JSON.stringify({ dateString: stringDate.substring(0, 10) })
     const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
-    const statisticToEdit = findStatisticToEdit.docs[0] || null
+    const statisticToEdit = findStatisticToEdit.data.docs[0] || null
     return statisticToEdit
 }
 
@@ -157,7 +157,7 @@ const EntradasForm = () => {
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(entries_state.params.fechaString.substring(0, 10))
         const newerRecord = await api.dailyBusinessStatistics.findNewer()
-        const newerRecordDate = newerRecord.date
+        const newerRecordDate = newerRecord.data.date
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
         )
@@ -182,7 +182,7 @@ const EntradasForm = () => {
                 recordsToFill.push(recordToFill)
             }
             const response = await api.dailyBusinessStatistics.save(recordsToFill)
-            if (!response || response.code !== 200) filled = false
+            if (!response || response.status !== 'OK') filled = false
             else filled = true
         }
         return filled
@@ -209,8 +209,8 @@ const EntradasForm = () => {
             const dateString = entries_state.params.fechaString.substring(0, 10)
             const filters = JSON.stringify({ dateString, product })
             const findStockHistory = await api.stockHistory.findAllByFilters(filters)
-            const stockHistory = findStockHistory.docs
-            let saveResponseCode
+            const stockHistory = findStockHistory.data.docs
+            let response
             const data = {
                 date: resetDateTo00hs(entries_state.params.fecha),
                 dateString,
@@ -220,8 +220,7 @@ const EntradasForm = () => {
             if (stockHistory.length < 1) {
                 data.entries = round(entries_state.params.cantidad)
                 data.outputs = 0
-                const saveNewRecord = await api.stockHistory.save(data)
-                saveResponseCode = saveNewRecord.code
+                response = await api.stockHistory.save(data)
             } else {
                 data._id = stockHistory[0]._id
                 data.entries = round(stockHistory[0].entries) + round(entries_state.params.cantidad)
@@ -231,10 +230,9 @@ const EntradasForm = () => {
                     data.entries -= previousQuantity
                 }
                 data.outputs = round(stockHistory[0].outputs)
-                const editRecord = await api.stockHistory.edit(data)
-                saveResponseCode = editRecord.code
+                response = await api.stockHistory.edit(data)
             }
-            if (saveResponseCode !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock".`)
+            if (response.status !== 'OK') errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock".`)
         }
     }
 
@@ -281,7 +279,7 @@ const EntradasForm = () => {
 
         // Guardar la entrada nueva
         const response = await api.entries.save(entries_state.params)
-        if (response.code === 200) {
+        if (response.status === 'OK') {
             successAlert('El registro se guardó correctamente')
             entries_dispatch({ type: 'CLEAN_STATE' })
             returnToIndex()
@@ -356,7 +354,7 @@ const EntradasForm = () => {
         // Guardar la entrada editada
         const recordToEdit = { ...entries_state.params, id: entryID }
         const response = await api.entries.edit(recordToEdit)
-        if (response.code === 200) {
+        if (response.status === 'OK') {
             successAlert('El registro se editó correctamente')
             entries_dispatch({ type: 'CLEAN_STATE' })
             returnToIndex()
@@ -458,7 +456,7 @@ const EntradasForm = () => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 15, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsAlreadySelected = entries_state.params.productos.map(product => product.normalizedBarcode)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
         const options = productsNotYetSelected.map(product => {
@@ -474,7 +472,7 @@ const EntradasForm = () => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsToSet = [...entries_state.params.productos, ...products]
         entries_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
         entries_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE', payload: [] })
@@ -508,7 +506,7 @@ const EntradasForm = () => {
         const filters = JSON.stringify({ normalizedName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsAlreadySelected = entries_state.params.productos.map(product => product.normalizedName)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedName))
         const options = productsNotYetSelected.map(product => { return { label: product.nombre, value: product.normalizedName } })
@@ -518,7 +516,7 @@ const EntradasForm = () => {
     const onSelectProductByName = async (e) => {
         const filters = JSON.stringify({ normalizedName: e })
         const findProducts = await api.products.findAllByFilters(filters)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsToSet = [...entries_state.params.productos, ...products]
         entries_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
         entries_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME', payload: [] })

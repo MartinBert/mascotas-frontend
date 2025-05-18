@@ -38,7 +38,7 @@ const FinalizeSaleModal = () => {
         const fetchUser = async () => {
             const userId = localStorage.getItem('userId')
             const loggedUser = await api.users.findById(userId)
-            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser })
+            auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
         }
         fetchUser()
     }, [auth_dispatch])
@@ -152,7 +152,7 @@ const FinalizeSaleModal = () => {
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10))
         const newerRecord = await api.dailyBusinessStatistics.findNewer()
-        const newerRecordDate = newerRecord.date
+        const newerRecordDate = newerRecord.data.date
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
         )
@@ -177,7 +177,7 @@ const FinalizeSaleModal = () => {
                 recordsToFill.push(recordToFill)
             }
             const response = await api.dailyBusinessStatistics.save(recordsToFill)
-            if (!response || response.code !== 200) filled = false
+            if (!response || response.status !== 'OK') filled = false
             else filled = true
         }
         return filled
@@ -186,7 +186,7 @@ const FinalizeSaleModal = () => {
     const saveDailyBusinessStatistic = async () => {
         const filters = JSON.stringify({ dateString: sale_state.fechaEmisionString.substring(0, 10) })
         const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
-        const statisticToEdit = findStatisticToEdit.docs[0] || null
+        const statisticToEdit = findStatisticToEdit.data.docs[0] ?? null
         const saleListPricesAndIva = (
             sale_state.renglones.reduce((acc, line) => acc + parseFloat(line.precioListaUnitario) * parseFloat(line.cantidadUnidades), 0)
             + sale_state.renglones
@@ -233,7 +233,7 @@ const FinalizeSaleModal = () => {
         const dataToSave = { ...saleData, renglones: fixedLines }
         const responseOfSaveLines = await api.salesLines.save(fixedLines)
         const responseOfSaveSale = await api.sales.save(dataToSave)
-        if (responseOfSaveLines.code !== 200 || responseOfSaveSale.code !== 200) {
+        if (responseOfSaveLines.status !== 'OK' || responseOfSaveSale.status !== 'OK') {
             errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
         }
     }
@@ -247,8 +247,8 @@ const FinalizeSaleModal = () => {
                 const productToSaveStockHistory = findProductToSaveStockHistory.data
                 const filters = JSON.stringify({ dateString, product: productToSaveStockHistory })
                 const findStockHistory = await api.stockHistory.findAllByFilters(filters)
-                const stockHistory = findStockHistory.docs
-                let saveResponse
+                const stockHistory = findStockHistory.data.docs
+                let response
                 const data = {
                     date: resetDateTo00hs(sale_state.fechaEmision),
                     dateString,
@@ -258,14 +258,14 @@ const FinalizeSaleModal = () => {
                 if (stockHistory.length < 1) {
                     data.entries = 0
                     data.outputs = round(line.cantidadUnidades)
-                    saveResponse = await api.stockHistory.save(data)
+                    response = await api.stockHistory.save(data)
                 } else {
                     data._id = stockHistory[0]._id
                     data.entries = round(stockHistory[0].entries)
                     data.outputs = round(stockHistory[0].outputs + line.cantidadUnidades)
-                    saveResponse = await api.stockHistory.edit(data)
+                    response = await api.stockHistory.edit(data)
                 }
-                if (saveResponse.code !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${line.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)
+                if (response.status !== 'OK') errorAlert(`No se pudo generar el historial de stock para el producto "${line.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock" / "Abrir historial" (del producto en cuestión) / "Aplicar corrección".`)
             }
         }
     }

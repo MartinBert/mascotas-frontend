@@ -32,13 +32,13 @@ const { Delete, Details, Edit } = icons
 
 const findOutput = async (outputID) => {
     const findOutput = await api.outputs.findById(outputID)
-    return findOutput
+    return findOutput.data
 }
 
 const fixDailyBusinessStatistics = async (outputToDelete) => {
     const filters = JSON.stringify({ concept: 'Generado automáticamente', dateString: outputToDelete.fechaString.substring(0, 10) })
     const findStatisticToFix = await api.dailyBusinessStatistics.findAllByFilters(filters)
-    const [statisticToFix] = findStatisticToFix.docs
+    const [statisticToFix] = findStatisticToFix.data.docs
     if (!statisticToFix) return
     const fixedDailyIncome = statisticToFix.balanceViewIncome - outputToDelete.ingreso
     const fixedStatistic = {
@@ -47,7 +47,7 @@ const fixDailyBusinessStatistics = async (outputToDelete) => {
         balanceViewProfit: fixedDailyIncome - statisticToFix.balanceViewExpense
     }
     const result = await api.dailyBusinessStatistics.edit(fixedStatistic)
-    if (result.code !== 200) errorAlert('No se pudo corregir la estadística diaria. Hágalo manualmente en "Estadísticas de negocio" / "Balance diario" / "Acciones" / "Editar".')
+    if (result.status !== 'OK') errorAlert('No se pudo corregir la estadística diaria. Hágalo manualmente en "Estadísticas de negocio" / "Balance diario" / "Acciones" / "Editar".')
 }
 
 const fixStock = async (outputToDelete) => {
@@ -71,14 +71,14 @@ const fixStockHistory = async (outputToDelete) => {
             product
         })
         const findStockHistoryToFix = await api.stockHistory.findAllByFilters(filters)
-        const [stockHistoryToFix] = findStockHistoryToFix.docs
+        const [stockHistoryToFix] = findStockHistoryToFix.data.docs
         if (stockHistoryToFix) {
             const fixedStockHistory = {
                 ...stockHistoryToFix,
                 outputs: stockHistoryToFix.outputs - product.cantidadesSalientes
             }
             const result = await api.stockHistory.edit(fixedStockHistory)
-            if (result.code !== 200) errorAlert(`No se pudo corregir el historial de stock de "${product.nombre}". Hágalo manualmente en "Estadísticas de negocio" / "Historial de stock" / (Elegir producto) "Abrir historial" / (Elegir fecha) "Editar".`)
+            if (result.status !== 'OK') errorAlert(`No se pudo corregir el historial de stock de "${product.nombre}". Hágalo manualmente en "Estadísticas de negocio" / "Historial de stock" / (Elegir producto) "Abrir historial" / (Elegir fecha) "Editar".`)
         }
     }
 }
@@ -95,14 +95,14 @@ const Salidas = () => {
         const recordsQuantityOfProducts = await api.products.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_PRODUCTS',
-            payload: recordsQuantityOfProducts < 1 ? false : true
+            payload: recordsQuantityOfProducts.data < 1 ? false : true
         })
     }
 
     const fetchOutputs_paginated = async () => {
         const findParams = formatFindParams(outputs_state.paginationParams)
-        const data = await api.outputs.findPaginated(findParams)
-        outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: data })
+        const findRecords = await api.outputs.findPaginated(findParams)
+        outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: findRecords.data.docs })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
@@ -130,12 +130,12 @@ const Salidas = () => {
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
         const findOutputToDelete = await findOutput(deleteModal_state.entityID)
-        if (findOutputToDelete.message !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
+        if (findOutputToDelete.status !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
         fixDailyBusinessStatistics(findOutputToDelete.data)
         fixStock(findOutputToDelete.data)
         fixStockHistory(findOutputToDelete.data)
         const response = await api.outputs.remove(deleteModal_state.entityID)
-        if (response.message !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
+        if (response.status !== 'OK') return errorAlert('Fallo al eliminar el registro. Intente de nuevo.')
         successAlert('El registro se eliminó correctamente.')
         deleteModal_dispatch({ type: 'CLEAN_STATE' })
     }

@@ -66,12 +66,12 @@ const Ventas = () => {
         // User data
         const userId = localStorage.getItem('userId')
         const loggedUser = await api.users.findById(userId)
-        sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.empresa })
-        sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.puntoVenta })
-        sale_dispatch({ type: 'SET_USER', payload: loggedUser })
+        sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.data.empresa })
+        sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.data.puntoVenta })
+        sale_dispatch({ type: 'SET_USER', payload: loggedUser.data })
         // Voucher data
-        const lastIndex = await api.sales.findLastIndex()
-        sale_dispatch({ type: 'SET_INDEX', payload: lastIndex + 1 })
+        const response = await api.sales.findLastIndex()
+        sale_dispatch({ type: 'SET_INDEX', payload: response.data + 1 })
     }
 
     const setFocus = () => {

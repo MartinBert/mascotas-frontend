@@ -30,7 +30,7 @@ const { ifNotNumbersCommaAndPoint } = regExp
 const findStatisticByStringDate = async (stringDate) => {
     const filters = JSON.stringify({ dateString: stringDate.substring(0, 10) })
     const findStatisticToEdit = await api.dailyBusinessStatistics.findAllByFilters(filters)
-    const statisticToEdit = findStatisticToEdit.docs[0] || null
+    const statisticToEdit = findStatisticToEdit.data.docs[0] || null
     return statisticToEdit
 }
 
@@ -157,7 +157,7 @@ const SalidasForm = () => {
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(outputs_state.params.fechaString.substring(0, 10))
         const newerRecord = await api.dailyBusinessStatistics.findNewer()
-        const newerRecordDate = newerRecord.date
+        const newerRecordDate = newerRecord.data.date
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
         )
@@ -182,7 +182,7 @@ const SalidasForm = () => {
                 recordsToFill.push(recordToFill)
             }
             const response = await api.dailyBusinessStatistics.save(recordsToFill)
-            if (!response || response.code !== 200) filled = false
+            if (!response || response.status !== 'OK') filled = false
             else filled = true
         }
         return filled
@@ -209,8 +209,8 @@ const SalidasForm = () => {
             const dateString = outputs_state.params.fechaString.substring(0, 10)
             const filters = JSON.stringify({ dateString, product })
             const findStockHistory = await api.stockHistory.findAllByFilters(filters)
-            const stockHistory = findStockHistory.docs
-            let saveResponseCode
+            const stockHistory = findStockHistory.data.docs
+            let response
             const data = {
                 date: resetDateTo00hs(outputs_state.params.fecha),
                 dateString,
@@ -220,8 +220,7 @@ const SalidasForm = () => {
             if (stockHistory.length < 1) {
                 data.entries = 0
                 data.outputs = round(outputs_state.params.cantidad)
-                const saveNewRecord = await api.stockHistory.save(data)
-                saveResponseCode = saveNewRecord.code
+                response = await api.stockHistory.save(data)
             } else {
                 data._id = stockHistory[0]._id
                 data.entries = round(stockHistory[0].entries)
@@ -231,10 +230,9 @@ const SalidasForm = () => {
                     const previousQuantity = round(outputToEdit.data.cantidad)
                     data.outputs -= previousQuantity
                 }
-                const editRecord = await api.stockHistory.edit(data)
-                saveResponseCode = editRecord.code
+                response = await api.stockHistory.edit(data)
             }
-            if (saveResponseCode !== 200) errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock".`)
+            if (response.status !== 'OK') errorAlert(`No se pudo generar el historial de stock para el producto "${product.nombre}". Cree el registro manualmente en la sección "Estadísticas de Negocio" / "Historial de Stock".`)
         }
     }
 
@@ -283,7 +281,7 @@ const SalidasForm = () => {
 
         // Guardar la salida nueva
         const response = await api.outputs.save(outputs_state.params)
-        if (response.code === 200) {
+        if (response.status === 'OK') {
             successAlert('El registro se guardó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
             returnToIndex()
@@ -378,7 +376,7 @@ const SalidasForm = () => {
         // Guardar la salida editada
         const recordToEdit = { ...outputs_state.params, id: outputID }
         const response = await api.outputs.edit(recordToEdit)
-        if (response.code === 200) {
+        if (response.status === 'OK') {
             successAlert('El registro se editó correctamente')
             outputs_dispatch({ type: 'CLEAN_STATE' })
             returnToIndex()
@@ -480,7 +478,7 @@ const SalidasForm = () => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 15, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedBarcode)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedBarcode))
         const options = productsNotYetSelected.map(product => {
@@ -496,7 +494,7 @@ const SalidasForm = () => {
         const filters = JSON.stringify({ normalizedBarcode: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsToSet = [...outputs_state.params.productos, ...products]
         outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
         outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_BARCODE', payload: [] })
@@ -530,7 +528,7 @@ const SalidasForm = () => {
         const filters = JSON.stringify({ normalizedName: normalizeString(e) })
         const params = { page: 1, limit: 8, filters }
         const findProducts = await api.products.findPaginated(params)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsAlreadySelected = outputs_state.params.productos.map(product => product.normalizedName)
         const productsNotYetSelected = products.filter(product => !productsAlreadySelected.includes(product.normalizedName))
         const options = productsNotYetSelected.map(product => { return { label: product.nombre, value: product.normalizedName } })
@@ -540,7 +538,7 @@ const SalidasForm = () => {
     const onSelectProductByName = async (e) => {
         const filters = JSON.stringify({ normalizedName: e })
         const findProducts = await api.products.findAllByFilters(filters)
-        const products = findProducts.docs
+        const products = findProducts.data.docs
         const productsToSet = [...outputs_state.params.productos, ...products]
         outputs_dispatch({ type: 'SET_PRODUCTS', payload: productsToSet })
         outputs_dispatch({ type: 'SET_OPTIONS_TO_SELECT_PRODUCT_BY_NAME', payload: [] })

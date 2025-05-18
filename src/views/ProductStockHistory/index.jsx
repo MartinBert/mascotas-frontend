@@ -37,22 +37,22 @@ const ProductStockHistory = () => {
         const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_ENTRIES',
-            payload: recordsQuantityOfEntries < 1 ? false : true
+            payload: recordsQuantityOfEntries.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_OUTPUTS',
-            payload: recordsQuantityOfOutputs < 1 ? false : true
+            payload: recordsQuantityOfOutputs.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_SALES',
-            payload: recordsQuantityOfSales < 1 ? false : true
+            payload: recordsQuantityOfSales.data < 1 ? false : true
         })
     }
 
 	const fetchProducts = async () => {
 		const findParams = formatFindParams(products_state.stockHistory.productsToRender.paginationParams)
-		const data = await api.products.findPaginated(findParams)
-		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: data })
+		const findRecords = await api.products.findPaginated(findParams)
+		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: findRecords.data.docs })
 	}
 
 	useEffect(() => {

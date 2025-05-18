@@ -58,8 +58,8 @@ const FormatPrivateComponent = ({ children, activeKey }) => {
     // ------------------------------------- Load data --------------------------------------- //
     const loadStyles = async () => {
         const res = await api.interfaceStyles.findAll()
-        if (res.length < 1) interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: null })
-        else interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: res[0] })
+        if (res.data.length < 1) interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: null })
+        else interfaceStyles_dispatch({ type: 'LOAD_STYLES', payload: res.data[0] })
     }
 
     useEffect(() => {

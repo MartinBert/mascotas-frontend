@@ -9,7 +9,7 @@
 					{ adicionaIva: true, nombre: 'Monotributista' },
 					{ adicionaIva: false, nombre: 'Excento' }
 				],
-				service: 'condicionesfiscales',
+				service: 'fiscalConditions',
 				title: 'Condiciones fiscales'
 			}[]
 		],
@@ -32,12 +32,12 @@
 							{
 								prop: 'condicionFiscal',	// Add to params
 								query: { nombre: 'Consumidor Final' },
-								service: 'condicionesfiscales'
+								service: 'fiscalConditions'
 							}[]
 						],
 					}
 				],
-				service: 'clientes',
+				service: 'clients',
 				title: 'Clientes'
 			}[]
 		],
@@ -152,7 +152,7 @@ const ProgressCircle = ({ data }) => {
 				for (let index = 0; index < predata.length; index++) {
 					const predataProp = predata[index]
 					const res = await api[predataProp.service].findAllByFilters(JSON.stringify(predataProp.query))
-					if (res.docs.length === 0) {
+					if (res.data.totalDocs.length === 0) {
 						failAlert()
 						return reloadPage()
 					}
@@ -160,7 +160,7 @@ const ProgressCircle = ({ data }) => {
 				}
 
 				const res = await api[modelService].save(newRecord)
-				if (res.code !== 200) {
+				if (res.status !== 'OK') {
 					failAlert()
 					return reloadPage()
 				}
@@ -274,7 +274,7 @@ const ProgressCircle = ({ data }) => {
 			for (let sourceIndex = 0; sourceIndex < modelSource.length; sourceIndex++) {
 				const newRecord = modelSource[sourceIndex]
 				const res = await api[modelService].save(newRecord)
-				if (res.code !== 200) {
+				if (res.status !== 'OK') {
 					failAlert()
 					return reloadPage()
 				}

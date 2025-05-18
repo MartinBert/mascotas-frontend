@@ -33,9 +33,9 @@ const FixStatisticsModal = () => {
     }
 
     const save = async () => {
-        const result = await api.dailyBusinessStatistics.save(dailyBusinessStatistics_state.params)
+        const response = await api.dailyBusinessStatistics.save(dailyBusinessStatistics_state.params)
         dailyBusinessStatistics_dispatch({ type: 'CLEAR_STATE' })
-        if (result.code === 500) return errorAlert('No se pudo guardar el registro, intente de nuevo más tarde.')
+        if (response.status !== 'OK') return errorAlert('No se pudo guardar el registro, intente de nuevo más tarde.')
         else return successAlert('Registro guardado con éxito.')
     }
 

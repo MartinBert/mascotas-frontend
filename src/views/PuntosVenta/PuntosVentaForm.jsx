@@ -45,9 +45,9 @@ const PuntosVentaForm = () => {
         const fetchPuntoVenta = async () => {
             const searchedItem = await api.salePoints.findById(id)
             setPuntoVenta({
-                _id: searchedItem._id,
-                nombre: searchedItem.nombre,
-                numero: searchedItem.numero
+                _id: searchedItem.data._id,
+                nombre: searchedItem.data.nombre,
+                numero: searchedItem.data.numero
             })
             setLoading(false)
         }
@@ -64,7 +64,7 @@ const PuntosVentaForm = () => {
             const response = (puntoVenta._id)
                 ? await api.salePoints.edit(puntoVenta)
                 : await api.salePoints.save(puntoVenta)
-            if (response.code === 200) return success()
+            if (response.status === 'OK') return success()
             return fail()
         }
         saveItem()

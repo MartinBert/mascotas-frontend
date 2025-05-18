@@ -32,15 +32,15 @@ const ProductStockHistoryGraphics = () => {
         const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_ENTRIES',
-            payload: recordsQuantityOfEntries < 1 ? false : true
+            payload: recordsQuantityOfEntries.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_OUTPUTS',
-            payload: recordsQuantityOfOutputs < 1 ? false : true
+            payload: recordsQuantityOfOutputs.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_SALES',
-            payload: recordsQuantityOfSales < 1 ? false : true
+            payload: recordsQuantityOfSales.data < 1 ? false : true
         })
     }
 

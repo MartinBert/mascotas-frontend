@@ -50,15 +50,15 @@ const DailyBusinessStatistics = () => {
         const recordsQuantityOfSales = await api.sales.countRecords()
         renderConditions_dispatch({
             type: 'SET_EXISTS_ENTRIES',
-            payload: recordsQuantityOfEntries < 1 ? false : true
+            payload: recordsQuantityOfEntries.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_OUTPUTS',
-            payload: recordsQuantityOfOutputs < 1 ? false : true
+            payload: recordsQuantityOfOutputs.data < 1 ? false : true
         })
         renderConditions_dispatch({
             type: 'SET_EXISTS_SALES',
-            payload: recordsQuantityOfSales < 1 ? false : true
+            payload: recordsQuantityOfSales.data < 1 ? false : true
         })
     }
 
@@ -86,8 +86,8 @@ const DailyBusinessStatistics = () => {
         }
         const paginationParams = { ...currentPaginationParams, filters }
         const params = formatFindParams(paginationParams)
-        const data = await api.dailyBusinessStatistics.findPaginated(params)
-        dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: data })
+        const findRecords = await api.dailyBusinessStatistics.findPaginated(params)
+        dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: findRecords.data.docs })
     }
 
     useEffect(() => {
@@ -122,7 +122,7 @@ const DailyBusinessStatistics = () => {
     const openFixStatisticModal = async (dailyBusinessStatisticsID) => {
         dailyBusinessStatistics_dispatch({ type: 'SHOW_FIX_STATISTICS_MODAL' })
         const response = await api.dailyBusinessStatistics.findById(dailyBusinessStatisticsID)
-        if (!response) errorAlert('No se pudo recuperar las estadìsticas diarias de referencia para realizar la corrección. Recargue la página para volver a intentar.')
+        if (!response || response.data.length === 0) errorAlert('No se pudo recuperar las estadìsticas diarias de referencia para realizar la corrección. Recargue la página para volver a intentar.')
         const referenceData = {
             concept: response.data.concept,
             balanceViewProfit: response.data.balanceViewProfit,

@@ -45,7 +45,7 @@ const SalesView = () => {
         // Credit notes
         const creditNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: creditCodes })
         const findCreditNotes = await api.sales.findAllByFilters(creditNotesFilters)
-        const creditNotes = findCreditNotes.data
+        const creditNotes = findCreditNotes.data.docs
         const creditNotesData = creditNotes.map(creditNote => {
             const dataItem = {
                 concept: 'Nota crédito',
@@ -61,7 +61,7 @@ const SalesView = () => {
         // Debit Notes
         const debitNotesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10), documentoCodigo: debitCodes })
         const findDebitNotes = await api.sales.findAllByFilters(debitNotesFilters)
-        const debitNotes = findDebitNotes.data
+        const debitNotes = findDebitNotes.data.docs
         const debitNotesData = debitNotes.map(debitNote => {
             const dataItem = {
                 concept: 'Nota débito',
@@ -77,7 +77,7 @@ const SalesView = () => {
         // Outputs
         const outputsFilters = JSON.stringify({ fechaString: statisticDate.substring(0, 10) })
         const findOutputs = await api.outputs.findAllByFilters(outputsFilters)
-        const outputs = findOutputs.docs
+        const outputs = findOutputs.data.docs
         const outputsData = outputs.map(output => {
             const data = output.productos.map(product => {
                 const profit = parseFloat(product.cantidadesSalientes) * (parseFloat(product.precioVenta) - parseFloat(product.precioUnitario) - parseFloat(product.ivaVenta))
@@ -97,7 +97,7 @@ const SalesView = () => {
         // Sales
         const salesFilters = JSON.stringify({ fechaEmisionString: statisticDate.substring(0, 10) })
         const findSales = await api.sales.findAllByFilters(salesFilters)
-        const sales = findSales.data
+        const sales = findSales.data.docs
             .filter(sale => sale.documento.cashRegister === true)
             .filter(sale => !creditCodes.includes(sale.documentoCodigo) && !debitCodes.includes(sale.documentoCodigo))
         const salesData = sales.map(sale => {
