@@ -1,7 +1,7 @@
 import helpers from '../helpers'
 
 
-const path = 'payment_method'
+const path = 'payment_methods'
 
 const countRecords = async () => {
     const { processService, services } = helpers.servicesHelper

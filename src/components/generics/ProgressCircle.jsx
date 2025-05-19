@@ -152,13 +152,12 @@ const ProgressCircle = ({ data }) => {
 				for (let index = 0; index < predata.length; index++) {
 					const predataProp = predata[index]
 					const res = await api[predataProp.service].findAllByFilters(JSON.stringify(predataProp.query))
-					if (res.data.totalDocs.length === 0) {
+					if (res.data.totalDocs === 0) {
 						failAlert()
 						return reloadPage()
 					}
-					newRecord[predataProp.prop] = res.docs[0]._id
+					newRecord[predataProp.prop] = res.data.docs[0]._id
 				}
-
 				const res = await api[modelService].save(newRecord)
 				if (res.status !== 'OK') {
 					failAlert()

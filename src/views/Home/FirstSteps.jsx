@@ -51,7 +51,7 @@ const FirstSteps = () => {
         for (let index = 0; index < data.length; index++) {
             const dataItem = data[index]
             const findResult = await api[dataItem.service].findAllByFilters(dataItem.filter)
-            results.push(findResult.data.totalDocs.length)
+            results.push(findResult.data.totalDocs)
         }
         if (results.includes(0)) return false
         else return true
@@ -71,6 +71,12 @@ const FirstSteps = () => {
 
     const reloadPage = () => {
         window.location.reload()
+    }
+
+    const setCuitForStep2 = () => {
+        const cuit = localStorage.getItem('tenantId')
+        const payload = { fieldStatus: null, value: cuit }
+        business_dispatch({ type: 'SET_CUIT', payload })
     }
 
     const setSelectOptionsForStep2 = async () => {
@@ -97,10 +103,16 @@ const FirstSteps = () => {
     }
 
     useEffect(() => {
+        setCuitForStep2()
+        // eslint-disable-next-line
+    }, [])
+  
+
+    useEffect(() => {
         setSelectOptionsForStep2()
         // eslint-disable-next-line
     }, [home_state.firstSteps.activeStep])
-
+    
     useEffect(() => {
         verifyStepsAreCompleted()
         // eslint-disable-next-line
@@ -113,10 +125,13 @@ const FirstSteps = () => {
         else {
             const findBusiness = await api.business.findAll()
             const findSalePoint = await api.salePoints.findAll()
-            const business = findBusiness.data[0]._id
-            const salePoint = findSalePoint.data[0]._id
+            const business = findBusiness.data[0]
+            const salePoint = findSalePoint.data[0]
             const updatedUser = { ...auth_state.user, empresa: business, puntoVenta: salePoint }
             const res = await api.users.edit(updatedUser)
+            console.log(updatedUser)
+            console.log('---------------')
+            console.log(res)
             if (res.status !== 'OK') return errorAlert('No se pudo completar el registro. Intente de nuevo.')
             const alertRes = await successAlert('¡Registros guardados exitosamente!')
             if (alertRes.isConfirmed) reloadPage()
@@ -298,19 +313,20 @@ const FirstSteps = () => {
                     {
                         params: {
                             ciudad: '-',
-                            cuit: '11111111111',
+                            cuit: '00000000000',
                             direccion: '-',
                             documentoReceptor: 86,
                             email: '-',
                             normalizedBusinessName: normalizeString('Consumidor final'),
                             provincia: '-',
                             razonSocial: 'Consumidor final',
+                            receiverIvaCondition: 5,
                             telefono: '-',
                         },
                         predataService: [
                             {
                                 prop: 'condicionFiscal',
-                                query: JSON.stringify({ nombre: 'Consumidor Final' }),
+                                query: { nombre: 'Consumidor Final' },
                                 service: 'fiscalConditions'
                             }
                         ]
@@ -375,6 +391,7 @@ const FirstSteps = () => {
             {
                 action: 'SET_CUIT',
                 datePickerValue: null,
+                disabled: true,
                 dispatch: business_dispatch,
                 key: 'cuit',
                 label: 'Cuit',

@@ -157,6 +157,7 @@ const Form = ({ data }) => {
 		const input = (
 			<>
 				<Input
+					disabled={field.disabled}
 					onChange={e => onChangeInput(e, field)}
 					placeholder={field.label}
 					status={field.status === 'error' ? 'error' : null}
