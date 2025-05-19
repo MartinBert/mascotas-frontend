@@ -10,6 +10,7 @@ import contexts from '../../contexts'
 
 // Design Components
 import { Button, Col, Row, Steps } from 'antd'
+import dayjs from 'dayjs'
 
 // Helpers
 import helpers from '../../helpers'
@@ -33,7 +34,7 @@ const { normalizeString } = helpers.stringHelper
 
 
 const FirstSteps = () => {
-    const [auth_state] = useAuthContext()
+    const [auth_state, auth_dispatch] = useAuthContext()
     const [business_state, business_dispatch] = useBusinessContext()
     const [home_state, home_dispatch] = useHomeContext()
     const [salePoint_state, salePoint_dispatch] = useSalePointContext()
@@ -73,12 +74,6 @@ const FirstSteps = () => {
         window.location.reload()
     }
 
-    const setCuitForStep2 = () => {
-        const cuit = localStorage.getItem('tenantId')
-        const payload = { fieldStatus: null, value: cuit }
-        business_dispatch({ type: 'SET_CUIT', payload })
-    }
-
     const setSelectOptionsForStep2 = async () => {
         if (home_state.firstSteps.activeStep !== 2) return
         const findSalePoints = await api.salePoints.findAll()
@@ -103,12 +98,6 @@ const FirstSteps = () => {
     }
 
     useEffect(() => {
-        setCuitForStep2()
-        // eslint-disable-next-line
-    }, [])
-  
-
-    useEffect(() => {
         setSelectOptionsForStep2()
         // eslint-disable-next-line
     }, [home_state.firstSteps.activeStep])
@@ -125,19 +114,17 @@ const FirstSteps = () => {
         else {
             const findBusiness = await api.business.findAll()
             const findSalePoint = await api.salePoints.findAll()
-            const business = findBusiness.data[0]
-            const salePoint = findSalePoint.data[0]
+            const business = findBusiness.data[0]._id
+            const salePoint = findSalePoint.data[0]._id
             const updatedUser = { ...auth_state.user, empresa: business, puntoVenta: salePoint }
             const res = await api.users.edit(updatedUser)
-            console.log(updatedUser)
-            console.log('---------------')
-            console.log(res)
             if (res.status !== 'OK') return errorAlert('No se pudo completar el registro. Intente de nuevo.')
+            auth_dispatch({ type: 'LOAD_USER', payload: updatedUser })
             const alertRes = await successAlert('¡Registros guardados exitosamente!')
             if (alertRes.isConfirmed) reloadPage()
         }
     }
-
+    
     const buttonToFinish = (
         <Button
             onClick={finish}
@@ -149,6 +136,60 @@ const FirstSteps = () => {
     )
 
     // ----------------------------------- Button to next ------------------------------------ //
+    const setSalePoint = async () => {
+        const isCurrentStep1 = home_state.firstSteps.activeStep === 1
+        if (!isCurrentStep1) {
+            return
+        } else {
+            const findRecord = await api.salePoints.findAll()
+            if (findRecord.data.length === 0) {
+                return
+            } else {
+                const salePoint = findRecord.data[0]
+                salePoint_dispatch({ type: 'SET_NAME', payload: { fieldStatus: null, value: salePoint.nombre } })
+                salePoint_dispatch({ type: 'SET_NUMBER', payload: { fieldStatus: null, value: salePoint.numero } })
+            }
+        }
+    }
+
+    const setBusiness = async () => {
+        const isCurrentStep2 = home_state.firstSteps.activeStep === 2
+        if (!isCurrentStep2) {
+            return
+        } else {
+            const findUsers = await api.users.findAll()
+            const email = findUsers.data[0].email
+            const cuit = localStorage.getItem('tenantId')
+            business_dispatch({ type: 'SET_CUIT', payload: { fieldStatus: null, value: cuit } })
+            business_dispatch({ type: 'SET_EMAIL', payload: { fieldStatus: null, value: email } })
+            const findBusiness = await api.business.findAll()
+            if (findBusiness.data.length === 0) {
+                return
+            } else {
+                const business = findBusiness.data[0]
+                business_dispatch({ type: 'SET_BUSINESS_NAME', payload: { fieldStatus: null, value: business.razonSocial } })
+                business_dispatch({ type: 'SET_ACTIVITY_DESCRIPTION', payload: { fieldStatus: null, value: business.actividad } })
+                business_dispatch({ type: 'SET_START_ACTIVITIES_DATE', payload: {
+                    fieldStatus: null,
+                    datePickerValue: dayjs(business.fechaInicioActividad),
+                    value: business.fechaInicioActividad
+                }})
+                business_dispatch({ type: 'SET_GROSS_INCOME', payload: { fieldStatus: null, value: business.ingresosBrutos } })
+                business_dispatch({ type: 'SET_ADDRESS', payload: { fieldStatus: null, value: business.direccion } })
+                business_dispatch({ type: 'SET_PHONE', payload: { fieldStatus: null, value: business.telefono } })
+                business_dispatch({ type: 'SET_LOGO', payload: { fieldStatus: null, value: business.logo } })
+                business_dispatch({ type: 'SET_FISCAL_CONDITION', payload: { fieldStatus: null, value: business.condicionFiscal._id } })
+                business_dispatch({ type: 'SET_SALE_POINT', payload: { fieldStatus: null, value: business.puntosVenta[0]._id } })
+            }
+        }
+    }
+
+    useEffect(() => {
+        setSalePoint()
+        setBusiness()
+        // eslint-disable-next-line
+    }, [home_state.firstSteps.activeStep])
+
     const next = () => {
         const currentStep = home_state.firstSteps.activeStep
         home_dispatch({ type: 'SET_ACTIVE_STEP', payload: currentStep + 1 })
