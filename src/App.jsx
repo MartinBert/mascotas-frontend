@@ -10,6 +10,8 @@ import contexts from './contexts'
 // Design Frameworks
 import 'antd/dist/reset.css'
 
+const { StoreContext } = contexts.Store
+
 // Imports Destructurings
 const { AuthContext } = contexts.Auth
 const { BenefitsContext } = contexts.Benefits
@@ -34,43 +36,45 @@ function App() {
 
     return (
         <div style={{ height: '100%' }}>
-            <AuthContext>
-                <BenefitsContext>
-                    <BusinessContext>
-                        <DailyBusinessStatisticsContext>
-                            <DeleteModalContext>
-                                <EntriesContext>
-                                    <FiscalNoteModalContext>
-                                        <GenericComponentsContext>
-                                            <HomeContext>
-                                                <InterfaceStylesContext>
-                                                    <OutputsContext>
-                                                        <PrivateRouteContext>
-                                                            <ProductsContext>
-                                                                <RenderConditionsContext>
-                                                                    <SaleContext>
-                                                                        <SalesAreasContext>
-                                                                            <SalePointContext>
-                                                                                <Router>
-                                                                                    <AppRouter />
-                                                                                </Router>
-                                                                            </SalePointContext>
-                                                                        </SalesAreasContext>
-                                                                    </SaleContext>
-                                                                </RenderConditionsContext>
-                                                            </ProductsContext>
-                                                        </PrivateRouteContext>
-                                                    </OutputsContext>
-                                                </InterfaceStylesContext>
-                                            </HomeContext>
-                                        </GenericComponentsContext>
-                                    </FiscalNoteModalContext>
-                                </EntriesContext>
-                            </DeleteModalContext>
-                        </DailyBusinessStatisticsContext>
-                    </BusinessContext>
-                </BenefitsContext>
-            </AuthContext>
+            <StoreContext>
+                <AuthContext>
+                    <BenefitsContext>
+                        <BusinessContext>
+                            <DailyBusinessStatisticsContext>
+                                <DeleteModalContext>
+                                    <EntriesContext>
+                                        <FiscalNoteModalContext>
+                                            <GenericComponentsContext>
+                                                <HomeContext>
+                                                    <InterfaceStylesContext>
+                                                        <OutputsContext>
+                                                            <PrivateRouteContext>
+                                                                <ProductsContext>
+                                                                    <RenderConditionsContext>
+                                                                        <SaleContext>
+                                                                            <SalesAreasContext>
+                                                                                <SalePointContext>
+                                                                                    <Router>
+                                                                                        <AppRouter />
+                                                                                    </Router>
+                                                                                </SalePointContext>
+                                                                            </SalesAreasContext>
+                                                                        </SaleContext>
+                                                                    </RenderConditionsContext>
+                                                                </ProductsContext>
+                                                            </PrivateRouteContext>
+                                                        </OutputsContext>
+                                                    </InterfaceStylesContext>
+                                                </HomeContext>
+                                            </GenericComponentsContext>
+                                        </FiscalNoteModalContext>
+                                    </EntriesContext>
+                                </DeleteModalContext>
+                            </DailyBusinessStatisticsContext>
+                        </BusinessContext>
+                    </BenefitsContext>
+                </AuthContext>
+            </StoreContext>
         </div>
     )
 }

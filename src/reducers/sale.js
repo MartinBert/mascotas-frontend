@@ -528,7 +528,6 @@ const reducer = (state = initialState, action) => {
                 documentoLetra: action.payload?.letra ?? null,
                 documentoFiscal: action.payload?.fiscal ?? null,
                 documentoCodigo: action.payload?.codigoUnico ?? null,
-                documentoDocumentoReceptor: action.payload?.documentoReceptor ?? null,
                 selectDocument: {
                     ...state.selectDocument,
                     selectedValue: action.payload?.nombre ?? null

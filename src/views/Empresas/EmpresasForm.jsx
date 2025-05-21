@@ -3,19 +3,18 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 // Custom Components
-import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
 // Design Components
-import { Row, Col, Form, Input, Upload } from 'antd'
+import dayjs from 'dayjs'
+import { Col, DatePicker, Form, Input, Row, Select, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 
 // Services
 import api from '../../services'
 
 // Imports Destructuring
-const { GenericAutocomplete } = generics
 const { Spinner } = graphics
 
 
@@ -23,8 +22,6 @@ const EmpresasForm = () => {
     const navigate = useNavigate()
     const { id } = useParams()
     const [uploadedImages, setUploadedImages] = useState([])
-    const [selectedCondition, setSelectedCondition] = useState(null)
-    const [selectedSalePoint, setSelectedSalePoint] = useState(null)
     const [loading, setLoading] = useState(true)
     const [empresa, setEmpresa] = useState({
         razonSocial: '',
@@ -37,8 +34,9 @@ const EmpresasForm = () => {
         email: '',
         logo: null,
         condicionFiscal: null,
-        puntosVenta: null,
+        puntosVenta: [],
     })
+    const [startActivityDateValue, setStartActivityDateValue] = useState('')
 
     const loadEmpresaData = (e) => {
         setEmpresa({
@@ -47,31 +45,32 @@ const EmpresasForm = () => {
         })
     }
 
-    useEffect(() => {
-        const fetchEmpresa = async () => {
-            if (id === 'nuevo') {
-                setLoading(false)
-                return
-            }
-            const searchedItem = await api.business.findById(id)
-            setEmpresa({
-                _id: searchedItem.data._id,
-                razonSocial: searchedItem.data.razonSocial,
-                cuit: searchedItem.data.cuit,
-                actividad: searchedItem.data.actividad,
-                fechaInicioActividad: searchedItem.data.fechaInicioActividad,
-                ingresosBrutos: searchedItem.data.ingresosBrutos,
-                direccion: searchedItem.data.direccion,
-                telefono: searchedItem.data.telefono,
-                email: searchedItem.data.email,
-                logo: searchedItem.data.logo,
-                condicionFiscal: searchedItem.data.condicionFiscal,
-                puntosVenta: searchedItem.data.puntosVenta
-            })
-            setSelectedCondition(searchedItem.data.condicionFiscal)
-            setSelectedSalePoint(searchedItem.data.puntosVenta[0])
+    const fetchEmpresa = async () => {
+        if (id === 'nuevo') {
             setLoading(false)
+            return
         }
+        const findBusiness = await api.business.findById(id)
+        const business = findBusiness.data
+        setEmpresa({
+            _id: business._id,
+            razonSocial: business.razonSocial,
+            cuit: business.cuit,
+            actividad: business.actividad,
+            fechaInicioActividad: business.fechaInicioActividad,
+            ingresosBrutos: business.ingresosBrutos,
+            direccion: business.direccion,
+            telefono: business.telefono,
+            email: business.email,
+            logo: business.logo,
+            condicionFiscal: business.condicionFiscal,
+            puntosVenta: business.puntosVenta
+        })
+        setStartActivityDateValue(dayjs(business.fechaInicioActividad))
+        setLoading(false)
+    }
+
+    useEffect(() => {
         fetchEmpresa()
     }, [empresa.razonSocial, id])
 
@@ -110,22 +109,6 @@ const EmpresasForm = () => {
         errorAlert('Error al guardar el registro')
     }
 
-    const setSelectedConditionToBusiness = async (condition) => {
-        setSelectedCondition(condition)
-        setEmpresa({
-            ...empresa,
-            condicionFiscal: condition,
-        })
-    }
-
-    const setSelectedSalePointToBusiness = async (salePoints) => {
-        setSelectedSalePoint(salePoints)
-        setEmpresa({
-            ...empresa,
-            puntosVenta: salePoints,
-        })
-    }
-
     const uploaderProps = {
         name: 'file',
         accept: '.jpg,.jpeg,.png',
@@ -148,6 +131,140 @@ const EmpresasForm = () => {
         setUploadedImages([])
         return response
     }
+
+    // ------------- Pick start activity date ------------ //
+    const [startActivityDateErrorStatus, setStartActivityDateErrorStatus] = useState(false)
+    
+    const onChangeStartActivityDate = (date, dateString) => {
+        // console.log(dateString)
+        setEmpresa({ ...empresa, fechaInicioActividad: date })
+        setStartActivityDateValue(dayjs(dateString, 'DD-MM-YYYY'))
+        setStartActivityDateErrorStatus(false)
+    }
+    
+    const pickerStartActivityDate = (
+        <>
+            <DatePicker
+                format={['DD-MM-YYYY']}
+                onChange={onChangeStartActivityDate}
+                placeholder='Seleccione fecha inicio act.'
+                status={startActivityDateErrorStatus ? 'error' : null}
+                style={{ width: '100%' }}
+                value={startActivityDateValue}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: startActivityDateErrorStatus ? 'block' : 'none'
+                }}
+            >
+                Debes elegir una fecha.
+            </span>
+        </>
+    )
+
+    // ------------- Select fiscal condition ------------- //
+    const [fiscalConditionOptions, setFiscalConditionOptions] = useState([])
+    const [fiscalConditionStatus, setFiscalConditionStatus] = useState(false)
+
+    const onSearchFiscalCondition = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.fiscalConditions.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setFiscalConditionOptions(options)
+        setFiscalConditionStatus(false)
+    }
+
+    const onClearFiscalCondition = () => {
+        setEmpresa({ ...empresa, condicionFiscal: null })
+        setFiscalConditionOptions([])
+        setFiscalConditionStatus(true)
+    }
+
+    const onSelectFiscalCondition = async (e) => {
+        const findDoc = await api.fiscalConditions.findById(e)
+        let fiscalCondition = null
+        if (findDoc.status === 'OK' && findDoc.data) {
+            fiscalCondition = findDoc.data
+        }
+        setEmpresa({ ...empresa, condicionFiscal: fiscalCondition })
+        setFiscalConditionOptions([])
+        setFiscalConditionStatus(false)
+    }
+
+    const selectFiscalCondition = (
+        <Select
+            allowClear
+            filterOption={false}
+            onClear={onClearFiscalCondition}
+            onSearch={onSearchFiscalCondition}
+            onSelect={onSelectFiscalCondition}
+            options={fiscalConditionOptions}
+            placeholder='Seleccione condición fiscal.'
+            showSearch
+            status={fiscalConditionStatus}
+            style={{ width: '100%' }}
+            value={empresa?.condicionFiscal?.nombre ?? null}
+        />
+    )
+
+    // ---------------- Select sale point ---------------- //
+    const [salePointOptions, setSalePointOptions] = useState([])
+    const [salePointStatus, setSalePointStatus] = useState(false)
+
+    const onSearchSalePoint = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.salePoints.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setSalePointOptions(options)
+        setSalePointStatus(false)
+    }
+
+    const onClearSalePoint = () => {
+        setEmpresa({ ...empresa, puntosVenta: [] })
+        setSalePointOptions([])
+        setSalePointStatus(true)
+    }
+
+    const onSelectSalePoint = async (e) => {
+        const findDoc = await api.salePoints.findById(e)
+        let salePoint = []
+        if (findDoc.status === 'OK' && findDoc.data) {
+            salePoint = findDoc.data
+        }
+        setEmpresa({ ...empresa, puntosVenta: [salePoint] })
+        setSalePointOptions([])
+        setSalePointStatus(false)
+    }
+
+    const selectSalePoint = (
+        <Select
+            allowClear
+            filterOption={false}
+            onClear={onClearSalePoint}
+            onSearch={onSearchSalePoint}
+            onSelect={onSelectSalePoint}
+            options={salePointOptions}
+            placeholder='Seleccione punto de venta.'
+            showSearch
+            status={salePointStatus}
+            style={{ width: '100%' }}
+            value={empresa?.puntosVenta[0]?.nombre ?? null}
+        />
+    )
+
 
     return loading ? (
         <Spinner />
@@ -176,6 +293,7 @@ const EmpresasForm = () => {
                 </Col>
                 <Col span={6} style={{ marginBottom: '10px' }}>
                     <Input
+                        disabled
                         name='cuit'
                         placeholder='CUIT'
                         value={empresa.cuit}
@@ -225,14 +343,7 @@ const EmpresasForm = () => {
                     />
                 </Col>
                 <Col span={6} style={{ marginBottom: '10px' }}>
-                    <Input
-                        name='fechaInicioActividad'
-                        placeholder='Fecha de inicio de actividad'
-                        value={empresa.fechaInicioActividad}
-                        onChange={(e) => {
-                            loadEmpresaData(e)
-                        }}
-                    />
+                    {pickerStartActivityDate}
                 </Col>
                 <Col span={6} style={{ marginBottom: '10px' }}>
                     <Input
@@ -245,29 +356,10 @@ const EmpresasForm = () => {
                     />
                 </Col>
                 <Col span={6} style={{ marginBottom: '10px' }}>
-                    <GenericAutocomplete
-                        label='Condición Fiscal'
-                        modelToFind='condicionfiscal'
-                        keyToCompare='nombre'
-                        controller='condicionesfiscales'
-                        returnCompleteModel={true}
-                        setResultSearch={setSelectedConditionToBusiness}
-                        selectedSearch={selectedCondition}
-                        styles={{ backgroundColor: '#fff' }}
-                    />
+                    {selectFiscalCondition}
                 </Col>
                 <Col span={6} style={{ marginBottom: '10px' }}>
-                    <GenericAutocomplete
-                        label='Punto de venta'
-                        // multiple={true}
-                        modelToFind='puntoventa'
-                        keyToCompare='nombre'
-                        controller='puntosventa'
-                        returnCompleteModel={true}
-                        setResultSearch={setSelectedSalePointToBusiness}
-                        selectedSearch={selectedSalePoint}
-                        styles={{ backgroundColor: '#fff' }}
-                    />
+                    {selectSalePoint}
                 </Col>
                 <Col span={24} style={{ marginBottom: '10px' }}>
                     <Upload {...uploaderProps}>

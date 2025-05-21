@@ -2,7 +2,6 @@ import ButtonForm from './ButtonForm'
 import CheckboxForm from './CheckboxForm'
 import DeleteModal from './DeleteModal'
 import Form from './Form'
-import GenericAutocomplete from './GenericAutocomplete'
 import InputForm from './InputForm'
 import InputHidden from './InputHidden'
 import OpenImage from './OpenImage'
@@ -19,7 +18,6 @@ const generics = {
     CheckboxForm,
     DeleteModal,
     Form,
-    GenericAutocomplete,
     GiselaDetailsModal,
     InputForm,
     InputHidden,

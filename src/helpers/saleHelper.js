@@ -518,7 +518,6 @@ const updateLinesValues = (state) => {
                 } else updatedDataOfLine = {}
 
                 updatedLine = { ...line, ...updatedDataOfLine }
-                console.log(updatedLine)
                 return updatedLine
             })
             break

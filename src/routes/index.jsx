@@ -45,13 +45,14 @@ const refreshAfipServices = async () => {
 }
 
 const verifyRefresh = async () => {
+    // Haya un usuario logeado
+    const loggedUser = await getUserData()
+
     // Sea entre las 2 y 2:11 de la mañana
     const hours = new Date().getHours()
     const minutes = new Date().getMinutes()
     const minutesElapsedToday = hours * 60 + minutes
     const correctSchedule = 120 < minutesElapsedToday < 131
-    // Haya un usuario logeado
-    const loggedUser = await getUserData()
 
     const isVerified = correctSchedule && loggedUser
     const data = { loggedUser, isVerified }
@@ -99,9 +100,6 @@ const AppRouter = () => {
 
     const getElementOfPrivateRoute = (route) => {
         if (auth_state.loading || !auth_state.user) return <Spin />
-        else if (auth_state.user.perfil === false && route.onlySuperadmin === true) {
-            return navigate('/ventas')
-        }
         else return route.element
     }
 

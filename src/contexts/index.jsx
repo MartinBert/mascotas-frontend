@@ -15,6 +15,7 @@ import RenderConditions from './RenderConditions'
 import Sale from './Sale'
 import SalesAreas from './SalesAreas'
 import SalePoint from './SalePoint'
+import Store from './Store'
 
 const contexts = {
     Auth,
@@ -33,7 +34,8 @@ const contexts = {
     RenderConditions,
     Sale,
     SalesAreas,
-    SalePoint
+    SalePoint,
+    Store
 }
 
 export default contexts

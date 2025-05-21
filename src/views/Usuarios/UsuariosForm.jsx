@@ -3,19 +3,17 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 // Custom Components
-import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import messages from '../../components/messages'
 import { errorAlert, successAlert } from '../../components/alerts'
 
 // Design Components
-import { Row, Col, Form, Input, Checkbox } from 'antd'
+import { Checkbox, Col, Form, Input, Row, Select } from 'antd'
 
 // Services
 import api from '../../services'
 
 // Imports Destructuring
-const { GenericAutocomplete } = generics
 const { Spinner } = graphics
 const { Error } = messages
 
@@ -23,17 +21,31 @@ const { Error } = messages
 const UsuariosForm = () => {
     const navigate = useNavigate()
     const { id } = useParams()
-    const [emailError, setEmailError] = useState(false)
     const [error, setError] = useState(false)
     const [loading, setLoading] = useState(true)
-    const [selectedCompany, setSelectedCompany] = useState(null)
-    const [selectedSalePoint, setSelectedSalePoint] = useState(null)
     const [usuario, setUsuario] = useState({
         nombre: '',
         email: '',
         password: '',
-        perfil: false
+        perfil: false,
+        puntoVenta: null,
+        empresa: null
     })
+
+    const loadBusiness = async () => {
+        const userId = localStorage.getItem('userId')
+        const mainUser = await api.users.findById(userId)
+        if (!mainUser.data) {
+            errorAlert('Error al cargar el usuario de referencia. Intente de nuevo.')
+            navigate('/')
+        } else {
+            const business = mainUser.data.empresa
+            setUsuario({ ...usuario, empresa: business })
+        }
+    }
+
+    // eslint-disable-next-line
+    useEffect(() => { loadBusiness() }, [])
 
     const loadUsuarioData = (e) => {
         setUsuario({
@@ -48,45 +60,33 @@ const UsuariosForm = () => {
             setLoading(false)
             return
         }
-
         const fetchUsuario = async () => {
             const searchedItem = await api.users.findById(id)
             setUsuario(searchedItem.data)
-            if (searchedItem.data.empresa) setSelectedCompany({ _id: searchedItem.data.empresa._id, razonSocial: searchedItem.data.empresa.razonSocial })
-            setSelectedSalePoint(searchedItem.data.puntoVenta)
             setLoading(false)
         }
         fetchUsuario()
     }, [usuario.nombre, id])
 
-    const setSelectedCompanyToUser = async (company) => {
-        setSelectedCompany(company)
-        setUsuario({
-            ...usuario,
-            empresa: company
-        })
-    }
-
-    const setSelectedSalePointToUser = async (salePoint) => {
-        setSelectedSalePoint(salePoint)
-        setUsuario({
-            ...usuario,
-            puntoVenta: salePoint
-        })
-    }
-
-    const save = () => {
-        if (!usuario.nombre || !usuario.email || !usuario.password) return setError(true)
-        if (usuario.email === 'admin@test.com') return setEmailError(true)
-
-        const saveItem = async () => {
-            const response = usuario._id
-                ? await api.users.edit(usuario)
-                : await api.users.save(usuario)
-            if (response.status === 'OK') return success()
+    const save = async () => {
+        if (!usuario.nombre || !usuario.email || !usuario.password || !usuario.puntoVenta) return setError(true)
+        let response
+        if (usuario._id) {
+            response = await api.users.edit(usuario)
+        } else {
+            const findIfExistsInDb = await api.users.findAllByFilters(JSON.stringify({ email: usuario.email }))
+            const existsInDb = findIfExistsInDb.data.docs.length > 0
+            if (existsInDb) {
+                return errorAlert('El email ya está en uso. Regístrese con otro email.')
+            } else {
+                response = await api.users.save(usuario)
+            }
+        }
+        if (response.status === 'OK') {
+            return success()
+        } else {
             return fail()
         }
-        saveItem()
     }
 
     const redirectToUsuarios = () => {
@@ -103,6 +103,57 @@ const UsuariosForm = () => {
         errorAlert('Error al guardar el registro')
     }
 
+    // ---------------- Select sale point ---------------- //
+    const [salePointOptions, setSalePointOptions] = useState([])
+    const [salePointStatus, setSalePointStatus] = useState(false)
+
+    const onSearchSalePoint = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.salePoints.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setSalePointOptions(options)
+        setSalePointStatus(false)
+    }
+
+    const onClearSalePoint = () => {
+        setUsuario({ ...usuario, puntoVenta: null })
+        setSalePointOptions([])
+        setSalePointStatus(true)
+    }
+
+    const onSelectSalePoint = async (e) => {
+        const findDoc = await api.salePoints.findById(e)
+        let salePoint = null
+        if (findDoc.status === 'OK' && findDoc.data) {
+            salePoint = findDoc.data
+        }
+        setUsuario({ ...usuario, puntoVenta: salePoint })
+        setSalePointOptions([])
+        setSalePointStatus(false)
+    }
+
+    const selectSalePoint = (
+        <Select
+            allowClear
+            filterOption={false}
+            onClear={onClearSalePoint}
+            onSearch={onSearchSalePoint}
+            onSelect={onSelectSalePoint}
+            options={salePointOptions}
+            placeholder='Seleccione punto de venta.'
+            showSearch
+            status={salePointStatus}
+            style={{ width: '100%' }}
+            value={usuario?.puntoVenta?.nombre ?? null}
+        />
+    )
+
     return (
         <Row>
             {loading ? (
@@ -112,9 +163,6 @@ const UsuariosForm = () => {
                     <h1>{id === 'nuevo' ? 'Crear nuevo usuario' : 'Editar usuario'}</h1>
                     {error ? (
                         <Error message='Debe completar todos los campos obligatorios *' />
-                    ) : null}
-                    {emailError ? (
-                        <Error message={`El email registrado no puede ser 'admin@test.com'`} />
                     ) : null}
                     <Form
                         name='basic'
@@ -169,32 +217,10 @@ const UsuariosForm = () => {
                             ></Checkbox>
                         </Form.Item>
                         <Form.Item
-                            label='Empresa'
-                            required={true}
-                        >
-                            <GenericAutocomplete
-                                label='Empresa'
-                                modelToFind='empresa'
-                                keyToCompare='razonSocial'
-                                controller='empresas'
-                                returnCompleteModel={true}
-                                setResultSearch={setSelectedCompanyToUser}
-                                selectedSearch={selectedCompany}
-                            />
-                        </Form.Item>
-                        <Form.Item
                             label='Punto de venta'
                             required={true}
                         >
-                            <GenericAutocomplete
-                                label='Punto de venta'
-                                modelToFind='puntoventa'
-                                keyToCompare='nombre'
-                                controller='puntosventa'
-                                returnCompleteModel={true}
-                                setResultSearch={setSelectedSalePointToUser}
-                                selectedSearch={selectedSalePoint}
-                            />
+                            {selectSalePoint}
                         </Form.Item>
                         <Row>
                             <Col span={8} style={{ display: 'flex' }}>

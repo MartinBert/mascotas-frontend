@@ -4,12 +4,11 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { FaTrashAlt } from 'react-icons/fa'
 
 // Custom Components
-import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import { errorAlert, questionAlert, successAlert } from '../../components/alerts'
 
 // Design Components
-import { Row, Col, Form, Input, Upload } from 'antd'
+import { Row, Col, Form, Input, Select, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 
 // Helpers
@@ -20,7 +19,6 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
-const { GenericAutocomplete } = generics
 const { Spinner } = graphics
 const { formatFindFilters } = actions.paginationParams
 const { decimalPercent, roundToMultiple, round } = helpers.mathHelper
@@ -309,6 +307,190 @@ const ProductosForm = () => {
         setUploadedImages([])
         return response
     }
+    
+    // ------------------- Select brand ------------------ //
+    const [brandOptions, setBrandOptions] = useState([])
+    const [brandStatus, setBrandStatus] = useState(false)
+
+    const onSearchBrand = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.brands.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setBrandOptions(options)
+        setBrandStatus(false)
+    }
+
+    const onClearBrand = () => {
+        setProduct({ ...product, marca: null, normalizedBrand: null })
+        setBrandOptions([])
+        setBrandStatus(true)
+    }
+
+    const onSelectBrand = async (e) => {
+        const findDoc = await api.brands.findById(e)
+        let brand = null
+        if (findDoc.status === 'OK' && findDoc.data) {
+            brand = findDoc.data
+        }
+        setProduct({ ...product, marca: brand, normalizedBrand: normalizeString(brand.nombre) })
+        setBrandOptions([])
+        setBrandStatus(false)
+    }
+
+    const selectBrand = (
+        <>
+            <Select
+                allowClear
+                filterOption={false}
+                onClear={onClearBrand}
+                onSearch={onSearchBrand}
+                onSelect={onSelectBrand}
+                options={brandOptions}
+                placeholder='Seleccione marca.'
+                showSearch
+                status={brandStatus ? 'error' : null}
+                style={{ width: '100%' }}
+                value={product?.marca?.nombre ?? null}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: brandStatus ? 'block' : 'none'
+                }}
+            >
+                Debes seleccionar una opción.
+            </span>
+        </>
+    )
+
+    // ------------------- Select type ------------------- //
+    const [typeOptions, setTypeOptions] = useState([])
+    const [typeStatus, setTypeStatus] = useState(false)
+
+    const onSearchType = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.types.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setTypeOptions(options)
+        setTypeStatus(false)
+    }
+
+    const onClearType = () => {
+        setProduct({ ...product, normalizedType: null, rubro: null })
+        setTypeOptions([])
+        setTypeStatus(true)
+    }
+
+    const onSelectType = async (e) => {
+        const findDoc = await api.types.findById(e)
+        let type = null
+        if (findDoc.status === 'OK' && findDoc.data) {
+            type = findDoc.data
+        }
+        setProduct({ ...product, normalizedType: normalizeString(type.nombre), rubro: type })
+        setTypeOptions([])
+        setTypeStatus(false)
+    }
+
+    const selectType = (
+        <>
+            <Select
+                allowClear
+                filterOption={false}
+                onClear={onClearType}
+                onSearch={onSearchType}
+                onSelect={onSelectType}
+                options={typeOptions}
+                placeholder='Seleccione rubro.'
+                showSearch
+                status={typeStatus ? 'error' : null}
+                style={{ width: '100%' }}
+                value={product?.rubro?.nombre ?? null}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: typeStatus ? 'block' : 'none'
+                }}
+            >
+                Debes seleccionar una opción.
+            </span>
+        </>
+    )
+
+    // --------------- Select measure unit --------------- //
+    const [measureUnitOptions, setMeasureUnitOptions] = useState([])
+    const [measureUnitStatus, setMeasureUnitStatus] = useState(false)
+
+    const onSearchMeasureUnit = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.measureUnits.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setMeasureUnitOptions(options)
+        setMeasureUnitStatus(false)
+    }
+
+    const onClearMeasureUnit = () => {
+        setProduct({ ...product, unidadMedida: null })
+        setMeasureUnitOptions([])
+        setMeasureUnitStatus(true)
+    }
+
+    const onSelectMeasureUnit = async (e) => {
+        const findDoc = await api.measureUnits.findById(e)
+        let type = null
+        if (findDoc.status === 'OK' && findDoc.data) {
+            type = findDoc.data
+        }
+        setProduct({ ...product, unidadMedida: type })
+        setMeasureUnitOptions([])
+        setMeasureUnitStatus(false)
+    }
+
+    const selectMeasureUnit = (
+        <>
+            <Select
+                allowClear
+                filterOption={false}
+                onClear={onClearMeasureUnit}
+                onSearch={onSearchMeasureUnit}
+                onSelect={onSelectMeasureUnit}
+                options={measureUnitOptions}
+                placeholder='Seleccione rubro.'
+                showSearch
+                status={measureUnitStatus ? 'error' : null}
+                style={{ width: '100%' }}
+                value={product?.unidadMedida?.nombre ?? null}
+            />
+            <span
+                style={{
+                    color: 'red',
+                    display: measureUnitStatus ? 'block' : 'none'
+                }}
+            >
+                Debes seleccionar una opción.
+            </span>
+        </>
+    )
+
 
     return (
         <Row>
@@ -365,15 +547,7 @@ const ProductosForm = () => {
                                     required
                                     label='Marca'
                                 >
-                                    <GenericAutocomplete
-                                        label='Marca'
-                                        modelToFind='marca'
-                                        keyToCompare='nombre'
-                                        controller='marcas'
-                                        returnCompleteModel={true}
-                                        setResultSearch={setSelectedBrandToProduct}
-                                        selectedSearch={selectedBrand}
-                                    />
+                                    {selectBrand}
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
@@ -381,15 +555,7 @@ const ProductosForm = () => {
                                     required
                                     label='Rubro'
                                 >
-                                    <GenericAutocomplete
-                                        label='Rubro'
-                                        modelToFind='rubro'
-                                        keyToCompare='nombre'
-                                        controller='rubros'
-                                        returnCompleteModel={true}
-                                        setResultSearch={setSelectedHeadingToProduct}
-                                        selectedSearch={selectedHeading}
-                                    />
+                                   {selectType}
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>
@@ -397,15 +563,7 @@ const ProductosForm = () => {
                                     required
                                     label='U. Medida'
                                 >
-                                    <GenericAutocomplete
-                                        label='U. Medida'
-                                        modelToFind='unidadmedida'
-                                        keyToCompare='nombre'
-                                        controller='unidadesmedida'
-                                        returnCompleteModel={true}
-                                        setResultSearch={setSelectedMeasureToProduct}
-                                        selectedSearch={selectedMeasure}
-                                    />
+                                   {selectMeasureUnit}
                                 </Form.Item>
                             </Col>
                             <Col xl={6} lg={8} md={12} sm={24} xs={24}>

@@ -8,12 +8,14 @@ const checkStorageStatus = (err) => {
 }
 
 const deleteImage = async (id) => {
-    const headers = {
-        headers: { Authorization: localStorage.getItem('token'), 'Content-Type': 'application/json' },
-        tenantid: localStorage.getItem('tenantId')
+    const reqConfig = {
+        headers: {
+            Authorization: localStorage.getItem('token'), 'Content-Type': 'application/json',
+            tenantid: localStorage.getItem('tenantId')
+        }
     }
     try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/uploads/${id}`, headers)
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/uploads/${id}`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -22,12 +24,14 @@ const deleteImage = async (id) => {
 }
 
 const getImageUrl = async (id) => {
-    const headers = { 
-        headers: { Authorization: localStorage.getItem('token'), 'Content-Type': 'application/json' },
-        tenantid: localStorage.getItem('tenantId')
+    const reqConfig = { 
+        headers: {
+            Authorization: localStorage.getItem('token'), 'Content-Type': 'application/json',
+            tenantid: localStorage.getItem('tenantId')
+        }
     }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/uploads/${id}`, headers)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/uploads/${id}`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -36,14 +40,16 @@ const getImageUrl = async (id) => {
 }
 
 const uploadImage = async (data) => {
-    const headers = {
-        headers: { Authorization: localStorage.getItem('token') },
-        tenantid: localStorage.getItem('tenantId')
+    const reqCofig = {
+        headers: {
+            Authorization: localStorage.getItem('token'),
+            tenantid: localStorage.getItem('tenantId')
+        }
     }
     const bodyMultiPart = new FormData()
     bodyMultiPart.append('file', data)
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_REST}/uploads`, bodyMultiPart, headers)
+        const response = await axios.post(`${process.env.REACT_APP_API_REST}/uploads`, bodyMultiPart, reqCofig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)

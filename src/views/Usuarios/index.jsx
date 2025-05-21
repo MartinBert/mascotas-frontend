@@ -30,7 +30,7 @@ const { Edit, Delete } = icons
 const Usuarios = () => {
     const navigate = useNavigate()
     const [deleteModal_state, deleteModal_dispatch] = useDeleteModalContext()
-
+    const [oldestUserId, setOldestUserId] = useState('')
     const [usuarios, setUsuarios] = useState(null)
     const [page, setPage] = useState(1)
     const [totalDocs, setTotalDocs] = useState(null)
@@ -43,7 +43,15 @@ const Usuarios = () => {
         const findRecords = await api.users.findPaginated({ page, limit, filters: stringFilters })
         setUsuarios(findRecords.data.docs)
         setTotalDocs(findRecords.data.totalDocs)
-        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+
+        const findOldestUser = await api.users.findOldest()
+        if (!findOldestUser.data) {
+            errorAlert('No se pudo recuperar el usuario de referencia. Intente de nuevo.')
+            return navigate('/')
+        } else {
+            setOldestUserId(findOldestUser.data._id)
+            deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
+        }
     }
 
     useEffect(() => {
@@ -114,12 +122,18 @@ const Usuarios = () => {
                                     >
                                         <Edit />
                                     </Col>
-                                    <Col
-                                        onClick={() => userDeletion(user._id)}
-                                        span={12}
-                                    >
-                                        <Delete />
-                                    </Col>
+                                    {
+                                        user._id === oldestUserId
+                                            ? ''
+                                            : (
+                                                <Col
+                                                    onClick={() => userDeletion(user._id)}
+                                                    span={12}
+                                                >
+                                                    <Delete />
+                                                </Col>
+                                            )
+                                    }
                                 </Row>
                             )
                     }

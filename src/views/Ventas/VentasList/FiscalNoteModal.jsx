@@ -70,6 +70,9 @@ const FiscalNoteModal = () => {
     }
 
     const save = async () => {
+        // if (auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT) {
+        //     errorAlert('No puede emitir documentos fiscales con este usuario de prueba.')
+        // }
         fiscalNoteModal_dispatch({ type: 'SET_LOADING_SAVING_OPERATION', payload: true })
 
         // Generate and set CAE

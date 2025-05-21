@@ -66,7 +66,8 @@ const Ventas = () => {
         // User data
         const userId = localStorage.getItem('userId')
         const loggedUser = await api.users.findById(userId)
-        sale_dispatch({ type: 'SET_COMPANY', payload: loggedUser.data.empresa })
+        const findBusiness = await api.business.findById(loggedUser.data.empresa._id)
+        sale_dispatch({ type: 'SET_COMPANY', payload: findBusiness.data })
         sale_dispatch({ type: 'SET_SALE_POINT', payload: loggedUser.data.puntoVenta })
         sale_dispatch({ type: 'SET_USER', payload: loggedUser.data })
         // Voucher data

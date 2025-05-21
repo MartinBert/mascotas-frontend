@@ -108,14 +108,14 @@ const Productos = () => {
             auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
         }
         fetchUser()
-    }, [auth_dispatch])
+    }, [])
 
     // ------------------ Fetch Products ------------------ //
     const fetchProducts = async () => {
         if (!products_state.index.paginationParams) return
         const findParamsForRender = formatFindParams(products_state.index.paginationParams)
         const dataForRender = await api.products.findPaginated(findParamsForRender)
-        products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender.data.docs })
+        products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_INDEX', payload: dataForRender.data })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

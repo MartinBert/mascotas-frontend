@@ -3,12 +3,11 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 // Custom Components
-import generics from '../../components/generics'
 import graphics from '../../components/graphics'
 import { errorAlert, successAlert } from '../../components/alerts'
 
 // Design Components
-import { Row, Col, Form, Input, Button } from 'antd'
+import { Row, Col, Form, Input, Button, Select } from 'antd'
 
 // Custom Context Providers
 import contexts from '../../contexts'
@@ -20,7 +19,6 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructuring
-const { GenericAutocomplete } = generics
 const { Spinner } = graphics
 const { noEmptyKeys } = helpers.objHelper
 const { normalizeString } = helpers.stringHelper
@@ -30,12 +28,10 @@ const { useAuthContext } = contexts.Auth
 const ClientesForm = () => {
 
     const navigate = useNavigate()
-    const loggedUserContext = useAuthContext()
-    const [auth_state, auth_dispatch] = loggedUserContext
+    const [auth_state, auth_dispatch] = useAuthContext()
     const { id } = useParams()
     const [loading, setLoading] = useState(true)
     const [cliente, setCliente] = useState({
-        _id: null,
         razonSocial: '',
         cuit: '',
         condicionFiscal: '',
@@ -58,15 +54,16 @@ const ClientesForm = () => {
             [e.target.name]: e.target.value,
         })
     }
-
-    const setReceiverIvaCondition = () => {
+    
+    const setReceiverIvaCondition = async () => {
         if (!cliente.condicionFiscal) return
         const allReceiverIvaConditions = [1, 4, 5, 6, 7, 8, 9, 10, 13, 15, 16]
         let receiverIvaCondition = 0
-        const businessFiscalCondition = auth_state.user.empresa.condicionFiscal.nombre
-        if (!businessFiscalCondition) receiverIvaCondition = 0 
-        else {
-            switch (cliente.condicionFiscal.nombre) {
+        const response = await api.fiscalConditions.findById(auth_state.user.empresa.condicionFiscal)
+        if (response.status !== 'OK' || !response.data) {
+            receiverIvaCondition = 0
+        } else {
+            switch (response.data.nombre) {
                 case 'Consumidor Final':
                     receiverIvaCondition = 5
                     break;
@@ -88,7 +85,7 @@ const ClientesForm = () => {
             errorAlert('No se pudo categorizar al cliente respecto al Iva. Contacte a su proveedor.')
             return
         } else {
-            const updatedClient = {...cliente, receiverIvaCondition}
+            const updatedClient = { ...cliente, receiverIvaCondition }
             setCliente(updatedClient)
             return
         }
@@ -105,7 +102,7 @@ const ClientesForm = () => {
             auth_dispatch({ type: 'LOAD_USER', payload: loggedUser.data })
         }
         fetchUser()
-    }, [auth_dispatch])
+    }, [])
 
     useEffect(() => {
         const fetchCliente = async (id) => {
@@ -116,22 +113,6 @@ const ClientesForm = () => {
         if (id !== 'nuevo') fetchCliente(id)
         else setLoading(false)
     }, [loading, id])
-
-    const setFiscalCondition = (condition) => {
-        if (condition.nombre === 'Consumidor Final') {
-            setCliente({
-                ...cliente,
-                condicionFiscal: condition,
-                documentoReceptor: 86
-            })
-        } else {
-            setCliente({
-                ...cliente,
-                condicionFiscal: condition,
-                documentoReceptor: 80
-            })
-        }
-    }
 
     const save = async () => {
         if (id && noEmptyKeys(cliente) === true) {
@@ -146,6 +127,7 @@ const ClientesForm = () => {
 
     const searchAfipClientData = async (e) => {
         e.preventDefault()
+        if (auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT) return
         setLoading(true)
         if (!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.')
 
@@ -163,9 +145,65 @@ const ClientesForm = () => {
             ciudad: taxpayerData?.domicilio[0]?.localidad ?? '',
             provincia: taxpayerData?.domicilio[0]?.descripcionProvincia ?? '',
             documentoReceptor: 80,
-            // receiverIvaCondition:
+            receiverIvaCondition: taxpayerData?.receiverIvaCondition[0] ?? 0
         })
     }
+
+    // ------------- Select fiscal condition ------------- //
+    const [fiscalConditionOptions, setFiscalConditionOptions] = useState([])
+    const [fiscalConditionStatus, setFiscalConditionStatus] = useState(false)
+
+    const onSearchFiscalCondition = async (e) => {
+        const filters = JSON.stringify({ nombre: e })
+        const findDocs = await api.fiscalConditions.findAllByFilters(filters)
+        let options = []
+        if (findDocs.status === 'OK' && findDocs.data.docs.length > 0) {
+            options = findDocs.data.docs.map(doc => {
+                const option = { label: doc.nombre, value: doc._id }
+                return option
+            })
+        }
+        setFiscalConditionOptions(options)
+        setFiscalConditionStatus(false)
+    }
+
+    const onClearFiscalCondition = () => {
+        setCliente({ ...cliente, condicionFiscal: null })
+        setFiscalConditionOptions([])
+        setFiscalConditionStatus(true)
+    }
+
+    const onSelectFiscalCondition = async (e) => {
+        const findDoc = await api.fiscalConditions.findById(e)
+        let documentReceiver = 0
+        let fiscalCondition = null
+        if (findDoc.status === 'OK' && findDoc.data) {
+            fiscalCondition = findDoc.data
+            documentReceiver = findDoc.data.nombre === 'Consumidor Final' ? 86 : 80
+        }
+        setCliente({ 
+            ...cliente,
+            condicionFiscal: fiscalCondition,
+            documentoReceptor: documentReceiver
+        })
+        setFiscalConditionOptions([])
+        setFiscalConditionStatus(false)
+    }
+
+    const selectFiscalCondition = (
+            <Select
+                allowClear
+                filterOption={false}
+                onClear={onClearFiscalCondition}
+                onSearch={onSearchFiscalCondition}
+                onSelect={onSelectFiscalCondition}
+                options={fiscalConditionOptions}
+                placeholder='Condición fiscal del cliente.'
+                showSearch
+                style={{ width: '100%' }}
+                value={cliente?.condicionFiscal?.nombre ?? null}
+            />
+    )
 
     const formProps = [
         { label: 'Razón social / Nombre', name: 'razonSocial', required: true, value: cliente.razonSocial },
@@ -189,21 +227,13 @@ const ClientesForm = () => {
                     <Form.Item
                         label='Condición fiscal'
                         name='condicionFiscal'
-                        onChange={e => loadClienteData(e)}
                         rules={
                             (cliente.condicionFiscal)
                                 ? [{ required: false, message: '' }]
                                 : [{ required: true, message: '¡Ingrese CONDICIÓN FISCAL de su cliente!' }]
                         }
                     >
-                        <GenericAutocomplete
-                            modelToFind='condicionfiscal'
-                            keyToCompare='nombre'
-                            controller='condicionesfiscales'
-                            setResultSearch={setFiscalCondition}
-                            selectedSearch={cliente.condicionFiscal}
-                            returnCompleteModel={true}
-                        />
+                        {selectFiscalCondition}
                     </Form.Item>
 
                     {formProps.map(formItem => (
@@ -234,6 +264,7 @@ const ClientesForm = () => {
                                     <Button
                                         className='btn-primary'
                                         type='button'
+                                        disabled={auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT}
                                         onClick={async (e) => searchAfipClientData(e)}
                                     >
                                         Buscar datos

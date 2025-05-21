@@ -128,7 +128,7 @@ const Documentos = () => {
                     </Col>
                 </Row>
             ),
-            renderable: true,
+            renderable: false,
             title: 'Acciones'
         }
     ]

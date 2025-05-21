@@ -9,7 +9,6 @@ import fiscalConditions from './condicionesfiscales'
 import dailyBusinessStatistics from './dailyBusinessStatistics'
 import documents from './documentos'
 import entries from './entradas'
-import generics from './genericos'
 import interfaceStyles from './interfaceStyles'
 import measureUnits from './unidadesmedida'
 import outputs from './salidas'
@@ -39,7 +38,6 @@ const api = {
     dailyBusinessStatistics,
     documents,
     entries,
-    generics, // Remove
     interfaceStyles,
     measureUnits,
     outputs,

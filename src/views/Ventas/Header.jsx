@@ -35,6 +35,7 @@ const Header = () => {
         sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
         let number
         if (sale_state.documento.fiscal) {
+            console.log('FISCAL')
             const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(
                 sale_state.documentoCodigo,
                 sale_state.empresaCuit,
@@ -163,7 +164,7 @@ const Header = () => {
             sale_dispatch({ type: 'SET_PRODUCT', payload: customProduct })
         }
     }
-
+  
     const generateCustomProductParams = () => {
         const porcentajeIvaVenta = parseFloat(sale_state.customProductParams.percentageIva)
         const precioVenta = parseFloat(sale_state.customProductParams.unitPrice)
@@ -173,6 +174,8 @@ const Header = () => {
         const customProduct = {
             _id,
             codigoBarras: _id,
+            gananciaNeta: round(precioVenta - ivaVenta),
+            gananciaNetaFraccionado: round(precioVenta - ivaVenta),
             ivaVenta: round(ivaVenta),
             key: _id,
             nombre: sale_state.customProductParams.concept,

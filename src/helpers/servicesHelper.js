@@ -230,7 +230,7 @@ const processFindLastIndex = async (caseProps) => {
 
 const processFindLastVoucherNumber = async (caseProps) => {
     try {
-        const { data: { code }, headers, path } = caseProps
+        const { data: code, headers, path } = caseProps
         const reqConfig = { headers, params: { code } }
         const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findLastVoucherNumber`, reqConfig)
         return response.data

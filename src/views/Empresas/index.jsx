@@ -113,15 +113,9 @@ const Empresas = () => {
                 >
                     <Col
                         onClick={() => businessEdition(business._id)}
-                        span={12}
+                        span={24}
                     >
                         <Edit />
-                    </Col>
-                    <Col
-                        onClick={() => businessDeletion(business._id)}
-                        span={12}
-                    >
-                        <Delete />
                     </Col>
                 </Row>
             ),

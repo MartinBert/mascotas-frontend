@@ -78,6 +78,9 @@ const FinalizeSaleModal = () => {
 
     // ------------------ Button to save ----------------- //
     const closeFiscalOperation = async () => {
+        // if (auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT) {
+        //     errorAlert('No puede emitir documentos fiscales con este usuario de prueba.')
+        // }
         const bodyToAfip = formatBody(sale_state)
         const responseOfAfip = await api.afip.generateVoucher(auth_state.user.empresa.cuit, bodyToAfip)
         if (!responseOfAfip) {
@@ -90,16 +93,16 @@ const FinalizeSaleModal = () => {
     }
 
     const startCloseSale = async () => {
-        sale_state.generalPercentage = round(sale_state.generalPercentage)
-        sale_state.porcentajeDescuentoGlobal = round(sale_state.porcentajeDescuentoGlobal)
-        sale_state.porcentajeRecargoGlobal = round(sale_state.porcentajeRecargoGlobal)
+        sale_state.generalPercentage = round(sale_state.generalPercentage) ?? 0
+        sale_state.porcentajeDescuentoGlobal = round(sale_state.porcentajeDescuentoGlobal) ?? 0
+        sale_state.porcentajeRecargoGlobal = round(sale_state.porcentajeRecargoGlobal) ?? 0
         sale_state.renglones = sale_state.renglones.map(line => {
             const fixedLine = {
                 ...line,
                 cantidadUnidades: round(line.cantidadUnidades),
                 cantidadUnidadesFraccionadas: round(line.cantidadUnidadesFraccionadas),
-                porcentajeDescuentoRenglon: round(line.porcentajeDescuentoRenglon),
-                porcentajeRecargoRenglon: round(line.porcentajeRecargoRenglon)
+                porcentajeDescuentoRenglon: round(line.porcentajeDescuentoRenglon) ?? 0,
+                porcentajeRecargoRenglon: round(line.porcentajeRecargoRenglon) ?? 0
             }
             return fixedLine
         })
@@ -152,6 +155,7 @@ const FinalizeSaleModal = () => {
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10))
         const newerRecord = await api.dailyBusinessStatistics.findNewer()
+        console.log(newerRecord)
         const newerRecordDate = newerRecord.data.date
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
@@ -231,9 +235,8 @@ const FinalizeSaleModal = () => {
         })
         const { refs, productos, ...saleData } = sale_state
         const dataToSave = { ...saleData, renglones: fixedLines }
-        const responseOfSaveLines = await api.salesLines.save(fixedLines)
         const responseOfSaveSale = await api.sales.save(dataToSave)
-        if (responseOfSaveLines.status !== 'OK' || responseOfSaveSale.status !== 'OK') {
+        if (responseOfSaveSale.status !== 'OK') {
             errorAlert('Error al guardar la venta en "Lista de ventas". A futuro deberá recuperar el comprobante desde la página de AFIP.')
         }
     }
