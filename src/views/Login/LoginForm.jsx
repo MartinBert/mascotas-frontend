@@ -74,7 +74,6 @@ const LoginForm = () => {
         if (!auth_state.user) return redirectToHome()
         const existsBusiness = auth_state.user.empresa ? true : false
         const existsSalePoint = auth_state.user.puntoVenta ? true : false
-        console.log(auth_state)
         if (existsBusiness && existsSalePoint) return redirectToVentas()
         else return redirectToHome()
     }
