@@ -48,7 +48,8 @@ const ZonasDeVentas = () => {
     const fetchZonasDeVentas = async () => {
         const findParams = formatFindParams(salesAreas_state.paginationParams)
         const findRecords = await api.salesAreas.findPaginated(findParams)
-        salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: findRecords.data.docs })
+        salesAreas_dispatch({ type: 'SET_SALES_AREAS_TO_RENDER', payload: findRecords.data })
+        deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     useEffect(() => {

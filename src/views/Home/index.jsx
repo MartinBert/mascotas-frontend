@@ -674,65 +674,10 @@ const Home = () => {
     // ------------------------------- Button to test service -------------------------------- //
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findAllDailyBusinessStatistics = await api.dailyBusinessStatistics.findAll()
-        const findAllEntries = await api.entries.findAll()
-        const findAllOutputs = await api.outputs.findAll()
-        const dailyBusinessStatistics = findAllDailyBusinessStatistics.data
-        const entries = findAllEntries.data
-        const outputs = findAllOutputs.data
+        const findRecord = await api.sales.findLastVoucherNumber('000')
+        console.log(findRecord)
         
-        const balanceViewTotalExpense = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + parseFloat(value.balanceViewExpense), 0
-        )
-        const balanceViewTotalIncome = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + parseFloat(value.balanceViewIncome), 0
-        )
-        const balanceViewTotalProfit = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + parseFloat(value.balanceViewProfit), 0
-        )
-        const salesViewTotalExpense = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + parseFloat(value.salesViewExpense), 0
-        )
-        const salesViewTotalIncome = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + parseFloat(value.salesViewIncome), 0
-        )
-        const salesViewTotalProfit = dailyBusinessStatistics.reduce(
-            (acc, value) => acc + parseFloat(value.salesViewProfit), 0
-        )
-        const entriesExpense = entries.reduce(
-            (acc, value) => acc + parseFloat(value.costoTotal), 0
-        )
-        const outputsIncome = outputs.reduce(
-            (acc, value) => acc + parseFloat(value.ingreso), 0
-        )
-        const outputsNetProfit = outputs.reduce(
-            (acc, value) => acc + parseFloat(value.gananciaNeta), 0
-        )
-
-        console.log('MODELO ESTADISTICA')
-        console.log(dailyBusinessStatistics[0])
-        console.log('PROFIT BALANCEVIEW')
-        console.log(round(balanceViewTotalProfit))
-        console.log('PROFIT SALESVIEW')
-        console.log(round(salesViewTotalProfit))
-        console.log('---------------------------------------')
-        console.log('INCOME BALANCEVIEW')
-        console.log(round(balanceViewTotalIncome))
-        console.log('INCOME SALESVIEW')
-        console.log(round(salesViewTotalIncome))
-        console.log('SALIDAS - INGRESO TOTAL')
-        console.log(round(outputsIncome))
-        console.log('SALIDAS - GANANCIA NETA')
-        console.log(round(outputsNetProfit))
-        console.log('---------------------------------------')
-        console.log('EXPENSE BALANCEVIEW')
-        console.log(round(balanceViewTotalExpense))
-        console.log('EXPENSE SALESVIEW')
-        console.log(round(salesViewTotalExpense))
-        console.log('ENTRADAS - GASTO TOTAL')
-        console.log(round(entriesExpense))
-        
-        home_dispatch({ type: 'SET_LOADING', payload: false })
+        home_dispatch({ type: 'SET_LOADING', payload: true })
     }
 
     // const testService = async () => {

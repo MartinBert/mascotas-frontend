@@ -52,7 +52,7 @@ const ProductStockHistory = () => {
 	const fetchProducts = async () => {
 		const findParams = formatFindParams(products_state.stockHistory.productsToRender.paginationParams)
 		const findRecords = await api.products.findPaginated(findParams)
-		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: findRecords.data.docs })
+		products_dispatch({ type: 'SET_PRODUCTS_TO_RENDER_IN_STOCK_HISTORY', payload: findRecords.data })
 	}
 
 	useEffect(() => {

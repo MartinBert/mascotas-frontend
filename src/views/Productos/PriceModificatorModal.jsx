@@ -528,7 +528,7 @@ const PriceModificatorModal = () => {
         const response = await api.products.findPaginated(params)
         products_dispatch({
             type: 'SET_PRODUCTS_TO_RENDER_IN_PRICE_MODIFICATOR',
-            payload: response.data.docs
+            payload: response.data
         })
     }
 

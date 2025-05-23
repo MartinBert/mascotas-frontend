@@ -12,10 +12,13 @@ const deleteImage = async (id) => {
         headers: {
             Authorization: localStorage.getItem('token'), 'Content-Type': 'application/json',
             tenantid: localStorage.getItem('tenantId')
+        },
+        params: {
+            id
         }
     }
     try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/uploads/${id}`, reqConfig)
+        const response = await axios.delete(`${process.env.REACT_APP_API_REST}/uploads`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -28,10 +31,13 @@ const getImageUrl = async (id) => {
         headers: {
             Authorization: localStorage.getItem('token'), 'Content-Type': 'application/json',
             tenantid: localStorage.getItem('tenantId')
+        },
+        params: {
+            id
         }
     }
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/uploads/${id}`, reqConfig)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/uploads`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)

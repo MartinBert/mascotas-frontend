@@ -20,6 +20,7 @@ import api from '../../services'
 
 // Imports Destructuring
 const { Spinner } = graphics
+const { cuitsAuthorizedForTaxOperations } = helpers.afipHelper
 const { noEmptyKeys } = helpers.objHelper
 const { normalizeString } = helpers.stringHelper
 const { useAuthContext } = contexts.Auth
@@ -127,7 +128,7 @@ const ClientesForm = () => {
 
     const searchAfipClientData = async (e) => {
         e.preventDefault()
-        if (auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT) return
+        if (!cuitsAuthorizedForTaxOperations.includes(auth_state.user.empresa.cuit)) return
         setLoading(true)
         if (!cliente.cuit) return errorAlert('Debe ingresar el cuit del cliente.')
 
@@ -264,7 +265,7 @@ const ClientesForm = () => {
                                     <Button
                                         className='btn-primary'
                                         type='button'
-                                        disabled={auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT}
+                                        disabled
                                         onClick={async (e) => searchAfipClientData(e)}
                                     >
                                         Buscar datos

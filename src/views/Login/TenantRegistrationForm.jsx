@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Col, Input, Modal, Row } from 'antd'
-import { errorAlert, successAlert } from '../../components/alerts'
+import { Checkbox, Col, Input, Modal, Row } from 'antd'
+import { errorAlert, successAlert, warningAlert } from '../../components/alerts'
 import helpers from '../../helpers'
 import api from '../../services'
 
@@ -9,18 +9,21 @@ const { ifNotNumber } = regExp
 
 
 const TenantRegistrationForm = () => {
+    const [createUser, setCreateUser] = useState(true)
     const [cuit, setCuit] = useState('')
+    const [cuitAlreadyExists, setCuitAlreadyExists] = useState(false)
     const [cuitError, setCuitError] = useState(false)
     const [devPassword, setDevPassword] = useState('')
     const [devPasswordError, setDevPasswordError] = useState('')
     const [email, setEmail] = useState('')
+    const [emailAlreadyExists, setEmailAlreadyExists] = useState(false)
     const [emailError, setEmailError] = useState(false)
     const [modalVisibility, setModalVisibility] = useState(false)
     const [name, setName] = useState('')
     const [nameError, setNameError] = useState(false)
     const [password, setPassword] = useState('')
     const [passwordError, setPasswordError] = useState(false)
-
+    
     // -------------------- Actions ---------------------- //
     const clearParams = () => {
         setCuit('')
@@ -43,13 +46,16 @@ const TenantRegistrationForm = () => {
         setModalVisibility(true)
     }
 
-    const validateData = () => {
+    const validateData = async () => {
         const devPasswordIsCorrect = devPassword === process.env.REACT_APP_DEV_PASSWORD
         const cuitContainsElevenDigits = cuit.length === 11
         const emailContainsOneOnlyAtSign = email.length > 0 && email.match('@').length === 1
         const emailContainsAlmostEightDigits = email.length >= 8
         const nameContainsAlmostOneDigit = name.length >= 1
         const passwordContainsAlmostFourDigits = password.length >= 4
+        const findTenant = await api.tenants.findAllByFilters(JSON.stringify({ $or: [{ cuit }, { email }] }))
+        const cuitAlreadyExists = findTenant.data.docs.find(doc => doc.cuit === cuit)
+        const emailAlreadyExists = findTenant.data.docs.find(doc => doc.email === email)
 
         let isValidData = false
         if (!devPasswordIsCorrect) {
@@ -62,6 +68,10 @@ const TenantRegistrationForm = () => {
             setNameError(true)
         } else if (!passwordContainsAlmostFourDigits) {
             setPasswordError(true)
+        } else if (cuitAlreadyExists) {
+            setCuitAlreadyExists(true)
+        } else if (emailAlreadyExists) {
+            setEmailAlreadyExists(true)
         } else {
             isValidData = true
         }
@@ -69,7 +79,7 @@ const TenantRegistrationForm = () => {
     }
 
     const saveTenant = async () => {
-        const validData = validateData()
+        const validData = await validateData()
         if (!validData) return
         
         const newTenant = { cuit, email, name }
@@ -77,30 +87,56 @@ const TenantRegistrationForm = () => {
         if (createTenantResponse.status !== 'OK') {
             return errorAlert('No se pudo crear el nuevo inquilino.')
         } else {
-            const newUserData = {
-                email,
-                nombre: name,
-                password,
-                perfil: true
-            }
-            const newlyUser = true
-            const tenantId = newTenant.cuit
-            const createUserResponse = await api.users.save(newUserData, tenantId, newlyUser)
-            if (createUserResponse.status !== 'OK') {
-                return errorAlert('No se pudo crear el nuevo usuario.')
+            if (!createUser) {
+                warningAlert('Solo fue creado el inquilino. Asegúrese de enlazarlo con el usuario existente.')
+                return setModalVisibility(false)
             } else {
-                successAlert('Nuevo inquilino y usuario creados.')
-                clearParams()
-                setModalVisibility(false)
+                const newUserData = {
+                    email,
+                    nombre: name,
+                    password,
+                    perfil: true
+                }
+                const newlyUser = true
+                const tenantId = cuit
+                const createUserResponse = await api.users.save(newUserData, tenantId, newlyUser)
+                if (createUserResponse.status !== 'OK') {
+                    return errorAlert('No se pudo crear el nuevo usuario.')
+                } else {
+                    successAlert('Nuevo inquilino y usuario creados.')
+                    clearParams()
+                    return setModalVisibility(false)
+                }
             }
         }
     }
+
+    // -------------- Check if create user --------------- //
+    const onCheckIfCreateUser = (e) => {
+        setCreateUser(e.target.checked)
+    }
+
+    const CheckIfCreateUser = (
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <span style={{ marginRight: '10px' }}>
+                Create user too?
+            </span>
+            <Checkbox
+                onChange={onCheckIfCreateUser}
+                checked={createUser}
+            />
+            <span style={{ marginLeft: '10px' }}>
+                If not: NAME, EMAIL and PASSWORD must match the existing one.
+            </span>
+        </div>
+    )
 
     // ------------------ Input cuit --------------------- //
     const onChangeCuit = (e) => {
         const parseValue = e.target.value.replace(ifNotNumber, '')
         const fixValue = parseValue.length > 11 ? parseValue.slice(0, -1) : parseValue
         setCuit(fixValue)
+        setCuitAlreadyExists(false)
         setCuitError(false)
     }
 
@@ -118,6 +154,15 @@ const TenantRegistrationForm = () => {
                     ? (
                         <span style={{ color: 'red' }}>
                             Escriba una CUIT válida, once dígitos.
+                        </span>
+                    )
+                    : ''
+            }
+            {
+                cuitAlreadyExists
+                    ? (
+                        <span style={{ color: 'red' }}>
+                            La CUIT ya fue registrada.
                         </span>
                     )
                     : ''
@@ -155,6 +200,7 @@ const TenantRegistrationForm = () => {
     // ------------------ Input email -------------------- //
     const onChangeEmail = (e) => {
         setEmail(e.target.value)
+        setEmailAlreadyExists(false)
         setEmailError(false)
     }
 
@@ -172,6 +218,15 @@ const TenantRegistrationForm = () => {
                     ? (
                         <span style={{ color: 'red' }}>
                             Escriba una dirección email válida.
+                        </span>
+                    )
+                    : ''
+            }
+            {
+                emailAlreadyExists
+                    ? (
+                        <span style={{ color: 'red' }}>
+                            El email ya fue registrada.
                         </span>
                     )
                     : ''
@@ -256,6 +311,9 @@ const TenantRegistrationForm = () => {
                 >
                     <Col span={24}>
                         {InputCuit}
+                    </Col>
+                    <Col span={24}>
+                        {CheckIfCreateUser}
                     </Col>
                     <Col span={24}>
                         {InputName}

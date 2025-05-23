@@ -102,7 +102,7 @@ const Salidas = () => {
     const fetchOutputs_paginated = async () => {
         const findParams = formatFindParams(outputs_state.paginationParams)
         const findRecords = await api.outputs.findPaginated(findParams)
-        outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: findRecords.data.docs })
+        outputs_dispatch({ type: 'SET_OUTPUTS_FOR_RENDER', payload: findRecords.data })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

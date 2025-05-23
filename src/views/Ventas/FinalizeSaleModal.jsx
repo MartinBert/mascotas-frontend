@@ -78,9 +78,6 @@ const FinalizeSaleModal = () => {
 
     // ------------------ Button to save ----------------- //
     const closeFiscalOperation = async () => {
-        // if (auth_state.user.empresa.cuit === process.env.REACT_APP_TEST_CUIT) {
-        //     errorAlert('No puede emitir documentos fiscales con este usuario de prueba.')
-        // }
         const bodyToAfip = formatBody(sale_state)
         const responseOfAfip = await api.afip.generateVoucher(auth_state.user.empresa.cuit, bodyToAfip)
         if (!responseOfAfip) {
@@ -155,8 +152,7 @@ const FinalizeSaleModal = () => {
     const fillPreviousDates = async () => {
         const currentDate = localFormatToDateObj(sale_state.fechaEmisionString.substring(0, 10))
         const newerRecord = await api.dailyBusinessStatistics.findNewer()
-        console.log(newerRecord)
-        const newerRecordDate = newerRecord.data.date
+        const newerRecordDate = newerRecord.data?.date ?? currentDate
         const differenceOfDaysBetweenNewerRecordDateAndCurrentDate = round(
             (Date.parse(currentDate) - Date.parse(newerRecordDate)) / 86400000
         )

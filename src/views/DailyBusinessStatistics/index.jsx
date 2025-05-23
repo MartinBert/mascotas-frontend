@@ -87,7 +87,7 @@ const DailyBusinessStatistics = () => {
         const paginationParams = { ...currentPaginationParams, filters }
         const params = formatFindParams(paginationParams)
         const findRecords = await api.dailyBusinessStatistics.findPaginated(params)
-        dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: findRecords.data.docs })
+        dailyBusinessStatistics_dispatch({ type: 'SET_DAILY_STATISTICS_RECORDS', payload: findRecords.data })
     }
 
     useEffect(() => {

@@ -16,9 +16,9 @@ const services = {
     findLastIndex: 'findLastIndex',
     findLastVoucherNumber: 'findLastVoucherNumber',
     findNewer: 'findNewer',
-    findNewerSale: 'findNewerSale',
+    findNewerFiscalSale: 'findNewerFiscalSale',
     findOldest: 'findOldest',
-    findOldestSale: 'findOldestSale',
+    findOldestFiscalSale: 'findOldestFiscalSale',
     findPaginated: 'findPaginated',
     modifyStock: 'modifyStock',
     remove: 'remove',
@@ -84,13 +84,13 @@ const processService = async (props) => {
         case services.findNewer:
             response = await processFindNewer(caseProps)
             break
-        case services.findNewerSale:
+        case services.findNewerFiscalSale:
             response = await processFindNewerSale(caseProps)
             break
         case services.findOldest:
             response = await processFindOldest(caseProps)
             break
-        case services.findOldestSale:
+        case services.findOldestFiscalSale:
             response = await processFindOldestSale(caseProps)
             break
         case services.findPaginated:
@@ -256,7 +256,7 @@ const processFindNewerSale = async (caseProps) => {
     try {
         const { headers, path } = caseProps
         const reqConfig = { headers }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findNewerSale`, reqConfig)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findNewerFiscalSale`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -280,7 +280,7 @@ const processFindOldestSale = async (caseProps) => {
     try {
         const { headers, path } = caseProps
         const reqConfig = { headers }
-        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findOldestSale`, reqConfig)
+        const response = await axios.get(`${process.env.REACT_APP_API_REST}/${path}/records/findOldestFiscalSale`, reqConfig)
         return response.data
     } catch (err) {
         checkStorageStatus(err)
@@ -328,8 +328,8 @@ const processRemove = async (caseProps) => {
         const responseData = []
         for (let index = 0; index < loopLimit; index++) {
             const idsFromRemove = idsOfRecords.slice(index * lotsLimit, (index + 1) * lotsLimit)
-            const reqConfig = { headers }
-            const response = await axios.delete(`${process.env.REACT_APP_API_REST}/${path}/records/remove`, idsFromRemove, reqConfig)
+            const reqConfig = { headers, params: { ids: idsFromRemove } }
+            const response = await axios.delete(`${process.env.REACT_APP_API_REST}/${path}/records/remove`, reqConfig)
             responseData.push(response.data)
         }
         const response = {

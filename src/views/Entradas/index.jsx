@@ -102,7 +102,7 @@ const Entradas = () => {
     const fetchEntries_paginated = async () => {
         const findParams = formatFindParams(entries_state.paginationParams)
         const findRecords = await api.entries.findPaginated(findParams)
-        entries_dispatch({ type: 'SET_ENTRIES_FOR_RENDER', payload: findRecords.data.docs })
+        entries_dispatch({ type: 'SET_ENTRIES_FOR_RENDER', payload: findRecords.data })
         deleteModal_dispatch({ type: 'SET_LOADING', payload: false })
     }
 

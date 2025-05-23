@@ -17,8 +17,9 @@ import helpers from '../../helpers'
 import api from '../../services'
 
 // Imports Destructurings
+const { useAuthContext } = contexts.Auth
 const { useSaleContext } = contexts.Sale
-const { findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, creditCodes, debitCodes } = helpers.afipHelper
+const { cuitsAuthorizedForTaxOperations, findNextVoucherNumber_fiscal, findNextVoucherNumber_noFiscal, fiscalNotesCodes, invoiceAndTicketCodes } = helpers.afipHelper
 const { dateToAfip, isItLater } = helpers.dateHelper
 const { round } = helpers.mathHelper
 const { sortArrayOfSelectOptions } = helpers.objHelper
@@ -26,6 +27,7 @@ const { fixInputNumber, fixInputNumberValue, nonCaseSensitive, normalizeString }
 
 
 const Header = () => {
+    const [auth_state] = useAuthContext()
     const [sale_state, sale_dispatch] = useSaleContext()
 
     // --------------------- Actions --------------------- //
@@ -35,7 +37,6 @@ const Header = () => {
         sale_dispatch({ type: 'LOADING_DOCUMENT_INDEX' })
         let number
         if (sale_state.documento.fiscal) {
-            console.log('FISCAL')
             const fiscalVoucherNumber = await findNextVoucherNumber_fiscal(
                 sale_state.documentoCodigo,
                 sale_state.empresaCuit,
@@ -123,7 +124,7 @@ const Header = () => {
             errorAlert('No es conveniente facturar con fecha posterior a hoy.')
             return sale_dispatch({ type: 'SET_DATES', payload: new Date() })
         }
-        const lastBill = await api.sales.findNewerSale()
+        const lastBill = await api.sales.findNewerFiscalSale()
         const dateOfLastBill = parseInt(dateToAfip(lastBill.data.fechaEmision))
         const selectedDate = parseInt(dateToAfip(e.$d))
         if (selectedDate < dateOfLastBill) {
@@ -532,12 +533,18 @@ const Header = () => {
 
     // ------------------ Select document ----------------- //
     const onSearchDocument = async (e) => {
-        const filters = JSON.stringify({ normalizedName: normalizeString(e) })
+        const filtersObj = {
+            codigoUnico: !cuitsAuthorizedForTaxOperations.includes(auth_state.user.empresa.cuit)
+                ? { $nin: [...fiscalNotesCodes, ...invoiceAndTicketCodes] }
+                : { $nin: fiscalNotesCodes },
+            normalizedName: normalizeString(e)
+        }
+        const filters = JSON.stringify(filtersObj)
         const params = { page: 1, limit: 8, filters }
         const findDocuments = await api.documents.findPaginated(params)
         const documents = findDocuments.data.docs
-        const fixedDocuments = documents.filter(document => !creditCodes.includes(document.codigoUnico) && !debitCodes.includes(document.codigoUnico))
-        const options = fixedDocuments.map(document => { return { label: document.nombre, value: document.normalizedName } })
+        // const fixedDocuments = documents.filter(document => !creditCodes.includes(document.codigoUnico) && !debitCodes.includes(document.codigoUnico))
+        const options = documents.map(document => { return { label: document.nombre, value: document.normalizedName } })
         sale_dispatch({ type: 'SET_OPTIONS_TO_SELECT_DOCUMENT', payload: options })
     }
 

@@ -485,9 +485,9 @@ const ExportProductListModal = () => {
         const dataForRender = await api.products.findPaginated(findParamsForRender)
         const dataForExport = await api.products.findAllForCatalogue(findParamsForRender.filters)
         const data = {
-            productsToExport: dataForExport.data.docs,
+            productsToExport: dataForExport.data,
             productsToRender: dataForRender.data.docs,
-            quantityOfProducts: dataForExport.data.totalDocs
+            quantityOfProducts: dataForExport.data.length
         }
         products_dispatch({ type: 'SET_PRODUCTS_TO_EXPORT_PRODUCT_LIST_MODAL', payload: data })
     }

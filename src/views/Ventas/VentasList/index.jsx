@@ -22,10 +22,11 @@ import FiscalNoteModal from './FiscalNoteModal'
 import Header from './Header'
 
 // Imports Destructuring
+const { useAuthContext } = contexts.Auth
 const { useFiscalNoteModalContext } = contexts.FiscalNoteModal
 const { useRenderConditionsContext } = contexts.RenderConditions
 const { EmitDocument, PrintPdf } = icons
-const { creditCodes, debitCodes, invoiceCodes, invoiceAndTicketCodes, ticketCodes } = helpers.afipHelper
+const { creditCodes, cuitsAuthorizedForTaxOperations, debitCodes, invoiceCodes, invoiceAndTicketCodes, ticketCodes } = helpers.afipHelper
 const { afipDateToLocalFormat } = helpers.dateHelper
 const {
     createBudgetPdf,
@@ -40,6 +41,7 @@ const { getAssociatedData } = validations
 
 
 const VentasList = () => {
+    const [auth_state, auth_dispatch] = useAuthContext()
     const [fiscalNoteModal_state, fiscalNoteModal_dispatch] = useFiscalNoteModalContext()
     const [renderConditions_state, renderConditions_dispatch] = useRenderConditionsContext()
 
@@ -207,6 +209,7 @@ const VentasList = () => {
                     </Col>
                     {
                         invoiceAndTicketCodes.includes(venta.documento.codigoUnico)
+                        && cuitsAuthorizedForTaxOperations.includes(auth_state.user.empresa.cuit)
                             ? (
                                 <Col
                                     onClick={() => openFiscalNoteModal(venta._id)}

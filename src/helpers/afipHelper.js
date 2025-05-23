@@ -12,6 +12,11 @@ import api from '../services/index.js'
 const { dateToAfip } = dateHelper
 const { completeLengthWithZero } = stringHelper
 
+const cuitsAuthorizedForTaxOperations = [
+    process.env.REACT_APP_CUIT_ADMIN,
+    process.env.REACT_APP_CUIT_GISELA
+]
+
 let attemps = 0
 const delay = ms => new Promise(result => setTimeout(result, ms))
 
@@ -243,6 +248,7 @@ const getReferenceVoucher = (state) => {
 
 const afipHelper = {
     creditCodes,
+    cuitsAuthorizedForTaxOperations,
     debitCodes,
     findNextVoucherNumber_fiscal,
     findNextVoucherNumber_noFiscal,

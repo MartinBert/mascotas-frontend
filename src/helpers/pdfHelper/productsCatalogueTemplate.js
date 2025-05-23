@@ -39,17 +39,24 @@ const generateBodyWithImages = (renglones) => {
                                     background-color: #FFFFFF;
                                     border-radius: 5px;
                                     display: flex;
+                                    height: 148px;
                                     margin: 5px;
                                     justify-content: center;
                                     align-items: center;
                                     width: 120px;'
                             >
-                                <img
-                                    crossorigin='anonymous'
-                                    height='100'
-                                    src='${line[0]}'
-                                    width='100'
-                                >
+                                ${
+                                    !line[0]
+                                        ? ''
+                                        : `
+                                            <img
+                                                crossorigin='anonymous'
+                                                height='100'
+                                                src='${line[0]}'
+                                                width='100'
+                                            >
+                                        `
+                                }
                             </div>
                             <div
                                 style='
@@ -137,14 +144,21 @@ const createProductsCatalogueTemplate = (productsCatalogueData) => {
                                 <div
                                     style='
                                         margin: 10px;
-                                        text-align: center;'
+                                        text-align: center;
+                                        '
                                 >
-                                    <img
-                                        crossorigin='anonymous'
-                                        height='100'
-                                        src='${enterprise.logo.url}'
-                                        width='100'
-                                    >
+                                    ${
+                                        !enterprise.logo
+                                            ? ''
+                                            : `
+                                                <img
+                                                    crossorigin='anonymous'
+                                                    height='100'
+                                                    src='${enterprise.logo.url}'
+                                                    width='100'
+                                                >
+                                            `
+                                    }
                                 </div>
                                 <div style='display: block;'>
                                     <div style=${overflowEllipsis}>${enterprise.direccion}</div>

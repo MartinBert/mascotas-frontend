@@ -58,18 +58,12 @@ const ProductosForm = () => {
         imagenes: null
     })
     const [loading, setLoading] = useState(true)
-    const [selectedBrand, setSelectedBrand] = useState(null)
-    const [selectedHeading, setSelectedHeading] = useState(null)
-    const [selectedMeasure, setSelectedMeasure] = useState(null)
     const [uploadedImages, setUploadedImages] = useState([])
 
     const fetchProductById = async () => {
         if (id === 'nuevo') return setLoading(false)
         const response = await api.products.findById(id)
         const product = response.data
-        setSelectedBrand({ _id: product?.marca?._id ?? null, nombre: product?.marca?.nombre ?? null })
-        setSelectedHeading({ _id: product?.rubro?._id ?? null, nombre: product?.rubro?.nombre ?? null })
-        setSelectedMeasure({ _id: product?.unidadMedida?._id ?? null, nombre: product?.unidadMedida?.nombre ?? null })
         setProduct(product)
         setUploadedImages(product.imagenes)
         setLoading(false)
@@ -92,10 +86,10 @@ const ProductosForm = () => {
         const ivaVenta = round(precioUnitario * porcentajeIvaVenta)
         const precioVentaSinRedondear = round(precioUnitario + ivaVenta + gananciaNeta)
         const precioVenta = roundToMultiple(round(precioUnitario + ivaVenta + gananciaNeta), 10)
-        const diferenciaPrecioVenta = precioVenta - precioVentaSinRedondear
+        const diferenciaPrecioVenta = round(precioVenta - precioVentaSinRedondear)
         const precioVentaFraccionadoSinRedondear = round(precioUnitario + ivaVenta + gananciaNetaFraccionado)
         const precioVentaFraccionado = roundToMultiple(round(precioUnitario + ivaVenta + gananciaNetaFraccionado), 10)
-        const diferenciaPrecioVentaFraccionado = precioVentaFraccionado - precioVentaFraccionadoSinRedondear
+        const diferenciaPrecioVentaFraccionado = round(precioVentaFraccionado - precioVentaFraccionadoSinRedondear)
         setProduct({
             ...product,
             ivaCompra,
@@ -144,39 +138,9 @@ const ProductosForm = () => {
         } else {
             setProduct({
                 ...product,
-                [target]: value
+                [target]: typeof value === 'number' ? round(value) : value
             })
         }
-    }
-
-    const setSelectedBrandToProduct = async (brand) => {
-        setSelectedBrand(brand)
-        const response = await api.brands.findById(brand._id)
-        setProduct({
-            ...product,
-            marca: response.data,
-            normalizedBrand: response.data.nombre
-        })
-    }
-
-    const setSelectedHeadingToProduct = async (heading) => {
-        setSelectedHeading(heading)
-        const response = await api.types.findById(heading._id)
-        setProduct({
-            ...product,
-            rubro: response.data,
-            normalizedType: response.data.nombre
-        })
-    }
-
-    const setSelectedMeasureToProduct = async (measure) => {
-        setSelectedMeasure(measure)
-        const response = await api.measureUnits.findById(measure._id)
-        setProduct({
-            ...product,
-            unidadMedida: response.data,
-            cantidadFraccionadaStock: response.data.fraccionamiento
-        })
     }
 
     const saveValidation = () => {

@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 // Custom Components
 import graphics from '../../components/graphics'
 import messages from '../../components/messages'
-import { errorAlert, successAlert } from '../../components/alerts'
+import { errorAlert, questionAlert, successAlert, warningAlert } from '../../components/alerts'
 
 // Design Components
 import { Checkbox, Col, Form, Input, Row, Select } from 'antd'
@@ -69,38 +69,52 @@ const UsuariosForm = () => {
     }, [usuario.nombre, id])
 
     const save = async () => {
-        if (!usuario.nombre || !usuario.email || !usuario.password || !usuario.puntoVenta) return setError(true)
-        let response
-        if (usuario._id) {
-            response = await api.users.edit(usuario)
+        if (!usuario.nombre || !usuario.email || !usuario.password || !usuario.puntoVenta) {
+            setError(true)
         } else {
-            const findIfExistsInDb = await api.users.findAllByFilters(JSON.stringify({ email: usuario.email }))
-            const existsInDb = findIfExistsInDb.data.docs.length > 0
-            if (existsInDb) {
-                return errorAlert('El email ya está en uso. Regístrese con otro email.')
+            const allUsers = await api.tenants.findAllUsers()
+            const emailAlreadyExists = allUsers.data.find(user => user.email === usuario.email)
+            if (emailAlreadyExists) {
+                errorAlert('El email ya está en uso. Regístrese con otro.')
             } else {
-                response = await api.users.save(usuario)
+                const questionResult = await questionAlert('Requiere volver a iniciar sesión. ¿Desea continuar?')
+                if (questionResult.isConfirmed) {
+                    let response
+                    if (id === 'nuevo') {
+                        response = await api.users.save(usuario)
+                    } else {
+                        const findUserBeforeModifications = await api.users.findById(usuario._id)
+                        const filters = JSON.stringify({ email: findUserBeforeModifications.data.email })
+                        const findIfNewUserIsATenant = await api.tenants.findAllByFilters(filters)
+                        const newUserIsATenant = findIfNewUserIsATenant.data.docs.find(tenant => tenant.email === findUserBeforeModifications.data.email)
+                        if (newUserIsATenant) {
+                            const updatedTenant = { ...newUserIsATenant, email: usuario.email, name: usuario.nombre }
+                            const editTenant = await api.tenants.edit(updatedTenant)
+                            if (editTenant.status !== 'OK') {
+                                return errorAlert('No se pudo editar el email coincidente del inquilino. Intente de nuevo.')
+                            } else {
+                                response = await api.users.edit(usuario)
+                            }
+                        } else {
+                            response = await api.users.edit(usuario)
+                        }
+                    }
+                    if (response.status !== 'OK') {
+                        warningAlert('Se modificó el inquilino pero no el usuario. Avise a su proveedor.')
+                    } else {
+                        successAlert('El registro se guardó con éxito.')
+                    }
+                    localStorage.clear()
+                    navigate('/login')
+                } else {
+                    return
+                }
             }
-        }
-        if (response.status === 'OK') {
-            return success()
-        } else {
-            return fail()
         }
     }
 
     const redirectToUsuarios = () => {
         navigate('/usuarios')
-    }
-
-    const success = () => {
-        successAlert('El registro se guardo en la base de datos').then(() => {
-            redirectToUsuarios()
-        })
-    }
-
-    const fail = () => {
-        errorAlert('Error al guardar el registro')
     }
 
     // ---------------- Select sale point ---------------- //

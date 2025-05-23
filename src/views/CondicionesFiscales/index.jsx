@@ -91,28 +91,28 @@ const CondicionesFiscales = () => {
             render: (_, fiscalCondition) => fiscalCondition.adicionaIva ? 'Si' : '-',
             title: 'Adiciona IVA',
         },
-        {
-            dataIndex: 'fiscalCondition_actions',
-            render: (_, fiscalCondition) => (
-                <Row
-                    justify='start'
-                >
-                    <Col
-                        onClick={() => fiscalConditionEdition(fiscalCondition._id)}
-                        span={12}
-                    >
-                        <Edit />
-                    </Col>
-                    <Col
-                        onClick={() => fiscalConditionDeletion(fiscalCondition._id)}
-                        span={12}
-                    >
-                        <Delete />
-                    </Col>
-                </Row>
-            ),
-            title: 'Acciones',
-        }
+        // {
+        //     dataIndex: 'fiscalCondition_actions',
+        //     render: (_, fiscalCondition) => (
+        //         <Row
+        //             justify='start'
+        //         >
+        //             <Col
+        //                 onClick={() => fiscalConditionEdition(fiscalCondition._id)}
+        //                 span={12}
+        //             >
+        //                 <Edit />
+        //             </Col>
+        //             <Col
+        //                 onClick={() => fiscalConditionDeletion(fiscalCondition._id)}
+        //                 span={12}
+        //             >
+        //                 <Delete />
+        //             </Col>
+        //         </Row>
+        //     ),
+        //     title: 'Acciones',
+        // }
     ]
 
     return (

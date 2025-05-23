@@ -35,7 +35,7 @@ const ProductStockHistoryModal = () => {
             products_state.stockHistory.productStockHistoryModal.paginationParams
         )
         const findRecords = await api.stockHistory.findPaginated(findStockHistory)
-        products_dispatch({ type: 'SET_STOCK_HISTORY_TO_RENDER', payload: findRecords.data.docs })
+        products_dispatch({ type: 'SET_STOCK_HISTORY_TO_RENDER', payload: findRecords.data })
     }
 
     useEffect(() => {
@@ -180,24 +180,24 @@ const ProductStockHistoryModal = () => {
         const previousFortnightStockHistories = await api.stockHistory.findAllByFilters(previousFortnightFilter)
         const previousMonthStockHistories = await api.stockHistory.findAllByFilters(previousMonthFilter)
         const previousWeekStockHistories = await api.stockHistory.findAllByFilters(previousWeekFilter)
-        const entriesOfPreviousFortnight = previousFortnightStockHistories.data.docs.reduce((accumulator, currentValue) =>
+        const entriesOfPreviousFortnight = previousFortnightStockHistories.data?.docs?.reduce((accumulator, currentValue) =>
             accumulator + parseFloat(currentValue.entries), 0
-        )
-        const entriesOfPreviousMonth = previousMonthStockHistories.data.docs.reduce((accumulator, currentValue) =>
+        ) ?? 0
+        const entriesOfPreviousMonth = previousMonthStockHistories.data?.docs?.reduce((accumulator, currentValue) =>
             accumulator + parseFloat(currentValue.entries), 0
-        )
-        const entriesOfPreviousWeek = previousWeekStockHistories.data.docs.reduce((accumulator, currentValue) =>
+        ) ?? 0
+        const entriesOfPreviousWeek = previousWeekStockHistories.data?.docs?.reduce((accumulator, currentValue) =>
             accumulator + parseFloat(currentValue.entries), 0
-        )
-        const outputsOfPreviousFortnight = previousFortnightStockHistories.data.docs.reduce((accumulator, currentValue) =>
+        ) ?? 0
+        const outputsOfPreviousFortnight = previousFortnightStockHistories.data?.docs?.reduce((accumulator, currentValue) =>
             accumulator + parseFloat(currentValue.outputs), 0
-        )
-        const outputsOfPreviousMonth = previousMonthStockHistories.data.docs.reduce((accumulator, currentValue) =>
+        ) ?? 0
+        const outputsOfPreviousMonth = previousMonthStockHistories.data?.docs?.reduce((accumulator, currentValue) =>
             accumulator + parseFloat(currentValue.outputs), 0
-        )
-        const outputsOfPreviousWeek = previousWeekStockHistories.data.docs.reduce((accumulator, currentValue) =>
+        ) ?? 0
+        const outputsOfPreviousWeek = previousWeekStockHistories.data?.docs?.reduce((accumulator, currentValue) =>
             accumulator + parseFloat(currentValue.outputs), 0
-        )
+        ) ?? 0
         const modalTitlesValues = {
             entriesOfPreviousFortnight,
             entriesOfPreviousMonth,

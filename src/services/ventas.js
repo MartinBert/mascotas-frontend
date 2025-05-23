@@ -66,9 +66,9 @@ const findNewer = async () => {
     return response
 }
 
-const findNewerSale = async () => {
+const findNewerFiscalSale = async () => {
     const { processService, services } = helpers.servicesHelper
-    const props = { path, service: services.findNewerSale }
+    const props = { path, service: services.findNewerFiscalSale }
     const response = await processService(props)
     return response
 }
@@ -80,9 +80,9 @@ const findOldest = async () => {
     return response
 }
 
-const findOldestSale = async () => {
+const findOldestFiscalSale = async () => {
     const { processService, services } = helpers.servicesHelper
-    const props = { path, service: services.findOldestSale }
+    const props = { path, service: services.findOldestFiscalSale }
     const response = await processService(props)
     return response
 }
@@ -127,9 +127,9 @@ const sales = {
     findLastIndex,
     findLastVoucherNumber,
     findNewer,
-    findNewerSale,
+    findNewerFiscalSale,
     findOldest,
-    findOldestSale,
+    findOldestFiscalSale,
     findPaginated,
     remove,
     removeProps,
