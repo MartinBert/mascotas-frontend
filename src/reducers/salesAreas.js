@@ -61,8 +61,8 @@ const reducer = (state = initialState, action) => {
                 loading: true
             }
         case actions.SET_ALL_SALES_AREAS:
-            const defaultSalesArea = action.payload.filter(salesArea => salesArea.name === 'Default')
-            const defaultSalesAreaName = { value: defaultSalesArea[0].name }
+            const defaultSalesArea = action.payload.find(salesArea => salesArea.name === 'Default')
+            const defaultSalesAreaName = { value: defaultSalesArea.name }
             return {
                 ...state,
                 allSalesAreas: action.payload,

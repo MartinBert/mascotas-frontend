@@ -2,8 +2,8 @@
 import React, { useEffect } from 'react'
 
 // Custom Components
+import components from '../../components'
 import { errorAlert } from '../../components/alerts'
-import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Contexts
 import contexts from '../../contexts'
@@ -16,8 +16,9 @@ import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
-
+import InputHidden from '../../components/generics/InputHidden'
 // Imports Destructurings
+const { ButtonToExportData } = components
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
 const { useInterfaceStylesContext } = contexts.InterfaceStyles
 const { resetDateTo00hs, simpleDateWithHours } = helpers.dateHelper
@@ -94,6 +95,26 @@ const Header = () => {
         >
             Limpiar filtros
         </Button>
+    )
+
+    // ----- Button to export daily business statistics ----- //
+    const exportData = [
+        {
+            element: 'hola',
+            header: 'hola',
+            option: 'Hola'            
+        },
+        {
+            element: 'chau',
+            header: 'chau',
+            option: 'Chau'            
+        },
+    ]
+
+    const buttonToExportDailyBusinessStatistics = (
+        <ButtonToExportData
+            exportData={exportData}
+        />
     )
 
     // -------- Button to show or hide null records --------- //
@@ -372,9 +393,13 @@ const Header = () => {
             order: { lg: 8, md: 8, sm: 4, xl: 8, xs: 4, xxl: 8 }
         },
         {
-            element: <InputHidden />,
+            element: <InputHidden/>,
             order: { lg: 7, md: 7, sm: 6, xl: 7, xs: 6, xxl: 7 }
         },
+        // {
+        //     element: buttonToExportDailyBusinessStatistics,
+        //     order: { lg: 7, md: 7, sm: 6, xl: 7, xs: 6, xxl: 7 }
+        // },
         {
             element: rangePickerToCalculateProfit,
             order: { lg: 9, md: 9, sm: 10, xl: 9, xs: 10, xxl: 9 }

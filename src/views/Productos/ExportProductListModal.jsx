@@ -101,8 +101,8 @@ const ExportProductListModal = () => {
     // --------- Button to export product list ----------- //
     const fixProductValues = (product) => {
         const fractionament = product.unidadMedida?.fraccionamiento ?? 1
-        const decimalDiscountOfArea = salesAreas_state.selectedSalesArea[0].discountPercentage
-        const decimalSurchargeOfArea = salesAreas_state.selectedSalesArea[0].surchargePercentage
+        const decimalDiscountOfArea = salesAreas_state.selectedSalesArea.discountPercentage
+        const decimalSurchargeOfArea = salesAreas_state.selectedSalesArea.surchargePercentage
         const parameter = decimalSurchargeOfArea - decimalDiscountOfArea
         const margenGanancia = product.margenGanancia + parameter
         const margenGananciaFraccionado = product.margenGananciaFraccionado + parameter
@@ -185,7 +185,9 @@ const ExportProductListModal = () => {
 
     const exportPdf = async () => {
         const brands = products_state.exportProductList.brandsForSelect.selectedBrandsNames.map(brand => brand.value)
-        const enterprise = auth_state.user.empresa
+        const enterpriseData = auth_state.user.empresa
+        const logoUrl = await api.uploader.getImageUrl(enterpriseData.logo)
+        const enterprise = {...enterpriseData, logo: { url: logoUrl } }
         const headers = generateHeaders()
         const renglones = await formatLines(headers)
         const salesArea = salesAreas_state.selectedSalesAreaName.value
