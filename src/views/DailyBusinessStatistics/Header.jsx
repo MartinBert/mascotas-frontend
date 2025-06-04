@@ -16,7 +16,7 @@ import helpers from '../../helpers'
 
 // Services
 import api from '../../services'
-import InputHidden from '../../components/generics/InputHidden'
+
 // Imports Destructurings
 const { ButtonToExportData } = components
 const { useDailyBusinessStatisticsContext } = contexts.DailyBusinessStatistics
@@ -393,13 +393,9 @@ const Header = () => {
             order: { lg: 8, md: 8, sm: 4, xl: 8, xs: 4, xxl: 8 }
         },
         {
-            element: <InputHidden/>,
+            element: buttonToExportDailyBusinessStatistics,
             order: { lg: 7, md: 7, sm: 6, xl: 7, xs: 6, xxl: 7 }
         },
-        // {
-        //     element: buttonToExportDailyBusinessStatistics,
-        //     order: { lg: 7, md: 7, sm: 6, xl: 7, xs: 6, xxl: 7 }
-        // },
         {
             element: rangePickerToCalculateProfit,
             order: { lg: 9, md: 9, sm: 10, xl: 9, xs: 10, xxl: 9 }

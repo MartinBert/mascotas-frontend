@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button, Col, Row, Select } from 'antd'
 import helpers from '../helpers'
 import { errorAlert } from './alerts'
+const { localFormat } = helpers.dateHelper
 const { generateExcel } = helpers.excel
 const { createProductsCataloguePdf } = helpers.pdfHelper
 
@@ -22,7 +23,9 @@ const pdf = { label: 'PDF', value: 'pdf' }
 const ButtonToExportData = (props) => {
     const {
         dispatch,
-        exportData
+        documentName,
+        exportData,
+        sheetName
     } = props
 
     const totalExportOptions = allExportOptions.concat(
@@ -46,23 +49,24 @@ const ButtonToExportData = (props) => {
 
     // ------------------ Button to export ------------------ //
     const exportExcel = async () => {
-        // const headers = generateHeaders()
-        // const lines = await formatLines(headers)
-        // const nameOfDocument = 'Lista de productos'
-        // const nameOfSheet = 'Hoja de productos'
-        // const result = await generateExcel(headers, lines, nameOfSheet, nameOfDocument)
-        // return { isCreated: result.isCreated, docType: 'excel' }
+        const headers = exportData.map(dataItem => dataItem.header)
+        const lines = exportData.map(dataItem => dataItem.element)
+        const nameOfDocument = documentName ?? `datos_exportados_${localFormat(new Date())}`
+        const nameOfSheet = sheetName ?? `Datos exportados, fecha: ${localFormat(new Date())}`
+        const result = await generateExcel(headers, lines, nameOfSheet, nameOfDocument)
+        return { isCreated: result.isCreated, docType: 'excel' }
     }
 
     const exportPdf = async () => {
-        // const brands = products_state.exportProductList.brandsForSelect.selectedBrandsNames.map(brand => brand.value)
-        // const enterprise = auth_state.user.empresa
-        // const headers = generateHeaders()
-        // const renglones = await formatLines(headers)
-        // const salesArea = salesAreas_state.selectedSalesAreaName.value
-        // const types = products_state.exportProductList.typesForSelect.selectedTypesNames.map(type => type.value)
-        // const data = { brands, enterprise, headers, renglones, salesArea, types }
-        // const result = await createProductsCataloguePdf(data)
+        return { isCreated: false, docType: 'pdf' }
+        // CREAR TEMPLATE GENERICO PARA PODER EXPORTAR EN PDF
+
+        // const headers = exportData.map(dataItem => dataItem.header)
+        // const lines = exportData.map(dataItem => dataItem.element)
+        // const nameOfDocument = documentName ?? `datos_exportados_${localFormat(new Date())}`
+        // const nameOfSheet = sheetName ?? `Datos exportados, fecha: ${localFormat(new Date())}`
+        // const data = { headers, lines, nameOfDocument, nameOfSheet }
+        // const result = await createGenericPdfTemplate(data)
         // return { isCreated: result.isCreated, docType: 'pdf' }
     }
 
