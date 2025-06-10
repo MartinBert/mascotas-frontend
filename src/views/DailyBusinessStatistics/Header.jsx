@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 // Custom Components
 import components from '../../components'
 import { errorAlert } from '../../components/alerts'
+import InputHidden from '../../components/generics/InputHidden'
 
 // Custom Contexts
 import contexts from '../../contexts'
@@ -393,7 +394,8 @@ const Header = () => {
             order: { lg: 8, md: 8, sm: 4, xl: 8, xs: 4, xxl: 8 }
         },
         {
-            element: buttonToExportDailyBusinessStatistics,
+            // element: buttonToExportDailyBusinessStatistics,
+            element: <InputHidden />,
             order: { lg: 7, md: 7, sm: 6, xl: 7, xs: 6, xxl: 7 }
         },
         {
