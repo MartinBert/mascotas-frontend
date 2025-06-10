@@ -115,11 +115,13 @@ const FinalizeSaleModal = () => {
         for (const lineOfProduct of productsToApplyModification) {
             const findProductToEdit = await api.products.findById(lineOfProduct.productId)
             const productToEdit = findProductToEdit.data
-            const productToModifyInStock = {
-                fractionedQuantity: round(lineOfProduct.cantidadUnidadesFraccionadas),
-                product: productToEdit
-            }
-            if (productToModifyInStock) {
+            if (productToEdit) {
+                const productToModifyInStock = { product: productToEdit }
+                if (lineOfProduct.fraccionar) {
+                    productToModifyInStock.fractionedQuantity = round(lineOfProduct.cantidadUnidadesFraccionadas)
+                } else {
+                    productToModifyInStock.quantity = round(lineOfProduct.cantidadUnidades)
+                }
                 const response = await api.products.modifyStock(productToModifyInStock)
                 if (response.code !== 200) errorAlert(`No se pudo modificar el stock del producto "${lineOfProduct.nombre}". Modifíquelo manualmente en la sección "Productos" / "Editar".`)
             }
