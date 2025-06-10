@@ -30,10 +30,6 @@ const { useRenderConditionsContext } = contexts.RenderConditions
 const { DeleteModal } = generics
 const { Delete, Details, Edit } = icons
 
-const findOutput = async (outputID) => {
-    const findOutput = await api.outputs.findById(outputID)
-    return findOutput.data
-}
 
 const fixDailyBusinessStatistics = async (outputToDelete) => {
     const filters = JSON.stringify({ concept: 'Generado automáticamente', dateString: outputToDelete.fechaString.substring(0, 10) })
@@ -129,7 +125,7 @@ const Salidas = () => {
         )
         if (validation === 'FAIL') return
         deleteModal_dispatch({ type: 'SET_LOADING', payload: true })
-        const findOutputToDelete = await findOutput(deleteModal_state.entityID)
+        const findOutputToDelete = await api.outputs.findById(deleteModal_state.entityID)
         if (findOutputToDelete.status !== 'OK') return errorAlert('Fallo al corregir stock. Intente de nuevo.')
         fixDailyBusinessStatistics(findOutputToDelete.data)
         fixStock(findOutputToDelete.data)

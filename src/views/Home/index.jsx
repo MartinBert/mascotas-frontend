@@ -674,9 +674,12 @@ const Home = () => {
     // ------------------------------- Button to test service -------------------------------- //
     const testService = async () => {
         home_dispatch({ type: 'SET_LOADING', payload: true })
-        const findRecord = await api.sales.findLastVoucherNumber('000')
-        console.log(findRecord)
-        
+
+        const filters = JSON.stringify({ nombre: 'POLAR SOFT Y CORDERITO T4' })
+        const findRecord = await api.products.findAllByFilters(filters)
+        const data = findRecord.data.docs
+        console.log(data)
+
         home_dispatch({ type: 'SET_LOADING', payload: true })
     }
 

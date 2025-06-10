@@ -303,11 +303,24 @@ const SalidasForm = () => {
         for (let product of outputs_state.params.productos) {
             const productOfOutputToEdit = outputToEdit.productos.find(el => el._id === product._id)
             if (productOfOutputToEdit && productOfOutputToEdit.cantidadesSalientes !== product.cantidadesSalientes) {
-                const findProductToModifyStock = await api.products.findById(product._id)
-                const productToModifyStock = findProductToModifyStock.data
-                productToModifyStock.cantidadStock += productOfOutputToEdit.cantidadesSalientes
-                productToModifyStock.cantidadStock -= parseFloat(product.cantidadesSalientes)
-                await api.products.edit(productToModifyStock)
+                const removeWrongStockResponse = await api.products.modifyStock({
+                    product,
+                    isIncrement: true,
+                    quantity: round(productOfOutputToEdit.cantidadesSalientes)
+                })
+                if (removeWrongStockResponse.status !== 'OK') {
+                    errorAlert('No se pudo remover el stock erróneo. Intente de nuevo.')
+                } else {
+                    const setCorrectedStockResponse = await api.products.modifyStock({
+                        product,
+                        isIncrement: false,
+                        quantity: round(product.cantidadesSalientes)
+                    })
+                    if (setCorrectedStockResponse.status !== 'OK') {
+                        errorAlert('No se pudo guardar el stock corregido. Modifíquelo editando el producto.')
+                    }
+                }
+
             } else {
                 await api.products.modifyStock({
                     product,

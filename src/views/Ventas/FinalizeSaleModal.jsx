@@ -116,16 +116,8 @@ const FinalizeSaleModal = () => {
             const findProductToEdit = await api.products.findById(lineOfProduct.productId)
             const productToEdit = findProductToEdit.data
             const productToModifyInStock = {
-                product: productToEdit,
-                [
-                    lineOfProduct.fraccionar
-                        ? 'fractionedQuantity'
-                        : 'quantity'
-                ]: round(
-                    lineOfProduct.fraccionar
-                        ? lineOfProduct.cantidadUnidadesFraccionadas
-                        : lineOfProduct.cantidadUnidades
-                )
+                fractionedQuantity: round(lineOfProduct.cantidadUnidadesFraccionadas),
+                product: productToEdit
             }
             if (productToModifyInStock) {
                 const response = await api.products.modifyStock(productToModifyInStock)
